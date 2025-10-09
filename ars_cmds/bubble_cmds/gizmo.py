@@ -8,21 +8,19 @@ def BBL_GIZMO_MOVE(self, position):
     config = ContextMenuConfig()
 
 
-    options_list = [ICON_GIZMO_QICK, ICON_GIZMO_MOVE_3D, ICON_GIZMO_SCALE, ICON_GIZMO_ROTATE_3D, ICON_GIZMO_DRAG]
+    options_list = [ICON_GIZMO_MOVE_3D, ICON_GIZMO_SCALE, ICON_GIZMO_ROTATE_3D, ICON_GIZMO_DRAG]
 
     config.callbackL = {
 
 
-        ICON_GIZMO_QICK:      lambda:(self.viewport.controller.set_handles(['f'])),
         ICON_GIZMO_MOVE_3D:   lambda:(self.viewport.controller.set_handles(['t'])),
         ICON_GIZMO_SCALE:     lambda:(self.viewport.controller.set_handles(['s'])),
         ICON_GIZMO_ROTATE_3D: lambda:(self.viewport.controller.set_handles(['r'])),
-        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['tx', 'ty', 'tz', 'rxy', 'ryz', 'rzx'])),
+        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['txy'])),
     }
 
 
     config.toggle_values = {
-    ICON_GIZMO_QICK:      (0,5,0),
     ICON_GIZMO_MOVE_3D:   (0,1,self.viewport.controller.get_visibility("move")),
     ICON_GIZMO_SCALE:     (0,1,self.viewport.controller.get_visibility("scale")),
     ICON_GIZMO_ROTATE_3D: (0,1,self.viewport.controller.get_visibility("rotate")),
@@ -32,7 +30,6 @@ def BBL_GIZMO_MOVE(self, position):
     config.toggle_groups = [options_list]
 
     config.hotkey_items = {
-        ICON_GIZMO_QICK:      "Q",
         ICON_GIZMO_MOVE_3D:   "W",
         ICON_GIZMO_SCALE:     "E",
         ICON_GIZMO_ROTATE_3D: "R",
@@ -40,7 +37,6 @@ def BBL_GIZMO_MOVE(self, position):
 
 
     config.additional_texts = {
-        ICON_GIZMO_QICK: "Quick",
         ICON_GIZMO_MOVE_3D: "Move",
         ICON_GIZMO_ROTATE_3D: "Rotate",
         ICON_GIZMO_SCALE: "Scale",

@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, QWidget, QFileDialog, QGraphicsRectItem, QGraphicsItem
 )
 from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainter, QBrush, QAction, QShowEvent
-from PyQt6.QtCore import Qt, QRectF, QPointF, QLineF
+from PyQt6.QtCore import Qt, QRectF, QPointF
 
 class ViewportRectItem(QGraphicsRectItem):
     def __init__(self, minimap_view):
@@ -301,7 +301,7 @@ class ImageViewerWidget(QWidget):
             padding = 500.0
             self.scene.setSceneRect(-padding - pixmap.width() / 2, -padding - pixmap.height() / 2, pixmap.width() + 2 * padding, pixmap.height() + 2 * padding)
             self.view.image_rect = item.sceneBoundingRect()
-            #self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
+            self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
             self.view._user_interacted = False  # Reset flag on new load
 
             if self.view.minimap:
@@ -324,7 +324,7 @@ class ImageViewerWidget(QWidget):
         super().resizeEvent(event)
         if self.view.image_rect and not self.view._user_interacted:
             # Auto-refit if no interaction (e.g., after resize)
-            #self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
+            self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
             if self.view.minimap:
                 self.view.minimap.update_viewport_rect()
         self.position_minimap()
@@ -335,6 +335,6 @@ class ImageViewerWidget(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     widget = ImageViewerWidget()
-    widget.open_image()  # Optional: auto-open dialog
+    widget.open_image()
     widget.show()
     sys.exit(app.exec())
