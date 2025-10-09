@@ -1,0 +1,86 @@
+QWidget#hierarchyWidget, QWidget#appOptionsWidget, QTreeWidget {
+    background-color: transparent;
+    color: #E0E0E0;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 18px;
+    border: none;
+}
+
+QTreeWidget, QListWidget#optionsList {
+    background-color: transparent;
+    border-radius: 10px;
+    alternate-background-color: #404040;
+}
+
+QTreeWidget::item, QListWidget#optionsList::item {
+    height: 20px;
+    padding: 4px;
+    color: #E0E0E0;
+    background-color: rgba(60, 60, 60, 180);
+    border-radius: 6px;
+    margin: 2px;
+}
+
+QTreeWidget::item:hover, QListWidget#optionsList::item:hover {
+    background-color: rgba(80, 80, 80, 200);
+}
+
+QTreeWidget::item:selected, QListWidget#optionsList::item:selected {
+    background-color: rgba(130, 130, 130, 220);
+    border: 1px solid #AAAAAA;
+}
+
+QTreeWidget::item:selected:hover, QListWidget#optionsList::item:selected:hover {
+    background-color: rgba(160, 160, 160, 240);
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url("theme/StyleSheets/1.png");
+    background-color: transparent;
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings {
+    border-image: none;
+    image: url("theme/StyleSheets/2.png");
+    background-color: transparent;
+}
+
+QPushButton#minimizeButton, QPushButton#optionsButton {
+    background-color: #505050;
+    color: white;
+    border-radius: 25px;
+    padding: 5px;
+    font-size: 12px;
+    width: 40px;
+    height: 40px;
+}
+
+QPushButton#minimizeButton:hover, QPushButton#optionsButton:hover {
+    background-color: #999999;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 6px;
+    margin: 0px;
+    border-radius: 3px;
+}
+
+QScrollBar::handle:vertical {
+    background: rgba(150, 150, 150, 120);
+    min-height: 20px;
+    border-radius: 3px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: rgba(150, 150, 150, 200);
+}
+
+QScrollBar::add-line, QScrollBar::sub-line,
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+    height: 0px;
+}

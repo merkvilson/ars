@@ -1,0 +1,79 @@
+{
+    "bubbles": [
+        {
+            "symbol": "\ue926",
+            "grid_x": 10,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue94a",
+            "grid_x": 12,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue90a",
+            "grid_x": 18,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue910",
+            "grid_x": 14,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue97e",
+            "grid_x": 13,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue975",
+            "grid_x": 3,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue92e",
+            "grid_x": 5,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue946",
+            "grid_x": 0,
+            "grid_y": 3
+        },
+        {
+            "symbol": "\ue940",
+            "grid_x": 20,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue96e",
+            "grid_x": 0,
+            "grid_y": 1
+        },
+        {
+            "symbol": "\ue97b",
+            "grid_x": 6,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue96a",
+            "grid_x": 19,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue972",
+            "grid_x": 0,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue91a",
+            "grid_x": 7,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue94c",
+            "grid_x": 0,
+            "grid_y": 2
+        }
+    ]
+}

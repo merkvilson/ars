@@ -1,0 +1,1 @@
+#MMB should switch to TurnableCamera during pressing and back to FlyCamera
