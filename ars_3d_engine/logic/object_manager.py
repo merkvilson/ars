@@ -41,7 +41,7 @@ class CObjectManager(QObject):
         self.object_added.emit(index, obj)
         # Immediately deselect current selection
         self.set_selection_state([], None)
-        # Schedule new object selection after 200ms delay
+        # Schedule new object selection after 250ms delay
         QTimer.singleShot(250, lambda: self.set_selection_state([index], index))
         
 

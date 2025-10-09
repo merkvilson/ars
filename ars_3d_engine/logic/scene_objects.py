@@ -124,6 +124,29 @@ class IObject3D(ABC):
             
             self._rotation_visual.color = new_color
 
+    def get_color(self) -> tuple:
+        """Get the current color of the visual. Returns a tuple (r, g, b, a) with values 0-1."""
+        if hasattr(self._rotation_visual, 'color'):
+            color = self._rotation_visual.color
+            if isinstance(color, np.ndarray):
+                return tuple(color)
+            return color
+        return (1.0, 1.0, 1.0, 1.0)
+
+    def get_alpha(self) -> float:
+        """Get the current alpha (transparency) value. Returns a value 0-1."""
+        if hasattr(self._rotation_visual, 'color'):
+            color = self._rotation_visual.color
+            if isinstance(color, np.ndarray):
+                color = tuple(color)
+            
+            # Handle both 3-component and 4-component colors
+            if len(color) == 4:
+                return color[3]
+            else:
+                return 1.0
+        return 1.0
+
     #Don't remove
     #Don't remove
     #Don't remove
