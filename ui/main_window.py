@@ -123,7 +123,6 @@ class MainWindow(QMainWindow):
     def dropEvent(self, event):
         dd_drop(self, event)
 
-
     def closeEvent(self, event):
         if not self._closing:
             event.ignore()
