@@ -69,6 +69,61 @@ class IObject3D(ABC):
         tr = transforms.MatrixTransform()
         tr.translate((float(x), float(y), float(z)))
         self._node.transform = tr
+
+    def set_color(self, color: tuple) -> None:
+        """Set the color of the visual. Color should be a tuple (r, g, b) or (r, g, b, a) with values 0-1."""
+        if hasattr(self._rotation_visual, 'color'):
+            self._rotation_visual.color = color
+
+    def set_scale(self, scale: tuple) -> None:
+        """Set the scale of the object. Scale can be a single float or tuple (sx, sy, sz)."""
+        if isinstance(scale, (int, float)):
+            scale = (scale, scale, scale)
+        
+        current_matrix = self._rotation_visual.transform.matrix.copy()
+        
+        # Get the current rotation by normalizing the basis vectors
+        sx_old = np.linalg.norm(current_matrix[0, :3])
+        sy_old = np.linalg.norm(current_matrix[1, :3])
+        sz_old = np.linalg.norm(current_matrix[2, :3])
+        
+        if sx_old < 1e-8: sx_old = 1e-8
+        if sy_old < 1e-8: sy_old = 1e-8
+        if sz_old < 1e-8: sz_old = 1e-8
+        
+        # Extract pure rotation
+        rot_matrix = current_matrix[:3, :3].copy()
+        rot_matrix[0, :] /= sx_old
+        rot_matrix[1, :] /= sy_old
+        rot_matrix[2, :] /= sz_old
+        
+        # Apply new scale
+        S = np.eye(4, dtype=float)
+        S[0, 0] = scale[0]
+        S[1, 1] = scale[1]
+        S[2, 2] = scale[2]
+        
+        R = np.eye(4, dtype=float)
+        R[:3, :3] = rot_matrix
+        
+        new_matrix = (S @ R).astype(np.float32)
+        self._rotation_visual.transform.matrix = new_matrix
+
+    def set_alpha(self, alpha: float) -> None:
+        """Set the alpha (transparency) value. Alpha should be a value 0-1."""
+        if hasattr(self._rotation_visual, 'color'):
+            current_color = self._rotation_visual.color
+            if isinstance(current_color, np.ndarray):
+                current_color = tuple(current_color)
+            
+            # Handle both 3-component and 4-component colors
+            if len(current_color) == 3:
+                new_color = (current_color[0], current_color[1], current_color[2], alpha)
+            else:
+                new_color = (current_color[0], current_color[1], current_color[2], alpha)
+            
+            self._rotation_visual.color = new_color
+
     #Don't remove
     #Don't remove
     #Don't remove

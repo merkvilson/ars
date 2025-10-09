@@ -2,9 +2,8 @@
 
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts.font_icons import *
-from PyQt6.QtGui import  QColor
-from core.cursor_modifier import show_cursor
-from ..render_cmds.render_pass import save_depth
+
+
 def BBL_OBJ_BOX(self, position):
     config = ContextMenuConfig()
     config.auto_close = False
@@ -12,18 +11,22 @@ def BBL_OBJ_BOX(self, position):
 
     options_list = [ "1", "2", "A","B","C"]
 
-    config.callbackL = {"A":lambda:show_cursor(False) , "B":lambda:show_cursor(True), "C": lambda: save_depth(self.viewport)}
+    def test_function(self, value):
+        obj = self.viewport._objectManager.get_selected_objects()[0]
+        obj.set_color((value,0,value))
+
+    def test_function2(self, value):
+        obj = self.viewport._objectManager.get_selected_objects()[0]
+        obj.set_scale((value,value,value))
+
+    config.callbackL = {"1": lambda value: test_function(self,value/100),
+                        "2": lambda value: test_function2(self,value/100),
+                        }
 
     config.slider_values = {
-    "1":(0,1000,300),
-    "2":(0,1000,300),
+    "1":(0,100,0),
+    "2":(0,1000,1)
     }
-
-    config.incremental_values = {
-    "1": 10,
-    }
-
-    config.slider_color = {"1": QColor(0,0,0,0)}
 
     ctx = open_context(
         parent=self.central_widget,

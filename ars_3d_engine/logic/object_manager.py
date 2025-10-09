@@ -25,21 +25,13 @@ class CObjectManager(QObject):
         self._selected_indices: List[int] = []
         self._selected_set: set[int] = set()
 
+    #used by camera
     def update_lights(self, light_dir):
             """Update light direction across all objects' shading filters."""
             for obj in self._objects:
                 if hasattr(obj, 'update_light_dir'):
                     obj.update_light_dir(light_dir)
 
-
-    # def add_object(self, obj: IObject3D) -> None:
-    #     index = len(self._objects)
-    #     self._objects.append(obj)
-    #     obj.visual.parent = self._view.scene
-    #     self._picking.register_visual(index=index, visual=obj.visual)
-    #     if len(self._objects) == 1:
-    #         self.set_active(index)
-    #     self.object_added.emit(index, obj)
 
     def add_object(self, obj: IObject3D) -> None:
         index = len(self._objects)
