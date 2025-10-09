@@ -10,11 +10,11 @@ from .logic.picking_manager import CPickingManager
 from .logic.object_manager import CObjectManager
 from vispy.scene import transforms
 from .fps_counter import FPSCounter
-from common.ars_debug import DEBUG_MODE as DBG
 from .gizmo.gizmo import *
 import transforms3d.quaternions as tq
 from scipy.spatial.transform import Rotation as ScipyRotation
-
+from ars_cmds import bubble_cmds
+from PyQt6.QtCore import QPoint
 
 class ViewportWidget(QWidget):
     def __init__(self, parent=None,):
@@ -213,7 +213,6 @@ class ViewportWidget(QWidget):
         self._canvas.native.setStyleSheet("border: none;")
 
         self._canvas.events.mouse_press.connect(self._on_mouse_press)
-        self._canvas.events.mouse_release.connect(self._on_mouse_release)
         self._canvas.native.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
         #self.loc_r_gizmo_node = gizmo_node
@@ -239,9 +238,6 @@ class ViewportWidget(QWidget):
             def on_camera_transform_change(event):
                 update_lights()
 
-    def add_object(self, obj):
-        self._objectManager.add_object(obj)
-        self._canvas.update()
 
     def remove_object_at(self, index: int):
         obj = self._objectManager.remove_object_at(index)
@@ -260,6 +256,11 @@ class ViewportWidget(QWidget):
             self.controller.handle_mouse_press(event)
             if event.handled:
                 return  # If the gizmo was clicked, do nothing else.
+
+
+        if event.button == 2:
+            bubble_cmds.BBL_OBJ_BOX(self.window(), QPoint(int(event.pos[0]), int(event.pos[1])))
+
 
         # If the gizmo didn't handle it, proceed with object picking ONLY for left-clicks.
         if event.button != 1:
@@ -293,12 +294,7 @@ class ViewportWidget(QWidget):
             positions = [obj.position() for obj in selected]
             center = np.mean(positions, axis=0)
         self._canvas.update()
-    # ===================================================================
-    # END OF MODIFIED SECTION
-    # ===================================================================
 
-    def _on_mouse_release(self, event):
-        if DBG: print("[_on_mouse_release] :  ")
 
     def _update_grid(self):
         cam_pos = self._view.camera.center
