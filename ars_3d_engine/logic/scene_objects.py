@@ -32,9 +32,10 @@ class IObject3D(ABC):
         # Attach shading filter for directional light
         self.shading_filter = None
         if hasattr(self._rotation_visual, 'mesh_data') and self._rotation_visual.mesh_data is not None:
-            self.shading_filter = ShadingFilter(shading='phong', shininess=50, light_dir=(0, -1, -1))
+            self.shading_filter = ShadingFilter(shading='smooth', shininess=50, light_dir=(0, -1, -1))
             #self.shading_filter.ambient_light = (0.2, 0.2, 0.2)
             self._rotation_visual.attach(self.shading_filter)
+            self._rotation_visual.update()
 
         self._update_gl_state()
 
@@ -42,6 +43,28 @@ class IObject3D(ABC):
         """Update the light direction for the shading filter (in view space)."""
         if self.shading_filter is not None:
             self.shading_filter.light_dir = np.array(light_dir, dtype=float)
+
+    def set_shading(self, shading_type: str) -> None:
+        """Set the shading type for the visual. Valid options: None, 'flat', 'smooth'."""
+        if self.shading_filter is None:
+            if shading_type is None:
+                return  # No shading filter exists, and None requested
+            else:
+                # Create and attach shading filter if it doesn't exist and shading is requested
+                if hasattr(self._rotation_visual, 'mesh_data') and self._rotation_visual.mesh_data is not None:
+                    self.shading_filter = ShadingFilter(shading=shading_type, shininess=50, light_dir=(0, -1, -1))
+                    self._rotation_visual.attach(self.shading_filter)
+                    self._rotation_visual.update()
+                else:
+                    return  # Cannot apply shading without mesh_data
+        self.shading_filter.shading = shading_type
+        self._rotation_visual.update()
+
+    def get_shading(self) -> str:
+        """Get the current shading type. Returns None if no shading filter is attached."""
+        if self.shading_filter is None:
+            return None
+        return self.shading_filter.shading
 
     @property
     def visual(self):
@@ -176,7 +199,7 @@ class CMesh(IObject3D):
     @classmethod
     def create(cls,file_path: str,color=DEFAULT_OBJ_COLOR,translate=(0.0, 0.0, 0.0),name="Mesh"):
         vertices, faces, normals, _ = read_mesh(file_path)
-        v = scene.visuals.Mesh(vertices=vertices, faces=faces, color=color, shading="None")
+        v = scene.visuals.Mesh(vertices=vertices, faces=faces, color=color, shading=None)
         obj = cls(v, name=name)
         obj.set_position(translate[0], translate[1], translate[2])
         return obj

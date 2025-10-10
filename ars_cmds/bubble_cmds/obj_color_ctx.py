@@ -152,7 +152,7 @@ def BBL_OBJ_BOX(self, position):
     config.auto_close = False
     config.show_value = True
 
-    options_list = ["H", "S", "V", "A", "X"]
+    options_list = ["H", "S", "V", "A", "W","X", "Y", "Z"]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -216,7 +216,11 @@ def BBL_OBJ_BOX(self, position):
         "S": make_callback("s"),
         "V": make_callback("v"),
         "A": make_callback("a"),
-       # "X": lambda: obj.set_shading("none"),
+        "W": lambda: obj.set_wireframe(not obj.get_wireframe()),
+        "X": lambda: obj.set_shading(None),
+        "Y": lambda: obj.set_shading('flat'),
+        "Z": lambda: obj.set_shading('smooth'),
+
     }
 
     # slider_values expects (min, max, current)
