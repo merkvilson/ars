@@ -15,13 +15,16 @@ def save_depth(self, filename: str = 'depth.png', invert: bool = True, x: int = 
     
     # Temporarily hide the grid for clean render (restore after)
     original_grid_visible = self.grid.visible
+    original_gizmo_visible = self.gizmo_node.visible
     self.grid.visible = False
+    self.gizmo_node.visible = False
     
     # Force a full render to populate the depth buffer (without crop)
     self._canvas.render()
     
     # Restore grid visibility
     self.grid.visible = original_grid_visible
+    self.gizmo_node.visible = original_gizmo_visible
     
     # Force scene update if needed
     self._canvas.update()
@@ -74,15 +77,19 @@ def save_render(self, filename: str = 'render.png', x: int = 512, y: int = 512) 
     picking = self._objectManager.picking()
     picking._set_enabled(False)
     
-    # Temporarily hide the grid for clean render
+    # Temporarily hide for clean render
     original_grid_visible = self.grid.visible
+    original_gizmo_visible = self.gizmo_node.visible
     self.grid.visible = False
+    self.gizmo_node.visible = False
     
     # Force a full render to populate the color buffer
     self._canvas.render()
     
-    # Restore grid visibility
+    # Restore visibility
     self.grid.visible = original_grid_visible
+    self.gizmo_node.visible = original_gizmo_visible
+
     
     # Force scene update if needed
     self._canvas.update()

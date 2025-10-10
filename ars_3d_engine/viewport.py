@@ -43,6 +43,8 @@ class ViewportWidget(QWidget):
         gizmo_node.order = 100  # Higher than default 0 for objects, so drawn last/on top
         gizmo_node.transform = transforms.MatrixTransform()
 
+        self.gizmo_node = gizmo_node
+
         rot = Rotation()
         renderer = GizmoRenderer(parent_node=gizmo_node, base_thickness=0.06, segments=96, parent_view=self._view)
         controller = GizmoController(view=self._view, canvas=self._canvas, renderer=renderer, rotation=rot)
