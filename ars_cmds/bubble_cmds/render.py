@@ -9,7 +9,7 @@ import json
 import requests
 
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
-from ars_cmds.render_cmds.render_pass import save_depth, save_render
+from ars_cmds.render_cmds.render_pass import save_depth, save_render 
 from ars_cmds.core_cmds.key_check import key_check
 from prefs.pref_controller import get_path
 
@@ -181,6 +181,7 @@ def BBL_RENDER(self, position):
             connect_websocket(),
             save_depth(self.viewport),
             save_render(self.viewport),
+
             self.render_manager.send_render(),
             start_polling(),
             queue_timer.start(500)
