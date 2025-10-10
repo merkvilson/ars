@@ -36,6 +36,7 @@ class IObject3D(ABC):
             #self.shading_filter.ambient_light = (0.2, 0.2, 0.2)
             self._rotation_visual.attach(self.shading_filter)
 
+        self._update_gl_state()
 
     def update_light_dir(self, light_dir):
         """Update the light direction for the shading filter (in view space)."""
@@ -74,6 +75,7 @@ class IObject3D(ABC):
         """Set the color of the visual. Color should be a tuple (r, g, b) or (r, g, b, a) with values 0-1."""
         if hasattr(self._rotation_visual, 'color'):
             self._rotation_visual.color = color
+        self._update_gl_state()
 
     def set_scale(self, scale: tuple) -> None:
         """Set the scale of the object. Scale can be a single float or tuple (sx, sy, sz)."""
@@ -111,41 +113,43 @@ class IObject3D(ABC):
 
     def set_alpha(self, alpha: float) -> None:
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
-        if hasattr(self._rotation_visual, 'color'):
-            current_color = self._rotation_visual.color
-            if isinstance(current_color, np.ndarray):
-                current_color = tuple(current_color)
-            
-            # Handle both 3-component and 4-component colors
-            if len(current_color) == 3:
-                new_color = (current_color[0], current_color[1], current_color[2], alpha)
-            else:
-                new_color = (current_color[0], current_color[1], current_color[2], alpha)
-            
-            self._rotation_visual.color = new_color
+        current_color = self.get_color()
+        new_color = (current_color[0], current_color[1], current_color[2], alpha)
+        self.set_color(new_color)
 
     def get_color(self) -> tuple:
         """Get the current color of the visual. Returns a tuple (r, g, b, a) with values 0-1."""
         if hasattr(self._rotation_visual, 'color'):
             color = self._rotation_visual.color
-            if isinstance(color, np.ndarray):
-                return tuple(color)
-            return color
+            try:
+                # If it's a Vispy Color object
+                if hasattr(color, 'rgba'):
+                    return tuple(color.rgba)
+                elif isinstance(color, np.ndarray):
+                    color = color.flatten()
+                    if color.size == 3:
+                        return (float(color[0]), float(color[1]), float(color[2]), 1.0)
+                    elif color.size >= 4:
+                        return (float(color[0]), float(color[1]), float(color[2]), float(color[3]))
+                elif isinstance(color, (tuple, list)):
+                    if len(color) == 3:
+                        return (float(color[0]), float(color[1]), float(color[2]), 1.0)
+                    elif len(color) >= 4:
+                        return (float(color[0]), float(color[1]), float(color[2]), float(color[3]))
+            except Exception:
+                pass
         return (1.0, 1.0, 1.0, 1.0)
 
     def get_alpha(self) -> float:
         """Get the current alpha (transparency) value. Returns a value 0-1."""
-        if hasattr(self._rotation_visual, 'color'):
-            color = self._rotation_visual.color
-            if isinstance(color, np.ndarray):
-                color = tuple(color)
-            
-            # Handle both 3-component and 4-component colors
-            if len(color) == 4:
-                return color[3]
-            else:
-                return 1.0
-        return 1.0
+        return self.get_color()[3]
+
+    def _update_gl_state(self):
+        alpha = self.get_alpha()
+        if alpha < 1.0:
+            self._rotation_visual.set_gl_state(preset='translucent', cull_face=True)
+        else:
+            self._rotation_visual.set_gl_state(preset='opaque')
 
     #Don't remove
     #Don't remove
@@ -172,7 +176,7 @@ class CMesh(IObject3D):
     @classmethod
     def create(cls,file_path: str,color=DEFAULT_OBJ_COLOR,translate=(0.0, 0.0, 0.0),name="Mesh"):
         vertices, faces, normals, _ = read_mesh(file_path)
-        v = scene.visuals.Mesh(vertices=vertices, faces=faces, color=color, shading=None)
+        v = scene.visuals.Mesh(vertices=vertices, faces=faces, color=color, shading="None")
         obj = cls(v, name=name)
         obj.set_position(translate[0], translate[1], translate[2])
         return obj

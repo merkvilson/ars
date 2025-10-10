@@ -1,5 +1,3 @@
-# TODO: Fix hotkey toggle
-
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts.font_icons import *
 import numpy as np
@@ -154,7 +152,7 @@ def BBL_OBJ_BOX(self, position):
     config.auto_close = False
     config.show_value = True
 
-    options_list = ["H", "S", "V"]
+    options_list = ["H", "S", "V", "A", "X"]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -163,7 +161,8 @@ def BBL_OBJ_BOX(self, position):
 
     # get current color in rgba float [0..1]
     try:
-        h, s, v, a = rgb_to_hsv(obj.get_color())
+        h, s, v, _ = rgb_to_hsv(obj.get_color())
+        a = obj.get_alpha()
     except Exception as e:
         # debug fallback: print type and repr so you can iterate if other cases appear
         c = obj.get_color()
@@ -181,6 +180,7 @@ def BBL_OBJ_BOX(self, position):
     h_pct = color_state["h"] * 100.0
     s_pct = color_state["s"] * 100.0
     v_pct = color_state["v"] * 100.0
+    a_pct = color_state["a"] * 100.0
 
     # callback factory: updates color_state and sets the object's color
     def make_callback(component):
@@ -195,28 +195,28 @@ def BBL_OBJ_BOX(self, position):
             color_state[component] = val / 100.0
 
             # convert HSV (0..1) -> RGB
-            r, g, b, alpha = hsv_to_rgb(color_state["h"], color_state["s"], color_state["v"], color_state["a"])
+            r, g, b, _ = hsv_to_rgb(color_state["h"], color_state["s"], color_state["v"])
+            alpha = color_state["a"]
 
             # try to set the color on the object (vispy Color preferred)
             try:
+                new_color = (float(r), float(g), float(b))
                 if VispyColor is not None:
-                    obj.set_color(VispyColor((float(r), float(g), float(b), float(alpha))))
-                else:
-                    obj.set_color((float(r), float(g), float(b), float(alpha)))
-            except Exception:
-                # fallback: try tuple
-                try:
-                    obj.set_color((float(r), float(g), float(b), float(alpha)))
-                except Exception as e:
-                    print("Failed to set object color:", e)
+                    new_color = VispyColor(new_color)
+                obj.set_color(new_color)
+                obj.set_alpha(float(alpha))
+            except Exception as e:
+                print("Failed to set object color or alpha:", e)
 
         return callback
 
-    # attach callbacks for H, S, V
+    # attach callbacks for H, S, V, A
     config.callbackL = {
         "H": make_callback("h"),
         "S": make_callback("s"),
         "V": make_callback("v"),
+        "A": make_callback("a"),
+       # "X": lambda: obj.set_shading("none"),
     }
 
     # slider_values expects (min, max, current)
@@ -224,6 +224,7 @@ def BBL_OBJ_BOX(self, position):
         "H": (0, 100, h_pct),
         "S": (0, 100, s_pct),
         "V": (0, 100, v_pct),
+        "A": (0, 100, a_pct),
     }
 
     ctx = open_context(
