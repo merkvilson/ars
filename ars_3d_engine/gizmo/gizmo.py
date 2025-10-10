@@ -269,8 +269,6 @@ class GizmoRenderer:
                 small_tr.translate(pos)
                 data["small_sphere"].transform = small_tr
 
-    def update_radius(self, new_radius):
-        pass  # No longer used, as positions are snapped to BB
 
 def screen_to_world_ray(view, screen_xy):
     x,y = screen_xy
@@ -393,11 +391,6 @@ class GizmoController:
                 if "small_sphere" in data:
                     data["small_sphere"].parent = None
 
-    def reset(self):    # --- Public API & State Management ---
-        # Assuming the new Rotation class has a reset method or similar
-        self.rotation._rotation = ScipyRotation.identity() 
-        self._object_translation = np.array([0.0, 0.0, 0.0], dtype=float)
-        self.set_scale(np.array([1.0, 1.0, 1.0]))
 
     def set_scale(self, scale, reset_originals=True):
         self._object_scale = scale

@@ -14,7 +14,7 @@ def BBL_GIZMO_MOVE(self, position):
         ICON_GIZMO_MOVE_3D:   lambda:(self.viewport.controller.set_handles(['t'])),
         ICON_GIZMO_SCALE:     lambda:(self.viewport.controller.set_handles(['s'])),
         ICON_GIZMO_ROTATE_3D: lambda:(self.viewport.controller.set_handles(['r'])),
-        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['tzx'])),
+        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['qq'])),
     }
 
 
@@ -31,6 +31,7 @@ def BBL_GIZMO_MOVE(self, position):
         ICON_GIZMO_MOVE_3D:   "W",
         ICON_GIZMO_SCALE:     "E",
         ICON_GIZMO_ROTATE_3D: "R",
+        ICON_GIZMO_DRAG: "Q",
     }
 
 
