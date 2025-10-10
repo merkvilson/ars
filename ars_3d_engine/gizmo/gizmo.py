@@ -374,6 +374,8 @@ class GizmoController:
         for h in handles:
             if h in self._handle_groups:
                 self._enabled_handles.update(self._handle_groups[h])
+            elif h in self.renderer.mesh_nodes:
+                self._enabled_handles.add(h)
         for name, data in self.renderer.mesh_nodes.items():
             if name in self._enabled_handles:
                 data["mesh"].parent = self.renderer.parent

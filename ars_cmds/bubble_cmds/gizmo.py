@@ -1,6 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts.font_icons import *
-from PyQt6.QtGui import QCursor, QColor
 
 
 BBL_GIZMO_MOVE_CONFIG = {"symbol": ICON_GIZMO_MOVE, "hotkey": "Q"}
@@ -12,11 +11,10 @@ def BBL_GIZMO_MOVE(self, position):
 
     config.callbackL = {
 
-
         ICON_GIZMO_MOVE_3D:   lambda:(self.viewport.controller.set_handles(['t'])),
         ICON_GIZMO_SCALE:     lambda:(self.viewport.controller.set_handles(['s'])),
         ICON_GIZMO_ROTATE_3D: lambda:(self.viewport.controller.set_handles(['r'])),
-        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['txy'])),
+        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['tzx'])),
     }
 
 
