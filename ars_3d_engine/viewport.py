@@ -44,7 +44,7 @@ class ViewportWidget(QWidget):
         gizmo_node.transform = transforms.MatrixTransform()
 
         rot = Rotation()
-        renderer = GizmoRenderer(parent_node=gizmo_node, radius=1.45, base_thickness=0.06, segments=96, parent_view=self._view)
+        renderer = GizmoRenderer(parent_node=gizmo_node, base_thickness=0.06, segments=96, parent_view=self._view)
         controller = GizmoController(view=self._view, canvas=self._canvas, renderer=renderer, rotation=rot)
 
         self.controller = controller
@@ -101,13 +101,10 @@ class ViewportWidget(QWidget):
                 controller.set_handles(['t'])  # Or your default mode
 
             else:
-                gizmo_node.visible = False
-                controller.reset() 
-                controller._ring_center = np.array([0.0, 0.0, 0.0], dtype=float)  # Add this to reset hit centers
+                #gizmo_node.visible = False
+               # controller.reset() 
+                #controller._ring_center = np.array([0.0, 0.0, 0.0], dtype=float)  # Add this to reset hit centers
                 controller.set_handles([])  # Add this to skip raycasts entirely when hidden
-
-
-
 
 
         self._objectManager.selection_changed.connect(update_gizmo_visibility_and_position)

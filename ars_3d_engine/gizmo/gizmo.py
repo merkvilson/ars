@@ -391,11 +391,6 @@ class GizmoController:
                 if "small_sphere" in data:
                     data["small_sphere"].parent = None
 
-    def reset(self):    # --- Public API & State Management ---
-        # Assuming the new Rotation class has a reset method or similar
-        self.rotation._rotation = ScipyRotation.identity() 
-        self._object_translation = np.array([0.0, 0.0, 0.0], dtype=float)
-        self.set_scale(np.array([1.0, 1.0, 1.0]))
 
     def set_scale(self, scale, reset_originals=True):
         self._object_scale = scale
