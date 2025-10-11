@@ -70,7 +70,8 @@ class ContextMenuConfig:
         self.image_items = {}
         self.clip_to_shape = True
         self.expand = None  # options: None, "x", "y", "xy"
-        self.custom_widget_items = {}  # Added new option
+        self.custom_widget_items = {}
+        self.inner_widgets = {}
         self.incremental_values = {}
 
     def set_arc_range(self, start_degrees: float, end_degrees: float):
@@ -160,6 +161,7 @@ class ContextButtonWindow(QWidget):
                         "hotkey_text": config.hotkey_items.get(action),
                         "image_path": config.image_items.get(action),
                         "incremental_value": config.incremental_values.get(action),
+                        "inner_widget": config.inner_widgets.get(action),
                     }
                     if action in config.additional_texts:
                         button_config_kwargs["additional_text"] = config.additional_texts[action]

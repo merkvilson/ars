@@ -1,7 +1,11 @@
 from PyQt6.QtWidgets import (
     QGraphicsTextItem,
     QGraphicsObject,
-    QGraphicsRectItem,QGraphicsItem)
+    QGraphicsRectItem,
+    QGraphicsItem,
+    QGraphicsProxyWidget, 
+    QWidget,
+    )
 
 from PyQt6.QtGui import (
     QPainter,
@@ -150,6 +154,7 @@ class BButtonConfig:
     image_path: Optional[str] = None
     clip_to_shape: bool = True
     incremental_value: bool = False
+    inner_widget: Optional[QWidget] = None
 
 
 class BButton(QGraphicsObject):
@@ -220,7 +225,6 @@ class BButton(QGraphicsObject):
 
         if self.use_extended_shape:
             height = (6 * self.radius) if self.image_path else (2 * self.radius)
-            print(self.use_extended_shape)
             if isinstance(self.use_extended_shape, tuple):
                 if self.use_extended_shape[1]: height = 6 * self.radius
                 else: height = 2 * self.radius
@@ -343,6 +347,19 @@ class BButton(QGraphicsObject):
         self.ripple_center = self.boundingRect().center()
         self.ripple_end_radius = max(self._bounding.width(), self._bounding.height()) / 2 * 1.5
         self.ripple_anim_group = None
+
+
+        # Inner Widget (behind slider)
+        self.inner_widget_proxy = None
+        if config.inner_widget:
+            self.inner_widget_proxy = QGraphicsProxyWidget(self)
+            self.inner_widget_proxy.setWidget(config.inner_widget)
+            # Position it to fill the button's bounds
+            widget_rect = self._bounding
+            self.inner_widget_proxy.setPos(widget_rect.topLeft())
+            self.inner_widget_proxy.resize(widget_rect.size())
+            self.inner_widget_proxy.setZValue(-0.5)  # Behind slider (which is at 1.0) but in front of background
+
 
         # Default callbacks
         def default_callback(value=None):

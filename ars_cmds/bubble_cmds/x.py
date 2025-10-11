@@ -4,7 +4,7 @@ from ars_cmds.core_cmds.load_object import add_mesh
 
 def BBL_X(self, position):
     config = ContextMenuConfig()
-    options_list = ["X","Y","Z"]
+    options_list = ["X","Y","Z", "W"]
 
     om = self.viewport._objectManager
 
@@ -18,10 +18,11 @@ def BBL_X(self, position):
         self.viewport._objectManager.duplicate_selected()
         self.viewport._canvas.update()
 
+    config.slider_values = {"Z": (0, 100, 30)}
+
 
     config.callbackL = {
         "X": lambda: clone_obj(),
-
         }
     
     config.additional_texts = {"X": "Clone object",
