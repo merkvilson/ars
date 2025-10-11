@@ -81,6 +81,18 @@ def set_default_cursor(cursor_name: str):
     default_cursor = create_qcursor(cursor_name, bg_color=None, anchor="top_left")
     QApplication.setOverrideCursor(default_cursor)
 
+def set_cursor(cursor_name: str, anchor: str = "top_left"):
+    """Sets the application-wide cursor at any time."""
+    app = QApplication.instance()
+    if not app:
+        print("Warning: QApplication instance not found. Cannot set cursor.")
+        return
+    # Restore existing override if present (assuming it's the previous default)
+    if QApplication.overrideCursor():
+        QApplication.restoreOverrideCursor()
+    new_cursor = create_qcursor(cursor_name, bg_color=None, anchor=anchor)
+    QApplication.setOverrideCursor(new_cursor)
+
 def show_cursor(value: bool = True):
     """Shows or hides the application-wide cursor."""
     app = QApplication.instance()

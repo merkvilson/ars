@@ -3,6 +3,7 @@ from vispy import app, scene
 from vispy.visuals.transforms import MatrixTransform
 from scipy.spatial.transform import Rotation as ScipyRotation 
 from core.sound_manager import play_sound
+from core.cursor_modifier import set_cursor
 
 def normalize(v):
     v = np.asarray(v, dtype=float)
@@ -533,6 +534,7 @@ class GizmoController:
     def handle_mouse_press(self, event):    # --- Main Event Handlers ---
         if event.button not in [1, 2, 3]:  # Allow left, right, and middle click
             return
+        
 
         origin, direction = screen_to_world_ray(self.view, event.pos)
         candidates = self._get_candidates(origin, direction)
@@ -580,6 +582,7 @@ class GizmoController:
         origin, direction = screen_to_world_ray(self.view, event.pos)
 
         if self._dragging:# Call the appropriate helper to handle the drag update
+
             if self._drag_mode == 'rotate': self._handle_drag_rotate(origin, direction)
             elif self._drag_mode == 'translate': self._handle_drag_translate(origin, direction)
             elif self._drag_mode == 'scale': self._handle_drag_scale(origin, direction)
@@ -593,6 +596,9 @@ class GizmoController:
         if self._hover_axis != picked_name:
             if picked_name is not None:
                 play_sound("hover")
+                set_cursor("arrows-move", 'center')
+            else:
+                set_cursor("cursor")
             self._hover_axis = picked_name
             self.renderer.highlight(picked_name)
 
