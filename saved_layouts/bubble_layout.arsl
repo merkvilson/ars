@@ -46,6 +46,11 @@
             "grid_y": 0
         },
         {
+            "symbol": "\ue94c",
+            "grid_x": 0,
+            "grid_y": 2
+        },
+        {
             "symbol": "\ue96e",
             "grid_x": 0,
             "grid_y": 1
@@ -56,13 +61,13 @@
             "grid_y": 0
         },
         {
-            "symbol": "\ue96a",
-            "grid_x": 19,
+            "symbol": "\ue972",
+            "grid_x": 0,
             "grid_y": 0
         },
         {
-            "symbol": "\ue972",
-            "grid_x": 0,
+            "symbol": "\ue96a",
+            "grid_x": 19,
             "grid_y": 0
         },
         {
@@ -71,9 +76,9 @@
             "grid_y": 0
         },
         {
-            "symbol": "\ue94c",
+            "symbol": "X",
             "grid_x": 0,
-            "grid_y": 2
+            "grid_y": 4
         }
     ]
 }

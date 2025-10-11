@@ -4,7 +4,7 @@ from vispy.visuals.transforms import MatrixTransform
 from scipy.spatial.transform import Rotation as ScipyRotation 
 from core.sound_manager import play_sound
 from core.cursor_modifier import set_cursor
-
+from ars_cmds.core_cmds.key_check import key_check
 def normalize(v):
     v = np.asarray(v, dtype=float)
     n = np.linalg.norm(v)
@@ -556,6 +556,11 @@ class GizmoController:
         
         self._dragging = True
         
+        if key_check("ctrl"):
+            print("press", event.button, self._ring_center, file=sys.stderr)
+            viewport = self.canvas.native.parent()
+            viewport._objectManager.duplicate_selected()
+    
         data = self.renderer.mesh_nodes[self._drag_axis]
         
         # Call the appropriate helper to initialize the drag

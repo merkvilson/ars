@@ -6,6 +6,7 @@ from vispy.scene import transforms
 from vispy.visuals.transforms import NullTransform
 from vispy.io import read_mesh
 from vispy.visuals.filters import ShadingFilter
+from vispy.geometry import MeshData  # Added import for MeshData
 
 DEFAULT_OBJ_COLOR = (102/255, 108/255, 120/255, 1.0)
 
@@ -175,12 +176,58 @@ class IObject3D(ABC):
         if parent:
             parent._children.append(self)
 
+    @abstractmethod
+    def clone(self) -> 'IObject3D':
+        """Create a deep copy of this object, preserving all parameters."""
+        raise NotImplementedError()
+
 class CMesh(IObject3D):
 
     @classmethod
     def create(cls,file_path: str,color=DEFAULT_OBJ_COLOR,translate=(0.0, 0.0, 0.0),name="Mesh"):
         vertices, faces, normals, _ = read_mesh(file_path)
-        v = scene.visuals.Mesh(vertices=vertices, faces=faces, color=color, shading=None)
+        md = MeshData(vertices=vertices, faces=faces)
+        if normals is not None:
+            md._vertex_normals = normals.astype(np.float32)
+        v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
         obj = cls(v, name=name)
         obj.set_position(translate[0], translate[1], translate[2])
         return obj
+
+    # New method: Implement cloning for meshes
+    def clone(self) -> 'IObject3D':
+        # Copy mesh data
+        md = self._visual.mesh_data
+        verts = md.get_vertices().copy() if md.get_vertices() is not None else None
+        faces = md.get_faces().copy() if md.get_faces() is not None else None
+        normals = md._vertex_normals.copy() if getattr(md, '_vertex_normals', None) is not None else None
+
+        # Create new MeshData
+        new_md = MeshData(vertices=verts, faces=faces)
+        if normals is not None:
+            new_md._vertex_normals = normals.astype(np.float32)
+
+        # Create new visual with the new MeshData
+        new_visual = scene.visuals.Mesh(
+            meshdata=new_md,
+            color=self.get_color(),
+            shading=None  # Shading will be set later
+        )
+
+        # Create new object
+        new_obj = CMesh(new_visual, name=self.name + "_copy")
+
+        # Copy position (translation)
+        new_obj.set_position(*self.position())
+
+        # Copy rotation and scale (full transform matrix)
+        new_obj._visual.transform.matrix = self._visual.transform.matrix.copy()
+
+        # Copy shading
+        new_obj.set_shading(self.get_shading())
+
+        # Copy alpha and GL state
+        new_obj.set_alpha(self.get_alpha())
+        new_obj._update_gl_state()
+
+        return new_obj
