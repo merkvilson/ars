@@ -4,20 +4,29 @@ from ars_cmds.core_cmds.load_object import add_mesh
 
 def BBL_X(self, position):
     config = ContextMenuConfig()
-    
     options_list = ["X","Y","Z"]
 
-    print(self)
+    om = self.viewport._objectManager
+
+    index = om._active_idx
+    if index < 0 or index >= len(om._objects):
+        return
+        
+    obj = om._objects.pop(index)
 
     def clone_obj():
         self.viewport._objectManager.duplicate_selected()
         self.viewport._canvas.update()
 
 
-    config.callbackL = {"X": lambda: clone_obj(),
-                        "Z": lambda: print("Z selected")}
+    config.callbackL = {
+        "X": lambda: clone_obj(),
+
+        }
     
-    config.additional_texts = {"X": "Clone selected object(s)",}
+    config.additional_texts = {"X": "Clone object",
+                               "Y": "Print bbox",
+                               "Z": "Add mesh"}
 
     ctx = open_context(
         parent=self.central_widget,

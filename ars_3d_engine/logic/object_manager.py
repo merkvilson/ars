@@ -44,7 +44,7 @@ class CObjectManager(QObject):
         # Schedule new object selection after 250ms delay
         QTimer.singleShot(250, lambda: self.set_selection_state([index], index))
         
-    def duplicate_selected(self) -> None:
+    def duplicate_selected(self, offset = (0,0,0)) -> None:
         """Duplicate the currently selected objects and add them to the scene."""
         selected = self.get_selected_objects()
         if not selected:
@@ -54,8 +54,9 @@ class CObjectManager(QObject):
         for obj in selected:
             clone = obj.clone()
             # Optionally offset the position slightly to avoid perfect overlap
-            # current_pos = clone.position()
-            # clone.set_position(current_pos[0] + 0.5, current_pos[1] + 0.5, current_pos[2] + 0.5)
+            if offset:
+                current_pos = clone.position()
+                clone.set_position(current_pos[0] + offset[0], current_pos[1] + offset[1], current_pos[2] + offset[2])
             
             self.add_object(clone)
             new_indices.append(len(self._objects) - 1)  # Clone was added at the end
