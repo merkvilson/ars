@@ -11,7 +11,7 @@ class ArsFlyCamera(scene.cameras.FlyCamera):
         self._prev_interactive = True
         super().__init__(*args, **kwargs)
 
-        for k in "Down,Up,Left,Right,Space,I,J,K,L,F,C".split(","):
+        for k in "Down,Up,Left,Right,Space,I,J,K,L,F,C,Q,E".split(","):
             if k in self._keymap:
                 del self._keymap[k]
 
