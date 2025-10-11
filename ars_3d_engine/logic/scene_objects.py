@@ -7,7 +7,6 @@ from vispy.visuals.transforms import NullTransform
 from vispy.io import read_mesh
 from vispy.visuals.filters import ShadingFilter
 
-DEFAULT_OBJ_COLOR = (75/255, 85/255, 95/255, 1.0)
 DEFAULT_OBJ_COLOR = (102/255, 108/255, 120/255, 1.0)
 
 class IObject3D(ABC):
