@@ -13,20 +13,22 @@ def unlock_function(self):
 
 def r_dropdown(self, position):
     config = ContextMenuConfig()
-    config.item_radius = 14
-    config.font = RRRFONT.get_font(12)
-    config.item_spacing = 29
+    config.item_radius = 15
+    config.font = RRRFONT.get_font(15)
+    config.item_spacing = 28
     config.use_extended_shape = True
     config.auto_close = True
     config.close_on_outside = True
 
     ICON_LOCK_state = ICON_LOCK if self.bubbles_overlay.locked else ICON_LOCK_OPEN
 
-
+    
     options_list = [
         ICON_LOCK_state,
         "?",
         ICON_MENU,
+        ICON_PIN,
+        ICON_SAVE,
         ICON_POWER,
     ]
 
@@ -48,6 +50,8 @@ def r_dropdown(self, position):
         ICON_LOCK_state: "Edit",
         "?": "Help",
         ICON_MENU: "Settings",
+        ICON_PIN: "Pin",
+        ICON_SAVE: "Save",
         ICON_POWER: "Exit",
     }
 

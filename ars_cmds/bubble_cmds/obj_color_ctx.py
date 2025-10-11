@@ -1,12 +1,9 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts.font_icons import *
 import numpy as np
+import theme.fonts.new_fonts as RRRFONT
+from vispy.color import Color as VispyColor
 
-# vispy Color helper (optional; fallback safely if vispy isn't available)
-try:
-    from vispy.color import Color as VispyColor
-except Exception:
-    VispyColor = None
 
 
 def _unwrap_color_obj(color):
@@ -149,10 +146,16 @@ def hsv_to_rgb(h, s, v, a=1.0):
 
 def BBL_OBJ_BOX(self, position):
     config = ContextMenuConfig()
+    config.item_radius = 14
+    config.font = RRRFONT.get_font(14)
+    config.item_spacing = 28
     config.auto_close = False
     config.show_value = True
 
     options_list = ["H", "S", "V", "A", "W","X", "Y", "Z"]
+
+    config.image_items = { "H": r"C:\Users\gmerk\OneDrive\Pictures\h0lBtpi.jpeg"}
+    config.use_extended_shape_items = {"H": (True,False),}
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
