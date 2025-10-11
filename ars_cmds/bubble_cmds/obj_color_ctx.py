@@ -3,7 +3,85 @@ from theme.fonts.font_icons import *
 import numpy as np
 import theme.fonts.new_fonts as RRRFONT
 from vispy.color import Color as VispyColor
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
+from PyQt6.QtCore import Qt, QTimer
 
+class GradientWidget(QWidget):
+    """Gradient widget that fills its area with a gradient based on the specified type."""
+    
+    def __init__(self, parent=None, gradient_type='hue', color_state=None):
+        super().__init__(parent)
+        # Fixed: In PyQt6, use Qt.WidgetAttribute directly (no need for .WidgetAttribute)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.gradient_type = gradient_type
+        self.color_state = color_state
+        self.position = 0.5  # Normalized position (0.0 to 1.0), default
+        
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        # Fixed: In PyQt6, use QPainter.RenderHint directly (no need for .RenderHint)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Create horizontal gradient (left to right)
+        gradient = QLinearGradient(0, 0, self.width(), 0)
+        
+        num_steps = 12
+        if self.gradient_type == 'hue':
+            # Full hue spectrum (0 to 360 degrees)
+            for i in range(num_steps + 1):
+                hue = (i / num_steps) * 360
+                color = QColor.fromHsvF(hue / 360, 1.0, 1.0)  # Full saturation and value
+                gradient.setColorAt(i / num_steps, color)
+        elif self.gradient_type == 'saturation':
+            if self.color_state is None:
+                raise ValueError("color_state required for saturation gradient")
+            h = self.color_state['h']
+            v = self.color_state['v']
+            for i in range(num_steps + 1):
+                sat = i / num_steps
+                r, g, b, _ = hsv_to_rgb(h, sat, v)
+                color = QColor.fromRgbF(r, g, b)
+                gradient.setColorAt(i / num_steps, color)
+        elif self.gradient_type == 'value':
+            if self.color_state is None:
+                raise ValueError("color_state required for value gradient")
+            h = self.color_state['h']
+            s = self.color_state['s']
+            for i in range(num_steps + 1):
+                val = i / num_steps
+                r, g, b, _ = hsv_to_rgb(h, s, val)
+                color = QColor.fromRgbF(r, g, b)
+                gradient.setColorAt(i / num_steps, color)
+        elif self.gradient_type == 'alpha':
+            if self.color_state is None:
+                raise ValueError("color_state required for alpha gradient")
+            h = self.color_state['h']
+            s = self.color_state['s']
+            v = self.color_state['v']
+            r, g, b, _ = hsv_to_rgb(h, s, v)
+            for i in range(num_steps + 1):
+                alph = i / num_steps
+                color = QColor.fromRgbF(r, g, b, alph)
+                gradient.setColorAt(i / num_steps, color)
+        else:
+            raise ValueError(f"Unknown gradient_type: {self.gradient_type}")
+        
+        painter.fillRect(self.rect(), gradient)
+        
+        # Draw unfilled white-outlined circle at position determined by self.position
+        if self.width() > 0 and self.height() > 0:
+            center_x = self.position * self.width()
+            center_y = self.height() / 2.0
+            radius = min(self.width(), self.height()) * .4
+            painter.setPen(QPen(QColor("white"), 2, Qt.PenStyle.SolidLine))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawEllipse(
+                int(center_x - radius),
+                int(center_y - radius),
+                int(2 * radius),
+                int(2 * radius)
+            )
 
 
 def _unwrap_color_obj(color):
@@ -152,10 +230,7 @@ def BBL_OBJ_BOX(self, position):
     config.auto_close = False
     config.show_value = True
 
-    options_list = ["H", "S", "V", "A", "W","X", "Y", "Z"]
-
-    config.image_items = { "H": r"C:\Users\gmerk\OneDrive\Pictures\h0lBtpi.jpeg"}
-    config.use_extended_shape_items = {"H": (True,False),}
+    options_list = ["H", "S", "V", "A"]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -185,45 +260,81 @@ def BBL_OBJ_BOX(self, position):
     v_pct = color_state["v"] * 100.0
     a_pct = color_state["a"] * 100.0
 
+    hue_gradient = GradientWidget(gradient_type='hue', color_state=color_state)
+    sat_gradient = GradientWidget(gradient_type='saturation', color_state=color_state)
+    val_gradient = GradientWidget(gradient_type='value', color_state=color_state)
+    alpha_gradient = GradientWidget(gradient_type='alpha', color_state=color_state)
+
+    # Set initial positions
+    hue_gradient.position = color_state['h']
+    sat_gradient.position = color_state['s']
+    val_gradient.position = color_state['v']
+    alpha_gradient.position = color_state['a']
+
+    config.inner_widgets = {
+        "H": hue_gradient,
+        "S": sat_gradient,
+        "V": val_gradient,
+        "A": alpha_gradient,
+    }
+
+    config.use_extended_shape_items = {
+        "H": (True, False),
+        "S": (True, False),
+        "V": (True, False),
+        "A": (True, False),
+    }
+
+    grad_map = {
+        "H": hue_gradient,
+        "S": sat_gradient,
+        "V": val_gradient,
+        "A": alpha_gradient,
+    }
+
+    update_timer = QTimer()
+    update_timer.setSingleShot(True)
+    update_timer.setInterval(100)  # 100 ms debounce
+
+    def heavy_update():
+        for grad in grad_map.values():
+            grad.update()
+
+    update_timer.timeout.connect(heavy_update)
+
     # callback factory: updates color_state and sets the object's color
     def make_callback(component):
+        my_grad = grad_map[component]
         def callback(value):
             # value is slider value in the UI: 0..100
-            try:
-                val = float(value)
-            except Exception:
-                # if UI sends (min,max,current) tuple or other shape, try to extract numeric
-                val = float(value[2]) if isinstance(value, (tuple, list)) and len(value) > 2 else 0.0
+            val = float(value) / 100.0
 
-            color_state[component] = val / 100.0
+            color_state[component.lower()] = val
 
-            # convert HSV (0..1) -> RGB
+            my_grad.position = val
+            my_grad.update()
+
+            # Immediate object update
             r, g, b, _ = hsv_to_rgb(color_state["h"], color_state["s"], color_state["v"])
             alpha = color_state["a"]
 
-            # try to set the color on the object (vispy Color preferred)
-            try:
-                new_color = (float(r), float(g), float(b))
-                if VispyColor is not None:
-                    new_color = VispyColor(new_color)
-                obj.set_color(new_color)
-                obj.set_alpha(float(alpha))
-            except Exception as e:
-                print("Failed to set object color or alpha:", e)
+            new_color = (float(r), float(g), float(b))
+            if VispyColor is not None:
+                new_color = VispyColor(new_color)
+            obj.set_color(new_color)
+            obj.set_alpha(float(alpha))
+
+            # Debounce updates for all gradients (including my_grad for consistency, though redundant)
+            update_timer.start()
 
         return callback
 
     # attach callbacks for H, S, V, A
     config.callbackL = {
-        "H": make_callback("h"),
-        "S": make_callback("s"),
-        "V": make_callback("v"),
-        "A": make_callback("a"),
-        # "W": lambda: obj.set_wireframe(not obj.get_wireframe()),
-        "X": lambda: obj.set_shading(None),
-        "Y": lambda: obj.set_shading('flat'),
-        "Z": lambda: obj.set_shading('smooth'),
-
+        "H": make_callback("H"),
+        "S": make_callback("S"),
+        "V": make_callback("V"),
+        "A": make_callback("A"),
     }
 
     # slider_values expects (min, max, current)
@@ -233,6 +344,7 @@ def BBL_OBJ_BOX(self, position):
         "V": (0, 100, v_pct),
         "A": (0, 100, a_pct),
     }
+    config.slider_color = { "H": QColor(0,0,0,0), "S": QColor(0,0,0,0), "V": QColor(0,0,0,0), "A": QColor(0,0,0,0) }
 
     ctx = open_context(
         parent=self.central_widget,
@@ -240,3 +352,6 @@ def BBL_OBJ_BOX(self, position):
         position=position,
         config=config
     )
+
+    # Ensure timer persists with context
+    ctx.update_timer = update_timer
