@@ -14,16 +14,16 @@ class IObject3D(ABC):
 
     def __init__(self, visual, name="Object"):
 
-        self._rotation_visual = visual
+        self._visual = visual
         
         # If the visual has the default NullTransform, replace it with a MatrixTransform.
-        if isinstance(self._rotation_visual.transform, NullTransform):
-            self._rotation_visual.transform = transforms.MatrixTransform()
+        if isinstance(self._visual.transform, NullTransform):
+            self._visual.transform = transforms.MatrixTransform()
 
         # A parent node that will only handle translation
         self._node = scene.Node()
         self._node.transform = transforms.MatrixTransform()
-        self._rotation_visual.parent = self._node
+        self._visual.parent = self._node
 
         self._name = name
         self._parent = None
@@ -31,11 +31,11 @@ class IObject3D(ABC):
 
         # Attach shading filter for directional light
         self.shading_filter = None
-        if hasattr(self._rotation_visual, 'mesh_data') and self._rotation_visual.mesh_data is not None:
+        if hasattr(self._visual, 'mesh_data') and self._visual.mesh_data is not None:
             self.shading_filter = ShadingFilter(shading='smooth', shininess=50, light_dir=(0, -1, -1))
             #self.shading_filter.ambient_light = (0.2, 0.2, 0.2)
-            self._rotation_visual.attach(self.shading_filter)
-            self._rotation_visual.update()
+            self._visual.attach(self.shading_filter)
+            self._visual.update()
 
         self._update_gl_state()
 
@@ -51,14 +51,14 @@ class IObject3D(ABC):
                 return  # No shading filter exists, and None requested
             else:
                 # Create and attach shading filter if it doesn't exist and shading is requested
-                if hasattr(self._rotation_visual, 'mesh_data') and self._rotation_visual.mesh_data is not None:
+                if hasattr(self._visual, 'mesh_data') and self._visual.mesh_data is not None:
                     self.shading_filter = ShadingFilter(shading=shading_type, shininess=50, light_dir=(0, -1, -1))
-                    self._rotation_visual.attach(self.shading_filter)
-                    self._rotation_visual.update()
+                    self._visual.attach(self.shading_filter)
+                    self._visual.update()
                 else:
                     return  # Cannot apply shading without mesh_data
         self.shading_filter.shading = shading_type
-        self._rotation_visual.update()
+        self._visual.update()
 
     def get_shading(self) -> str:
         """Get the current shading type. Returns None if no shading filter is attached."""
@@ -74,7 +74,7 @@ class IObject3D(ABC):
     @property
     def rotation_visual(self):
         """The visual that holds the rotation and scale transform."""
-        return self._rotation_visual
+        return self._visual
 
     def position(self) -> np.ndarray:
         # Map the local origin [0,0,0] into world coordinates
@@ -96,8 +96,8 @@ class IObject3D(ABC):
 
     def set_color(self, color: tuple) -> None:
         """Set the color of the visual. Color should be a tuple (r, g, b) or (r, g, b, a) with values 0-1."""
-        if hasattr(self._rotation_visual, 'color'):
-            self._rotation_visual.color = color
+        if hasattr(self._visual, 'color'):
+            self._visual.color = color
         self._update_gl_state()
 
     def set_scale(self, scale: tuple) -> None:
@@ -105,7 +105,7 @@ class IObject3D(ABC):
         if isinstance(scale, (int, float)):
             scale = (scale, scale, scale)
         
-        current_matrix = self._rotation_visual.transform.matrix.copy()
+        current_matrix = self._visual.transform.matrix.copy()
         
         # Get the current rotation by normalizing the basis vectors
         sx_old = np.linalg.norm(current_matrix[0, :3])
@@ -132,7 +132,7 @@ class IObject3D(ABC):
         R[:3, :3] = rot_matrix
         
         new_matrix = (S @ R).astype(np.float32)
-        self._rotation_visual.transform.matrix = new_matrix
+        self._visual.transform.matrix = new_matrix
 
     def set_alpha(self, alpha: float) -> None:
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
@@ -142,26 +142,8 @@ class IObject3D(ABC):
 
     def get_color(self) -> tuple:
         """Get the current color of the visual. Returns a tuple (r, g, b, a) with values 0-1."""
-        if hasattr(self._rotation_visual, 'color'):
-            color = self._rotation_visual.color
-            try:
-                # If it's a Vispy Color object
-                if hasattr(color, 'rgba'):
-                    return tuple(color.rgba)
-                elif isinstance(color, np.ndarray):
-                    color = color.flatten()
-                    if color.size == 3:
-                        return (float(color[0]), float(color[1]), float(color[2]), 1.0)
-                    elif color.size >= 4:
-                        return (float(color[0]), float(color[1]), float(color[2]), float(color[3]))
-                elif isinstance(color, (tuple, list)):
-                    if len(color) == 3:
-                        return (float(color[0]), float(color[1]), float(color[2]), 1.0)
-                    elif len(color) >= 4:
-                        return (float(color[0]), float(color[1]), float(color[2]), float(color[3]))
-            except Exception:
-                pass
-        return (1.0, 1.0, 1.0, 1.0)
+        color = self._visual.color
+        return tuple(color.rgba)
 
     def get_alpha(self) -> float:
         """Get the current alpha (transparency) value. Returns a value 0-1."""
@@ -170,9 +152,9 @@ class IObject3D(ABC):
     def _update_gl_state(self):
         alpha = self.get_alpha()
         if alpha < 1.0:
-            self._rotation_visual.set_gl_state(preset='translucent', cull_face=True)
+            self._visual.set_gl_state(preset='translucent', cull_face=True)
         else:
-            self._rotation_visual.set_gl_state(preset='opaque')
+            self._visual.set_gl_state(preset='opaque')
 
     #Don't remove
     #Don't remove
