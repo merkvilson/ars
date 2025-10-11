@@ -219,7 +219,7 @@ def BBL_OBJ_BOX(self, position):
         "S": make_callback("s"),
         "V": make_callback("v"),
         "A": make_callback("a"),
-        "W": lambda: obj.set_wireframe(not obj.get_wireframe()),
+        # "W": lambda: obj.set_wireframe(not obj.get_wireframe()),
         "X": lambda: obj.set_shading(None),
         "Y": lambda: obj.set_shading('flat'),
         "Z": lambda: obj.set_shading('smooth'),
