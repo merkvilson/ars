@@ -48,32 +48,12 @@ def BBL_TRASH(self, position):
             om.selection_changed.emit()
         om.set_active(om._active_idx)  # This will emit active_changed if needed
         
-        # Extract current rotation and scale for animation
+        # Extract initial scales for animation
         current_matrix = obj.rotation_visual.transform.matrix.copy()
         
         sx = np.linalg.norm(current_matrix[0, :3])
         sy = np.linalg.norm(current_matrix[1, :3])
         sz = np.linalg.norm(current_matrix[2, :3])
-        
-        if sx < 1e-8: sx = 1.0
-        if sy < 1e-8: sy = 1.0
-        if sz < 1e-8: sz = 1.0
-        
-        rot_matrix_part = current_matrix[:3, :3].copy()
-        rot_matrix_part[0, :] /= sx
-        rot_matrix_part[1, :] /= sy
-        rot_matrix_part[2, :] /= sz
-        
-        # Function to build transform matrix
-        def build_transform(f):
-            S_vec = [sx * f, sy * f, sz * f]
-            S = np.eye(4)
-            S[0, 0] = S_vec[0]
-            S[1, 1] = S_vec[1]
-            S[2, 2] = S_vec[2]
-            R_full = np.eye(4)
-            R_full[:3, :3] = rot_matrix_part
-            return (S @ R_full).astype(np.float32)
         
         # Start scale up animation (50ms to 1.2, linear)
         def start_scale_up():
@@ -81,7 +61,7 @@ def BBL_TRASH(self, position):
             start_time = time.time()
             duration = 0.050
             
-            timer = QTimer()
+            timer = QTimer(self)
             
             def update_scale():
                 elapsed = time.time() - start_time
@@ -92,7 +72,7 @@ def BBL_TRASH(self, position):
                 
                 t = elapsed / duration
                 f = 1 + 0.2 * t  # Linear scale up
-                obj.rotation_visual.transform.matrix = build_transform(f)
+                obj.set_scale((sx * f, sy * f, sz * f))
                 self.viewport._canvas.update()
             
             timer.timeout.connect(update_scale)
@@ -105,7 +85,7 @@ def BBL_TRASH(self, position):
             start_time = time.time()
             duration = 0.150
             
-            timer = QTimer()
+            timer = QTimer(self)
             
             def update_scale():
                 elapsed = time.time() - start_time
@@ -118,7 +98,7 @@ def BBL_TRASH(self, position):
                 t = elapsed / duration
                 ease = t ** 2  # Ease-in quadratic
                 f = 1.2 - 1.2 * ease
-                obj.rotation_visual.transform.matrix = build_transform(f)
+                obj.set_scale((sx * f, sy * f, sz * f))
                 self.viewport._canvas.update()
             
             timer.timeout.connect(update_scale)
