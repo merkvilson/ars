@@ -1,8 +1,6 @@
-from vispy import scene
+import vispy
 import numpy as np
-import math
-
-class ArsFlyCamera(scene.cameras.FlyCamera):
+class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
     def __init__(self, *args, fly_bounds=None, **kwargs):
         self.update_callback = None
         self.fly_bounds = fly_bounds
@@ -42,6 +40,21 @@ class ArsFlyCamera(scene.cameras.FlyCamera):
 
         if self.update_callback is not None:
             self.update_callback()
+
+
+    def on_timer(self, event):
+        # Call the parent's on_timer to handle standard updates
+        super().on_timer(event)
+        
+        # Override the damping logic with stronger reduction (less inertia)
+        reduce = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2])  # Increased values for faster slowdown
+        reduce[self._brake > 0] = 0.4  # Even stronger when braking
+        
+        self._speed -= self._speed * reduce
+        if np.abs(self._speed).max() < 0.05:
+            self._speed *= 0.0
+        
+        self.view_changed()
 
 
     def viewbox_key_event(self, event):
