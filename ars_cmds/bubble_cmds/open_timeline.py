@@ -55,7 +55,7 @@ def BBL_TIMELINE(self, position):
         )
 
     config.callbackL = {
-        "1": lambda: img_list("1", [0,0]),
+        "1": lambda: img_list("1", [-9999,0]),
         "2": lambda: img_list("2", [9999,0]),
         }
 
