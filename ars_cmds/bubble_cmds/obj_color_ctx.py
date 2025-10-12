@@ -285,7 +285,8 @@ def hsv_to_rgb(h, s, v, a=1.0):
 
     return np.float32(r), np.float32(g), np.float32(b), np.float32(a)
 
-def BBL_OBJ_BOX(self, position):
+BBL_COLOR_CONFIG = {"symbol": ic.ICON_PALETTE}
+def BBL_COLOR(self, position):
     config = ContextMenuConfig()
     config.item_radius = 14
     config.font = RRRFONT.get_font(14)
