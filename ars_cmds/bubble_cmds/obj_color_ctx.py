@@ -3,86 +3,152 @@ from theme.fonts.font_icons import *
 import numpy as np
 import theme.fonts.new_fonts as RRRFONT
 from vispy.color import Color as VispyColor
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QWidget, QSlider, QHBoxLayout, QLabel, QStyleOptionSlider, QStyle
 from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QRectF
+from core.sound_manager import play_sound
 
-class GradientWidget(QWidget):
-    """Gradient widget that fills its area with a gradient based on the specified type."""
-    
-    def __init__(self, parent=None, gradient_type='hue', color_state=None):
-        super().__init__(parent)
-        # Fixed: In PyQt6, use Qt.WidgetAttribute directly (no need for .WidgetAttribute)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+class HSVSlider(QSlider):
+    """
+    Horizontal slider that paints a gradient in the groove and a circular indicator.
+    Designed to avoid cropping by using widget padding and respecting the style's groove rect.
+    """
+
+    def __init__(self, gradient_type, color_state, initial_value, callback):
+        super().__init__(Qt.Orientation.Horizontal)
         self.gradient_type = gradient_type
         self.color_state = color_state
-        self.position = 0.5  # Normalized position (0.0 to 1.0), default
-        
+        self.callback = callback
+
+        self.is_hovered = False
+
+        self.setRange(0, 100)
+        self.setValue(initial_value)
+        self.valueChanged.connect(self.on_value_changed)
+
+        # Ensure there's enough height to paint the groove + indicator without clipping.
+        self.setMinimumHeight(24)
+        # Remove any fixed width: let layout decide. Fixed widths were causing cropping previously.
+
+        # Minimal stylesheet: hide the default handle visuals so we can draw a custom indicator.
+        self.setStyleSheet("""
+            QSlider::groove:horizontal {
+                background: transparent;
+                height: 12px;
+                margin: 8px 8px; /* top/bottom and left/right margins so groove has breathing room */
+                border-radius: 6px;
+            }
+            QSlider::handle:horizontal {
+                background: transparent;
+                width: 0px;
+                height: 0px;
+                margin: 0px;
+            }
+            QSlider::add-page:horizontal, QSlider::sub-page:horizontal {
+                background: transparent;
+            }
+        """)
+
+    def on_value_changed(self, value):
+        # propagate up and repaint (so indicator moves and dependent gradients update)
+        try:
+            self.callback(value)
+        except Exception:
+            # don't let exceptions stop UI refresh; still update
+            pass
+        self.update()
+
+    def enterEvent(self, event):
+        play_sound("hover")
+        self.is_hovered = True
+        self.update()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.is_hovered = False
+        self.update()
+        super().leaveEvent(event)
+
     def paintEvent(self, event):
+        # Custom painting of the gradient groove and circular handle
         painter = QPainter(self)
-        # Fixed: In PyQt6, use QPainter.RenderHint directly (no need for .RenderHint)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
-        # Create horizontal gradient (left to right)
-        gradient = QLinearGradient(0, 0, self.width(), 0)
-        
-        num_steps = 12
+
+        # Use the style's groove rect so we match platform metrics.
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        groove_rect = self.style().subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderGroove, self)
+
+        # Build the gradient according to type
+        gradient = QLinearGradient(groove_rect.left(), groove_rect.top(), groove_rect.right(), groove_rect.top())
+        num_steps = 24
+
         if self.gradient_type == 'hue':
-            # Full hue spectrum (0 to 360 degrees)
             for i in range(num_steps + 1):
-                hue = (i / num_steps) * 360
-                color = QColor.fromHsvF(hue / 360, 1.0, 1.0)  # Full saturation and value
-                gradient.setColorAt(i / num_steps, color)
+                t = i / num_steps
+                hue = t  # 0..1
+                color = QColor.fromHsvF(hue, 1.0, 1.0)
+                gradient.setColorAt(t, color)
         elif self.gradient_type == 'saturation':
-            if self.color_state is None:
-                raise ValueError("color_state required for saturation gradient")
-            h = self.color_state['h']
-            v = self.color_state['v']
+            h = float(self.color_state.get('h', 0.0))
+            v = float(self.color_state.get('v', 1.0))
             for i in range(num_steps + 1):
-                sat = i / num_steps
+                t = i / num_steps
+                sat = t
                 r, g, b, _ = hsv_to_rgb(h, sat, v)
-                color = QColor.fromRgbF(r, g, b)
-                gradient.setColorAt(i / num_steps, color)
+                gradient.setColorAt(t, QColor.fromRgbF(float(r), float(g), float(b)))
         elif self.gradient_type == 'value':
-            if self.color_state is None:
-                raise ValueError("color_state required for value gradient")
-            h = self.color_state['h']
-            s = self.color_state['s']
+            h = float(self.color_state.get('h', 0.0))
+            s = float(self.color_state.get('s', 1.0))
             for i in range(num_steps + 1):
-                val = i / num_steps
+                t = i / num_steps
+                val = t
                 r, g, b, _ = hsv_to_rgb(h, s, val)
-                color = QColor.fromRgbF(r, g, b)
-                gradient.setColorAt(i / num_steps, color)
+                gradient.setColorAt(t, QColor.fromRgbF(float(r), float(g), float(b)))
         elif self.gradient_type == 'alpha':
-            if self.color_state is None:
-                raise ValueError("color_state required for alpha gradient")
-            h = self.color_state['h']
-            s = self.color_state['s']
-            v = self.color_state['v']
+            h = float(self.color_state.get('h', 0.0))
+            s = float(self.color_state.get('s', 0.0))
+            v = float(self.color_state.get('v', 1.0))
             r, g, b, _ = hsv_to_rgb(h, s, v)
             for i in range(num_steps + 1):
-                alph = i / num_steps
-                color = QColor.fromRgbF(r, g, b, alph)
-                gradient.setColorAt(i / num_steps, color)
+                t = i / num_steps
+                a = t ** 2  # Non-linear transition: quadratic easing for better low-alpha visibility
+                # QColor.fromRgbF accepts alpha as 4th arg
+                gradient.setColorAt(t, QColor.fromRgbF(float(r), float(g), float(b), float(a)))
         else:
-            raise ValueError(f"Unknown gradient_type: {self.gradient_type}")
-        
-        painter.fillRect(self.rect(), gradient)
-        
-        # Draw unfilled white-outlined circle at position determined by self.position
-        if self.width() > 0 and self.height() > 0:
-            center_x = self.position * self.width()
-            center_y = self.height() / 2.0
-            radius = min(self.width(), self.height()) * .4
-            painter.setPen(QPen(QColor("white"), 2, Qt.PenStyle.SolidLine))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawEllipse(
-                int(center_x - radius),
-                int(center_y - radius),
-                int(2 * radius),
-                int(2 * radius)
-            )
+            # fallback: neutral grey gradient
+            gradient.setColorAt(0.0, QColor(40, 40, 40))
+            gradient.setColorAt(1.0, QColor(200, 200, 200))
 
+        # Draw rounded gradient bar
+        painter.save()
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(gradient)
+        radius = min(18.0, groove_rect.height() / 2.0)
+        painter.drawRoundedRect(groove_rect, radius, radius)
+        painter.restore()
+
+        # Draw circular indicator (centered on groove, guaranteed to be inside widget)
+        pos_fraction = (self.value() - self.minimum()) / max(1, (self.maximum() - self.minimum()))
+        cx = groove_rect.left() + pos_fraction * groove_rect.width()
+        cy = groove_rect.center().y()
+        handle_radius = max(3.0, groove_rect.height() * 0.3)  # ensures visible handle
+
+        # Dynamic pen width based on hover
+        pen_width = 3.5 if self.is_hovered else 2.0
+        half_pen = pen_width / 2.0
+
+        # Clamp cx to keep the handle fully within widget bounds, with extra 2px margin
+        widget_width = self.width()
+        cx = max(handle_radius + half_pen + 2, min(cx, widget_width - handle_radius - half_pen - 2))
+
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # White outer ring
+        painter.setPen(QPen(QColor("white"), pen_width))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawEllipse(QRectF(cx - handle_radius, cy - handle_radius, handle_radius * 2.0, handle_radius * 2.0))
+        painter.restore()
 
 def _unwrap_color_obj(color):
     """
@@ -137,7 +203,6 @@ def _unwrap_color_obj(color):
 
     return float(r), float(g), float(b), float(a)
 
-
 def rgb_to_hsv(*args):
     """
     Convert RGB(A) -> HSV(A).
@@ -176,7 +241,6 @@ def rgb_to_hsv(*args):
     v = mx
 
     return np.float32(h), np.float32(s), np.float32(v), np.float32(a)
-
 
 def hsv_to_rgb(h, s, v, a=1.0):
     """
@@ -221,16 +285,15 @@ def hsv_to_rgb(h, s, v, a=1.0):
 
     return np.float32(r), np.float32(g), np.float32(b), np.float32(a)
 
-
 def BBL_OBJ_BOX(self, position):
     config = ContextMenuConfig()
     config.item_radius = 14
     config.font = RRRFONT.get_font(14)
     config.item_spacing = 28
     config.auto_close = False
-    config.show_value = True
+    config.show_value = False  # We'll handle value display ourselves
 
-    options_list = ["H", "S", "V", "A"]
+    options_list = ["H", "S", "V", "A", "1", "2",]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -255,66 +318,28 @@ def BBL_OBJ_BOX(self, position):
         "a": float(a),
     }
 
-    h_pct = color_state["h"] * 100.0
-    s_pct = color_state["s"] * 100.0
-    v_pct = color_state["v"] * 100.0
-    a_pct = color_state["a"] * 100.0
+    h_pct = int(color_state["h"] * 100)
+    s_pct = int(color_state["s"] * 100)
+    v_pct = int(color_state["v"] * 100)
+    a_pct = int(color_state["a"] * 100)
 
-    hue_gradient = GradientWidget(gradient_type='hue', color_state=color_state)
-    sat_gradient = GradientWidget(gradient_type='saturation', color_state=color_state)
-    val_gradient = GradientWidget(gradient_type='value', color_state=color_state)
-    alpha_gradient = GradientWidget(gradient_type='alpha', color_state=color_state)
-
-    # Set initial positions
-    hue_gradient.position = color_state['h']
-    sat_gradient.position = color_state['s']
-    val_gradient.position = color_state['v']
-    alpha_gradient.position = color_state['a']
-
-    config.inner_widgets = {
-        "H": hue_gradient,
-        "S": sat_gradient,
-        "V": val_gradient,
-        "A": alpha_gradient,
-    }
-
-    config.use_extended_shape_items = {
-        "H": (True, False),
-        "S": (True, False),
-        "V": (True, False),
-        "A": (True, False),
-    }
-
-    grad_map = {
-        "H": hue_gradient,
-        "S": sat_gradient,
-        "V": val_gradient,
-        "A": alpha_gradient,
-    }
-
-    update_timer = QTimer()
-    update_timer.setSingleShot(True)
-    update_timer.setInterval(100)  # 100 ms debounce
-
-    def heavy_update():
-        for grad in grad_map.values():
-            grad.update()
-
-    update_timer.timeout.connect(heavy_update)
-
-    # callback factory: updates color_state and sets the object's color
     def make_callback(component):
-        my_grad = grad_map[component]
         def callback(value):
-            # value is slider value in the UI: 0..100
             val = float(value) / 100.0
-
             color_state[component.lower()] = val
 
-            my_grad.position = val
-            my_grad.update()
+            # Update dependent sliders' gradients
+            if component == "H":
+                sat_slider.update()
+                val_slider.update()
+                alpha_slider.update()
+            elif component == "S":
+                val_slider.update()
+                alpha_slider.update()
+            elif component == "V":
+                sat_slider.update()
+                alpha_slider.update()
 
-            # Immediate object update
             r, g, b, _ = hsv_to_rgb(color_state["h"], color_state["s"], color_state["v"])
             alpha = color_state["a"]
 
@@ -324,27 +349,19 @@ def BBL_OBJ_BOX(self, position):
             obj.set_color(new_color)
             obj.set_alpha(float(alpha))
 
-            # Debounce updates for all gradients (including my_grad for consistency, though redundant)
-            update_timer.start()
-
         return callback
 
-    # attach callbacks for H, S, V, A
-    config.callbackL = {
-        "H": make_callback("H"),
-        "S": make_callback("S"),
-        "V": make_callback("V"),
-        "A": make_callback("A"),
-    }
+    hue_slider = HSVSlider('hue', color_state, h_pct, make_callback("H"))
+    sat_slider = HSVSlider('saturation', color_state, s_pct, make_callback("S"))
+    val_slider = HSVSlider('value', color_state, v_pct, make_callback("V"))
+    alpha_slider = HSVSlider('alpha', color_state, a_pct, make_callback("A"))
 
-    # slider_values expects (min, max, current)
-    config.slider_values = {
-        "H": (0, 100, h_pct),
-        "S": (0, 100, s_pct),
-        "V": (0, 100, v_pct),
-        "A": (0, 100, a_pct),
+    config.custom_widget_items = {
+        "H": hue_slider,
+        "S": sat_slider,
+        "V": val_slider,
+        "A": alpha_slider,
     }
-    config.slider_color = { "H": QColor(0,0,0,0), "S": QColor(0,0,0,0), "V": QColor(0,0,0,0), "A": QColor(0,0,0,0) }
 
     ctx = open_context(
         parent=self.central_widget,
@@ -352,6 +369,3 @@ def BBL_OBJ_BOX(self, position):
         position=position,
         config=config
     )
-
-    # Ensure timer persists with context
-    ctx.update_timer = update_timer
