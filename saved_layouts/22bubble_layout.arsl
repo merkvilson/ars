@@ -7,8 +7,8 @@
         },
         {
             "symbol": "\ue94a",
-            "grid_x": 14,
-            "grid_y": 0
+            "grid_x": 16,
+            "grid_y": 5
         },
         {
             "symbol": "\ue90a",
@@ -32,8 +32,8 @@
         },
         {
             "symbol": "\ue92e",
-            "grid_x": 7,
-            "grid_y": 0
+            "grid_x": 5,
+            "grid_y": 8
         },
         {
             "symbol": "\ue946",
@@ -58,7 +58,7 @@
         {
             "symbol": "\ue97b",
             "grid_x": 8,
-            "grid_y": 0
+            "grid_y": 6
         },
         {
             "symbol": "\ue972",
@@ -67,18 +67,18 @@
         },
         {
             "symbol": "\ue96a",
-            "grid_x": 1,
-            "grid_y": 0
+            "grid_x": 12,
+            "grid_y": 9
         },
         {
             "symbol": "\ue91a",
-            "grid_x": 9,
-            "grid_y": 0
+            "grid_x": 2,
+            "grid_y": 3
         },
         {
             "symbol": "Y",
-            "grid_x": 17,
-            "grid_y": 0
+            "grid_x": 19,
+            "grid_y": 10
         }
     ]
 }
