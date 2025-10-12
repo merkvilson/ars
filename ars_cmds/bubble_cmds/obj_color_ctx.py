@@ -1,5 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 import numpy as np
 import theme.fonts.new_fonts as RRRFONT
 from vispy.color import Color as VispyColor

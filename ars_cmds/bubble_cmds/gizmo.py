@@ -1,45 +1,45 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 
 
-BBL_GIZMO_MOVE_CONFIG = {"symbol": ICON_GIZMO_MOVE, "hotkey": "Q"}
+BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
 def BBL_GIZMO_MOVE(self, position):
     config = ContextMenuConfig()
 
 
-    options_list = [ICON_GIZMO_MOVE_3D, ICON_GIZMO_SCALE, ICON_GIZMO_ROTATE_3D, ICON_GIZMO_DRAG]
+    options_list = [ic.ICON_GIZMO_MOVE_3D, ic.ICON_GIZMO_SCALE, ic.ICON_GIZMO_ROTATE_3D, ic.ICON_GIZMO_DRAG]
 
     config.callbackL = {
 
-        ICON_GIZMO_MOVE_3D:   lambda:(self.viewport.controller.set_handles(['t'])),
-        ICON_GIZMO_SCALE:     lambda:(self.viewport.controller.set_handles(['s'])),
-        ICON_GIZMO_ROTATE_3D: lambda:(self.viewport.controller.set_handles(['r'])),
-        ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['qq'])),
+        ic.ICON_GIZMO_MOVE_3D:   lambda:(self.viewport.controller.set_handles(['t'])),
+        ic.ICON_GIZMO_SCALE:     lambda:(self.viewport.controller.set_handles(['s'])),
+        ic.ICON_GIZMO_ROTATE_3D: lambda:(self.viewport.controller.set_handles(['r'])),
+        ic.ICON_GIZMO_DRAG: lambda:(self.viewport.controller.set_handles(['qq'])),
     }
 
 
     config.toggle_values = {
-    ICON_GIZMO_MOVE_3D:   (0,1,self.viewport.controller.get_visibility("move")),
-    ICON_GIZMO_SCALE:     (0,1,self.viewport.controller.get_visibility("scale")),
-    ICON_GIZMO_ROTATE_3D: (0,1,self.viewport.controller.get_visibility("rotate")),
-    ICON_GIZMO_DRAG: (0,1,0),
+    ic.ICON_GIZMO_MOVE_3D:   (0,1,self.viewport.controller.get_visibility("move")),
+    ic.ICON_GIZMO_SCALE:     (0,1,self.viewport.controller.get_visibility("scale")),
+    ic.ICON_GIZMO_ROTATE_3D: (0,1,self.viewport.controller.get_visibility("rotate")),
+    ic.ICON_GIZMO_DRAG: (0,1,0),
 }
 
     config.toggle_groups = [options_list]
 
     config.hotkey_items = {
-        ICON_GIZMO_MOVE_3D:   "W",
-        ICON_GIZMO_SCALE:     "E",
-        ICON_GIZMO_ROTATE_3D: "R",
-        ICON_GIZMO_DRAG: "Q",
+        ic.ICON_GIZMO_MOVE_3D:   "W",
+        ic.ICON_GIZMO_SCALE:     "E",
+        ic.ICON_GIZMO_ROTATE_3D: "R",
+        ic.ICON_GIZMO_DRAG: "Q",
     }
 
 
     config.additional_texts = {
-        ICON_GIZMO_MOVE_3D: "Move",
-        ICON_GIZMO_ROTATE_3D: "Rotate",
-        ICON_GIZMO_SCALE: "Scale",
-        ICON_GIZMO_DRAG: "New Gizmo",
+        ic.ICON_GIZMO_MOVE_3D: "Move",
+        ic.ICON_GIZMO_ROTATE_3D: "Rotate",
+        ic.ICON_GIZMO_SCALE: "Scale",
+        ic.ICON_GIZMO_DRAG: "New Gizmo",
     }
 
     ctx = open_context(

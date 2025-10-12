@@ -1,11 +1,11 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 from prefs.pref_controller import edit_pref, read_pref
 import json
 
 
 
-BBL_X_CONFIG ={"symbol": ICON_SETTINGS }
+BBL_X_CONFIG ={"symbol": ic.ICON_SETTINGS }
 def BBL_X(self, position):
     config = ContextMenuConfig()
 

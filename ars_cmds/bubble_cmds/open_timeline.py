@@ -1,10 +1,10 @@
 import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 from ui.widgets.timeline import TimelineWidget
 from prefs.pref_controller import get_path
 
-BBL_TIMELINE_CONFIG = {"symbol": ICON_SIZE, "hotkey": "T" }
+BBL_TIMELINE_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
 def BBL_TIMELINE(self, position):
     config = ContextMenuConfig()
     config.auto_close = False

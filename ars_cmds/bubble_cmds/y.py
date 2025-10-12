@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
 from PyQt6.QtCore import Qt
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 
 class GradientWidget(QWidget):
     """Simple gradient widget that fills its area with a full hue gradient."""

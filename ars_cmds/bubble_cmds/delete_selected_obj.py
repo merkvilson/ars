@@ -1,10 +1,10 @@
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 from core.sound_manager import play_sound
 from PyQt6.QtCore import QTimer
 import time
 import numpy as np
 
-BBL_TRASH_CONFIG = {'symbol': ICON_TRASH, 'hotkey': 'del'}
+BBL_TRASH_CONFIG = {'symbol': ic.ICON_TRASH, 'hotkey': 'del'}
 def BBL_TRASH(self, position):
     if self.viewport.is_not_empty():
         om = self.viewport._objectManager

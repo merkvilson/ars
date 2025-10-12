@@ -1,7 +1,7 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from PyQt6.QtGui import QCursor, QColor, QFont
 from PyQt6.QtCore import QPoint, Qt, QTimer
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 import theme.fonts.new_fonts as RRRFONT
 
 def unlock_function(self):
@@ -20,39 +20,39 @@ def r_dropdown(self, position):
     config.auto_close = True
     config.close_on_outside = True
 
-    ICON_LOCK_state = ICON_LOCK if self.bubbles_overlay.locked else ICON_LOCK_OPEN
+    ic.ICON_LOCK_state = ic.ICON_LOCK if self.bubbles_overlay.locked else ic.ICON_LOCK_OPEN
 
     
     options_list = [
-        ICON_LOCK_state,
+        ic.ICON_LOCK_state,
         "?",
-        ICON_MENU,
-        ICON_PIN,
-        ICON_SAVE,
-        ICON_POWER,
+        ic.ICON_MENU,
+        ic.ICON_PIN,
+        ic.ICON_SAVE,
+        ic.ICON_POWER,
     ]
 
     config.toggle_values = {
-            ICON_LOCK_state: not self.bubbles_overlay.locked,
+            ic.ICON_LOCK_state: not self.bubbles_overlay.locked,
     }
 
     config.callbackL = {
-        ICON_LOCK_state:  lambda: (
+        ic.ICON_LOCK_state:  lambda: (
                                unlock_function(self),
-                               ctx.update_item(ICON_LOCK_state, "symbol", ICON_LOCK if self.bubbles_overlay.locked else ICON_LOCK_OPEN),
+                               ctx.update_item(ic.ICON_LOCK_state, "symbol", ic.ICON_LOCK if self.bubbles_overlay.locked else ic.ICON_LOCK_OPEN),
             ),
-        ICON_POWER: lambda: QTimer.singleShot(500, self.close),
+        ic.ICON_POWER: lambda: QTimer.singleShot(500, self.close),
     }
 
 
 
     config.additional_texts = {
-        ICON_LOCK_state: "Edit",
+        ic.ICON_LOCK_state: "Edit",
         "?": "Help",
-        ICON_MENU: "Settings",
-        ICON_PIN: "Pin",
-        ICON_SAVE: "Save",
-        ICON_POWER: "Exit",
+        ic.ICON_MENU: "Settings",
+        ic.ICON_PIN: "Pin",
+        ic.ICON_SAVE: "Save",
+        ic.ICON_POWER: "Exit",
     }
 
 

@@ -10,16 +10,14 @@ from .utils import animated_effects
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QScrollArea,
     QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QGraphicsObject, QGraphicsBlurEffect, QStyle,
+    QStyle,
 )
 from PyQt6.QtGui import (
-    QPainter, QColor, QPen, QBrush, QCursor,
+    QPainter, QColor,  QBrush, QCursor,
     QFont, QPainterPath, QRegion
 )
 from PyQt6.QtCore import (
-    Qt, QPoint, QPointF, QRect, QRectF, QEvent,
-    QPropertyAnimation, QEasingCurve, QParallelAnimationGroup,
-    QTimer, QObject, pyqtProperty, QSize
+    Qt, QPoint, QPointF, QRect, QRectF, QEvent, QTimer
 )
 
 from core.sound_manager import play_sound

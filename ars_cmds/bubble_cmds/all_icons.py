@@ -1,7 +1,7 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from PyQt6.QtGui import QCursor, QColor
 from PyQt6.QtCore import QPoint, Qt, QTimer
-from theme.fonts.font_icons import *  # ICON_MOVE, ICON_FULL_LIST, etc.
+from theme.fonts import font_icons as ic
 import pyperclip
 from theme.fonts.new_fonts import get_font
 
@@ -17,18 +17,18 @@ def split_list(lst, size):
 
 
 
-BBL_ICONS_CONFIG={"symbol": ICON_FILE_STACK}
+BBL_ICONS_CONFIG={"symbol": ic.ICON_FILE_STACK}
 def BBL_ICONS(self, position):
     config = ContextMenuConfig()
     config.use_extended_shape = False
-    options_list = split_list(ICON_FULL_LIST, 10)
+    options_list = split_list(ic.ICON_FULL_LIST, 10)
 
 
 
     vars_dict = {
     v: (lambda key=k, value=v: copy_name(self, key, value))
     for k, v in globals().items()
-    if v in ICON_FULL_LIST
+    if v in ic.ICON_FULL_LIST
 }
 
     config.callbackL = vars_dict
