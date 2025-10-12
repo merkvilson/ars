@@ -51,11 +51,11 @@ def save_depth(self, filename: str = 'depth.png', invert: bool = True, x: int = 
     # Calculate scale factor based on minimum dimension ratio
     scale_x = x / norm_depth.shape[1]  # target_width / current_width
     scale_y = y / norm_depth.shape[0]  # target_height / current_height
-    scale = max(scale_x, scale_y)  # Use max to ensure we cover the target size
+    scale = max(scale_x, scale_y)  # Use max to ensure we cover the target size (fit shortest axis)
     
     # Calculate new dimensions after scaling
-    new_w = int(norm_depth.shape[1] * scale)
-    new_h = int(norm_depth.shape[0] * scale)
+    new_w = round(norm_depth.shape[1] * scale)
+    new_h = round(norm_depth.shape[0] * scale)
     
     # Resize the image
     resized = cv2.resize(norm_depth, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
@@ -109,11 +109,11 @@ def save_render(self, filename: str = 'render.png', x: int = 512, y: int = 512) 
     # Calculate scale factor based on minimum dimension ratio
     scale_x = x / rgb.shape[1]  # target_width / current_width
     scale_y = y / rgb.shape[0]  # target_height / current_height
-    scale = max(scale_x, scale_y)  # Use max to ensure we cover the target size
+    scale = max(scale_x, scale_y)  # Use max to ensure we cover the target size (fit shortest axis)
     
     # Calculate new dimensions after scaling
-    new_w = int(rgb.shape[1] * scale)
-    new_h = int(rgb.shape[0] * scale)
+    new_w = round(rgb.shape[1] * scale)
+    new_h = round(rgb.shape[0] * scale)
     
     # Resize the image
     resized = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
