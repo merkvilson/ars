@@ -15,7 +15,6 @@ def r_dropdown(self, position):
     config = ContextMenuConfig()
     config.item_radius = 15
     config.font = RRRFONT.get_font(15)
-    config.item_spacing = 28
     config.use_extended_shape = True
     config.auto_close = True
     config.close_on_outside = True

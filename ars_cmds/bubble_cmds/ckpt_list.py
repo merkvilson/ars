@@ -24,14 +24,16 @@ except:
     print("not running")
 
 
-
+BBL_CKPTLIST_CONFIG={"symbol": ic.ICON_BRAIN}
 def BBL_CKPTLIST(self, position):
     run_ext(__file__, self)
 
 def doit(self):
     config = ContextMenuConfig()
     config.auto_close = False
-    #config.show_symbol = False
+    config.item_radius = 15
+
+    config.show_symbol = False
     def set_ckpt(ckpt_name):
         self.render_manager.set_userdata("ckpt_name", ckpt_name)
 

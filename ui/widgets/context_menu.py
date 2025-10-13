@@ -26,7 +26,6 @@ class ContextMenuConfig:
     def __init__(self):
         self.menu_radius = 90
         self.item_radius = 22
-        self.item_spacing = self.item_radius * 2.2
         self.extra_padding = 10
         self.extra_distance = [0, 0]
         self.start_angle = -math.pi / 2

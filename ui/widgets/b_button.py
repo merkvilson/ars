@@ -296,7 +296,7 @@ class BButton(QGraphicsObject):
             self.additional_text_item.setHtml(initial_text)
             add_bounding = self.additional_text_item.boundingRect()
             main_right = bounding.width() / 2
-            padding = 3
+            padding = 3 if self.show_symbol else -25
             add_left = main_right + padding
             self.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
 
