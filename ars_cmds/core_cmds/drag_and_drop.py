@@ -1,5 +1,5 @@
 import os
-from theme.fonts.font_icons import *
+from theme.fonts import font_icons as ic
 from ars_cmds import bubble_cmds as Bcmd
 
 imgs = (".png", ".jpg", ".jpeg", ".bmp")
@@ -16,18 +16,18 @@ def dd_drag(self, event):
     one = count == 1
 
     if all(s.endswith(imgs) for s in files):
-        sym = ICON_IMAGE
+        sym = ic.ICON_IMAGE
         ttip = first_file if one else f"{count} Images"
 
     elif all(s.endswith(objs) for s in files):
-        sym = ICON_FILE_3D
+        sym = ic.ICON_FILE_3D
         ttip = first_file if one else f"{count} Objects"
 
     elif all(s.endswith(".arsl") for s in files):
-        sym = ICON_LAYOUT
+        sym = ic.ICON_LAYOUT
         ttip = first_file if one else f"{count} Layouts"
 
-    else: ttip,sym = "Files", ICON_FILES
+    else: ttip,sym = "Files", ic.ICON_FILES
 
 
     self.CF.UP("additional_text", ttip,  sym, False)
@@ -42,24 +42,24 @@ def dd_drop(self, event):
 
         if f.endswith(objs):
             Bcmd.add_mesh(self, f, True)
-            ttip, sym = "Object Loaded!", ICON_FILE_CHECK
+            ttip, sym = "Object Loaded!", ic.ICON_FILE_CHECK
 
         elif f.endswith(imgs):
             Bcmd.load_bg_image(self,f)
-            ttip, sym = "Image Loaded!", ICON_FILE_CHECK
+            ttip, sym = "Image Loaded!", ic.ICON_FILE_CHECK
 
         elif f.endswith(".arsl"):
             self.bubbles_overlay.load_layout(f)
-            ttip, sym = "Layout Loaded!", ICON_FILE_CHECK
+            ttip, sym = "Layout Loaded!", ic.ICON_FILE_CHECK
     
         elif f.endswith(".py"):
             run_ext(f, self)
-            ttip, sym = "Script Loaded!", ICON_FILE_CHECK
+            ttip, sym = "Script Loaded!", ic.ICON_FILE_CHECK
 
     
         elif f.endswith(".arsp"):
             run_ext(f, self)
-            ttip, sym = "Script Loaded!", ICON_FILE_CHECK
+            ttip, sym = "Script Loaded!", ic.ICON_FILE_CHECK
 
 
 

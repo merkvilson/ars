@@ -1,7 +1,10 @@
 {
   "4": {
     "inputs": {
-      "ckpt_name": "dreamshaper_8.safetensors"
+      "ckpt_name": [
+        "34",
+        0
+      ]
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
@@ -207,6 +210,16 @@
     "class_type": "Airen_Int",
     "_meta": {
       "title": "Airen Integer"
+    }
+  },
+  "34": {
+    "inputs": {
+      "ud_name": "ckpt_name",
+      "output": "dreamshaper_8.safetensors"
+    },
+    "class_type": "Airen_Checkpoint_String",
+    "_meta": {
+      "title": "Airen Checkpoint"
     }
   }
 }
