@@ -221,5 +221,18 @@
     "_meta": {
       "title": "Airen Checkpoint"
     }
+  },
+  "35": {
+    "inputs": {
+      "ud_name": "KSampler",
+      "output": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "Airen_InfoGetter",
+    "_meta": {
+      "title": "Airen Info Getter"
+    }
   }
 }
