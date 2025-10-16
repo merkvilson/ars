@@ -20,7 +20,6 @@ def obj_scale(self, position):
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = True
-    config.extra_distance = [0,-150]
     config.show_value = True
     
 

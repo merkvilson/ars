@@ -274,7 +274,6 @@ def obj_color(self, position):
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = True
-    config.extra_distance = [0,-250]
 
     options_list = ["H", "S", "V", "A", "1", "2",]
     config.callbackL = {"2":lambda: print("test"),}
