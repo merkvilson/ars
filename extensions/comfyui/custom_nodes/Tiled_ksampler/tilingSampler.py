@@ -28,7 +28,7 @@ class Asymmetric_Tiled_KSampler:
 
     RETURN_TYPES = ("LATENT",)
     FUNCTION = "sample"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/Tiled KSampler"
 
 
     def apply_asymmetric_tiling(self, model, tileX, tileY):
