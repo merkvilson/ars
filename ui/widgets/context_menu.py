@@ -21,6 +21,7 @@ from PyQt6.QtCore import (
 )
 
 from core.sound_manager import play_sound
+from theme.fonts import font_icons as ic
 
 class ContextMenuConfig:
     def __init__(self):
@@ -225,7 +226,7 @@ class ContextButtonWindow(QWidget):
             center = QPointF(0, 0)
 
             center = QPointF(0, 0)
-            if len(self.processed_items) > 0 and self.processed_items[0].symbol == "x":
+            if len(self.processed_items) > 0 and self.processed_items[0].symbol == ic.ICON_CLOSE_RADIAL:
                 count_surround = len(self.processed_items) - 1
                 positions = [center] + calc_positions(config, center, count_surround)
             else:

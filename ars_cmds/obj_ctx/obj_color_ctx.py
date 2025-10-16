@@ -291,7 +291,6 @@ def obj_color(self, position):
     config.close_on_outside = False
     config.item_radius = 14
     config.font = RRRFONT.get_font(14)
-    config.item_spacing = 281
     config.auto_close = True
     config.extra_distance = [0,-250]
 

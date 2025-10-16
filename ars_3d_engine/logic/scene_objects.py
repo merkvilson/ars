@@ -134,6 +134,15 @@ class IObject3D(ABC):
         new_matrix = (S @ R).astype(np.float32)
         self._visual.transform.matrix = new_matrix
 
+
+    def get_scale(self) -> tuple:
+        """Get the current scale of the object. Returns a tuple (sx, sy, sz)."""
+        current_matrix = self._visual.transform.matrix
+        sx = np.linalg.norm(current_matrix[0, :3])
+        sy = np.linalg.norm(current_matrix[1, :3])
+        sz = np.linalg.norm(current_matrix[2, :3])
+        return (sx, sy, sz)
+
     def set_alpha(self, alpha: float) -> None:
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
         current_color = self.get_color()
