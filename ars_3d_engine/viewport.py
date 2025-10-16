@@ -199,9 +199,6 @@ class ViewportWidget(QWidget):
 
         self.attach_headlight(self._objectManager)
 
-        #from vispy.scene.visuals import Text
-        #t2 = Text('Text in viewbox (18 pt)', parent=self._view.scene, color='green',)
-
 
         layout = QVBoxLayout()
         layout.addWidget(self._canvas.native)

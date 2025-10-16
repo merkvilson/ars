@@ -106,7 +106,7 @@
   "24": {
     "inputs": {
       "pixels": [
-        "28",
+        "36",
         0
       ],
       "vae": [
@@ -143,15 +143,6 @@
       "title": "Airen Save Image"
     }
   },
-  "28": {
-    "inputs": {
-      "image": "render.png"
-    },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Image"
-    }
-  },
   "30": {
     "inputs": {
       "ud_name": "positive",
@@ -180,8 +171,8 @@
         0
       ],
       "image": [
-        "32",
-        0
+        "36",
+        1
       ],
       "vae": [
         "4",
@@ -193,19 +184,10 @@
       "title": "Apply ControlNet"
     }
   },
-  "32": {
-    "inputs": {
-      "image": "depth.png"
-    },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Image"
-    }
-  },
   "33": {
     "inputs": {
       "ud_name": "seed",
-      "output": 0
+      "output": 5
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -233,6 +215,54 @@
     "class_type": "Airen_InfoGetter",
     "_meta": {
       "title": "Airen Info Getter"
+    }
+  },
+  "36": {
+    "inputs": {
+      "ud_name": ""
+    },
+    "class_type": "Airen_RenderPass",
+    "_meta": {
+      "title": "Airen_RenderPass"
+    }
+  },
+  "37": {
+    "inputs": {
+      "model_name": "RealESRGAN_x4plus.safetensors"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "38": {
+    "inputs": {
+      "upscale_model": [
+        "37",
+        0
+      ],
+      "image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale Image (using Model)"
+    }
+  },
+  "39": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "images": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
     }
   }
 }

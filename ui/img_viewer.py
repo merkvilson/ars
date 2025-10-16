@@ -170,9 +170,9 @@ class ImageViewer(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.zoom_factor = 1.15
         self.minimap = None
-        self.min_zoom = 1  # Lowered to allow zoom from small initial scales
-        self.max_zoom = 10.0
-        self.setBackgroundBrush(QBrush(QColor(45, 46, 50, 255)))
+        self.min_zoom = 0.1  # Lowered to allow zoom from small initial scales
+        self.max_zoom = 5.0
+        #self.setBackgroundBrush(QBrush(QColor(45, 46, 50, 255)))
         self.image_rect = None
         self._user_interacted = False  # Flag for auto-refit on resize
 
