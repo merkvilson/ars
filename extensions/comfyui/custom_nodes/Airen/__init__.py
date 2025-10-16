@@ -6,6 +6,8 @@ import os
 import folder_paths
 from PIL import Image
 import numpy as np
+import torch
+import hashlib
 
 class Airen_Str:
     @classmethod
@@ -135,8 +137,7 @@ class Airen_InfoGetter:
         return {
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
-            },
-            "optional": {
+                "weight": ("INT", {"default": 10, "min": 1, "max": 100, "step": 1}),      
                 "output": ("*", ),
             }
         }
@@ -146,8 +147,6 @@ class Airen_InfoGetter:
     OUTPUT_NODE = False
 
 
-import torch
-import hashlib
 class Airen_RenderPass:
     @classmethod
     def INPUT_TYPES(cls):
@@ -210,16 +209,4 @@ NODE_CLASS_MAPPINGS = {
     "Airen_SaveImage": Airen_SaveImage,
     "Airen_InfoGetter": Airen_InfoGetter,
     "Airen_RenderPass": Airen_RenderPass,
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "Airen_Str": "Airen Text",
-    "Airen_Int": "Airen Integer",
-    "Airen_Checkpoint_String": "Airen Checkpoint",
-    "Airen_VAE_String": "Airen VAE",
-    "Airen_Lora_String": "Airen Lora",
-    "Airen_SaveImage": "Airen Save Image",
-    "Airen_InfoGetter": "Airen Info Getter",
-    "Airen_RenderPass": "Airen Render Pass",
-
 }
