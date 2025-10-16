@@ -27,27 +27,11 @@ class HSVSlider(QSlider):
         self.valueChanged.connect(self.on_value_changed)
 
         # Ensure there's enough height to paint the groove + indicator without clipping.
-        self.setMinimumHeight(24)
+        self.setMinimumHeight(42)
         # Remove any fixed width: let layout decide. Fixed widths were causing cropping previously.
 
         # Minimal stylesheet: hide the default handle visuals so we can draw a custom indicator.
-        self.setStyleSheet("""
-            QSlider::groove:horizontal {
-                background: transparent;
-                height: 12px;
-                margin: 8px 8px; /* top/bottom and left/right margins so groove has breathing room */
-                border-radius: 6px;
-            }
-            QSlider::handle:horizontal {
-                background: transparent;
-                width: 0px;
-                height: 0px;
-                margin: 0px;
-            }
-            QSlider::add-page:horizontal, QSlider::sub-page:horizontal {
-                background: transparent;
-            }
-        """)
+
 
     def on_value_changed(self, value):
         # propagate up and repaint (so indicator moves and dependent gradients update)
@@ -124,7 +108,7 @@ class HSVSlider(QSlider):
         painter.save()
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(gradient)
-        radius = min(18.0, groove_rect.height() / 2.0)
+        radius = min(22.0, groove_rect.height() / 2.0)
         painter.drawRoundedRect(groove_rect, radius, radius)
         painter.restore()
 
@@ -132,7 +116,7 @@ class HSVSlider(QSlider):
         pos_fraction = (self.value() - self.minimum()) / max(1, (self.maximum() - self.minimum()))
         cx = groove_rect.left() + pos_fraction * groove_rect.width()
         cy = groove_rect.center().y()
-        handle_radius = max(3.0, groove_rect.height() * 0.3)  # ensures visible handle
+        handle_radius = groove_rect.height() * 0.4
 
         # Dynamic pen width based on hover
         pen_width = 3.5 if self.is_hovered else 2.0
@@ -287,10 +271,8 @@ def hsv_to_rgb(h, s, v, a=1.0):
 
 def obj_color(self, position):
     config = ContextMenuConfig()
-    #config.auto_close = True
+    config.anchor = "+y"
     config.close_on_outside = False
-    config.item_radius = 14
-    config.font = RRRFONT.get_font(14)
     config.auto_close = True
     config.extra_distance = [0,-250]
 

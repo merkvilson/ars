@@ -33,6 +33,7 @@ class ContextMenuConfig:
         self.arc_span = 2 * math.pi
         self.hover_scale = 1.3
         self.distribution_mode = 'y'
+        self.anchor = "-y"  # Options: "-y", "+y", "-x", "+x"
         self.close_on_outside = True
         self.background_color = (255, 255, 255, 10)
         self.background_corner_radius = 22.0
@@ -462,8 +463,19 @@ def open_context(parent, items, position=None, config=None):
         menu_x = position.x() - int(radial_center.x()) + config.item_radius
         menu_y = position.y() - int(radial_center.y()) + config.item_radius
     else:
-        menu_x = position.x() - ctx_window.width() // 2
-        menu_y = position.y() + 40
+        # Handle different anchor positions
+        if config.anchor == "-y":  # Open below cursor
+            menu_x = position.x() - ctx_window.width() // 2
+            menu_y = position.y() + 40
+        elif config.anchor == "+y":  # Open above cursor
+            menu_x = position.x() - ctx_window.width() // 2
+            menu_y = position.y() - ctx_window.height() - 10
+        elif config.anchor == "-x":  # Open to the right of cursor
+            menu_x = position.x() + 10
+            menu_y = position.y() - ctx_window.height() // 2
+        elif config.anchor == "+x":  # Open to the left of cursor
+            menu_x = position.x() - ctx_window.width() - 10
+            menu_y = position.y() - ctx_window.height() // 2
 
     parent_rect = parent.geometry()
     menu_pos = QPoint(menu_x+config.extra_distance[0], menu_y+config.extra_distance[1])

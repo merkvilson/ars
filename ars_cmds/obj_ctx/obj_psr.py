@@ -17,27 +17,41 @@ def obj_scale(self, position):
 
 
     config = ContextMenuConfig()
-    #config.auto_close = True
+    config.anchor = "+y"
     config.close_on_outside = False
-    config.item_radius = 14
-    config.font = RRRFONT.get_font(14)
     config.auto_close = True
     config.extra_distance = [0,-150]
+    config.show_value = True
+    
 
     options_list = [
-        ["1", "2", "3"],
+        [
+        ic.ICON_AXIS_X,
+        ic.ICON_AXIS_Y,
+        ic.ICON_AXIS_Z,
+        ],
     ]
 
+    config.additional_texts = {
+        ic.ICON_AXIS_Y: "Size Y",
+        ic.ICON_AXIS_X: "Size X",
+        ic.ICON_AXIS_Z: "Size Z",
+    }
+
     config.slider_values = {
-        "1": (1,100,obj.get_scale()[0]*100),
-        "2": (1,100,obj.get_scale()[1]*100),
-        "3": (1,100,obj.get_scale()[2]*100),}
+        ic.ICON_AXIS_X: (1,10000,obj.get_scale()[0]*100),
+        ic.ICON_AXIS_Y: (1,10000,obj.get_scale()[1]*100),
+        ic.ICON_AXIS_Z: (1,10000,obj.get_scale()[2]*100),}
+    
+    config.incremental_values = {ic.ICON_AXIS_X: 100, ic.ICON_AXIS_Y: 100, ic.ICON_AXIS_Z: 100,}
     
     config.callbackL = {
-        "1": lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
-        "2": lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
-        "3": lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)), 
+        ic.ICON_AXIS_X: lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
+        ic.ICON_AXIS_Y: lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
+        ic.ICON_AXIS_Z: lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)), 
     }
+
+
     ctx = open_context(
         parent=self.central_widget,
         items=options_list,
