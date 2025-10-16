@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
 
         # Render data manager
         self.render_manager = RenderDataManager(
-            default_workflow_path=os.path.join("comfyui_workflow", "render.json")
+            default_workflow_path=os.path.join("extensions","comfyui","workflow", "render.json")
         )
 
         # Cursor follower
