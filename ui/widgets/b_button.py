@@ -327,18 +327,15 @@ class BButton(QGraphicsObject):
             self._update_handle_position()
             self.slider_handle.setZValue(1.0)
 
-            if self.incremental_value: cursor_type = ("arrow-bar-both","arrow-bar-left","arrow-bar-right") 
-            else: cursor_type = ("caret-left-right","caret-left","caret-right") 
-
-            self._cursor_modifier = CursorModifier(
-                trigger_widget=self.slider_handle,
-                axis="x",
-                bg_color=QColor(70, 70, 70, 200) if self.incremental_value else None,
-                #target=self.slider_handle.scenePos().toPoint(),
-                target = None,
-                cursor_type=cursor_type,
-                anchor="center",
-                teleport_back=self.incremental_value)
+            if self.incremental_value: 
+                self._cursor_modifier = CursorModifier(
+                    trigger_widget=self.slider_handle,
+                    axis="x",
+                    bg_color=QColor(70, 70, 70, 200) if self.incremental_value else None,
+                    target = None,
+                    cursor_type=("arrow-bar-both","arrow-bar-left","arrow-bar-right") ,
+                    anchor="center",
+                    teleport_back=self.incremental_value)
 
 
         # Ripple effect
