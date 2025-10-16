@@ -14,7 +14,7 @@ def doit(self):
         ["1", "2", "3", "4"],
     ]
     
-    self.render_manager.set_workflow(os.path.join("comfyui_workflow", "render2.json")),
+    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
 
 
     config.additional_texts = {

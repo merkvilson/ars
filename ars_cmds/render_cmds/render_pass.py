@@ -15,16 +15,14 @@ def pre_proc(self):
     self.grid.visible = False
     self.gizmo_node.visible = False
 
-    # Force a full render (without crop)
-    self._canvas.render()
+    self._canvas.render()    # Force a full render (without crop)
 
     # Restore visibility
     self.grid.visible = original_grid_visible
     self.gizmo_node.visible = original_gizmo_visible
 
-    # Force scene update if needed
-    self._canvas.update()
-    
+    self._canvas.update()    # Force scene update if needed
+
     ps = float(self._canvas.pixel_scale or 1.0)
     w, h = int(self._canvas.size[0] * ps), int(self._canvas.size[1] * ps)
 
