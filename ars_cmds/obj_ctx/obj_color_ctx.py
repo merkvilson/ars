@@ -285,16 +285,18 @@ def hsv_to_rgb(h, s, v, a=1.0):
 
     return np.float32(r), np.float32(g), np.float32(b), np.float32(a)
 
-BBL_COLOR_CONFIG = {"symbol": ic.ICON_PALETTE}
-def BBL_COLOR(self, position):
+def obj_color(self, position):
     config = ContextMenuConfig()
+    #config.auto_close = True
+    config.close_on_outside = False
     config.item_radius = 14
     config.font = RRRFONT.get_font(14)
-    config.item_spacing = 28
-    config.auto_close = False
-    config.show_value = False  # We'll handle value display ourselves
+    config.item_spacing = 281
+    config.auto_close = True
+    config.extra_distance = [0,-250]
 
     options_list = ["H", "S", "V", "A", "1", "2",]
+    config.callbackL = {"2":lambda: print("test"),}
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:

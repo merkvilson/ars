@@ -258,7 +258,8 @@ class ViewportWidget(QWidget):
 
 
         if event.button == 2:
-            bubble_cmds.BBL_COLOR(self.window(), QPoint(int(event.pos[0]), int(event.pos[1])))
+            bubble_cmds.obj_att_mng(self.window())
+            self.controller.set_handles([])
 
 
         # If the gizmo didn't handle it, proceed with object picking ONLY for left-clicks.
