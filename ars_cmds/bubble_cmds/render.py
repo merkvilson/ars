@@ -12,9 +12,12 @@ from ars_cmds.render_cmds.make_screenshot import make_screenshot
 from ars_cmds.render_cmds.render_pass import save_depth, save_render 
 from ars_cmds.core_cmds.key_check import key_check
 from prefs.pref_controller import get_path
+from ..core_cmds.load_object import add_mesh
 
 
 def BBL_RENDER(self, position):
+
+    len_meshes = len(os.listdir(get_path('mesh')))
 
     config = ContextMenuConfig()
     config.auto_close = False
@@ -91,6 +94,7 @@ def BBL_RENDER(self, position):
                 ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
                 if percent == 100:
                     check_queue()
+
         elif msg_type == "status":
             exec_info = data.get("data", {}).get("status", {}).get("exec_info", {})
             queue_remaining = exec_info.get("queue_remaining", 1)
@@ -113,6 +117,8 @@ def BBL_RENDER(self, position):
             self._render_timer.stop()
 
     def update_image():
+        nonlocal len_meshes  # Access the outer variable
+        
         latest_render_path = ""
         if os.path.exists(get_path('steps')):
             files = [f for f in os.listdir(get_path('steps'))]
@@ -125,6 +131,15 @@ def BBL_RENDER(self, position):
         
         if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and latest_render_path:
             self.img.open_image(latest_render_path)
+        
+        # Check for new meshes
+        if os.path.exists(get_path('mesh')):
+            current_mesh_count = len(os.listdir(get_path('mesh')))
+            if current_mesh_count > len_meshes:
+                print("new mesh is found")
+                len_meshes = current_mesh_count  # Update the count
+                add_mesh(self, os.path.join(get_path('mesh'), os.listdir(get_path('mesh'))[-1]), animated=True)
+
 
     def swap_imge(self):
         image_path = os.path.join(get_path('input'), "vp_screenshot.png")

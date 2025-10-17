@@ -23,6 +23,7 @@ def get_path(key = "image"):
 
     if key == "input": res = opj(cui,"input")
     if key == "steps": res = opj(output,"steps")
+    if key == "mesh":  res = opj(output,"mesh")
     if key == "output": res = output
 
     return res
