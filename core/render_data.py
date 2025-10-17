@@ -40,10 +40,8 @@ class RenderDataManager(QObject):
 
 
     def send_render(self):
-        if self.workflow_template is None:
-            return
+        if self.workflow_template is None: return
 
         data = json.dumps({"prompt": self.workflow_template}).encode('utf-8')
         req = request.Request("http://127.0.0.1:8188/prompt", data=data)
         request.urlopen(req)
-        #self.render_started.emit()

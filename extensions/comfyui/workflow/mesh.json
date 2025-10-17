@@ -10,7 +10,7 @@
   },
   "2": {
     "inputs": {
-      "image": "ComfyUI_00027_.png"
+      "image": "ComfyUI_00086_.png"
     },
     "class_type": "LoadImage",
     "_meta": {
@@ -54,7 +54,7 @@
   },
   "7": {
     "inputs": {
-      "seed": 952805179515179,
+      "seed": 947800235221283,
       "steps": [
         "19",
         0
@@ -151,11 +151,53 @@
   "19": {
     "inputs": {
       "ud_name": "steps",
-      "output": 0
+      "output": 20
     },
     "class_type": "Airen_Int",
     "_meta": {
       "title": "Airen Integer"
+    }
+  },
+  "20": {
+    "inputs": {
+      "ud_name": "KSampler",
+      "weight": 10,
+      "output": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "Airen_InfoGetter",
+    "_meta": {
+      "title": "Airen_InfoGetter"
+    }
+  },
+  "21": {
+    "inputs": {
+      "ud_name": "NEW",
+      "weight": 10,
+      "output": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "Airen_InfoGetter",
+    "_meta": {
+      "title": "Airen_InfoGetter"
+    }
+  },
+  "22": {
+    "inputs": {
+      "ud_name": "NEW2",
+      "weight": 10,
+      "output": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "Airen_InfoGetter",
+    "_meta": {
+      "title": "Airen_InfoGetter"
     }
   }
 }

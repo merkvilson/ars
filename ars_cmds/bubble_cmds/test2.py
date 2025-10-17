@@ -29,7 +29,7 @@ def doit(self):
         except Exception as e: print(e)
 
     config.callbackL = {"1": lambda: self.render_manager.set_userdata("seed", random.randint(1, 1000)),
-                        "2": lambda: print(self.render_manager.get_userdata("seed")),
+                        "2": lambda: print(self.render_manager.workflow_template),
                         "3": lambda: try_it(),
                         }
 

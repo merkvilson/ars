@@ -75,32 +75,29 @@ def BBL_RENDER(self, position):
     reconnect_timer.timeout.connect(connect_websocket)
 
     def on_text_message(message):
-        try:
-            data = json.loads(message)
-            msg_type = data.get("type")
-            if msg_type == "progress":
-                # Handle progress messages for KSampler
-                node_id = data.get("data", {}).get("node")
-                value = data.get("data", {}).get("value", 0)
-                max_val = max(data.get("data", {}).get("max", 1), 1)
-                
-                # Only track progress from the known KSampler node
-                if node_id == self.render_manager.get_userdata("KSampler")[0]:
-                    percent = int((value / max_val) * 100)
-                    print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
-                    ctx.update_item(ic.ICON_RENDER, "progress", percent)
-                    ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
-                    if percent == 100:
-                        check_queue()
-            elif msg_type == "status":
-                exec_info = data.get("data", {}).get("status", {}).get("exec_info", {})
-                queue_remaining = exec_info.get("queue_remaining", 1)
-                print(f"Queue status: {queue_remaining} remaining")
-                if queue_remaining == 0:
-                    revert_to_normal()
-            update_image()
-        except:
-            print("on_text_message failed!")
+        data = json.loads(message)
+        msg_type = data.get("type")
+        if msg_type == "progress":
+            # Handle progress messages for KSampler
+            node_id = data.get("data", {}).get("node")
+            value = data.get("data", {}).get("value", 0)
+            max_val = max(data.get("data", {}).get("max", 1), 1)
+            
+            # Only track progress from the known KSampler node
+            if node_id == self.render_manager.get_userdata("KSampler")[0]:
+                percent = int((value / max_val) * 100)
+                print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
+                ctx.update_item(ic.ICON_RENDER, "progress", percent)
+                ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
+                if percent == 100:
+                    check_queue()
+        elif msg_type == "status":
+            exec_info = data.get("data", {}).get("status", {}).get("exec_info", {})
+            queue_remaining = exec_info.get("queue_remaining", 1)
+            print(f"Queue status: {queue_remaining} remaining")
+            if queue_remaining == 0:
+                revert_to_normal()
+        update_image()
 
     self._render_timer = None
 

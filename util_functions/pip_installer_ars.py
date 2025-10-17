@@ -8,7 +8,7 @@ python_path = os.path.join(comfy_path, "python_embeded", "python.exe")
 
 base_dir = (os.path.split(__file__)[0])
 
-packages = ["opencv-python","imageio-ffmpeg"]
+packages = ["imageio-ffmpeg"]
 
 for pkg in packages:
     subprocess.run([python_path, "-m", "pip", "install", pkg], check=True)
