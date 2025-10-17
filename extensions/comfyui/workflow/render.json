@@ -207,6 +207,7 @@
   "35": {
     "inputs": {
       "ud_name": "KSampler",
+      "weight": 100,
       "output": [
         "15",
         0

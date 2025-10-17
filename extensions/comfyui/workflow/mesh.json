@@ -174,24 +174,10 @@
   },
   "21": {
     "inputs": {
-      "ud_name": "NEW",
-      "weight": 10,
+      "ud_name": "VoxelToMesh",
+      "weight": 20,
       "output": [
         "9",
-        0
-      ]
-    },
-    "class_type": "Airen_InfoGetter",
-    "_meta": {
-      "title": "Airen_InfoGetter"
-    }
-  },
-  "22": {
-    "inputs": {
-      "ud_name": "NEW2",
-      "weight": 10,
-      "output": [
-        "8",
         0
       ]
     },

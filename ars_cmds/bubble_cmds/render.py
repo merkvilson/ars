@@ -77,16 +77,20 @@ def BBL_RENDER(self, position):
     ws.errorOccurred.connect(on_error)
     reconnect_timer.timeout.connect(connect_websocket)
 
+
+    weights =self.render_manager.get_weights()
+    print("Weights (percentage):", weights)
+
     def on_text_message(message):
         data = json.loads(message)
         msg_type = data.get("type")
         if msg_type == "progress":
-            # Handle progress messages for KSampler
+            # Handle progress messages
             node_id = data.get("data", {}).get("node")
             value = data.get("data", {}).get("value", 0)
             max_val = max(data.get("data", {}).get("max", 1), 1)
             
-            # Only track progress from the known KSampler node
+            # Only track progress from the known node
             if node_id == self.render_manager.get_userdata("KSampler")[0]:
                 percent = int((value / max_val) * 100)
                 print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")

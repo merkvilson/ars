@@ -38,6 +38,19 @@ class RenderDataManager(QObject):
 
         print(f"Userdata node with ud_name '{key}' not found.")
 
+    
+    def get_weights(self):
+        weights = {}
+        for _, node in self.workflow_template.items():
+            inputs = node.get("inputs", {})
+            if "weight" in inputs:
+                weights[inputs["output"][0]]= inputs["weight"]
+
+        sum_values = sum(weights.values())
+        percentage_values = {k: (v / sum_values) * 100 for k, v in weights.items()}
+
+        return percentage_values
+
 
     def send_render(self):
         if self.workflow_template is None: return
