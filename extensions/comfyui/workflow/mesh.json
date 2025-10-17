@@ -8,15 +8,6 @@
       "title": "Image Only Checkpoint Loader (img2vid model)"
     }
   },
-  "2": {
-    "inputs": {
-      "image": "ComfyUI_00086_.png"
-    },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Image"
-    }
-  },
   "3": {
     "inputs": {
       "shift": 1,
@@ -54,7 +45,7 @@
   },
   "7": {
     "inputs": {
-      "seed": 947800235221283,
+      "seed": 210617601078509,
       "steps": [
         "19",
         0
@@ -88,7 +79,7 @@
   "8": {
     "inputs": {
       "num_chunks": 8000,
-      "octree_resolution": 256,
+      "octree_resolution": 64,
       "samples": [
         "7",
         0
@@ -139,7 +130,7 @@
         1
       ],
       "image": [
-        "2",
+        "23",
         0
       ]
     },
@@ -160,30 +151,39 @@
   },
   "20": {
     "inputs": {
-      "ud_name": "KSampler",
+      "ud_name": "1",
       "weight": 10,
       "output": [
         "7",
         0
       ]
     },
-    "class_type": "Airen_InfoGetter",
+    "class_type": "Airen_Progress_Reader",
     "_meta": {
-      "title": "Airen_InfoGetter"
+      "title": "Airen_Progress_Reader"
     }
   },
   "21": {
     "inputs": {
-      "ud_name": "VoxelToMesh",
+      "ud_name": "2",
       "weight": 20,
       "output": [
         "9",
         0
       ]
     },
-    "class_type": "Airen_InfoGetter",
+    "class_type": "Airen_Progress_Reader",
     "_meta": {
-      "title": "Airen_InfoGetter"
+      "title": "Airen_Progress_Reader"
+    }
+  },
+  "23": {
+    "inputs": {
+      "ud_name": ""
+    },
+    "class_type": "Airen_RenderPass",
+    "_meta": {
+      "title": "Airen_RenderPass"
     }
   }
 }

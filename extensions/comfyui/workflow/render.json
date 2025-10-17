@@ -204,20 +204,6 @@
       "title": "Airen Checkpoint"
     }
   },
-  "35": {
-    "inputs": {
-      "ud_name": "KSampler",
-      "weight": 100,
-      "output": [
-        "15",
-        0
-      ]
-    },
-    "class_type": "Airen_InfoGetter",
-    "_meta": {
-      "title": "Airen Info Getter"
-    }
-  },
   "36": {
     "inputs": {
       "ud_name": ""
@@ -264,6 +250,20 @@
     "class_type": "Airen_SaveImage",
     "_meta": {
       "title": "Airen Save Image"
+    }
+  },
+  "41": {
+    "inputs": {
+      "ud_name": "",
+      "weight": 10,
+      "output": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "Airen_Progress_Reader",
+    "_meta": {
+      "title": "Airen_Progress_Reader"
     }
   }
 }

@@ -131,7 +131,7 @@ class Airen_SaveImage:
         return {"ui": {"images": results}}
 
 
-class Airen_InfoGetter:
+class Airen_Progress_Reader:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -207,6 +207,6 @@ NODE_CLASS_MAPPINGS = {
     "Airen_VAE_String": Airen_VAE_String,
     "Airen_Lora_String": Airen_Lora_String,
     "Airen_SaveImage": Airen_SaveImage,
-    "Airen_InfoGetter": Airen_InfoGetter,
+    "Airen_Progress_Reader": Airen_Progress_Reader,
     "Airen_RenderPass": Airen_RenderPass,
 }

@@ -79,7 +79,10 @@ def BBL_RENDER(self, position):
 
 
     weights =self.render_manager.get_weights()
-    print("Weights (percentage):", weights)
+    
+    for weight_item, weight_value in weights.items():
+        print(f"Weight Item: {weight_item}, Weight Value: {weight_value}")
+
 
     def on_text_message(message):
         data = json.loads(message)
@@ -90,15 +93,18 @@ def BBL_RENDER(self, position):
             value = data.get("data", {}).get("value", 0)
             max_val = max(data.get("data", {}).get("max", 1), 1)
             
+            """
             # Only track progress from the known node
-            if node_id == self.render_manager.get_userdata("KSampler")[0]:
-                percent = int((value / max_val) * 100)
-                print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
-                ctx.update_item(ic.ICON_RENDER, "progress", percent)
-                ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
-                if percent == 100:
-                    check_queue()
-
+            for weight_item, weight_value in weights.items():
+                if node_id == weight_item:
+                    percent = int((value / max_val) * 100)
+                    #print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
+                    print("update")
+                    ctx.update_item(ic.ICON_RENDER, "progress", percent)
+                    ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
+                    if percent == 100:
+                        check_queue()
+            """
         elif msg_type == "status":
             exec_info = data.get("data", {}).get("status", {}).get("exec_info", {})
             queue_remaining = exec_info.get("queue_remaining", 1)
@@ -142,7 +148,7 @@ def BBL_RENDER(self, position):
             if current_mesh_count > len_meshes:
                 print("new mesh is found")
                 len_meshes = current_mesh_count  # Update the count
-                add_mesh(self, os.path.join(get_path('mesh'), os.listdir(get_path('mesh'))[-1]), animated=True)
+                #add_mesh(self, os.path.join(get_path('mesh'), os.listdir(get_path('mesh'))[-1]), animated=True)
 
 
     def swap_imge(self):
