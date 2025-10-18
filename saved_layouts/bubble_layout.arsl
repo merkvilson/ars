@@ -46,8 +46,18 @@
             "grid_y": 0
         },
         {
+            "symbol": "4",
+            "grid_x": 21,
+            "grid_y": 0
+        },
+        {
             "symbol": "\ue919",
             "grid_x": 15,
+            "grid_y": 0
+        },
+        {
+            "symbol": "3",
+            "grid_x": 13,
             "grid_y": 0
         },
         {
@@ -78,11 +88,6 @@
         {
             "symbol": "2",
             "grid_x": 19,
-            "grid_y": 0
-        },
-        {
-            "symbol": "3",
-            "grid_x": 13,
             "grid_y": 0
         },
         {

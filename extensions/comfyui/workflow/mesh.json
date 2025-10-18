@@ -45,7 +45,10 @@
   },
   "7": {
     "inputs": {
-      "seed": 210617601078509,
+      "seed": [
+        "24",
+        0
+      ],
       "steps": [
         "19",
         0
@@ -79,7 +82,7 @@
   "8": {
     "inputs": {
       "num_chunks": 8000,
-      "octree_resolution": 64,
+      "octree_resolution": 256,
       "samples": [
         "7",
         0
@@ -131,7 +134,7 @@
       ],
       "image": [
         "23",
-        0
+        2
       ]
     },
     "class_type": "CLIPVisionEncode",
@@ -184,6 +187,28 @@
     "class_type": "Airen_RenderPass",
     "_meta": {
       "title": "Airen_RenderPass"
+    }
+  },
+  "24": {
+    "inputs": {
+      "ud_name": "seed",
+      "output": 5
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "25": {
+    "inputs": {
+      "images": [
+        "23",
+        2
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
     }
   }
 }

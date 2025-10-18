@@ -10,6 +10,8 @@ class RenderDataManager(QObject):
     def __init__(self, default_workflow_path=None):
         super().__init__()
         
+        self.workflow_name = ""
+
         # Load default workflow JSON if provided (like your default.json)
         self.workflow_template = None
         if default_workflow_path and os.path.exists(default_workflow_path):
@@ -19,6 +21,7 @@ class RenderDataManager(QObject):
     def set_workflow(self, workflow_json):
         with open(workflow_json, 'r') as f:
             self.workflow_template = json.load(f)
+            self.workflow_name = os.path.splitext(os.path.basename(workflow_json))[0]
  
     def set_userdata(self, key, value):
         for _, node in self.workflow_template.items():

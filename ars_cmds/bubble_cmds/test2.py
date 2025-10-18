@@ -14,23 +14,19 @@ def doit(self):
         ["1", "2", "3", "4"],
     ]
     
-    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
+    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
 
 
     config.additional_texts = {
     "1": "set userdata",
     "2": "get userdata",
-    "3": "get node index",
+    "3": "workflow template",
     }
 
-    def try_it():
-        try:
-            print(self.render_manager.get_userdata("KSampler")[0])
-        except Exception as e: print(e)
+
 
     config.callbackL = {"1": lambda: self.render_manager.set_userdata("seed", random.randint(1, 1000)),
-                        "2": lambda: print(self.render_manager.workflow_template),
-                        "3": lambda: try_it(),
+                        "2": lambda: print(self.render_manager.workflow_name),
                         }
 
     ctx = open_context(

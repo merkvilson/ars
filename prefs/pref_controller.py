@@ -15,15 +15,27 @@ def read_pref(key = "cui_root"):
             return res
 
 
+
+
 def get_path(key = "image"):
 
     cui_root = read_pref(key = "cui_root")
     cui      = opj(cui_root, "ComfyUI")
     output   = opj(cui,  "output")
 
+    last_step_path = ""
+    if os.path.exists(opj(output,"steps")):
+        files = [f for f in os.listdir(opj(output,"steps"))]
+        if files:
+            full_paths = [opj(opj(output,"steps"), f) for f in files]
+            last_step_path = max(full_paths, key=os.path.getmtime)
+
+
     if key == "input": res = opj(cui,"input")
     if key == "steps": res = opj(output,"steps")
     if key == "mesh":  res = opj(output,"mesh")
+    if key == "keyframes": res = opj(output,"keyframes")
+    if key == "last_step": res = last_step_path
     if key == "output": res = output
 
     return res

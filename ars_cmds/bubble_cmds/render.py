@@ -12,7 +12,7 @@ from ars_cmds.render_cmds.make_screenshot import make_screenshot
 from ars_cmds.render_cmds.render_pass import save_depth, save_render 
 from ars_cmds.core_cmds.key_check import key_check
 from prefs.pref_controller import get_path
-
+from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 
 def BBL_RENDER(self, position):
 
@@ -121,18 +121,9 @@ def BBL_RENDER(self, position):
             self._render_timer.stop()
 
     def update_image():
-        latest_render_path = ""
-        if os.path.exists(get_path('steps')):
-            files = [f for f in os.listdir(get_path('steps'))]
-            if files:
-                full_paths = [os.path.join(get_path('steps'), f) for f in files]
-                latest_render_path = max(full_paths, key=os.path.getmtime)
-        
-        if latest_render_path:
-            ctx.update_item(ic.ICON_IMAGE, "image_path", latest_render_path)
-        
-        if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and latest_render_path:
-            self.img.open_image(latest_render_path)
+        ctx.update_item(ic.ICON_IMAGE, "image_path", get_path('last_step'))
+        if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
+            self.img.open_image(get_path('last_step'))
 
     def swap_imge(self):
         image_path = os.path.join(get_path('input'), "vp_screenshot.png")
@@ -156,11 +147,15 @@ def BBL_RENDER(self, position):
         ctx.update_item(ic.ICON_RENDER, "progress_bar", 0)
         ctx.update_item(ic.ICON_RENDER, "additional_text", "Start Render")
         stop_polling()
+        print("Render complete")
         if queue_timer.isActive():
             queue_timer.stop()
 
     queue_timer = QTimer()
     queue_timer.timeout.connect(lambda: check_queue())
+
+
+
 
     def check_queue():
         response = requests.get("http://127.0.0.1:8188/queue")
@@ -170,6 +165,13 @@ def BBL_RENDER(self, position):
             print(f"Queue check: {queue_remaining} remaining")
             if queue_remaining == 0:
                 revert_to_normal()
+
+
+    def save_output(name = self.render_manager.workflow_name):
+        if name == "mesh_image":
+            copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
+        elif name == "render":
+            copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
 
     config.callbackL = {
         ic.ICON_RENDER: lambda: (
@@ -187,10 +189,8 @@ def BBL_RENDER(self, position):
         ic.ICON_STEPS: lambda value: self.render_manager.set_userdata("steps", value),
         ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
         ic.ICON_GIZMO_SCALE: lambda value: print(value),
-        "X": lambda: (
-            self.render_manager.set_workflow(os.path.join("comfyui_workflow", "mesh.json")),
-            self.render_manager.set_userdata("steps", ctx.get_value(ic.ICON_STEPS)),
-        ),
+        ic.ICON_SAVE: lambda: save_output(),
+
     }
 
     ctx = open_context(
