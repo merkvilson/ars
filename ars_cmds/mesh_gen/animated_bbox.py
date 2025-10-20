@@ -19,9 +19,7 @@ def _create_cube_mesh(size=1.0, color='white', alpha=1.0, parent=None):
         [-size/2, size/2, size/2],
     ], dtype=np.float32)
     
-    # Define faces (triangles, 2 per face, with INWARD-pointing normals)
-    # The winding order of each triangle (e.g., [a, b, c]) has been
-    # changed to [a, c, b] to flip the normal.
+    # Define cube faces (12 triangles)
     faces = np.array([
         # Front face (z+)
         [4, 6, 5], [4, 7, 6],
@@ -203,9 +201,9 @@ def bbox_loading_animation(parent, bbox_scale = 2.0, count = 3):
             # Fade in main cube alpha over 0.5 seconds
             if elapsed < fade_in_duration:
                 progress = elapsed / fade_in_duration
-                alpha = 0.2 * progress
+                alpha = 0.1 * progress
             else:
-                alpha = 0.2
+                alpha = 0.1
             
             cube.color = Color((1.0, 1.0, 1.0), alpha=alpha)
             cube.update()
