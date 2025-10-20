@@ -76,7 +76,7 @@ class IObject3D(ABC):
         """The visual that holds the rotation and scale transform."""
         return self._visual
 
-    def position(self) -> np.ndarray:
+    def get_position(self) -> np.ndarray:
         # Map the local origin [0,0,0] into world coordinates
         return self._node.transform.map([0, 0, 0])[:3]
     """
@@ -227,7 +227,7 @@ class CMesh(IObject3D):
         new_obj = CMesh(new_visual, name=self.name + "_copy")
 
         # Copy position (translation)
-        new_obj.set_position(*self.position())
+        new_obj.set_position(*self.get_position())
 
         # Copy rotation and scale (full transform matrix)
         new_obj._visual.transform.matrix = self._visual.transform.matrix.copy()

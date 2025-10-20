@@ -60,7 +60,7 @@ class ViewportWidget(QWidget):
             selected = self._objectManager.get_selected_objects()
             if len(selected) == 1:
                 obj = selected[0]
-                pos = obj.position()
+                pos = obj.get_position()
 
                 # Sync controller's translation state with the selected object
                 controller._object_translation = np.array(pos, dtype=float) 
@@ -288,7 +288,7 @@ class ViewportWidget(QWidget):
 
         selected = om.get_selected_objects()
         if selected:
-            positions = [obj.position() for obj in selected]
+            positions = [obj.get_position() for obj in selected]
             center = np.mean(positions, axis=0)
         self._canvas.update()
 

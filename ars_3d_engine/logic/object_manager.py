@@ -55,7 +55,7 @@ class CObjectManager(QObject):
             clone = obj.clone()
             # Optionally offset the position slightly to avoid perfect overlap
             if offset:
-                current_pos = clone.position()
+                current_pos = clone.get_position()
                 clone.set_position(current_pos[0] + offset[0], current_pos[1] + offset[1], current_pos[2] + offset[2])
             
             self.add_object(clone)
