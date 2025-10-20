@@ -16,7 +16,7 @@ def BBL_PROMPT(self, position):
     options_list = [[ic.ICON_EYE,ic.ICON_EYE_CLOSED,ic.ICON_MENU], "A",]
 
     prompt_widget = MultiLineInputWidget(central_widget = self.central_widget)
-    prompt_widget.setFixedSize(600, 140)
+    prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"A": prompt_widget}
 

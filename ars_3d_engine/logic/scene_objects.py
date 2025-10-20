@@ -27,6 +27,7 @@ class IObject3D(ABC):
 
         self._name = name
         self._parent = None
+        self._prompt = ""
         self._children = []
 
         # Attach shading filter for directional light
@@ -93,6 +94,12 @@ class IObject3D(ABC):
         tr = transforms.MatrixTransform()
         tr.translate((float(x), float(y), float(z)))
         self._node.transform = tr
+
+    def set_prompt(self, prompt: str) -> None:
+        self._prompt = prompt
+
+    def get_prompt(self) -> str:
+        return self._prompt
 
     def set_color(self, color: tuple) -> None:
         """Set the color of the visual. Color should be a tuple (r, g, b) or (r, g, b, a) with values 0-1."""
