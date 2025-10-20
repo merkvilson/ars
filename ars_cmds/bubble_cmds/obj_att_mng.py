@@ -7,6 +7,7 @@ import random
 from ars_cmds.obj_ctx.obj_color_ctx import obj_color
 from ars_cmds.obj_ctx.obj_psr import obj_scale
 from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH  as delete_selected_obj
+from ars_cmds.bubble_cmds.open_prompt import BBL_PROMPT as open_prompt
 
 def BBL_3(self, position):
     run_ext(__file__, self)
@@ -32,7 +33,9 @@ def obj_att_mng(self, ):
 
     config.callbackL = {ic.ICON_PALETTE: lambda: obj_color(self,mouse_pos),
                         ic.ICON_GIZMO_SCALE_3D: lambda: obj_scale(self,mouse_pos),
-                        ic.ICON_TRASH: lambda: delete_selected_obj(self, None),}
+                        ic.ICON_TRASH: lambda: delete_selected_obj(self, None),
+                        ic.ICON_TEXT_INPUT: lambda: open_prompt(self, mouse_pos),
+                        }
     
 
     ctx = open_context(

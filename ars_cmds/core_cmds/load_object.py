@@ -92,9 +92,8 @@ def add_mesh(self, file_path=None, animated=False):
             
             # Wait 50 ms before starting the movement
             QTimer.singleShot(50, start_animation)
-        else:
-            play_sound("obj-drop-deep")  # Optional: play sound immediately if not animated
 
         print(f"Added mesh: {name}")
+        return obj
     except Exception as e:
         print(f"Failed to add mesh: {e}")

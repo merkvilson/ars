@@ -72,8 +72,8 @@ class MainWindow(QMainWindow):
         # Add hierarchy panel (top-right)
         self.hierarchy = ObjectHierarchyWindow(self.viewport)
         self.hierarchy.setParent(self.central_widget)
-        #self.hierarchy.show()
-        self.hierarchy.hide()
+        self.hierarchy.show()
+        #self.hierarchy.hide()
 
         # Floating bubbles overlay
         self.bubbles_overlay = FloatingBubblesManager(parent=self.central_widget)

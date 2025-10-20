@@ -7,11 +7,13 @@ BBL_PROMPT_CONFIG = {"symbol": ic.ICON_TEXT_INPUT, "hotkey": "P"}
 def BBL_PROMPT(self, position):
     config = ContextMenuConfig()
     config.auto_close = False
-    config.expand = "x"
-    config.distribution_mode = "x"
-    config.extra_distance = [0,99999]
+    config.close_on_outside = False
+   # config.expand = "x"
+    config.use_extended_shape = False
+    config.distribution_mode = "y"
+    config.anchor = "+y"
 
-    options_list = ["1","   ", "A","   ","2"]
+    options_list = [[ic.ICON_EYE,ic.ICON_EYE_CLOSED,ic.ICON_MENU], "A",]
 
     prompt_widget = MultiLineInputWidget(central_widget = self.central_widget)
     prompt_widget.setFixedSize(600, 140)

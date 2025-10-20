@@ -82,7 +82,10 @@
   "8": {
     "inputs": {
       "num_chunks": 8000,
-      "octree_resolution": 256,
+      "octree_resolution": [
+        "26",
+        0
+      ],
       "samples": [
         "7",
         0
@@ -166,20 +169,6 @@
       "title": "Airen_Progress_Reader"
     }
   },
-  "21": {
-    "inputs": {
-      "ud_name": "2",
-      "weight": 20,
-      "output": [
-        "9",
-        0
-      ]
-    },
-    "class_type": "Airen_Progress_Reader",
-    "_meta": {
-      "title": "Airen_Progress_Reader"
-    }
-  },
   "23": {
     "inputs": {
       "ud_name": ""
@@ -199,16 +188,14 @@
       "title": "Airen Integer"
     }
   },
-  "25": {
+  "26": {
     "inputs": {
-      "images": [
-        "23",
-        2
-      ]
+      "ud_name": "resolution",
+      "output": 256
     },
-    "class_type": "PreviewImage",
+    "class_type": "Airen_Int",
     "_meta": {
-      "title": "Preview Image"
+      "title": "Airen_Int"
     }
   }
 }

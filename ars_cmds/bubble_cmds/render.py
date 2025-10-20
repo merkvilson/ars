@@ -10,6 +10,7 @@ import requests
 
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
 from ars_cmds.render_cmds.render_pass import save_depth, save_render 
+from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check
 from prefs.pref_controller import get_path
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
@@ -96,7 +97,7 @@ def BBL_RENDER(self, position):
                     ctx.update_item(ic.ICON_RENDER, "progress", percent)
                     ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
                     if percent == 100:
-                        check_queue()
+                        check_queue(revert_to_normal)
 
 
         elif msg_type == "status":
@@ -152,19 +153,9 @@ def BBL_RENDER(self, position):
             queue_timer.stop()
 
     queue_timer = QTimer()
-    queue_timer.timeout.connect(lambda: check_queue())
+    queue_timer.timeout.connect(lambda: check_queue(revert_to_normal))
 
 
-
-
-    def check_queue():
-        response = requests.get("http://127.0.0.1:8188/queue")
-        if response.status_code == 200:
-            queue_data = response.json()
-            queue_remaining = len(queue_data.get("queue_running", [])) + len(queue_data.get("queue_pending", []))
-            print(f"Queue check: {queue_remaining} remaining")
-            if queue_remaining == 0:
-                revert_to_normal()
 
 
     def save_output(name = self.render_manager.workflow_name):
