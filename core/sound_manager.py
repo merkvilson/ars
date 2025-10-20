@@ -1,5 +1,7 @@
-import pygame
 import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+import pygame
+
 sound_path = os.path.join("res", "sounds")
 
 def play_sound(name, volume=0.5):  # Default to half volume; pass a different value if needed
