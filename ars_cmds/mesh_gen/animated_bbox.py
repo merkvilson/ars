@@ -19,20 +19,22 @@ def _create_cube_mesh(size=1.0, color='white', alpha=1.0, parent=None):
         [-size/2, size/2, size/2],
     ], dtype=np.float32)
     
-    # Define faces (triangles, 2 per face, with outward-pointing normals)
+    # Define faces (triangles, 2 per face, with INWARD-pointing normals)
+    # The winding order of each triangle (e.g., [a, b, c]) has been
+    # changed to [a, c, b] to flip the normal.
     faces = np.array([
         # Front face (z+)
-        [4, 5, 6], [4, 6, 7],
+        [4, 6, 5], [4, 7, 6],
         # Back face (z-)
-        [1, 0, 3], [1, 3, 2],
+        [1, 3, 0], [1, 2, 3],
         # Right face (x+)
-        [5, 1, 2], [5, 2, 6],
+        [5, 2, 1], [5, 6, 2],
         # Left face (x-)
-        [0, 4, 7], [0, 7, 3],
+        [0, 7, 4], [0, 3, 7],
         # Top face (y+)
-        [7, 6, 2], [7, 2, 3],
+        [7, 2, 6], [7, 3, 2],
         # Bottom face (y-)
-        [0, 1, 5], [0, 5, 4],
+        [0, 5, 1], [0, 4, 5],
     ], dtype=np.uint32)
     
     # Create mesh
