@@ -106,8 +106,8 @@ def main(self):
                 new_file = new_files.pop()
                 print(f"New file detected: {new_file}")
                 cleanup()
-                add_mesh(self, os.path.join(mesh_dir, new_file), animated=False)
-        
+                mesh = add_mesh(self, os.path.join(mesh_dir, new_file), animated=False)
+                mesh.set_scale((2,2,2))
         # Connect signals
         self._mesh_watcher.directoryChanged.connect(on_directory_changed)
         queue_check_timer.timeout.connect(check_queue_status)

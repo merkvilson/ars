@@ -58,7 +58,7 @@ def _create_cube_mesh(size=1.0, color='white', alpha=1.0, parent=None):
     
     return mesh
 
-def bbox_loading_animation(parent, bbox_scale = 2.0, count = 3):
+def bbox_loading_animation(parent, bbox_scale = 4.0, count = 3):
     play_sound("bbox-in")
     # Create 27 mini-cubes in a 3x3x3 grid
     mini_cube_size = (bbox_scale / count)
@@ -68,7 +68,7 @@ def bbox_loading_animation(parent, bbox_scale = 2.0, count = 3):
     
     # Animation parameters
     min_scale = 0.01
-    max_scale = (bbox_scale / count) * 0.8
+    max_scale = (bbox_scale / count) * (1/count)
     animation_period = 2.0  # Duration of one full scale cycle in seconds
     fade_in_duration = 0.5  # Duration to fade in the main cube alpha
     initial_scale = 0.0001  # Extremely small to hide initial flash
