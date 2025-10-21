@@ -32,7 +32,7 @@ def BBL_TIMELINE(self, position):
         config2.close_on_outside = False
         config2.extra_distance = distance
 
-        items = [os.path.join(get_path("steps"),img) for img in os.listdir(get_path("steps")) if img.startswith("Airen_")]
+        items = [os.path.join(get_path("keyframes"),img) for img in os.listdir(get_path("keyframes"))]
 
         imgs_dict = {
             img: (lambda img=img: ctx.update_item(keyframe, "image_path",  img))
