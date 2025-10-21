@@ -47,7 +47,7 @@
         },
         {
             "symbol": "4",
-            "grid_x": 21,
+            "grid_x": 20,
             "grid_y": 0
         },
         {
@@ -93,11 +93,6 @@
         {
             "symbol": "\ue979",
             "grid_x": 11,
-            "grid_y": 0
-        },
-        {
-            "symbol": "Y",
-            "grid_x": 20,
             "grid_y": 0
         }
     ]

@@ -14,14 +14,14 @@ def doit(self):
         ["1", "2", "3", "4"],
     ]
     
-    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
+
 
 
     config.additional_texts = {
-    "1": "set userdata",
-    "2": "get userdata",
-    "3": "set prompt",
-    "4": "get prompt",
+    "1": "Mesh Workflow",
+    "2": "Render Workflow",
+    "3": "Mesh Img Workflow",
+    "4": "Current Workflow",
     }
 
     def get_obj(self):
@@ -38,10 +38,10 @@ def doit(self):
             obj.set_prompt(prompt)
             print(f"Set prompt to: {prompt}")
 
-    config.callbackL = {"1": lambda: self.render_manager.set_userdata("seed", random.randint(1, 1000)),
-                        "2": lambda: print(self.render_manager.workflow_name),
-                        "3": lambda: set_prompt(),
-                        "4": lambda: print(get_obj(self).get_prompt() if get_obj(self) else "No object selected"),
+    config.callbackL = {"1": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
+                        "2": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
+                        "3": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
+                        "4": lambda: print(self.render_manager.workflow_name),
 
                         }
 

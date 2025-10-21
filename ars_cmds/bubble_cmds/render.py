@@ -15,13 +15,16 @@ from ars_cmds.core_cmds.key_check import key_check
 from prefs.pref_controller import get_path
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 
-def BBL_RENDER(self, position):
+def BBL_RENDER(self, position, workflow = None):
+    
+    workflow = workflow if workflow else self.render_manager.workflow_name
+
 
     config = ContextMenuConfig()
     config.auto_close = False
-    config.close_on_outside = False
+    #config.close_on_outside = False
 
-    options_list = [ic.ICON_RENDER, ic.ICON_STEPS, ic.ICON_GIZMO_SCALE, ic.ICON_IMAGE, ic.ICON_SAVE, "X"]
+    options_list = [ic.ICON_RENDER, ic.ICON_STEPS, ic.ICON_GIZMO_SCALE, ic.ICON_SAVE, ic.ICON_IMAGE, ]
 
     config.image_items = {ic.ICON_IMAGE: r" "}
 
@@ -156,31 +159,31 @@ def BBL_RENDER(self, position):
     queue_timer.timeout.connect(lambda: check_queue(revert_to_normal))
 
 
-
-
     def save_output(name = self.render_manager.workflow_name):
         if name == "mesh_image":
             copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
         elif name == "render":
             copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
 
+
+    def start_render():
+        ctx.update_item(ic.ICON_RENDER, "progress_bar", 1)
+        ctx.update_item(ic.ICON_RENDER, "progress", 0)
+        ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%")
+        self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
+        connect_websocket()
+        save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+        save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+        self.render_manager.send_render()
+        start_polling()
+        queue_timer.start(500)
+
     config.callbackL = {
-        ic.ICON_RENDER: lambda: (
-            ctx.update_item(ic.ICON_RENDER, "progress_bar", 1),
-            ctx.update_item(ic.ICON_RENDER, "progress", 0),
-            ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%"),
-            self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0),
-            connect_websocket(),
-            save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE))),
-            save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE))),
-            self.render_manager.send_render(),
-            start_polling(),
-            queue_timer.start(500)
-        ),
+        ic.ICON_RENDER: lambda: start_render(),
         ic.ICON_STEPS: lambda value: self.render_manager.set_userdata("steps", value),
-        ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
         ic.ICON_GIZMO_SCALE: lambda value: print(value),
         ic.ICON_SAVE: lambda: save_output(),
+        ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
 
     }
 
