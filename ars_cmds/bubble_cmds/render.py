@@ -1,19 +1,25 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
-from PyQt6.QtCore import QTimer, QUrl
+from PyQt6.QtCore import QTimer, QUrl, QFileSystemWatcher
 from PyQt6.QtWebSockets import QWebSocket
 from PyQt6.QtNetwork import QAbstractSocket
+from PyQt6.QtGui import QCursor
+
+from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
+
+from ars_cmds.render_cmds.make_screenshot import make_screenshot
+from ars_cmds.render_cmds.render_pass import save_depth, save_render
+from ars_cmds.render_cmds.check import check_queue
+from ars_cmds.core_cmds.key_check import key_check
+from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.mesh_gen.generate_mesh import generate_mesh
+
+from prefs.pref_controller import get_path
+
 import os
 import uuid
 import json
-import requests
 
-from ars_cmds.render_cmds.make_screenshot import make_screenshot
-from ars_cmds.render_cmds.render_pass import save_depth, save_render 
-from ars_cmds.render_cmds.check import check_queue
-from ars_cmds.core_cmds.key_check import key_check
-from prefs.pref_controller import get_path
-from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+
 
 def BBL_RENDER(self, position, workflow = None):
     
@@ -125,7 +131,8 @@ def BBL_RENDER(self, position, workflow = None):
             self._render_timer.stop()
 
     def update_image():
-        ctx.update_item(ic.ICON_IMAGE, "image_path", get_path('last_step'))
+        if self.viewport.isVisible():
+            ctx.update_item(ic.ICON_IMAGE, "image_path", get_path('last_step'))
         if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
             self.img.open_image(get_path('last_step'))
 
@@ -166,17 +173,21 @@ def BBL_RENDER(self, position, workflow = None):
             copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
 
 
+
     def start_render():
-        ctx.update_item(ic.ICON_RENDER, "progress_bar", 1)
-        ctx.update_item(ic.ICON_RENDER, "progress", 0)
-        ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%")
-        self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
-        connect_websocket()
-        save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-        save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-        self.render_manager.send_render()
-        start_polling()
-        queue_timer.start(500)
+        if workflow in ("render", "mesh_image"):
+            ctx.update_item(ic.ICON_RENDER, "progress_bar", 1)
+            ctx.update_item(ic.ICON_RENDER, "progress", 0)
+            ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%")
+            self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
+            connect_websocket()
+            save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+            save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+            self.render_manager.send_render()
+            start_polling()
+            queue_timer.start(500)
+        elif workflow == "mesh":
+            generate_mesh(self, ctx)
 
     config.callbackL = {
         ic.ICON_RENDER: lambda: start_render(),
