@@ -1,11 +1,7 @@
-# bg.py
 from vispy import scene
 from vispy.io import imread
 from vispy.gloo import clear as gloo_clear, Texture2D
 from vispy.scene import Widget, Node
-import numpy as np
-
-from common.ars_debug import DEBUG_MODE as DBG
 
 
 class Background(Widget):
@@ -43,7 +39,7 @@ class Background(Widget):
         try:
             image_data = imread(image_path)[::-1, :, :]  # Flip vertically to correct orientation
         except Exception as e:
-            if DBG: print(f"Error loading image {image_path}: {e}")
+            print(f"Error loading image {image_path}: {e}")
             return
         
         # Determine texture format based on number of channels

@@ -9,7 +9,6 @@ from .bg import Background
 from .logic.picking_manager import CPickingManager
 from .logic.object_manager import CObjectManager
 from vispy.scene import transforms
-from .fps_counter import FPSCounter
 from .gizmo.gizmo import *
 import transforms3d.quaternions as tq
 from scipy.spatial.transform import Rotation as ScipyRotation
