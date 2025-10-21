@@ -55,7 +55,10 @@
       "cfg": 8,
       "sampler_name": "euler",
       "scheduler": "normal",
-      "denoise": 0.5,
+      "denoise": [
+        "43",
+        0
+      ],
       "model": [
         "4",
         0
@@ -199,7 +202,7 @@
       "ud_name": "ckpt_name",
       "output": "dreamshaper_8.safetensors"
     },
-    "class_type": "Airen_Checkpoint_String",
+    "class_type": "Airen_Checkpoint",
     "_meta": {
       "title": "Airen Checkpoint"
     }
@@ -264,6 +267,16 @@
     "class_type": "Airen_Progress_Reader",
     "_meta": {
       "title": "Airen_Progress_Reader"
+    }
+  },
+  "43": {
+    "inputs": {
+      "ud_name": "denoise",
+      "output": 0.8
+    },
+    "class_type": "Airen_Float",
+    "_meta": {
+      "title": "Airen_Float"
     }
   }
 }

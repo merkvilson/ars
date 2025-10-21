@@ -46,7 +46,25 @@ class Airen_Int:
     def execute(self, ud_name, output):
         return (output,)
 
-class Airen_Checkpoint_String:
+class Airen_Float:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ud_name": ("STRING", {"default": "", "multiline": False}),
+                "output": ("FLOAT", {"default": 0, "min": -999999, "max": 999999, "step": 0.1}),
+            }
+        }
+
+    RETURN_TYPES = ("FLOAT",)
+    FUNCTION = "execute"
+    CATEGORY = "Airen_Studio"
+    OUTPUT_NODE = True
+
+    def execute(self, ud_name, output):
+        return (output,)
+    
+class Airen_Checkpoint:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -64,7 +82,7 @@ class Airen_Checkpoint_String:
     def execute(self, ud_name, output):
         return (output,)
 
-class Airen_VAE_String:
+class Airen_VAE:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -82,7 +100,7 @@ class Airen_VAE_String:
     def execute(self, ud_name, vae_name):
         return (vae_name,)
 
-class Airen_Lora_String:
+class Airen_Lora:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -204,9 +222,10 @@ class Airen_RenderPass:
 NODE_CLASS_MAPPINGS = {
     "Airen_Str": Airen_Str,
     "Airen_Int": Airen_Int,
-    "Airen_Checkpoint_String": Airen_Checkpoint_String,
-    "Airen_VAE_String": Airen_VAE_String,
-    "Airen_Lora_String": Airen_Lora_String,
+    "Airen_Float": Airen_Float,
+    "Airen_Checkpoint": Airen_Checkpoint,
+    "Airen_VAE": Airen_VAE,
+    "Airen_Lora": Airen_Lora,
     "Airen_SaveImage": Airen_SaveImage,
     "Airen_Progress_Reader": Airen_Progress_Reader,
     "Airen_RenderPass": Airen_RenderPass,
