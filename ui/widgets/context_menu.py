@@ -27,6 +27,7 @@ class ContextMenuConfig:
     def __init__(self):
         self.menu_radius = 90
         self.item_radius = 22
+        self.per_item_radius = {}
         self.extra_padding = 10
         self.extra_distance = [0, 0]
         self.start_angle = -math.pi / 2
@@ -141,7 +142,7 @@ class ContextButtonWindow(QWidget):
                         continue  # Skip creating BButton for custom widgets
                     button_config_kwargs = {
                         "symbol": action,
-                        "radius": config.item_radius,
+                        "radius": config.per_item_radius.get(action, config.item_radius),
                         "font": config.font,
                         "clip_to_shape": config.clip_to_shape,
                         "additional_font": config.additional_font,
@@ -298,8 +299,7 @@ class ContextButtonWindow(QWidget):
                         continue
                     if action in config.custom_widget_items:  # Added check
                         custom_widget = config.custom_widget_items[action]
-                        #custom_widget.setFixedSize(int(full_rect.width()),100)
-                        col_layout.addWidget(custom_widget)
+                        col_layout.addWidget(custom_widget, alignment=Qt.AlignmentFlag.AlignHCenter)
                     else:
                         btn = next(btn for btn in self.processed_items if btn.symbol == action)
                         full_rect = btn.boundingRect().united(btn.childrenBoundingRect())
@@ -318,7 +318,7 @@ class ContextButtonWindow(QWidget):
                         view.setStyleSheet("background: transparent; border: none;")
                         view.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
                         view.viewport().setStyleSheet("background: transparent;")
-                        col_layout.addWidget(view)
+                        col_layout.addWidget(view, alignment=Qt.AlignmentFlag.AlignHCenter)
                 if has_spacer:
                     pass
                 elif 'y' in expands:

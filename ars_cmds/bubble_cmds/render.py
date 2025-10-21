@@ -28,10 +28,13 @@ def BBL_RENDER(self, position, workflow = None):
 
     config = ContextMenuConfig()
     config.auto_close = False
-    #config.close_on_outside = False
+    config.distribution_mode = 'x'
+    config.use_extended_shape = False
+    config.use_extended_shape_items = {ic.ICON_IMAGE: True}
 
-    options_list = [ic.ICON_RENDER, ic.ICON_STEPS, ic.ICON_GIZMO_SCALE, ic.ICON_SAVE, ic.ICON_IMAGE, ]
-
+    options_list = [ [ic.ICON_IMAGE], [ ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", ic.ICON_RENDER, "   ", ic.ICON_SAVE, "x",]]
+    config.per_item_radius = {
+        ic.ICON_IMAGE: 45,}
     config.image_items = {ic.ICON_IMAGE: r" "}
 
     config.additional_texts = {
