@@ -26,6 +26,8 @@ def BBL_TIMELINE(self, position):
     }
 
     def img_list(keyframe,distance):
+        if not os.path.exists(get_path("keyframes")):
+            return
         config2 = ContextMenuConfig()
         config2.expand = "y"
         config2.show_symbol = False
