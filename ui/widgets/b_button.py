@@ -125,7 +125,7 @@ class RoundedRectOutline(QGraphicsRectItem):
 @dataclass
 class BButtonConfig:
     symbol: str = ""
-    radius: int = 20
+    radius: int = 22
     color: QColor = field(default_factory=lambda: QColor(70, 70, 70, 200))
     hover_color: QColor = field(default_factory=lambda: QColor(150, 150, 150, 200))
     symbol_color: QColor = field(default_factory=lambda: QColor(255, 255, 255, 180))

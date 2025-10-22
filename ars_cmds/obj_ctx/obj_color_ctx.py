@@ -28,6 +28,8 @@ class HSVSlider(QSlider):
 
         # Ensure there's enough height to paint the groove + indicator without clipping.
         self.setMinimumHeight(42)
+        self.setMinimumWidth(22 * 8)
+
         # Remove any fixed width: let layout decide. Fixed widths were causing cropping previously.
 
         # Minimal stylesheet: hide the default handle visuals so we can draw a custom indicator.
