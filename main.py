@@ -13,9 +13,6 @@ import pygame
 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
 
 
-
-
-
 class Application:
 
     def __init__(self):
