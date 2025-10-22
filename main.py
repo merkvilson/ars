@@ -1,8 +1,13 @@
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
+os.environ["QT_FONT_DPI"] = "200"
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
 os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
+
+
+
+
 
 import sys
 from PyQt6.QtWidgets import QApplication
