@@ -5,18 +5,13 @@ os.environ["QT_FONT_DPI"] = "200"
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
 os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
 
-
-
-
-
 import sys
 from PyQt6.QtWidgets import QApplication
 from core.cursor_modifier import set_default_cursor
-
 from ui.main_window import MainWindow
+
 import pygame
 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
-
 
 class Application:
 
