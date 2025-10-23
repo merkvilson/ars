@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QWidget, QSlider, QHBoxLayout, QLabel, QStyleOptionS
 from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
 from PyQt6.QtCore import Qt, QRectF
 from core.sound_manager import play_sound
+from PyQt6.QtWidgets import QFileDialog
 
 class HSVSlider(QSlider):
     """
@@ -277,7 +278,7 @@ def obj_color(self, position):
     config.close_on_outside = False
     config.auto_close = True
 
-    options_list = ["H", "S", "V", "A", "1", "2",]
+    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, "x",]
     config.callbackL = {"2":lambda: print("test"),}
 
     selected = self.viewport._objectManager.get_selected_objects()
@@ -346,6 +347,24 @@ def obj_color(self, position):
         "S": sat_slider,
         "V": val_slider,
         "A": alpha_slider,
+    }
+
+    config.image_items = {
+        ic.ICON_IMAGE: obj.texture_path if hasattr(obj, 'texture_path') else None,}
+    
+    config.use_extended_shape_items = {ic.ICON_IMAGE: (True,False) if hasattr(obj, 'texture_path') else False, "x": False,}
+
+    def load_image(image_path):
+        if image_path == None:
+            image_path, _ = QFileDialog.getOpenFileName(None, "Select Background Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        if image_path:
+            obj.set_texture(image_path)
+            ctx.update_item(ic.ICON_IMAGE, "image_path", image_path)
+                   
+    config.callbackL = {
+        ic.ICON_IMAGE: lambda: load_image(None),        
+        "x": lambda: print(obj.texture_path),
+
     }
 
     ctx = open_context(

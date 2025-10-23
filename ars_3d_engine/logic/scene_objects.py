@@ -33,6 +33,7 @@ class IObject3D(ABC):
         self._name = name
         self._parent = None
         self._prompt = ""
+        self.texture_path = None
         self._children = []
 
         # Attach shading filter for directional light
@@ -235,6 +236,11 @@ class CMesh(IObject3D):
         self.texture_filter = TextureFilter(image, texcoords_to_use)
         self._visual.attach(self.texture_filter)
         self._visual.update()
+
+        self.texture_path = image_path  # Store the texture path
+      
+
+
 
     def clone(self) -> 'IObject3D':
         # Copy mesh data
