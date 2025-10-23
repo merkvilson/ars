@@ -22,7 +22,7 @@ class Airen_Str:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
     def execute(self, ud_name, output):
@@ -40,7 +40,7 @@ class Airen_Int:
 
     RETURN_TYPES = ("INT",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
     def execute(self, ud_name, output):
@@ -58,7 +58,7 @@ class Airen_Float:
 
     RETURN_TYPES = ("FLOAT",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
     def execute(self, ud_name, output):
@@ -77,7 +77,7 @@ class Airen_Checkpoint:
     RETURN_TYPES = (folder_paths.get_filename_list("checkpoints"),)
     RETURN_NAMES = ("output",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
 
     def execute(self, ud_name, output):
         return (output,)
@@ -95,7 +95,7 @@ class Airen_VAE:
     RETURN_TYPES = (folder_paths.get_filename_list("vae"),)
     RETURN_NAMES = ("vae_name",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
 
     def execute(self, ud_name, vae_name):
         return (vae_name,)
@@ -113,7 +113,7 @@ class Airen_Lora:
     RETURN_TYPES = (folder_paths.get_filename_list("loras"),)
     RETURN_NAMES = ("lora_name",)
     FUNCTION = "execute"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/User Data"
 
     def execute(self, ud_name, lora_name):
         return (lora_name,)
