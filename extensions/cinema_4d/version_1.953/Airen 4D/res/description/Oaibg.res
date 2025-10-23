@@ -1,0 +1,7 @@
+CONTAINER Oaibg
+{
+	NAME Oaibg;
+	INCLUDE Obase;
+
+	GROUP ID_OBJECTPROPERTIES{}
+} 

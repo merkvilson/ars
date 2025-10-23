@@ -1,0 +1,7 @@
+CONTAINER Opprompt
+{
+	NAME Opprompt;
+	INCLUDE Obase;
+
+	GROUP ID_OBJECTPROPERTIES{}
+} 
