@@ -8,6 +8,11 @@ from vispy.io import read_mesh
 from vispy.visuals.filters import ShadingFilter
 from vispy.geometry import MeshData  # Added import for MeshData
 
+from vispy.io import imread  # Add this
+from vispy.gloo import Texture2D  # Add this
+from vispy.visuals.filters import TextureFilter  # Add this (note: ShadingFilter is already imported from here)
+
+
 DEFAULT_OBJ_COLOR = (102/255, 108/255, 120/255, 1.0)
 
 class IObject3D(ABC):
@@ -200,28 +205,55 @@ class IObject3D(ABC):
 class CMesh(IObject3D):
 
     @classmethod
-    def create(cls,file_path: str,color=DEFAULT_OBJ_COLOR,translate=(0.0, 0.0, 0.0),name="Mesh"):
-        vertices, faces, normals, _ = read_mesh(file_path)
+    def create(cls, file_path: str, color=DEFAULT_OBJ_COLOR, translate=(0.0, 0.0, 0.0), name="Mesh"):
+        vertices, faces, normals, texcoords = read_mesh(file_path)  # Changed _ to texcoords
         md = MeshData(vertices=vertices, faces=faces)
         if normals is not None:
             md._vertex_normals = normals.astype(np.float32)
+        if texcoords is not None:
+            md._vertex_tex_coords = texcoords.astype(np.float32)  # Add this to set texcoords
         v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
         obj = cls(v, name=name)
         obj.set_position(translate[0], translate[1], translate[2])
         return obj
 
-    # New method: Implement cloning for meshes
+    def set_texture(self, image_path: str) -> None:
+        """Apply a texture to the mesh from an image file path. Requires the mesh to have texture coordinates."""
+        texcoords = getattr(self._visual.mesh_data, '_vertex_tex_coords', None)
+        if texcoords is None:
+            print("Mesh does not have texture coordinates. Cannot apply texture.")
+            return
+        if texcoords.ndim != 2 or texcoords.shape[-1] not in (2, 3):
+            print("Texture coordinates must be a 2D array with last dimension 2 or 3.")
+            return
+        
+        texcoords_to_use = texcoords[:, :2] if texcoords.shape[-1] == 3 else texcoords
+        
+        image = imread(image_path)
+        image = np.flipud(image) 
+        if image.ndim == 2:  image = image[..., np.newaxis]
+        self.texture_filter = TextureFilter(image, texcoords_to_use)
+        self._visual.attach(self.texture_filter)
+        self._visual.update()
+
     def clone(self) -> 'IObject3D':
         # Copy mesh data
         md = self._visual.mesh_data
         verts = md.get_vertices().copy() if md.get_vertices() is not None else None
         faces = md.get_faces().copy() if md.get_faces() is not None else None
-        normals = md._vertex_normals.copy() if getattr(md, '_vertex_normals', None) is not None else None
+        normals = getattr(md, '_vertex_normals', None)
+        if normals is not None:
+            normals = normals.copy()
+        texcoords = getattr(md, '_vertex_tex_coords', None)
+        if texcoords is not None:
+            texcoords = texcoords.copy()
 
         # Create new MeshData
         new_md = MeshData(vertices=verts, faces=faces)
         if normals is not None:
             new_md._vertex_normals = normals.astype(np.float32)
+        if texcoords is not None:
+            new_md._vertex_tex_coords = texcoords.astype(np.float32)
 
         # Create new visual with the new MeshData
         new_visual = scene.visuals.Mesh(
@@ -230,8 +262,21 @@ class CMesh(IObject3D):
             shading=None  # Shading will be set later
         )
 
-        # Create new object
+        # Create new object (moved up here so it's defined before setting attributes)
         new_obj = CMesh(new_visual, name=self.name + "_copy")
+
+        # Copy texture if applied
+        if hasattr(self, 'texture_filter') and self.texture_filter is not None:
+            texture_data = self.texture_filter.texture[...]  # Get the numpy array data
+            new_texcoords = getattr(new_md, '_vertex_tex_coords', None)
+            if new_texcoords is None:
+                raise ValueError("Cloned mesh does not have texture coordinates.")
+            if new_texcoords.ndim != 2 or new_texcoords.shape[-1] not in (2, 3):
+                raise ValueError("Texture coordinates must be a 2D array with last dimension 2 or 3.")
+            new_texcoords_to_use = new_texcoords[:, :2] if new_texcoords.shape[-1] == 3 else new_texcoords
+            new_texture_filter = TextureFilter(texture_data, new_texcoords_to_use)
+            new_visual.attach(new_texture_filter)
+            new_obj.texture_filter = new_texture_filter  # Set the attribute for future clones
 
         # Copy position (translation)
         new_obj.set_position(*self.get_position())
