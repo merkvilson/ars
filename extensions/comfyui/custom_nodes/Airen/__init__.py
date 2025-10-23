@@ -135,18 +135,32 @@ class Airen_SaveImage:
     CATEGORY = "Airen_Studio"
 
     def save_images(self, ud_name, images, category):
-        output_dir = folder_paths.get_output_directory()
-        filename_prefix = f"{category}/0"
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
-            filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
-        results = []
-        for image in images:
-            i = 255. * image.cpu().numpy()
-            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-            file = f"{filename}{len(os.listdir(full_output_folder)):03d}.png"
-            img.save(os.path.join(full_output_folder, file), compress_level=4)
-            results.append({"filename": file, "subfolder": subfolder, "type": "output"})
-        return {"ui": {"images": results}}
+        if category in ["keyframes", "3d", "bg", "dome", "sprite", "steps", "texture"]:
+            output_dir = folder_paths.get_output_directory()
+            filename_prefix = f"{category}/0"
+            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+                filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
+            results = []
+            for image in images:
+                i = 255. * image.cpu().numpy()
+                img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+                file = f"{filename}{len(os.listdir(full_output_folder)):03d}.png"
+                img.save(os.path.join(full_output_folder, file), compress_level=4)
+                results.append({"filename": file, "subfolder": subfolder, "type": "output"})
+            return {"ui": {"images": results}}
+        elif category in ["mesh"]:
+            output_dir = folder_paths.get_input_directory()
+            filename_prefix = f"{category}"
+            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+                filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
+            results = []
+            for image in images:
+                i = 255. * image.cpu().numpy()
+                img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+                file = f"{filename}.png"
+                img.save(os.path.join(full_output_folder, file), compress_level=4)
+                results.append({"filename": file, "subfolder": subfolder, "type": "output"})
+            return {"ui": {"images": results}}
 
 
 class Airen_Progress_Reader:
