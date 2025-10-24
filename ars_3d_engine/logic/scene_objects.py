@@ -34,6 +34,7 @@ class IObject3D(ABC):
         self._parent = None
         self._prompt = ""
         self.texture_path = None
+        self.alpha_map_path = None
         self._children = []
 
         # Attach shading filter for directional light
