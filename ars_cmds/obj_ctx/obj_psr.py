@@ -21,15 +21,22 @@ def obj_scale(self, position):
     config.close_on_outside = False
     config.auto_close = True
     config.show_value = True
-    
+
 
     options_list = [
-        [
         ic.ICON_AXIS_X,
         ic.ICON_AXIS_Y,
         ic.ICON_AXIS_Z,
-        ],
+        ic.ICON_CLOSE_RADIAL,
     ]
+
+    config.extra_distance = [0,(config.item_radius * 2) - 6 ]
+
+
+    config.use_extended_shape_items = {
+                                       ic.ICON_CLOSE_RADIAL: False,
+                                       }
+
 
     config.additional_texts = {
         ic.ICON_AXIS_Y: "Size Y",
@@ -47,7 +54,8 @@ def obj_scale(self, position):
     config.callbackL = {
         ic.ICON_AXIS_X: lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
         ic.ICON_AXIS_Y: lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
-        ic.ICON_AXIS_Z: lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)), 
+        ic.ICON_AXIS_Z: lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)),
+        ic.ICON_CLOSE_RADIAL: False,
     }
 
 

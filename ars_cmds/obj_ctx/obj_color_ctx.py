@@ -277,8 +277,8 @@ def obj_color(self, position):
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = True
-
-    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, "?", "x",]
+#
+    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, "?", ic.ICON_CLOSE_RADIAL,]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -353,7 +353,8 @@ def obj_color(self, position):
         "?":  obj.alpha_map_path if hasattr(obj, 'alpha_map_path') else None,}
     
     config.use_extended_shape_items = {ic.ICON_IMAGE: (True,False) if hasattr(obj, 'texture_path') else False, 
-                                       "?": (True,False) if hasattr(obj, 'alpha_map_path') else False,}
+                                       "?": (True,False) if hasattr(obj, 'alpha_map_path') else False,
+                                       ic.ICON_CLOSE_RADIAL: False,}
 
     def load_image(image_path):
         if image_path == None:
@@ -373,9 +374,10 @@ def obj_color(self, position):
     config.callbackL = {
         ic.ICON_IMAGE: lambda: load_image(None),
         "?": lambda: load_alpha_img(None),
-        "x": lambda: print(obj.texture_path),
+        ic.ICON_CLOSE_RADIAL: lambda: print(obj.texture_path),
 
     }
+    config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
     ctx = open_context(
         parent=self.central_widget,
