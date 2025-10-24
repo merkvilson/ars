@@ -1,12 +1,12 @@
 from typing import List, Optional
 from vispy import scene
-from .scene_objects import IObject3D
+from .scene_objects import CGeometry
 from .picking_manager import CPickingManager
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 
 class CObjectManager(QObject):
-    object_added = pyqtSignal(int, IObject3D)
-    object_removed = pyqtSignal(int, IObject3D)
+    object_added = pyqtSignal(int, CGeometry)
+    object_removed = pyqtSignal(int, CGeometry)
     active_changed = pyqtSignal(int)
     selection_changed = pyqtSignal()
 
@@ -20,7 +20,7 @@ class CObjectManager(QObject):
         self._canvas = canvas
         self._mover = mover
         self._picking = picking
-        self._objects: List[IObject3D] = []
+        self._objects: List[CGeometry] = []
         self._active_idx = -1
         self._selected_indices: List[int] = []
         self._selected_set: set[int] = set()
@@ -33,7 +33,7 @@ class CObjectManager(QObject):
                     obj.update_light_dir(light_dir)
 
 
-    def add_object(self, obj: IObject3D) -> None:
+    def add_object(self, obj: CGeometry) -> None:
         index = len(self._objects)
         self._objects.append(obj)
         obj.visual.parent = self._view.scene
@@ -65,7 +65,7 @@ class CObjectManager(QObject):
         self.set_selection_state(new_indices, new_indices[-1] if new_indices else None)
 
 
-    def remove_object_at(self, index: int) -> Optional[IObject3D]:
+    def remove_object_at(self, index: int) -> Optional[CGeometry]:
         if index < 0 or index >= len(self._objects):
             return None
         obj = self._objects.pop(index)
@@ -96,7 +96,7 @@ class CObjectManager(QObject):
                 self._active_idx = index
                 self.active_changed.emit(index)
 
-    def active_object(self) -> Optional[IObject3D]:
+    def active_object(self) -> Optional[CGeometry]:
         if 0 <= self._active_idx < len(self._objects):
             return self._objects[self._active_idx]
         return None
@@ -113,10 +113,10 @@ class CObjectManager(QObject):
     def selected_indices(self) -> List[int]:
         return list(self._selected_indices)
 
-    def get_selected_objects(self) -> List[IObject3D]:
+    def get_selected_objects(self) -> List[CGeometry]:
         return [self._objects[i] for i in self._selected_indices if 0 <= i < len(self._objects)]
 
-    def resolve_targets(self) -> List[IObject3D]:
+    def resolve_targets(self) -> List[CGeometry]:
         if self._selected_indices:
             return [self._objects[i] for i in self._selected_indices if 0 <= i < len(self._objects)]
         if 0 <= self._active_idx < len(self._objects):

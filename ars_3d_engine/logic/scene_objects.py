@@ -1,21 +1,16 @@
 from abc import ABC, abstractmethod
-import inspect
 import numpy as np
 from vispy import scene
 from vispy.scene import transforms
 from vispy.visuals.transforms import NullTransform
 from vispy.io import read_mesh
 from vispy.visuals.filters import ShadingFilter
-from vispy.geometry import MeshData  # Added import for MeshData
+from vispy.geometry import MeshData  
 
-from vispy.io import imread  # Add this
-from vispy.gloo import Texture2D  # Add this
-from vispy.visuals.filters import TextureFilter  # Add this (note: ShadingFilter is already imported from here)
+from vispy.io import imread 
+from vispy.visuals.filters import TextureFilter 
 
-
-DEFAULT_OBJ_COLOR = (102/255, 108/255, 120/255, 1.0)
-
-class IObject3D(ABC):
+class CGeometry(ABC):
 
     def __init__(self, visual, name="Object"):
 
@@ -87,15 +82,15 @@ class IObject3D(ABC):
     def get_position(self) -> np.ndarray:
         # Map the local origin [0,0,0] into world coordinates
         return self._node.transform.map([0, 0, 0])[:3]
-    """
-    # homogeneous version (handles 4D coords / perspective parents)
-    def position(self) -> np.ndarray:
+
+    # homogeneous version (handles 4D coords / perspective parents) (Not used currently but kept for reference)
+    def homogeneous_position(self) -> np.ndarray:
         p = self._node.transform.map([0.0, 0.0, 0.0, 1.0])
         p = np.asarray(p, dtype=float)
         if p.size == 4 and abs(p[3]) > 1e-12:
             return (p[:3] / p[3]).copy()
         return p[:3].copy()
-    """
+
 
     def set_position(self, x: float, y: float, z: float) -> None:
         tr = transforms.MatrixTransform()
@@ -103,9 +98,11 @@ class IObject3D(ABC):
         self._node.transform = tr
 
     def set_prompt(self, prompt: str) -> None:
+        """Set the text prompt associated with this object."""
         self._prompt = prompt
 
     def get_prompt(self) -> str:
+        """Get the text prompt associated with this object."""
         return self._prompt
 
     def set_color(self, color: tuple) -> None:
@@ -180,9 +177,7 @@ class IObject3D(ABC):
         else:
             self._visual.set_gl_state(preset='opaque')
 
-    #Don't remove
-    #Don't remove
-    #Don't remove
+
     @property
     def name(self) -> str:
         return self._name
@@ -200,25 +195,7 @@ class IObject3D(ABC):
         if parent:
             parent._children.append(self)
 
-    @abstractmethod
-    def clone(self) -> 'IObject3D':
-        """Create a deep copy of this object, preserving all parameters."""
-        raise NotImplementedError()
 
-class CMesh(IObject3D):
-
-    @classmethod
-    def create(cls, file_path: str, color=DEFAULT_OBJ_COLOR, translate=(0.0, 0.0, 0.0), name="Mesh"):
-        vertices, faces, normals, texcoords = read_mesh(file_path)  # Changed _ to texcoords
-        md = MeshData(vertices=vertices, faces=faces)
-        if normals is not None:
-            md._vertex_normals = normals.astype(np.float32)
-        if texcoords is not None:
-            md._vertex_tex_coords = texcoords.astype(np.float32)  # Add this to set texcoords
-        v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
-        obj = cls(v, name=name)
-        obj.set_position(translate[0], translate[1], translate[2])
-        return obj
 
     def set_texture(self, image_path: str) -> None:
         """Apply a texture to the mesh from an image file path. Requires the mesh to have texture coordinates."""
@@ -314,7 +291,7 @@ class CMesh(IObject3D):
 
 
 
-    def clone(self) -> 'IObject3D':
+    def clone(self) -> 'CGeometry':
         # Copy mesh data
         md = self._visual.mesh_data
         verts = md.get_vertices().copy() if md.get_vertices() is not None else None
@@ -370,3 +347,18 @@ class CMesh(IObject3D):
         new_obj._update_gl_state()
 
         return new_obj
+
+class CMesh(CGeometry):
+
+    @classmethod
+    def create(cls, file_path: str, color=(102/255, 108/255, 120/255, 1.0), translate=(0.0, 0.0, 0.0), name="Mesh"):
+        vertices, faces, normals, texcoords = read_mesh(file_path)  # Changed _ to texcoords
+        md = MeshData(vertices=vertices, faces=faces)
+        if normals is not None:
+            md._vertex_normals = normals.astype(np.float32)
+        if texcoords is not None:
+            md._vertex_tex_coords = texcoords.astype(np.float32)  # Add this to set texcoords
+        v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
+        obj = cls(v, name=name)
+        obj.set_position(translate[0], translate[1], translate[2])
+        return obj
