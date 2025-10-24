@@ -33,7 +33,7 @@ class ContextMenuConfig:
         self.start_angle = -math.pi / 2
         self.arc_span = 2 * math.pi
         self.hover_scale = 1.3
-        self.distribution_mode = 'y'
+        self.distribution_mode = 'y'  # Options: "x", "y", "radial"
         self.anchor = "-y"  # Options: "-y", "+y", "-x", "+x"
         self.close_on_outside = True
         self.background_color = (255, 255, 255, 10)
