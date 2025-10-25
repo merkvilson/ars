@@ -9,6 +9,9 @@ from PyQt6.QtCore import Qt, QRectF
 from core.sound_manager import play_sound
 from PyQt6.QtWidgets import QFileDialog
 
+from PyQt6.QtGui import QCursor, QColor
+from PyQt6.QtCore import QPoint
+
 class HSVSlider(QSlider):
     """
     Horizontal slider that paints a gradient in the groove and a circular indicator.
@@ -375,8 +378,15 @@ def obj_color(self, position):
         ic.ICON_IMAGE: lambda: load_image(None),
         "?": lambda: load_alpha_img(None),
         ic.ICON_CLOSE_RADIAL: lambda: print(obj.texture_path),
-
     }
+
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    }
+    config.slider_values = {ic.ICON_CLOSE_RADIAL: (0,1,0)}
+    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
+
+
+
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
     ctx = open_context(
