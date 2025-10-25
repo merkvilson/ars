@@ -34,13 +34,14 @@ def get_path(key = "image"):
 
     if key == "image": res = opj(output,"images")
 
-    if key == "input": res = opj(cui,"input")
-    if key == "steps": res = opj(output,"steps")
-    if key == "mesh":  res = opj(output,"mesh")
-    if key == "keyframes": res = opj(output,"keyframes")
-    if key == "last_step": res = last_step_path
-    if key == "output": res = output
-    if key == "custom_nodes": res = opj("extensions","comfyui")
+    if key == "input":            res = opj(cui,"input")
+    if key == "steps":            res = opj(output,"steps")
+    if key == "mesh":             res = opj(output,"mesh")
+    if key == "keyframes":        res = opj(output,"keyframes")
+    if key == "sprite":           res = opj(output,"sprite")    
+    if key == "last_step":        res = last_step_path
+    if key == "output":           res = output
+    if key == "custom_nodes":     res = opj("extensions","comfyui")
     if key == "extra_model_yaml": res = opj(cui, "extra_model_paths.yaml")
 
     return os.path.abspath(res)

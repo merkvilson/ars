@@ -12,6 +12,7 @@ from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 from ars_cmds.mesh_gen.generate_mesh import generate_mesh
+from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 
 from prefs.pref_controller import get_path
 
@@ -192,6 +193,8 @@ def BBL_RENDER(self, position, workflow = None):
             queue_timer.start(500)
         elif workflow == "mesh":
             generate_mesh(self, ctx)
+        elif workflow == "sprite":
+            generate_sprite(self, ctx)
 
     config.callbackL = {
         ic.ICON_RENDER: lambda: start_render(),

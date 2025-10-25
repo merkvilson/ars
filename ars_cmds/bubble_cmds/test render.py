@@ -12,7 +12,7 @@ def BBL_2(self, position):
 def doit(self):
     config = ContextMenuConfig()
     options_list = [
-        ["1", "2", "3", "4", ic.ICON_GIZMO_MOVE],
+        ["0","1", "2", "3", "4", ic.ICON_GIZMO_MOVE],
     ]
     
     config.auto_close = False
@@ -23,19 +23,21 @@ def doit(self):
     config.use_extended_shape_items = {ic.ICON_GIZMO_MOVE: False}
 
     config.additional_texts = {
+    "0": "Current Workflow",
     "1": "Mesh Workflow",
     "2": "Render Workflow",
     "3": "Mesh Img Workflow",
-    "4": "Current Workflow",
+    "4": "Sprite Workflow",
     }
 
 
 
-    config.callbackL = {"1": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
+    config.callbackL = {
+                        "0": lambda: print(self.render_manager.workflow_name),
+                        "1": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
                         "2": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
                         "3": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
-                        "4": lambda: print(self.render_manager.workflow_name),
-
+                        "4": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
                         }
 
     ctx = open_context(
