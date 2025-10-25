@@ -14,7 +14,7 @@
   "6": {
     "inputs": {
       "text": [
-        "30",
+        "43",
         0
       ],
       "clip": [
@@ -107,9 +107,9 @@
   "27": {
     "inputs": {
       "ud_name": "",
-      "category": "steps",
+      "category": "mesh",
       "images": [
-        "16",
+        "45",
         0
       ]
     },
@@ -121,7 +121,7 @@
   "30": {
     "inputs": {
       "ud_name": "positive",
-      "output": ""
+      "output": "cat"
     },
     "class_type": "Airen_Str",
     "_meta": {
@@ -131,7 +131,7 @@
   "33": {
     "inputs": {
       "ud_name": "seed",
-      "output": 6
+      "output": 0
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -171,6 +171,46 @@
     "class_type": "EmptyLatentImage",
     "_meta": {
       "title": "Empty Latent Image"
+    }
+  },
+  "43": {
+    "inputs": {
+      "string_a": [
+        "30",
+        0
+      ],
+      "string_b": ",\ncentered,\nThe subject is isolated on a black background.",
+      "delimiter": ""
+    },
+    "class_type": "StringConcatenate",
+    "_meta": {
+      "title": "Concatenate"
+    }
+  },
+  "45": {
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "Image Remove Background (rembg)",
+    "_meta": {
+      "title": "Image Remove Background (rembg)"
+    }
+  },
+  "47": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "images": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
     }
   }
 }
