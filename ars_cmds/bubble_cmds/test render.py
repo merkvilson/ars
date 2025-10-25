@@ -29,28 +29,12 @@ def doit(self):
     "4": "Current Workflow",
     }
 
-    def get_obj(self):
-        selected = self.viewport._objectManager.get_selected_objects()
-        if not selected:
-            return
-        obj = selected[0]
-        return obj
-    
-    def set_prompt():
-        obj = get_obj(self)
-        if obj:
-            prompt = f"A random number: {random.randint(1,1000)}"
-            obj.set_prompt(prompt)
-            print(f"Set prompt to: {prompt}")
-
-
 
 
     config.callbackL = {"1": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
                         "2": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
                         "3": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
                         "4": lambda: print(self.render_manager.workflow_name),
-                        ic.ICON_GIZMO_MOVE: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
 
                         }
 

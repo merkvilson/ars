@@ -9,8 +9,8 @@ from ars_cmds.obj_ctx.obj_psr import obj_scale
 from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH  as delete_selected_obj
 from ars_cmds.bubble_cmds.open_prompt import BBL_PROMPT as open_prompt
 
-def BBL_3(self, position):
-    run_ext(__file__, self)
+# def BBL_3(self, position):
+    # run_ext(__file__, self)
 
 def obj_att_mng(self, ):
 
