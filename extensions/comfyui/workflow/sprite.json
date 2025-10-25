@@ -1,0 +1,216 @@
+{
+  "4": {
+    "inputs": {
+      "ckpt_name": [
+        "34",
+        0
+      ]
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": [
+        "43",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "text, watermark",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "15": {
+    "inputs": {
+      "seed": [
+        "33",
+        0
+      ],
+      "tileX": 0,
+      "tileY": 0,
+      "steps": [
+        "25",
+        0
+      ],
+      "cfg": 8,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.8,
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "Asymmetric Tiled KSampler",
+    "_meta": {
+      "title": "Asymmetric Tiled KSampler"
+    }
+  },
+  "16": {
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "25": {
+    "inputs": {
+      "ud_name": "steps",
+      "output": 20
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "27": {
+    "inputs": {
+      "ud_name": "",
+      "category": "mesh",
+      "images": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
+    }
+  },
+  "30": {
+    "inputs": {
+      "ud_name": "positive",
+      "output": "cat"
+    },
+    "class_type": "Airen_Str",
+    "_meta": {
+      "title": "Airen Text"
+    }
+  },
+  "33": {
+    "inputs": {
+      "ud_name": "seed",
+      "output": 0
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "34": {
+    "inputs": {
+      "ud_name": "ckpt_name",
+      "output": "dreamshaper_8.safetensors"
+    },
+    "class_type": "Airen_Checkpoint",
+    "_meta": {
+      "title": "Airen Checkpoint"
+    }
+  },
+  "41": {
+    "inputs": {
+      "ud_name": "",
+      "weight": 10,
+      "output": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "Airen_Progress_Reader",
+    "_meta": {
+      "title": "Airen_Progress_Reader"
+    }
+  },
+  "42": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "43": {
+    "inputs": {
+      "string_a": [
+        "30",
+        0
+      ],
+      "string_b": ",\ncentered,\nThe subject is isolated on a black background.",
+      "delimiter": ""
+    },
+    "class_type": "StringConcatenate",
+    "_meta": {
+      "title": "Concatenate"
+    }
+  },
+  "45": {
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "Image Remove Background (rembg)",
+    "_meta": {
+      "title": "Image Remove Background (rembg)"
+    }
+  },
+  "47": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "images": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
+    }
+  }
+}
