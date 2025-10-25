@@ -194,7 +194,7 @@ def BBL_RENDER(self, position, workflow = None):
         elif workflow == "mesh":
             generate_mesh(self, ctx)
         elif workflow == "sprite":
-            generate_sprite(self, ctx)
+            generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)) )
 
     config.callbackL = {
         ic.ICON_RENDER: lambda: start_render(),
