@@ -32,7 +32,7 @@ class ContextMenuConfig:
         self.extra_distance = [0, 0]
         self.start_angle = -math.pi / 2
         self.arc_span = 2 * math.pi
-        self.hover_scale = 1.3
+        self.hover_scale = 1.0
         self.distribution_mode = 'y'  # Options: "x", "y", "radial"
         self.anchor = "-y"  # Options: "-y", "+y", "-x", "+x"
         self.close_on_outside = True
@@ -279,7 +279,7 @@ class ContextButtonWindow(QWidget):
             content_widget.setStyleSheet("background: transparent;")
             main_layout = QHBoxLayout(content_widget) if config.distribution_mode == "y" else QVBoxLayout(content_widget)
             main_layout.setContentsMargins(0, 0, 0, 0)
-            main_layout.setSpacing(4)
+            main_layout.setSpacing(0)
             expands = set(config.expand.lower()) if config.expand else set()
             has_h_spacer = any(isinstance(col, str) and col == "h_spacer" for col in processed_columns)
             if 'x' in expands and not has_h_spacer:
