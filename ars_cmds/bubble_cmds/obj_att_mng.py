@@ -21,7 +21,7 @@ def obj_att_mng(self, ):
     mouse_pos = self.central_widget.mapFromGlobal(QCursor.pos())
     config = ContextMenuConfig()
     #config.close_on_outside = False
-   # config.auto_close = False
+    #config.auto_close = False
     config.distribution_mode = "radial"
     config.use_extended_shape = False
     config.background_color = (255, 255, 255, 0)
@@ -31,8 +31,8 @@ def obj_att_mng(self, ):
     
     options_list = [ic.ICON_CLOSE_RADIAL, ic.ICON_PALETTE, ic.ICON_SETTINGS, ic.ICON_GIZMO_SCALE_3D, ic.ICON_LOCK, ic.ICON_TRASH, ic.ICON_TEXT_INPUT, ]
 
-    config.callbackL = {ic.ICON_PALETTE: lambda: obj_color(self,mouse_pos),
-                        ic.ICON_GIZMO_SCALE_3D: lambda: obj_scale(self,mouse_pos),
+    config.callbackL = {ic.ICON_PALETTE: lambda: obj_color(self,mouse_pos, obj_att_mng),
+                        ic.ICON_GIZMO_SCALE_3D: lambda: obj_scale(self,mouse_pos, obj_att_mng),
                         ic.ICON_TRASH: lambda: delete_selected_obj(self, None),
                         ic.ICON_TEXT_INPUT: lambda: open_prompt(self, mouse_pos),
                         }

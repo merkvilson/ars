@@ -1,10 +1,11 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
-from PyQt6.QtGui import QCursor
-import theme.fonts.new_fonts as RRRFONT
 
 
-def obj_scale(self, position):
+from PyQt6.QtGui import QCursor, QColor
+from PyQt6.QtCore import QPoint
+
+def obj_scale(self, position, callback):
 
     obj = self.viewport._objectManager.get_selected_objects()
     if not obj:
@@ -33,9 +34,7 @@ def obj_scale(self, position):
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
 
-    config.use_extended_shape_items = {
-                                       ic.ICON_CLOSE_RADIAL: False,
-                                       }
+    config.use_extended_shape_items = {ic.ICON_CLOSE_RADIAL: False,}
 
 
     config.additional_texts = {
@@ -47,16 +46,24 @@ def obj_scale(self, position):
     config.slider_values = {
         ic.ICON_AXIS_X: (1,10000,obj.get_scale()[0]*100),
         ic.ICON_AXIS_Y: (1,10000,obj.get_scale()[1]*100),
-        ic.ICON_AXIS_Z: (1,10000,obj.get_scale()[2]*100),}
-    
+        ic.ICON_AXIS_Z: (1,10000,obj.get_scale()[2]*100),
+        ic.ICON_CLOSE_RADIAL: (0,1,0),
+        }
+
     config.incremental_values = {ic.ICON_AXIS_X: 100, ic.ICON_AXIS_Y: 100, ic.ICON_AXIS_Z: 100,}
     
     config.callbackL = {
-        ic.ICON_AXIS_X: lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
-        ic.ICON_AXIS_Y: lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
-        ic.ICON_AXIS_Z: lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)),
-        ic.ICON_CLOSE_RADIAL: False,
+        ic.ICON_AXIS_X:       lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
+        ic.ICON_AXIS_Y:       lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
+        ic.ICON_AXIS_Z:       lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)),
+       # ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }
+
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    }
+
+    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
+
 
 
     ctx = open_context(
