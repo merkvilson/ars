@@ -19,7 +19,7 @@ import os
 import uuid
 import json
 
-
+from PyQt6.QtGui import QColor
 
 def BBL_RENDER(self, position, workflow = None):
     
@@ -31,6 +31,7 @@ def BBL_RENDER(self, position, workflow = None):
     config.distribution_mode = 'x'
     config.use_extended_shape = False
     config.use_extended_shape_items = {ic.ICON_IMAGE: True}
+    config.color = {ic.ICON_IMAGE: QColor(0, 0, 0,0)}
 
     options_list = [ [ic.ICON_IMAGE], [ ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", ic.ICON_RENDER, "   ", ic.ICON_SAVE, "x",]]
     config.per_item_radius = {

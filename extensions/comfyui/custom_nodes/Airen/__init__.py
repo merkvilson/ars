@@ -189,8 +189,8 @@ class Airen_RenderPass:
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE")  # Render, Depth, Mesh
-    RETURN_NAMES = ("render", "depth", "mesh")
+    RETURN_TYPES = ("IMAGE", "IMAGE")  # Render, Depth
+    RETURN_NAMES = ("render", "depth")
     FUNCTION = "load_passes"
     CATEGORY = "Airen_Studio"
 
@@ -199,7 +199,6 @@ class Airen_RenderPass:
         input_dir = folder_paths.get_input_directory()
         render_path = os.path.join(input_dir, "render.png")
         depth_path = os.path.join(input_dir, "depth.png")
-        mesh_path = os.path.join(input_dir, "mesh.png")
 
         def get_file_hash(filepath):
             if not os.path.exists(filepath):
@@ -212,9 +211,7 @@ class Airen_RenderPass:
 
         render_hash = get_file_hash(render_path)
         depth_hash = get_file_hash(depth_path)
-        mesh_hash = get_file_hash(mesh_path)
-
-        return f"{render_hash}_{depth_hash}_{mesh_hash}"
+        return f"{render_hash}_{depth_hash}"
 
     def load_image_as_tensor(self, path):
         if not os.path.exists(path):
@@ -228,9 +225,7 @@ class Airen_RenderPass:
 
         render_tensor = self.load_image_as_tensor(os.path.join(input_dir, "render.png"))
         depth_tensor = self.load_image_as_tensor(os.path.join(input_dir, "depth.png"))
-        mesh_tensor = self.load_image_as_tensor(os.path.join(input_dir, "mesh.png"))
-
-        return (render_tensor, depth_tensor, mesh_tensor)
+        return (render_tensor, depth_tensor)
 
 
 NODE_CLASS_MAPPINGS = {

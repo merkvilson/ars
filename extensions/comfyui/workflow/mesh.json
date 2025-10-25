@@ -103,7 +103,7 @@
   "9": {
     "inputs": {
       "algorithm": "surface net",
-      "threshold": 0.6,
+      "threshold": 0.5,
       "voxel": [
         "8",
         0
@@ -136,8 +136,8 @@
         1
       ],
       "image": [
-        "23",
-        2
+        "30",
+        0
       ]
     },
     "class_type": "CLIPVisionEncode",
@@ -169,15 +169,6 @@
       "title": "Airen_Progress_Reader"
     }
   },
-  "23": {
-    "inputs": {
-      "ud_name": ""
-    },
-    "class_type": "Airen_RenderPass",
-    "_meta": {
-      "title": "Airen_RenderPass"
-    }
-  },
   "24": {
     "inputs": {
       "ud_name": "seed",
@@ -196,6 +187,50 @@
     "class_type": "Airen_Int",
     "_meta": {
       "title": "Airen_Int"
+    }
+  },
+  "29": {
+    "inputs": {
+      "image": "mesh.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "30": {
+    "inputs": {
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "destination": [
+        "29",
+        0
+      ],
+      "source": [
+        "31",
+        0
+      ],
+      "mask": [
+        "29",
+        1
+      ]
+    },
+    "class_type": "ImageCompositeMasked",
+    "_meta": {
+      "title": "ImageCompositeMasked"
+    }
+  },
+  "31": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1,
+      "color": 0
+    },
+    "class_type": "EmptyImage",
+    "_meta": {
+      "title": "EmptyImage"
     }
   }
 }
