@@ -7,11 +7,20 @@ from ars_cmds.core_cmds.load_object import add_mesh
 from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation
 from ars_cmds.render_cmds.check import check_queue
 
-def generate_sprite(self, ctx):
+
+
+def generate_sprite(self, ctx, max_steps):
     """
     Generates a sprite by monitoring a directory for new images and creating a sprite sheet.
+    sprite images are saved in the 'steps' directory.
+    
     """
-    sprite_plane = add_mesh(self, os.path.join("res","mesh files", 'plane.obj'    ), animated = False)
+
+    selected = self.viewport._objectManager.get_selected_objects()
+    if not selected:
+        return
+    
+    sprite_plane = selected[0]
 
     ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)
     self.render_manager.send_render()
