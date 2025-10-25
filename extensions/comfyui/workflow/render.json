@@ -54,7 +54,7 @@
       ],
       "cfg": 8,
       "sampler_name": "euler",
-      "scheduler": "normal",
+      "scheduler": "exponential",
       "denoise": [
         "43",
         0
