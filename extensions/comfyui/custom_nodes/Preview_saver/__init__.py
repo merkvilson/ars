@@ -1,4 +1,10 @@
+"""
+Custom Preview Saver Node for ComfyUI
+Saves preview images at each step of the diffusion process to a specified folder.
+"""
+
 from pathlib import Path
+import shutil
 import folder_paths
 import comfy.utils
 import logging
@@ -16,6 +22,14 @@ def prepare_callback2(model, steps, x0_output_dict=None):
     previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
     pbar = comfy.utils.ProgressBar(steps)
 
+    output_dir = Path(folder_paths.get_output_directory()) / "steps"
+    if output_dir.exists():
+        for item in output_dir.iterdir():
+            if item.is_file() or item.is_symlink():
+                item.unlink()
+            elif item.is_dir():
+                shutil.rmtree(item)
+
     def callback(step, x0, x, total_steps):
         if x0_output_dict is not None:
             x0_output_dict["x0"] = x0
@@ -25,7 +39,6 @@ def prepare_callback2(model, steps, x0_output_dict=None):
             preview_bytes = previewer.decode_latent_to_preview_image(preview_format, x0)
 
             # Save preview to custom folder
-            output_dir = Path(folder_paths.get_output_directory()) / "steps"
             output_dir.mkdir(parents=True, exist_ok=True)
 
             output_path = output_dir / f"{step:04d}.{preview_format.lower()}"
