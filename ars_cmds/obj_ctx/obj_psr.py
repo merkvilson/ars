@@ -7,9 +7,6 @@ from PyQt6.QtCore import QPoint
 
 def obj_scale(self, position, callback):
 
-    obj = self.viewport._objectManager.get_selected_objects()
-    if not obj:
-        return
     
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
