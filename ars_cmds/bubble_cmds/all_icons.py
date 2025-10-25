@@ -1,7 +1,8 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts.font_icons import *  # ICON_MOVE, ICON_FULL_LIST, etc.
 import pyperclip
 from theme.fonts.new_fonts import get_font
+from theme.fonts import font_icons as ic
+
 
 def copy_name(self, k,v):
     pyperclip.copy(k)
@@ -11,20 +12,20 @@ def copy_name(self, k,v):
 def split_list(lst, size):
     return [lst[i:i + size] for i in range(0, len(lst), size)]
 
-BBL_ICONS_CONFIG={"symbol": ICON_FILE_STACK}
+BBL_ICONS_CONFIG={"symbol": ic.ICON_FILE_STACK}
 def BBL_ICONS(self, position):
     config = ContextMenuConfig()
     config.item_radius = 25
     config.font = get_font(25)
     config.background_color = (30, 30, 30, 230)
     config.use_extended_shape = False
-    options_list = split_list(ICON_FULL_LIST, 10)
+    options_list = split_list(ic.ICON_FULL_LIST, 10)
 
     vars_dict = {
-    v: (lambda key=k, value=v: copy_name(self, key, value))
-    for k, v in globals().items()
-    if v in ICON_FULL_LIST
-}
+        value: (lambda key=name, val=value: copy_name(self, key, val))
+        for name, value in vars(ic).items()
+        if isinstance(value, str) and value in ic.ICON_FULL_LIST
+    }
 
     config.callbackL = vars_dict
 
