@@ -56,7 +56,7 @@ def obj_scale(self, position, callback):
         ic.ICON_AXIS_X:       lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),
         ic.ICON_AXIS_Y:       lambda value: obj.set_scale((obj.get_scale()[0], value/100, obj.get_scale()[2])),
         ic.ICON_AXIS_Z:       lambda value: obj.set_scale((obj.get_scale()[0], obj.get_scale()[1], value/100)),
-       # ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
+        ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }
 
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
