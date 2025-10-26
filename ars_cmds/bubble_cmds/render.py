@@ -11,6 +11,7 @@ from ars_cmds.render_cmds.render_pass import save_depth, save_render
 from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.mesh_gen.generate_mesh import generate_mesh
 from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 
@@ -180,11 +181,13 @@ def BBL_RENDER(self, position, workflow = None):
 
 
     def start_render():
+        delete_all_files_in_folder( get_path('steps') )
+        self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
+        
         if workflow in ("render", "mesh_image"):
             ctx.update_item(ic.ICON_RENDER, "progress_bar", 1)
             ctx.update_item(ic.ICON_RENDER, "progress", 0)
             ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%")
-            self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
             connect_websocket()
             save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
             save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
