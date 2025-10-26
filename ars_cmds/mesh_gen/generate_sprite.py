@@ -7,7 +7,7 @@ from ars_cmds.core_cmds.load_object import add_mesh
 from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation
 from ars_cmds.render_cmds.check import check_queue
 
-
+from prefs.pref_controller import get_path
 
 def generate_sprite(self, ctx, max_steps):
     """
@@ -28,9 +28,32 @@ def generate_sprite(self, ctx, max_steps):
 
     os.makedirs(sprite_dir, exist_ok=True)    # Ensure the sprite directory exists
     
-    initial_files = os.listdir(sprite_dir)
-    if initial_files:
-        sprite_plane.set_texture(os.path.join(sprite_dir, initial_files[-1]))
+    # Stop any existing timer before starting a new one
+    if hasattr(self, '_sprite_timer') and self._sprite_timer is not None:
+        self._sprite_timer.stop()
+        self._sprite_timer.deleteLater()
     
-    print(initial_files)
+    # Create a timer to apply the latest file every 500ms
+    update_timer = QTimer()
+    
+    def apply_latest_texture():
+        try:
+            latest_file = get_path("last_step")
+            if latest_file:
+                sprite_plane.set_texture(latest_file)
+                
+                # Check if we've reached max_steps + 1
+                current_files = os.listdir(sprite_dir)
+                if len(current_files) >= max_steps + 1:
+                    print("finish")
+                    update_timer.stop()
+        except Exception as e:
+            print(f"Error applying texture: {e}")
+    
+    # Start the timer
+    update_timer.timeout.connect(apply_latest_texture)
+    update_timer.start(500)  # Update every 500ms
+    
+    # Store timer reference to prevent garbage collection
+    self._sprite_timer = update_timer
     
