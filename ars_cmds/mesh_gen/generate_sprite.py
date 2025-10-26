@@ -22,6 +22,9 @@ def generate_sprite(self, ctx, max_steps):
     
     sprite_plane = selected[0]
 
+    sprite_plane.set_color((1,1,1,0.99)) # Set to white to ensure textures are visible
+
+
     ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)
     self.render_manager.send_render()
     sprite_dir = get_path("steps")
@@ -52,7 +55,7 @@ def generate_sprite(self, ctx, max_steps):
     
     # Start the timer
     update_timer.timeout.connect(apply_latest_texture)
-    update_timer.start(500)  # Update every 500ms
+    update_timer.start(100)
     
     # Store timer reference to prevent garbage collection
     self._sprite_timer = update_timer

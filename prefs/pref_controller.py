@@ -39,7 +39,11 @@ def get_path(key = "image"):
     if key == "mesh":             res = opj(output,"mesh")
     if key == "keyframes":        res = opj(output,"keyframes")
     if key == "sprite":           res = opj(output,"sprite")    
-    if key == "last_step":        res = last_step_path
+    if key == "last_step":        
+        if last_step_path:
+            return last_step_path  # Return the file path directly without abspath
+        else:
+            return ""  # Return empty string if no file exists
     if key == "output":           res = output
     if key == "custom_nodes":     res = opj("extensions","comfyui")
     if key == "extra_model_yaml": res = opj(cui, "extra_model_paths.yaml")
