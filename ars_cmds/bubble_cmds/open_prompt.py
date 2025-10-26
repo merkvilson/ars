@@ -4,7 +4,7 @@ from theme.fonts import font_icons as ic
 from ui.widgets.multi_line_input import MultiLineInputWidget
 
 BBL_PROMPT_CONFIG = {"symbol": ic.ICON_TEXT_INPUT, "hotkey": "P"}
-def BBL_PROMPT(self, position):
+def BBL_PROMPT(self, position, default_object = None):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
@@ -15,7 +15,7 @@ def BBL_PROMPT(self, position):
 
     options_list = [[ic.ICON_EYE,ic.ICON_EYE_CLOSED,ic.ICON_MENU], "A",]
 
-    prompt_widget = MultiLineInputWidget(central_widget = self.central_widget)
+    prompt_widget = MultiLineInputWidget(central_widget = self.central_widget, default_object = default_object)
     prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"A": prompt_widget}
