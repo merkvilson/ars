@@ -30,7 +30,7 @@ class CGeometry(ABC):
         self._children = []
 
         self.prompt = ""
-        self.seed = 0
+        self.seed = 12345
         self.steps = 20
         self.cfg = 7.0
         self.denoise = 1.0
