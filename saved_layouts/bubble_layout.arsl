@@ -1,93 +1,93 @@
 {
     "bubbles": [
         {
-            "symbol": "\ue985",
-            "grid_x": 14,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue923",
-            "grid_x": 10,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue96a",
-            "grid_x": 2,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue970",
-            "grid_x": 8,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue96b",
-            "grid_x": 7,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue958",
-            "grid_x": 9,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue94f",
-            "grid_x": 16,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue98d",
-            "grid_x": 6,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue91f",
-            "grid_x": 0,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue919",
-            "grid_x": 15,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue948",
-            "grid_x": 12,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue955",
+            "symbol": "\ue98c",
             "grid_x": 4,
             "grid_y": 0
         },
         {
-            "symbol": "\ue94c",
-            "grid_x": 3,
+            "symbol": "\ue92a",
+            "grid_x": 17,
             "grid_y": 0
         },
         {
-            "symbol": "\ue944",
-            "grid_x": 1,
+            "symbol": "\ue971",
+            "grid_x": 8,
             "grid_y": 0
         },
         {
-            "symbol": "5",
-            "grid_x": 20,
+            "symbol": "\ue977",
+            "grid_x": 16,
             "grid_y": 0
         },
         {
-            "symbol": "2",
+            "symbol": "\ue972",
+            "grid_x": 10,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue95f",
             "grid_x": 19,
             "grid_y": 0
         },
         {
-            "symbol": "\ue908",
+            "symbol": "\ue956",
+            "grid_x": 24,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue994",
             "grid_x": 18,
             "grid_y": 0
         },
         {
-            "symbol": "\ue979",
-            "grid_x": 11,
+            "symbol": "\ue926",
+            "grid_x": 0,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue920",
+            "grid_x": 26,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue94f",
+            "grid_x": 1,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue95c",
+            "grid_x": 7,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue953",
+            "grid_x": 5,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue94b",
+            "grid_x": 9,
+            "grid_y": 0
+        },
+        {
+            "symbol": "5",
+            "grid_x": 23,
+            "grid_y": 0
+        },
+        {
+            "symbol": "2",
+            "grid_x": 22,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue90f",
+            "grid_x": 21,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue980",
+            "grid_x": 3,
             "grid_y": 0
         }
     ]
