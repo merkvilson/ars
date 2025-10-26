@@ -34,7 +34,7 @@ def obj_att_mng(self, ):
     config.callbackL = {ic.ICON_PALETTE: lambda: obj_color(self,mouse_pos, obj_att_mng),
                         ic.ICON_GIZMO_SCALE_3D: lambda: obj_scale(self,mouse_pos, obj_att_mng),
                         ic.ICON_TRASH: lambda: delete_selected_obj(self, None),
-                        ic.ICON_TEXT_INPUT: lambda: open_prompt(self, mouse_pos),
+                        ic.ICON_TEXT_INPUT: lambda: open_prompt(self, mouse_pos, default_object = selected[0]),
                         }
     
 
