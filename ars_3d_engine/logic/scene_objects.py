@@ -29,7 +29,6 @@ class CGeometry(ABC):
         self._parent = None
         self._prompt = ""
         self.texture_path = None
-        self.alpha_map_path = None
         self._children = []
 
         # Attach shading filter for directional light
@@ -207,6 +206,11 @@ class CGeometry(ABC):
             print("Texture coordinates must be a 2D array with last dimension 2 or 3.")
             return
         
+        # Remove old texture filter if it exists
+        if hasattr(self, 'texture_filter') and self.texture_filter is not None:
+            self._visual.detach(self.texture_filter)
+            self.texture_filter = None
+        
         texcoords_to_use = texcoords[:, :2] if texcoords.shape[-1] == 3 else texcoords
         
         image = imread(image_path)
@@ -217,79 +221,6 @@ class CGeometry(ABC):
         self._visual.update()
 
         self.texture_path = image_path  # Store the texture path
-      
-
-    def set_alpha_map(self, alpha_map_path: str) -> None:
-        """Apply an alpha/transparency map to the mesh. Brightness values determine transparency.
-        White = fully opaque, Black = fully transparent. Requires texture coordinates."""
-        texcoords = getattr(self._visual.mesh_data, '_vertex_tex_coords', None)
-        if texcoords is None:
-            print("Mesh does not have texture coordinates. Cannot apply alpha map.")
-            return
-        if texcoords.ndim != 2 or texcoords.shape[-1] not in (2, 3):
-            print("Texture coordinates must be a 2D array with last dimension 2 or 3.")
-            return
-        
-        texcoords_to_use = texcoords[:, :2] if texcoords.shape[-1] == 3 else texcoords
-        
-        # Load the alpha map image
-        alpha_image = imread(alpha_map_path)
-        alpha_image = np.flipud(alpha_image)
-        
-        # Convert to grayscale if it's a color image (use luminance formula)
-        if alpha_image.ndim == 3 and alpha_image.shape[-1] >= 3:
-            # Standard luminance conversion: 0.299*R + 0.587*G + 0.114*B
-            alpha_channel = (0.299 * alpha_image[..., 0] + 
-                           0.587 * alpha_image[..., 1] + 
-                           0.114 * alpha_image[..., 2])
-        elif alpha_image.ndim == 2:
-            alpha_channel = alpha_image
-        else:
-            # Single channel image
-            alpha_channel = alpha_image[..., 0]
-        
-        # Normalize to 0-1 range if needed
-        if alpha_channel.max() > 1.0:
-            alpha_channel = alpha_channel / 255.0
-        
-        # Create RGBA texture with the alpha channel
-        # If there's already a texture, combine it with the alpha
-        if hasattr(self, 'texture_filter') and self.texture_filter is not None:
-            # Get existing texture and add alpha channel
-            existing_texture = self.texture_filter.texture[...]
-            if existing_texture.shape[-1] == 3:
-                # RGB texture, add alpha channel
-                rgba_texture = np.dstack([existing_texture, alpha_channel])
-            else:
-                # Already has alpha, replace it
-                rgba_texture = existing_texture.copy()
-                rgba_texture[..., 3] = alpha_channel
-        else:
-            # No existing texture, create white RGB with alpha channel
-            h, w = alpha_channel.shape
-            rgb = np.ones((h, w, 3), dtype=alpha_channel.dtype)
-            if alpha_channel.max() <= 1.0:
-                rgb = rgb.astype(np.float32)
-            else:
-                rgb = (rgb * 255).astype(np.uint8)
-            rgba_texture = np.dstack([rgb, alpha_channel])
-        
-        # Remove old texture filter if it exists
-        if hasattr(self, 'texture_filter') and self.texture_filter is not None:
-            self._visual.detach(self.texture_filter)
-        
-        # Apply new texture with alpha
-        self.texture_filter = TextureFilter(rgba_texture, texcoords_to_use)
-        self._visual.attach(self.texture_filter)
-        
-        # Enable transparency in GL state
-        self._visual.set_gl_state(preset='translucent', cull_face=False)
-        self._visual.update()
-        
-        self.alpha_map_path = alpha_map_path  # Store the alpha map path
-
-
-
 
     def clone(self) -> 'CGeometry':
         # Copy mesh data

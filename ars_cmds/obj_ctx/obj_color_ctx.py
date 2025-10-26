@@ -149,7 +149,7 @@ def obj_color(self, position, callback=None):
     config.close_on_outside = False
     config.auto_close = True
 #
-    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, "?", ic.ICON_CLOSE_RADIAL,]
+    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_CLOSE_RADIAL,]
 
     selected = self.viewport._objectManager.get_selected_objects()
     if not selected:
@@ -217,10 +217,9 @@ def obj_color(self, position, callback=None):
 
     config.image_items = {
         ic.ICON_IMAGE: obj.texture_path if hasattr(obj, 'texture_path') else None,
-        "?":  obj.alpha_map_path if hasattr(obj, 'alpha_map_path') else None,}
+        }
     
-    config.use_extended_shape_items = {ic.ICON_IMAGE: (True,False) if hasattr(obj, 'texture_path') else False, 
-                                       "?": (True,False) if hasattr(obj, 'alpha_map_path') else False,
+    config.use_extended_shape_items = {ic.ICON_IMAGE: (True,True) if obj.texture_path else True, 
                                        ic.ICON_CLOSE_RADIAL: False,}
 
     def load_image(image_path):
@@ -231,16 +230,9 @@ def obj_color(self, position, callback=None):
             ctx.update_item(ic.ICON_IMAGE, "image_path", image_path)
 
 
-    def load_alpha_img(image_path):
-        if image_path == None:
-            image_path, _ = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
-        if image_path:
-            obj.set_alpha_map(image_path)
-            ctx.update_item("?", "image_path", image_path)    
 
     config.callbackL = {
         ic.ICON_IMAGE: lambda: load_image(None),
-        "?": lambda: load_alpha_img(None),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self))
     }
 
