@@ -73,6 +73,8 @@ class ContextMenuConfig:
         self.custom_widget_items = {}
         self.inner_widgets = {}
         self.incremental_values = {}
+        self.custom_width = None
+        self.custom_height = None
 
     def set_arc_range(self, start_degrees: float, end_degrees: float):
         self.start_angle = math.radians(start_degrees)
@@ -267,7 +269,9 @@ class ContextButtonWindow(QWidget):
             view.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
             view.viewport().setStyleSheet("background: transparent;")
             window_layout.addWidget(view)
-            self.setFixedSize(int(width), int(height))
+            final_width = config.custom_width if config.custom_width is not None else int(width)
+            final_height = config.custom_height if config.custom_height is not None else int(height)
+            self.setFixedSize(final_width, final_height)
             path = QPainterPath()
             path.addRoundedRect(QRectF(0, 0, width, height), self.corner_radius, self.corner_radius)
             region = QRegion(path.toFillPolygon().toPolygon())
@@ -353,7 +357,9 @@ class ContextButtonWindow(QWidget):
             scroll_bar_width = QApplication.style().pixelMetric(QStyle.PixelMetric.PM_ScrollBarExtent)
             if max_height > y:
                 x += scroll_bar_width
-            self.setFixedSize(x, y)
+            final_width = config.custom_width if config.custom_width is not None else x
+            final_height = config.custom_height if config.custom_height is not None else y
+            self.setFixedSize(final_width, final_height)
             path = QPainterPath()
             path.addRoundedRect(0, 0, self.width() + 2, self.height() + 2, self.corner_radius, self.corner_radius)
             region = QRegion(path.toFillPolygon().toPolygon())

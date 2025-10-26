@@ -4,34 +4,26 @@ from theme.fonts import font_icons as ic
 from ui.widgets.multi_line_input import MultiLineInputWidget
 from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 
-from PyQt6.QtCore import QTimer, QUrl, QFileSystemWatcher
-from PyQt6.QtWebSockets import QWebSocket
-from PyQt6.QtNetwork import QAbstractSocket
+
 from PyQt6.QtGui import QCursor
 
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 
-from ars_cmds.render_cmds.make_screenshot import make_screenshot
-from ars_cmds.render_cmds.render_pass import save_depth, save_render
-from ars_cmds.render_cmds.check import check_queue
-from ars_cmds.core_cmds.key_check import key_check
-from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.mesh_gen.generate_mesh import generate_mesh
 from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 
 from prefs.pref_controller import get_path
+from PyQt6.QtCore import QPoint
 
 import os
-import uuid
-import json
+
 
 from PyQt6.QtGui import QColor
 
-
-BBL_PROMPT_CONFIG = {"symbol": ic.ICON_TEXT_INPUT, "hotkey": "P"}
-def BBL_PROMPT(self, position, default_object = None):
+def prompt_ctx(self, position, default_object = None, callback = None):
 
     config = ContextMenuConfig()
     config.auto_close = False
@@ -43,8 +35,13 @@ def BBL_PROMPT(self, position, default_object = None):
     config.custom_height = 260
     config.custom_width = 410
 
+    config.extra_distance = [0,(config.item_radius * 2) - 6 ]
+
+
     if type(default_object).__name__ == "CSprite":
         self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
+
+
 
 
     options_list = [
@@ -54,13 +51,16 @@ def BBL_PROMPT(self, position, default_object = None):
     ]
 
     config.slider_values = {
-        ic.ICON_STEPS: (1, 50, self.render_manager.get_userdata("steps")),
+        ic.ICON_STEPS: (1, 50, default_object.steps),
         ic.ICON_GIZMO_SCALE: (25, 1024, 512),
+        ic.ICON_CLOSE_RADIAL: (0,1,0),
+
     }
 
     def start_render(seed_step = 0):
         delete_all_files_in_folder( get_path('steps') )
-        self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + seed_step)
+        default_object.seed += seed_step
+        self.render_manager.set_userdata("seed", default_object.seed)
         self.render_manager.set_userdata("steps", int(ctx.get_value(ic.ICON_STEPS))),
         self.render_manager.set_userdata("positive", default_object.prompt)
         generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
@@ -69,12 +69,23 @@ def BBL_PROMPT(self, position, default_object = None):
         ic.ICON_PLAYER_PLAY: lambda: start_render(0),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
-                    }
+        ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
+    }
+
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    }
+
+    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
+
+
+
 
     prompt_widget = MultiLineInputWidget(central_widget = self.central_widget, default_object = default_object)
     prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"A": prompt_widget}
+
+    print(default_object.texture_path)
 
     ctx = open_context(
         parent=self.central_widget,

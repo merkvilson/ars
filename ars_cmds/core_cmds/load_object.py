@@ -108,3 +108,10 @@ def add_sprite(self, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), name="Sprite")
         return obj
     except Exception as e:
         print(f"Failed to add CSprite: {e}")
+
+
+def selected_object(self):
+    selected = self.viewport._objectManager.get_selected_objects()
+    if selected:
+        return selected[0]
+    return None

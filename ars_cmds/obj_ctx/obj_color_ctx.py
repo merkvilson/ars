@@ -8,7 +8,7 @@ from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
 from PyQt6.QtCore import Qt, QRectF
 from core.sound_manager import play_sound
 from PyQt6.QtWidgets import QFileDialog
-
+from ars_cmds.core_cmds.load_object import selected_object
 from PyQt6.QtGui import QCursor, QColor
 from PyQt6.QtCore import QPoint
 
@@ -151,10 +151,9 @@ def obj_color(self, position, callback=None):
 #
     options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_CLOSE_RADIAL,]
 
-    selected = self.viewport._objectManager.get_selected_objects()
-    if not selected:
+    if not selected_object(self):
         return
-    obj = selected[0]
+    obj = selected_object(self)
 
     # get current color in rgba float [0..1]
 
