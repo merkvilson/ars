@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QFileDialog
 import os
-from ars_3d_engine.logic.scene_objects import CMesh
+from ars_3d_engine.logic.scene_objects import CMesh, CSprite
 import trimesh 
 import tempfile
 from core.sound_manager import play_sound
@@ -97,3 +97,14 @@ def add_mesh(self, file_path=None, animated=False):
         return obj
     except Exception as e:
         print(f"Failed to add mesh: {e}")
+
+
+def add_sprite(self, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), name="Sprite"):
+    try:
+        obj = CSprite.create(size=size, color=color, name=name)
+        self.viewport._objectManager.add_object(obj)
+        self.viewport._view.camera.view_changed()
+        print(f"Added CSprite: {name}")
+        return obj
+    except Exception as e:
+        print(f"Failed to add CSprite: {e}")
