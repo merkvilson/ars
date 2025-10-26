@@ -27,9 +27,16 @@ class CGeometry(ABC):
 
         self._name = name
         self._parent = None
-        self._prompt = ""
-        self.texture_path = None
         self._children = []
+
+        self.prompt = ""
+        self.seed = 0
+        self.steps = 20
+        self.cfg = 7.0
+        self.denoise = 1.0
+        self.workflow = None
+        self.resolution = (512, 512)
+        self.texture_path = None
 
         # Attach shading filter for directional light
         self.shading_filter = None
@@ -293,3 +300,61 @@ class CMesh(CGeometry):
         obj = cls(v, name=name)
         obj.set_position(translate[0], translate[1], translate[2])
         return obj
+
+class CSprite(CGeometry):
+    
+    def __init__(self, visual, name="Sprite", cfg=7.0):
+        # Call parent constructor first to initialize all CGeometry attributes
+        super().__init__(visual, name)
+        
+        # Add CSprite-specific attributes
+        self.cfg = cfg
+
+    @classmethod
+    def create(cls, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), translate=(0.0, 0.0, 0.0), name="Sprite", cfg=7.0):
+        # Create vertices for a plane in XY orientation (facing +Z)
+        width, height = size
+        hw, hh = width / 2.0, height / 2.0
+        
+        vertices = np.array([
+            [-hw, -hh, 0],  # Bottom-left
+            [ hw, -hh, 0],  # Bottom-right
+            [ hw,  hh, 0],  # Top-right
+            [-hw,  hh, 0],  # Top-left
+        ], dtype=np.float32)
+        
+        # Two triangles to form the plane
+        faces = np.array([
+            [0, 1, 2],  # First triangle
+            [0, 2, 3],  # Second triangle
+        ], dtype=np.uint32)
+        
+        # Normals pointing in +Z direction
+        normals = np.array([
+            [0, 0, 1],
+            [0, 0, 1],
+            [0, 0, 1],
+            [0, 0, 1],
+        ], dtype=np.float32)
+        
+        # UV texture coordinates
+        texcoords = np.array([
+            [0, 0],  # Bottom-left
+            [1, 0],  # Bottom-right
+            [1, 1],  # Top-right
+            [0, 1],  # Top-left
+        ], dtype=np.float32)
+        
+        # Create MeshData
+        md = MeshData(vertices=vertices, faces=faces)
+        md._vertex_normals = normals
+        md._vertex_tex_coords = texcoords
+        
+        # Create visual
+        v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
+        
+        # Create sprite object with custom attributes
+        obj = cls(v, name=name, cfg=cfg)
+        obj.set_position(translate[0], translate[1], translate[2])
+        
+        return obj 
