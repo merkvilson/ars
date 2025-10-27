@@ -7,7 +7,7 @@ from core.sound_manager import play_sound
 from PyQt6.QtCore import QTimer
 import time
 from prefs.pref_controller import get_path
-
+from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation
 mesh_files = "(*.obj *.stl *.ply *.off *.dae *.glb *.gltf *.3mf)"
 
 def process_mesh_file(file_path):
@@ -99,15 +99,24 @@ def add_mesh(self, file_path=None, animated=False):
         print(f"Failed to add mesh: {e}")
 
 
-def add_sprite(self, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), name="Sprite"):
-    try:
-        obj = CSprite.create(size=size, color=color, name=name)
+def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.5), name="Sprite", animated=False):
+    
+    if animated:
+        play_sound("bbox-in")
+
+        grow_duration = 0.3
+        plane_fill_animation(self.viewport._view.scene, grow_duration=grow_duration, count=4)
+    else:
+        grow_duration = 0
+
+    obj = CSprite.create(size=size, color=color, name=name)
+    def add_to_scene():
         self.viewport._objectManager.add_object(obj)
         self.viewport._view.camera.view_changed()
         print(f"Added CSprite: {name}")
-        return obj
-    except Exception as e:
-        print(f"Failed to add CSprite: {e}")
+
+    QTimer.singleShot(int(grow_duration * 2000), add_to_scene)
+    return obj
 
 
 def selected_object(self):
