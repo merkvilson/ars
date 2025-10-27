@@ -4,10 +4,12 @@ import os
 from prefs.pref_controller import get_path
 from ars_cmds.core_cmds.load_object import add_mesh
 
-from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation
+from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation, delete_bbox_animations
 from ars_cmds.render_cmds.check import check_queue
 
 def generate_mesh(self, ctx):
+    delete_bbox_animations(self.viewport._view.scene)
+    
     self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
 
 

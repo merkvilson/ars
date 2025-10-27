@@ -7,7 +7,7 @@ from core.sound_manager import play_sound
 from PyQt6.QtCore import QTimer
 import time
 from prefs.pref_controller import get_path
-from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation
+from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation, delete_bbox_animations
 mesh_files = "(*.obj *.stl *.ply *.off *.dae *.glb *.gltf *.3mf)"
 
 def process_mesh_file(file_path):
@@ -111,6 +111,7 @@ def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.5), name="Sprite",
 
     obj = CSprite.create(size=size, color=color, name=name)
     def add_to_scene():
+        delete_bbox_animations(self.viewport._view.scene)
         self.viewport._objectManager.add_object(obj)
         self.viewport._view.camera.view_changed()
         print(f"Added CSprite: {name}")

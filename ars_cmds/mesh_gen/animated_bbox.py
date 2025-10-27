@@ -100,7 +100,7 @@ def _create_plane_mesh(width=1.0, height=1.0, color='white', alpha=1.0, parent=N
 
     return mesh
 
-def bbox_loading_animation(parent, bbox_scale = 4.0, count = 3):
+def bbox_loading_animation(parent, bbox_scale=4.0, count=3):
     play_sound("bbox-in")
     # Create 27 mini-cubes in a 3x3x3 grid
     mini_cube_size = (bbox_scale / count)
@@ -259,6 +259,14 @@ def bbox_loading_animation(parent, bbox_scale = 4.0, count = 3):
     timer._removing = removing
     timer._transform_big = transform_big
     
+    # Track on parent for global deletion
+    if not hasattr(parent, '_animation_meshes'):
+        parent._animation_meshes = []
+    if not hasattr(parent, '_animation_timers'):
+        parent._animation_timers = []
+    parent._animation_meshes.extend(cubes + [cube])
+    parent._animation_timers.append(timer)
+    
     return timer
 
 def remove_bbox_loading_animation(timer):
@@ -267,7 +275,7 @@ def remove_bbox_loading_animation(timer):
     timer._removing[0] = True
 
 
-def plane_fill_animation(parent, plane_scale=4.0, count=4, grow_duration = 0.3):
+def plane_fill_animation(parent, plane_scale=4.0, count=4, grow_duration=0.3):
     """Create a 2D grid of planes that scale in once to form a single larger plane."""
 
     plane_size = plane_scale / count
@@ -325,4 +333,22 @@ def plane_fill_animation(parent, plane_scale=4.0, count=4, grow_duration = 0.3):
     timer = app.Timer(interval=1 / 60, connect=update, start=True)
     timer._animation_planes = planes
 
+    # Track on parent for global deletion
+    if not hasattr(parent, '_animation_meshes'):
+        parent._animation_meshes = []
+    if not hasattr(parent, '_animation_timers'):
+        parent._animation_timers = []
+    parent._animation_meshes.extend(planes)
+    parent._animation_timers.append(timer)
+    
     return timer
+
+def delete_bbox_animations(parent):
+    if hasattr(parent, '_animation_timers'):
+        for t in parent._animation_timers:
+            t.stop()
+        parent._animation_timers = []
+    if hasattr(parent, '_animation_meshes'):
+        for m in parent._animation_meshes:
+            m.parent = None
+        parent._animation_meshes = []
