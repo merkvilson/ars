@@ -8,6 +8,9 @@ from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_
 from ars_cmds.render_cmds.check import check_queue
 
 def generate_mesh(self, ctx):
+    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
+
+
     timer = bbox_loading_animation(self.viewport._view.scene)
 
     ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)

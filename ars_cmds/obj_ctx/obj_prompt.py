@@ -43,10 +43,13 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
 
-
     options_list = [
     ["   ","A","   ",],
-    [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", ic.ICON_SAVE, "x",], 
+
+    [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
+    ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", 
+    ic.ICON_OBJ_HEXAGONS ,ic.ICON_SAVE, "x",], 
+
     ["   ",ic.ICON_CLOSE_RADIAL,"   "],
     ]
 
@@ -69,6 +72,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_PLAYER_PLAY: lambda: start_render(0),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
+        ic.ICON_OBJ_HEXAGONS: lambda: generate_mesh(self, ctx),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }
 
