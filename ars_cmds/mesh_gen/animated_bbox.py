@@ -58,6 +58,48 @@ def _create_cube_mesh(size=1.0, color='white', alpha=1.0, parent=None):
     
     return mesh
 
+
+def _create_plane_mesh(width=1.0, height=1.0, color='white', alpha=1.0, parent=None):
+    """Create an XY-oriented plane (facing +Z) using a Mesh visual."""
+    half_w = width / 2.0
+    half_h = height / 2.0
+    vertices = np.array([
+        [-half_w, -half_h, 0.0],
+        [ half_w, -half_h, 0.0],
+        [ half_w,  half_h, 0.0],
+        [-half_w,  half_h, 0.0],
+    ], dtype=np.float32)
+
+    faces = np.array(
+        [
+            [0, 1, 2],
+            [0, 2, 3],
+        ],
+        dtype=np.uint32,
+    )
+
+    if isinstance(color, str):
+        col = Color(color, alpha=alpha)
+    else:
+        col = Color(color + (alpha,))
+
+    mesh = scene.visuals.Mesh(
+        vertices=vertices,
+        faces=faces,
+        color=col,
+        shading=None,
+        parent=parent,
+    )
+
+    mesh.set_gl_state(
+        depth_test=True,
+        cull_face='back',
+        blend=True,
+        blend_func=('src_alpha', 'one_minus_src_alpha'),
+    )
+
+    return mesh
+
 def bbox_loading_animation(parent, bbox_scale = 4.0, count = 3):
     play_sound("bbox-in")
     # Create 27 mini-cubes in a 3x3x3 grid
@@ -223,3 +265,64 @@ def remove_bbox_loading_animation(timer):
     play_sound("bbox-out")
     # Just set the flag to start removal animation
     timer._removing[0] = True
+
+
+def plane_fill_animation(parent, plane_scale=4.0, count=4, grow_duration = 0.3):
+    """Create a 2D grid of planes that scale in once to form a single larger plane."""
+
+    plane_size = plane_scale / count
+    indices = np.linspace(-(count - 1) / 2.0, (count - 1) / 2.0, count)
+    positions = [(ix * plane_size, iy * plane_size, 0.0) for iy in indices for ix in indices]
+    positions = [positions[i] for i in np.random.permutation(len(positions))]
+
+    initial_scale = 0.0001
+    start_delays = np.linspace(0.0, 0.4, len(positions))
+
+    planes = []
+    transforms = []
+
+    for pos in positions:
+        plane = _create_plane_mesh(width=plane_size, height=plane_size, color=(0.5, 0.5, 0.5), alpha=1.0, parent=None)
+        transform = MatrixTransform()
+        transform.scale([initial_scale, initial_scale, 1.0])
+        transform.translate(pos)
+        plane.transform = transform
+        plane.update()
+        plane.parent = parent
+        planes.append(plane)
+        transforms.append(transform)
+
+    parent.canvas.update()
+
+    def update(event):
+        elapsed = event.elapsed
+        all_finished = True
+
+        for idx, (plane, transform) in enumerate(zip(planes, transforms)):
+            delay = start_delays[idx]
+            local_time = elapsed - delay
+
+            if local_time <= 0:
+                scale_factor = initial_scale
+                all_finished = False
+            elif local_time < grow_duration:
+                progress = local_time / grow_duration
+                scale_factor = initial_scale + (1.0 - initial_scale) * progress
+                all_finished = False
+            else:
+                scale_factor = 1.0
+
+            transform.matrix = np.eye(4)
+            transform.scale([scale_factor, scale_factor, 1.0])
+            transform.translate(positions[idx])
+            plane.update()
+
+        if all_finished:
+            timer.stop()
+            for plane in planes:
+                plane.parent = None
+
+    timer = app.Timer(interval=1 / 60, connect=update, start=True)
+    timer._animation_planes = planes
+
+    return timer
