@@ -1,9 +1,13 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
-
+from ars_cmds.core_cmds.load_object import selected_object
 
 BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
 def BBL_GIZMO_MOVE(self, position):
+
+    if not selected_object(self):
+        return
+
     config = ContextMenuConfig()
 
 
