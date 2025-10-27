@@ -22,7 +22,7 @@ def BBL_OBJECT(self, position):
                      ]
 
     config.callbackL = {
-        ic.ICON_SPRITE:            lambda: add_sprite(self),
+        ic.ICON_SPRITE:            lambda: add_sprite(self, animated=True),
         ic.ICON_OBJ_BOX:           lambda: add_mesh(self, os.path.join("res","mesh files", 'box.obj'      ), animated = True),
         ic.ICON_OBJ_SPHERE:        lambda: add_mesh(self, os.path.join("res","mesh files", 'sphere.obj'   ), animated = True),
         ic.ICON_OBJ_CYLINDER:      lambda: add_mesh(self, os.path.join("res","mesh files", 'cylinder.obj' ), animated = True),
