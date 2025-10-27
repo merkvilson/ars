@@ -4,9 +4,11 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 
 from ars_cmds.core_cmds.load_object import add_sprite, selected_object
-
+from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation
 def BBL_5(self, position):
     run_ext(__file__, self)
+
+    plane_fill_animation(self.viewport._view.scene)
 
 def main(self):
     config = ContextMenuConfig()
