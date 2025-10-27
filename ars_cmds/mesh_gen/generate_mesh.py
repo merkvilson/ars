@@ -8,7 +8,7 @@ from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_
 from ars_cmds.render_cmds.check import check_queue
 
 def generate_mesh(self, ctx):
-    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
+    self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
 
 
     timer = bbox_loading_animation(self.viewport._view.scene)
