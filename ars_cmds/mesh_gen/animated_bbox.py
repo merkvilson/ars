@@ -290,7 +290,7 @@ def plane_fill_animation(parent, plane_scale=4.0, count=4, grow_duration=0.3):
     transforms = []
 
     for pos in positions:
-        plane = _create_plane_mesh(width=plane_size, height=plane_size, color=(0.5, 0.5, 0.5), alpha=1.0, parent=None)
+        plane = _create_plane_mesh(width=plane_size, height=plane_size, color=(1, 1, 1), alpha=0.3, parent=None)
         transform = MatrixTransform()
         transform.scale([initial_scale, initial_scale, 1.0])
         transform.translate(pos)

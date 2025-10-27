@@ -99,7 +99,7 @@ def add_mesh(self, file_path=None, animated=False):
         print(f"Failed to add mesh: {e}")
 
 
-def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.5), name="Sprite", animated=False):
+def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", animated=False):
     
     if animated:
         play_sound("bbox-in")
@@ -117,6 +117,7 @@ def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.5), name="Sprite",
         print(f"Added CSprite: {name}")
 
     QTimer.singleShot(int(grow_duration * 2000), add_to_scene)
+    obj.set_shading(None)
     return obj
 
 
