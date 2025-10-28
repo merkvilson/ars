@@ -5,12 +5,21 @@ from PyQt6.QtGui import QCursor
 
 from ars_cmds.core_cmds.load_object import add_sprite, selected_object
 from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation, delete_bbox_animations
+
+
+
 def BBL_5(self, position):
     run_ext(__file__, self)
 
     
-
 def main(self):
+    
+    if not selected_object(self):
+        return
+    else: obj = selected_object(self)
+
+    obj.cutout()
+    
     config = ContextMenuConfig()
     config.auto_close = False
     options_list = [

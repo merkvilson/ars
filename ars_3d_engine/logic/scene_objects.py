@@ -9,6 +9,7 @@ from vispy.geometry import MeshData
 
 from vispy.io import imread 
 from vispy.visuals.filters import TextureFilter 
+from PIL import Image # <-- Added this import
 
 class CGeometry(ABC):
 
@@ -205,7 +206,10 @@ class CGeometry(ABC):
 
     def set_texture(self, image_path: str) -> None:
         """Apply a texture to the mesh from an image file path. Requires the mesh to have texture coordinates."""
-        texcoords = getattr(self._visual.mesh_data, '_vertex_tex_coords', None)
+        # Use the *new* mesh_data attached to the visual
+        current_mesh_data = self._visual.mesh_data
+        texcoords = getattr(current_mesh_data, '_vertex_tex_coords', None)
+        
         if texcoords is None:
             print("Mesh does not have texture coordinates. Cannot apply texture.")
             return
@@ -220,7 +224,15 @@ class CGeometry(ABC):
         
         texcoords_to_use = texcoords[:, :2] if texcoords.shape[-1] == 3 else texcoords
         
-        image = imread(image_path)
+        try:
+            image = imread(image_path)
+        except FileNotFoundError:
+            print(f"Error: Texture file not found at {image_path}")
+            return
+        except Exception as e:
+            print(f"Error reading texture file {image_path}: {e}")
+            return
+
         image = np.flipud(image) 
         if image.ndim == 2:  image = image[..., np.newaxis]
         self.texture_filter = TextureFilter(image, texcoords_to_use)
@@ -259,18 +271,11 @@ class CGeometry(ABC):
         new_obj = CMesh(new_visual, name=self.name + "_copy")
 
         # Copy texture if applied
-        if hasattr(self, 'texture_filter') and self.texture_filter is not None:
-            texture_data = self.texture_filter.texture[...]  # Get the numpy array data
-            new_texcoords = getattr(new_md, '_vertex_tex_coords', None)
-            if new_texcoords is None:
-                raise ValueError("Cloned mesh does not have texture coordinates.")
-            if new_texcoords.ndim != 2 or new_texcoords.shape[-1] not in (2, 3):
-                raise ValueError("Texture coordinates must be a 2D array with last dimension 2 or 3.")
-            new_texcoords_to_use = new_texcoords[:, :2] if new_texcoords.shape[-1] == 3 else new_texcoords
-            new_texture_filter = TextureFilter(texture_data, new_texcoords_to_use)
-            new_visual.attach(new_texture_filter)
-            new_obj.texture_filter = new_texture_filter  # Set the attribute for future clones
-
+        if hasattr(self, 'texture_filter') and self.texture_filter is not None and self.texture_path:
+            # We can't just copy the filter, we need to re-apply the texture
+            # using the new mesh's texcoords.
+            new_obj.set_texture(self.texture_path)
+        
         # Copy position (translation)
         new_obj.set_position(*self.get_position())
 
@@ -309,6 +314,7 @@ class CSprite(CGeometry):
         
         # Add CSprite-specific attributes
         self.cfg = cfg
+        self.sprite_size = (2.0, 2.0) # Default size
 
     @classmethod
     def create(cls, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), translate=(0.0, 0.0, 0.0), name="Sprite", cfg=7.0):
@@ -356,5 +362,107 @@ class CSprite(CGeometry):
         # Create sprite object with custom attributes
         obj = cls(v, name=name, cfg=cfg)
         obj.set_position(translate[0], translate[1], translate[2])
+        obj.sprite_size = size # Store the intended size
         
         return obj 
+
+    def cutout(self):
+        """
+        Modifies the sprite's geometry based on the alpha channel of its texture.
+        This will replace the existing quad with a mesh matching the
+        opaque pixels of the texture.
+        """
+        if self.texture_path is None:
+            print("Error: No texture_path set. Call set_texture() first.")
+            return
+
+        try:
+            img = Image.open(self.texture_path)
+        except Exception as e:
+            print(f"Error opening image {self.texture_path}: {e}")
+            return
+        
+        # Get image pixels
+        if img.mode != 'RGBA':
+            img = img.convert('RGBA')
+        pixels = np.asarray(img)
+        height_px, width_px = pixels.shape[:2]
+        if width_px == 0 or height_px == 0:
+             print("Error: Texture image has zero dimensions.")
+             return
+             
+        mask = pixels[:, :, 3] > 0
+        
+        if not mask.any():
+            print("Warning: Texture is fully transparent. Clearing geometry.")
+            self._visual.set_data(meshdata=MeshData())
+            self._visual.update()
+            return
+            
+        # Get target mesh size from sprite
+        width_units, height_units = self.sprite_size
+        scale_x = width_units / width_px
+        scale_y = height_units / height_px
+        
+        # Build index mapping for valid pixels
+        indices = np.zeros((height_px, width_px), dtype=np.int32)
+        num_vertices = mask.sum()
+        indices[mask] = np.arange(num_vertices)  # 0-indexed
+        
+        # Get coordinates of valid pixels
+        ys, xs = np.nonzero(mask)
+        
+        # Compute vertices
+        vx = (xs - width_px * 0.5) * scale_x
+        vy = -(ys - height_px * 0.5) * scale_y # Flipped Y to match vispy coords
+        vz = np.zeros(num_vertices, dtype=np.float32)
+        vertices = np.stack([vx, vy, vz], axis=-1).astype(np.float32)
+        
+        # Compute UVs
+        u = xs / (width_px - 1.0)
+        v = 1.0 - ys / (height_px - 1.0) # Flipped Y for texture mapping
+        texcoords = np.stack([u, v], axis=-1).astype(np.float32)
+        
+        # Compute normals
+        normals = np.zeros_like(vertices, dtype=np.float32)
+        normals[:, 2] = 1.0  # Pointing +Z
+        
+        # Find valid quads (cells where all 4 corners are opaque)
+        mask_down = mask[1:, :]
+        mask_right = mask[:, 1:]
+        mask_diag = mask[1:, 1:]
+        mask_tl = mask[:-1, :-1]
+        
+        valid_quads = mask_tl & mask_right[:-1, :] & mask_down[:, :-1] & mask_diag
+        qy, qx = np.nonzero(valid_quads)
+
+        if qy.size == 0:
+            print("Warning: No valid quads found. Result will be a point cloud (no faces).")
+            faces = np.empty((0, 3), dtype=np.uint32)
+        else:
+            # Get vertex indices for the top-left corner of each quad
+            idx = indices
+            v1 = idx[qy, qx]          # Top-left
+            v2 = idx[qy, qx + 1]      # Top-right
+            v3 = idx[qy + 1, qx + 1]  # Bottom-right
+            v4 = idx[qy + 1, qx]      # Bottom-left
+            
+            # Create two triangles per quad
+            tri1 = np.stack([v1, v2, v3], axis=-1)
+            tri2 = np.stack([v1, v3, v4], axis=-1)
+            faces = np.concatenate([tri1, tri2], axis=0).astype(np.uint32)
+        
+        # Create new MeshData
+        new_md = MeshData(vertices=vertices, faces=faces)
+        new_md._vertex_normals = normals
+        new_md._vertex_tex_coords = texcoords
+        
+        # Update the visual with the new geometry
+        self._visual.set_data(meshdata=new_md)
+        
+        # Re-apply the texture. This is crucial!
+        # It rebuilds the TextureFilter using the *new* texcoords.
+        self.set_texture(self.texture_path)
+        
+        self._visual.update()
+        print(f"Cutout complete. New mesh has {num_vertices} vertices and {faces.shape[0]} faces.")
