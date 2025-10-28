@@ -385,10 +385,6 @@ class ContextButtonWindow(QWidget):
                 break
 
     def close_animated(self, duration: int = 250, end_radius: int = 50):
-        if self.config.callback_on_close:
-            self.config.callback_on_close()
-            self.config.callback_on_close = None # Prevent multiple calls
-    
         play_sound("back")
         animated_effects.close_effect(self, duration, end_radius)
 
@@ -429,6 +425,10 @@ class ContextButtonWindow(QWidget):
         return super().eventFilter(watched, event)
 
     def closeEvent(self, event):
+        if self.config.callback_on_close:
+            self.config.callback_on_close()
+            self.config.callback_on_close = None # Prevent multiple calls
+            
         if self._close_on_outside:
             QApplication.instance().removeEventFilter(self)
         super().closeEvent(event)
