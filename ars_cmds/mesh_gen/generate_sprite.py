@@ -22,7 +22,7 @@ def generate_sprite(self, ctx, max_steps):
     
     sprite_plane = selected[0]
 
-    sprite_plane.set_color((1,1,1,0.99)) # Set to white to ensure textures are visible
+    sprite_plane.set_color((1,1,1,0.3)) # Set to white to ensure textures are visible
 
 
     #ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)
@@ -45,9 +45,14 @@ def generate_sprite(self, ctx, max_steps):
             if latest_file:
                 sprite_plane.set_texture(latest_file)
                 
-                # Check if we've reached max_steps + 1
+                # Calculate alpha based on current step (0.1 to 0.99)
                 current_files = os.listdir(sprite_dir)
-                if len(current_files) >= max_steps + 1:
+                current_step = len(current_files)
+                alpha = 0.1 + (0.89 * (current_step / (max_steps + 1)))
+                sprite_plane.set_alpha( alpha)
+                
+                # Check if we've reached max_steps + 1
+                if current_step >= max_steps + 1:
                     print("finish")
                     update_timer.stop()
         except Exception as e:
