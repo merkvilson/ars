@@ -3,7 +3,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ui.widgets.multi_line_input import MultiLineInputWidget
 from ars_cmds.mesh_gen.generate_sprite import generate_sprite
-
+from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
 
 from PyQt6.QtGui import QCursor
 
@@ -48,7 +48,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
     [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
     ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", 
-    ic.ICON_OBJ_HEXAGONS ,ic.ICON_SAVE, "x",], 
+    ic.ICON_OBJ_HEXAGONS ,ic.ICON_SAVE], 
 
     ["   ",ic.ICON_CLOSE_RADIAL,"   "],
     ]
@@ -68,11 +68,15 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         self.render_manager.set_userdata("positive", default_object.prompt)
         generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
 
+    def convert_sprite_to_mesh():
+        delete_obj(self, position)
+        generate_mesh(self, ctx)
+
     config.callbackL = {
         ic.ICON_PLAYER_PLAY: lambda: start_render(0),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
-        ic.ICON_OBJ_HEXAGONS: lambda: generate_mesh(self, ctx),
+        ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }
 
