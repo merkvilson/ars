@@ -12,12 +12,9 @@ def BBL_2(self, position):
 def doit(self):
     config = ContextMenuConfig()
     options_list = [
-        ["0","1", "2", "3", "4", ic.ICON_GIZMO_MOVE],
+        ["0","1", "2", "3", "4", ],
     ]
     
-    config.auto_close = False
-    config.close_on_outside = False
-
     config.slider_values = {ic.ICON_GIZMO_MOVE: (0,1,0)}
     config.slider_color = {ic.ICON_GIZMO_MOVE: QColor(150, 150, 150, 0)}
     config.use_extended_shape_items = {ic.ICON_GIZMO_MOVE: False}
