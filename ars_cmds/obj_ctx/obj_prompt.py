@@ -56,6 +56,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     }
 
     def start_render(seed_step = 0):
+        default_object.revert_cutout()
+
         delete_all_files_in_folder( get_path('steps') )
         default_object.seed += seed_step
         self.render_manager.set_userdata("seed", default_object.seed)

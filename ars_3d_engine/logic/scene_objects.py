@@ -316,9 +316,9 @@ class CSprite(CGeometry):
         self.cfg = cfg
         self.sprite_size = (2.0, 2.0) # Default size
 
-    @classmethod
-    def create(cls, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), translate=(0.0, 0.0, 0.0), name="Sprite", cfg=7.0):
-        # Create vertices for a plane in XY orientation (facing +Z)
+    @staticmethod
+    def _create_quad_meshdata(size):
+        """Helper staticmethod to generate simple quad MeshData."""
         width, height = size
         hw, hh = width / 2.0, height / 2.0
         
@@ -355,6 +355,13 @@ class CSprite(CGeometry):
         md = MeshData(vertices=vertices, faces=faces)
         md._vertex_normals = normals
         md._vertex_tex_coords = texcoords
+        return md
+
+    @classmethod
+    def create(cls, size=(2.0, 2.0), color=(1.0, 1.0, 1.0, 1.0), translate=(0.0, 0.0, 0.0), name="Sprite", cfg=7.0):
+        
+        # Use the static helper method to get the geometry
+        md = CSprite._create_quad_meshdata(size)
         
         # Create visual
         v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
@@ -365,6 +372,32 @@ class CSprite(CGeometry):
         obj.sprite_size = size # Store the intended size
         
         return obj 
+    
+
+
+    def _update_gl_state(self):
+
+            self._visual.set_gl_state(cull_face=False)
+
+
+
+    def revert_cutout(self):
+        """
+        Reverts the cutout operation, restoring the sprite to a simple
+        rectangular quad.
+        """
+        # Get the standard quad geometry using the helper
+        new_md = CSprite._create_quad_meshdata(self.sprite_size)
+        
+        # Update the visual with the new (simple) geometry
+        self._visual.set_data(meshdata=new_md)
+        
+        # Re-apply the texture if it exists
+        if self.texture_path:
+            self.set_texture(self.texture_path)
+        
+        self._visual.update()
+        print("Sprite geometry reverted to standard quad.")
 
     def cutout(self):
         """
@@ -466,3 +499,4 @@ class CSprite(CGeometry):
         
         self._visual.update()
         print(f"Cutout complete. New mesh has {num_vertices} vertices and {faces.shape[0]} faces.")
+

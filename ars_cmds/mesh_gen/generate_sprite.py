@@ -19,6 +19,7 @@ def generate_sprite(self, ctx, max_steps):
         return
     
     sprite_plane = selected[0]
+    #sprite_plane.revert_cutout()
 
     sprite_plane.set_color((1,1,1,0.3)) # Set to white to ensure textures are visible
 
@@ -51,6 +52,7 @@ def generate_sprite(self, ctx, max_steps):
                 
                 # Check if we've reached max_steps + 1
                 if current_step >= max_steps + 1:
+                    sprite_plane.cutout()
                     print("finish")
                     update_timer.stop()
         except Exception as e:

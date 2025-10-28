@@ -18,7 +18,7 @@ def main(self):
         return
     else: obj = selected_object(self)
 
-    obj.cutout()
+    
     
     config = ContextMenuConfig()
     config.auto_close = False
@@ -27,8 +27,8 @@ def main(self):
     ]
     
     config.callbackL = {"1": lambda: plane_fill_animation(self.viewport._view.scene),
-                        "2": lambda: delete_bbox_animations(self.viewport._view.scene),
-                        "3": lambda: print("Option 3 selected"),
+                        "2": lambda: obj.cutout(),
+                        "3": lambda: obj.revert_cutout(),
     }
 
 
