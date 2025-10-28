@@ -7,8 +7,6 @@ from ars_cmds.core_cmds.load_object import add_mesh
 from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation
 from ars_cmds.render_cmds.check import check_queue
 
-from prefs.pref_controller import get_path
-
 def generate_sprite(self, ctx, max_steps):
     """
     Generates a sprite by monitoring a directory for new images and creating a sprite sheet.

@@ -7,13 +7,8 @@ from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
 
 from PyQt6.QtGui import QCursor
 
-from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts import font_icons as ic
-
-
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.mesh_gen.generate_mesh import generate_mesh
-from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 
 from prefs.pref_controller import get_path
 from PyQt6.QtCore import QPoint
