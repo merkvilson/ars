@@ -26,6 +26,8 @@ def main(self):
         ["1", "2", "3",],
     ]
     
+    def doit(): print("doit")
+    config.callback_on_close = doit
 
     ctx = open_context(
         parent=self.central_widget,
@@ -34,18 +36,6 @@ def main(self):
         config=config
     )
 
-    # def doit(): print("doit")
-    
-    # # Store the original closeEvent method
-    # original_closeEvent = ctx.closeEvent
-    
-    # # Create a new closeEvent function
-    # def new_closeEvent(event):
-    #     doit()  # Call your function
-    #     original_closeEvent(event)  # Call the original event handler
-    
-    # # Replace the widget's closeEvent with your new one
-    # ctx.closeEvent = new_closeEvent
 
 def execute_plugin(window):
     main(window)
