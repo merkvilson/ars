@@ -1,73 +1,73 @@
 {
     "bubbles": [
         {
-            "symbol": "\ue98c",
-            "grid_x": 4,
+            "symbol": "\ue94f",
+            "grid_x": 24,
             "grid_y": 0
         },
         {
-            "symbol": "\ue92a",
+            "symbol": "\ue976",
+            "grid_x": 11,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue983",
+            "grid_x": 5,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue989",
+            "grid_x": 6,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue984",
+            "grid_x": 3,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue913",
             "grid_x": 12,
             "grid_y": 0
         },
         {
-            "symbol": "\ue971",
-            "grid_x": 8,
+            "symbol": "\ue905",
+            "grid_x": 16,
             "grid_y": 0
         },
         {
-            "symbol": "\ue977",
+            "symbol": "\ue957",
             "grid_x": 13,
             "grid_y": 0
         },
         {
             "symbol": "\ue972",
-            "grid_x": 10,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue95f",
-            "grid_x": 15,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue956",
-            "grid_x": 24,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue994",
-            "grid_x": 14,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue926",
             "grid_x": 0,
             "grid_y": 0
         },
         {
-            "symbol": "\ue920",
+            "symbol": "\ue96c",
             "grid_x": 26,
             "grid_y": 0
         },
         {
-            "symbol": "\ue94f",
+            "symbol": "\ue948",
             "grid_x": 1,
             "grid_y": 0
         },
         {
-            "symbol": "\ue95c",
+            "symbol": "\ue910",
+            "grid_x": 4,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue902",
+            "grid_x": 8,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue943",
             "grid_x": 7,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue953",
-            "grid_x": 5,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue94b",
-            "grid_x": 9,
             "grid_y": 0
         },
         {
@@ -81,13 +81,13 @@
             "grid_y": 0
         },
         {
-            "symbol": "\ue90f",
+            "symbol": "\ue90e",
             "grid_x": 23,
             "grid_y": 0
         },
         {
-            "symbol": "\ue980",
-            "grid_x": 3,
+            "symbol": "\ue99b",
+            "grid_x": 15,
             "grid_y": 0
         }
     ]
