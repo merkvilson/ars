@@ -208,6 +208,13 @@ def BBL_RENDER(self, position, workflow = None):
 
     }
 
+    config.callback_on_close = lambda: (
+        stop_polling(),
+        ws.close(),
+        reconnect_timer.stop(),
+        queue_timer.stop(),
+    )
+
     ctx = open_context(
         parent=self.central_widget,
         items=options_list,
@@ -218,7 +225,3 @@ def BBL_RENDER(self, position, workflow = None):
     ws.textMessageReceived.connect(on_text_message)
     connect_websocket()
 
-    ctx.destroyed.connect(stop_polling)
-    ctx.destroyed.connect(ws.close)
-    ctx.destroyed.connect(reconnect_timer.stop)
-    ctx.destroyed.connect(queue_timer.stop)
