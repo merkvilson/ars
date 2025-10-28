@@ -44,6 +44,7 @@ class ContextMenuConfig:
         self.callbackL = {}
         self.callbackR = {}
         self.callbackM = {}
+        self.callback_on_close = None
         self.tooltips = {}
         self.symbol_colors = {}
         self.color = {}
