@@ -14,9 +14,9 @@ def BBL_5(self, position):
     
 def main(self):
     
-    if not selected_object(self):
-        return
-    else: obj = selected_object(self)
+    # if not selected_object(self):
+    #     return
+    # else: obj = selected_object(self)
 
     
     
@@ -26,11 +26,6 @@ def main(self):
         ["1", "2", "3",],
     ]
     
-    config.callbackL = {"1": lambda: plane_fill_animation(self.viewport._view.scene),
-                        "2": lambda: obj.cutout(),
-                        "3": lambda: obj.revert_cutout(),
-    }
-
 
     ctx = open_context(
         parent=self.central_widget,
@@ -38,6 +33,19 @@ def main(self):
         position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
+
+    # def doit(): print("doit")
+    
+    # # Store the original closeEvent method
+    # original_closeEvent = ctx.closeEvent
+    
+    # # Create a new closeEvent function
+    # def new_closeEvent(event):
+    #     doit()  # Call your function
+    #     original_closeEvent(event)  # Call the original event handler
+    
+    # # Replace the widget's closeEvent with your new one
+    # ctx.closeEvent = new_closeEvent
 
 def execute_plugin(window):
     main(window)
