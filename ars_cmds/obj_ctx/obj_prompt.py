@@ -38,7 +38,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
 
-    options_list = [
+    options_list = [["T"],
     ["   ","A","   ",],
 
     [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
@@ -75,6 +75,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
+        "T": lambda: print(prompt_widget.text_edit.toPlainText()),
     }
 
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
@@ -83,14 +84,18 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
 
 
+    def set_text_from_prompt():
+        default_object.prompt = prompt_widget.text_edit.toPlainText()
 
+    prompt_widget = MultiLineInputWidget()
+    prompt_widget.text_edit.setPlainText(default_object.prompt)
+    prompt_widget.text_edit.textChanged.connect(set_text_from_prompt)
 
-    prompt_widget = MultiLineInputWidget( default_object = default_object)
     prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"A": prompt_widget}
 
-    print(default_object.texture_path)
+
 
     ctx = open_context(
         parent=self.central_widget,
