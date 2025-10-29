@@ -6,7 +6,7 @@ from PyQt6.QtCore import QPoint
 
 
 
-def BBL_5(self, position):
+def BBL_TEST2(self, position):
     run_ext(__file__, self)
 
     
