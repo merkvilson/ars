@@ -510,7 +510,7 @@ class CText3D(CGeometry):
         self._angle = angle
 
     @classmethod
-    def create(cls, text="Hello 3D", depth=0.5, color=(0.5, 0.7, 1, 1), translate=(0.0, 0.0, 0.0), name="Text3D", angle=30.0):
+    def create(cls, text="Hello 3D", depth=0.5, color=(102/255, 108/255, 120/255, 1.0), translate=(0.0, 0.0, 0.0), name="Text3D", angle=30.0):
         md = CText3D._generate_mesh_data_with_breaking_angle(text, depth, angle)
         v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
         
