@@ -85,7 +85,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
 
-    prompt_widget = MultiLineInputWidget(central_widget = self.central_widget, default_object = default_object)
+    prompt_widget = MultiLineInputWidget( default_object = default_object)
     prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"A": prompt_widget}
