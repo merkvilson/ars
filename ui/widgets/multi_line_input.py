@@ -22,10 +22,9 @@ class MultiLineInputConfig:
 
 class MultiLineInputWidget(QWidget):
     """A multi-line text input widget with a custom-painted background."""
-    def __init__(self, parent=None, config: MultiLineInputConfig = None, central_widget = None, default_object = None):
-        super().__init__(parent, )
-        self.config = config or MultiLineInputConfig()
-        self.central_widget = central_widget
+    def __init__(self,  default_object = None):
+        super().__init__()
+        self.config = MultiLineInputConfig()
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
@@ -41,8 +40,6 @@ class MultiLineInputWidget(QWidget):
 
         if self.default_object:
             self.text_edit.setPlainText(default_object.prompt)
-        else:
-            self.text_edit.setPlainText(self.central_widget.parent().render_manager.get_userdata("positive"))
         
         self.text_edit.setFont(QFont(self.config.font_family, self.config.font_size))
         layout.addWidget(self.text_edit)
@@ -75,8 +72,6 @@ class MultiLineInputWidget(QWidget):
     def _on_text_changed(self):
         if self.default_object:
             self.default_object.prompt = self.text_edit.toPlainText()
-        else:
-            self.central_widget.parent().render_manager.set_userdata("positive", self.text_edit.toPlainText())
 
     def paintEvent(self, e):
         """Paints the rounded rectangle background."""
