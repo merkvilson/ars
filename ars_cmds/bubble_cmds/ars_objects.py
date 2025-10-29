@@ -2,13 +2,14 @@ import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 
-from ..core_cmds.load_object import add_mesh, add_sprite
+from ..core_cmds.load_object import add_mesh, add_sprite, add_text3d
 
 BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
 def BBL_OBJECT(self, position):
     config = ContextMenuConfig()
 
     options_list =  [
+        "T",
                      ic.ICON_OBJ_SPRITE,
                      ic.ICON_OBJ_BOX,
                      ic.ICON_OBJ_SPHERE,
@@ -22,6 +23,7 @@ def BBL_OBJECT(self, position):
                      ]
 
     config.callbackL = {
+        "T": lambda: add_text3d(self),
         ic.ICON_OBJ_SPRITE:        lambda: add_sprite(self, animated=True),
         ic.ICON_OBJ_BOX:           lambda: add_mesh(self, os.path.join("res","mesh files", 'box.obj'      ), animated = True),
         ic.ICON_OBJ_SPHERE:        lambda: add_mesh(self, os.path.join("res","mesh files", 'sphere.obj'   ), animated = True),

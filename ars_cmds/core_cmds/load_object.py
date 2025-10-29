@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QFileDialog
 import os
-from ars_3d_engine.logic.scene_objects import CMesh, CSprite
+from ars_3d_engine.logic.scene_objects import CMesh, CSprite, CText3D
 import trimesh 
 import tempfile
 from core.sound_manager import play_sound
@@ -118,6 +118,14 @@ def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite",
 
     QTimer.singleShot(int(grow_duration * 2000), add_to_scene)
     obj.set_shading(None)
+    return obj
+
+def add_text3d(self):
+    obj = CText3D.create()
+
+    self.viewport._objectManager.add_object(obj)
+    self.viewport._view.camera.view_changed()
+
     return obj
 
 

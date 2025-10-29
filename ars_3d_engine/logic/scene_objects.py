@@ -500,3 +500,43 @@ class CSprite(CGeometry):
         self._visual.update()
         print(f"Cutout complete. New mesh has {num_vertices} vertices and {faces.shape[0]} faces.")
 
+import pyvista as pv
+
+class CText3D(CGeometry):
+
+    @classmethod
+    def create(cls, text="Hello 3D", depth=0.5, color=(0.5, 0.7, 1, 1), translate=(0.0, 0.0, 0.0), name="Text3D"):
+        pv_mesh = pv.Text3D(text, depth=depth)
+        vertices = pv_mesh.points.astype(np.float32)
+        faces_flat = pv_mesh.faces
+        if faces_flat[0] != 3:
+            raise ValueError("Mesh must be triangular for simple VisPy conversion.")
+        faces = faces_flat.reshape(-1, 4)[:, 1:].astype(np.uint32)
+        normals = pv_mesh.point_normals.astype(np.float32) if pv_mesh.point_normals is not None else None
+        md = MeshData(vertices=vertices, faces=faces)
+        if normals is not None:
+            md._vertex_normals = normals
+        v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
+        obj = cls(v, name=name)
+        obj.set_position(*translate)
+        obj._text = text
+        obj._depth = depth
+        return obj
+
+    def set_text(self, text: str) -> None:
+        self._text = text
+        pv_mesh = pv.Text3D(self._text, depth=self._depth)
+        vertices = pv_mesh.points.astype(np.float32)
+        faces_flat = pv_mesh.faces
+        if faces_flat[0] != 3:
+            raise ValueError("Mesh must be triangular for simple VisPy conversion.")
+        faces = faces_flat.reshape(-1, 4)[:, 1:].astype(np.uint32)
+        normals = pv_mesh.point_normals.astype(np.float32) if pv_mesh.point_normals is not None else None
+        md = MeshData(vertices=vertices, faces=faces)
+        if normals is not None:
+            md._vertex_normals = normals
+        self._visual.set_data(meshdata=md)
+        self._visual.update()
+
+    def get_text(self) -> str:
+        return self._text
