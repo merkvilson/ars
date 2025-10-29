@@ -194,9 +194,9 @@
         0
       ]
     },
-    "class_type": "Image Remove Background (rembg)",
+    "class_type": "Airen_REMBG",
     "_meta": {
-      "title": "Image Remove Background (rembg)"
+      "title": "Airen_REMBG"
     }
   },
   "47": {
@@ -205,7 +205,7 @@
       "category": "steps",
       "images": [
         "45",
-        0
+        2
       ]
     },
     "class_type": "Airen_SaveImage",

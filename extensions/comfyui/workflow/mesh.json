@@ -136,7 +136,7 @@
         1
       ],
       "image": [
-        "30",
+        "29",
         0
       ]
     },
@@ -196,41 +196,6 @@
     "class_type": "LoadImage",
     "_meta": {
       "title": "Load Image"
-    }
-  },
-  "30": {
-    "inputs": {
-      "x": 0,
-      "y": 0,
-      "resize_source": false,
-      "destination": [
-        "29",
-        0
-      ],
-      "source": [
-        "31",
-        0
-      ],
-      "mask": [
-        "29",
-        1
-      ]
-    },
-    "class_type": "ImageCompositeMasked",
-    "_meta": {
-      "title": "ImageCompositeMasked"
-    }
-  },
-  "31": {
-    "inputs": {
-      "width": 512,
-      "height": 512,
-      "batch_size": 1,
-      "color": 0
-    },
-    "class_type": "EmptyImage",
-    "_meta": {
-      "title": "EmptyImage"
     }
   }
 }
