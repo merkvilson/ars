@@ -132,7 +132,7 @@ class Airen_SaveImage:
     RETURN_TYPES = ()
     FUNCTION = "save_images"
     OUTPUT_NODE = True
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/Image Processing"
 
     def save_images(self, ud_name, images, category):
         if category in ["keyframes", "3d", "bg", "dome", "sprite", "steps", "texture"]:
@@ -175,7 +175,7 @@ class Airen_Progress_Reader:
         }
 
     RETURN_TYPES = ()
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/Utility"
     OUTPUT_NODE = False
 
 
@@ -192,7 +192,7 @@ class Airen_RenderPass:
     RETURN_TYPES = ("IMAGE", "IMAGE")  # Render, Depth
     RETURN_NAMES = ("render", "depth")
     FUNCTION = "load_passes"
-    CATEGORY = "Airen_Studio"
+    CATEGORY = "Airen_Studio/Image Processing"
 
     @classmethod
     def IS_CHANGED(cls, ud_name):
