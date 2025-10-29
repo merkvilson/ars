@@ -9,7 +9,7 @@ def BBL_OBJECT(self, position):
     config = ContextMenuConfig()
 
     options_list =  [
-        "T",
+                     ic.ICON_OBJ_TXT_ABC,
                      ic.ICON_OBJ_SPRITE,
                      ic.ICON_OBJ_BOX,
                      ic.ICON_OBJ_SPHERE,
@@ -23,7 +23,7 @@ def BBL_OBJECT(self, position):
                      ]
 
     config.callbackL = {
-        "T": lambda: add_text3d(self),
+        ic.ICON_OBJ_TXT_ABC:           lambda: add_text3d(self),
         ic.ICON_OBJ_SPRITE:        lambda: add_sprite(self, animated=True),
         ic.ICON_OBJ_BOX:           lambda: add_mesh(self, os.path.join("res","mesh files", 'box.obj'      ), animated = True),
         ic.ICON_OBJ_SPHERE:        lambda: add_mesh(self, os.path.join("res","mesh files", 'sphere.obj'   ), animated = True),
@@ -37,6 +37,7 @@ def BBL_OBJECT(self, position):
     }
 
     config.additional_texts = {
+        ic.ICON_OBJ_TXT_ABC:   'Text',
         ic.ICON_OBJ_SPRITE: '2D Sprite',
         ic.ICON_OBJ_BOX:   'Cube', 
         ic.ICON_OBJ_SPHERE: 'Sphere', 
@@ -45,11 +46,12 @@ def BBL_OBJECT(self, position):
         ic.ICON_OBJ_PYRAMID: 'Pyramid',
         ic.ICON_OBJ_PLANE: 'Plane',
         ic.ICON_OBJ_TORUS: 'Torus',
-        ic.ICON_FILE_3D: 'Import Object',
+        ic.ICON_FILE_3D: 'Load Object',
         ic.ICON_ORIGAMI: 'Test Mesh',
     }
 
     config.hotkey_items = {
+        ic.ICON_OBJ_TXT_ABC:    'A',
         ic.ICON_OBJ_SPRITE: 'D',
         ic.ICON_OBJ_BOX:    'C', 
         ic.ICON_OBJ_SPHERE:  'S', 
@@ -58,7 +60,7 @@ def BBL_OBJECT(self, position):
         ic.ICON_OBJ_PYRAMID: 'Y',
         ic.ICON_OBJ_PLANE: 'P',
         ic.ICON_OBJ_TORUS: 'T',
-        ic.ICON_FILE_3D:  'I',
+        ic.ICON_FILE_3D:  'L',
         ic.ICON_ORIGAMI:  'O',
 
     }
