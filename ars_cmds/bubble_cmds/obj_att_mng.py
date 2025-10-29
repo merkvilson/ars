@@ -1,14 +1,10 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
-from ars_cmds.core_cmds.run_ext import run_ext
-import os
 from PyQt6.QtGui import QCursor, QColor
-import random
 from ars_cmds.obj_ctx.obj_color_ctx import obj_color
 from ars_cmds.obj_ctx.obj_psr import obj_scale
 from ars_cmds.obj_ctx.obj_prompt import prompt_ctx
 from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH  as delete_selected_obj
-from ars_cmds.bubble_cmds.open_prompt import BBL_PROMPT as open_prompt
 from PyQt6.QtCore import QPoint
 
 

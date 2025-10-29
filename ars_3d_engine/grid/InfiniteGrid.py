@@ -1,5 +1,5 @@
 from vispy import scene, app, gloo
-from vispy.visuals import Visual, transforms
+from vispy.visuals import Visual
 import numpy as np
 import time
 from .shaders import FRAGMENT_SHADER, VERTEX_SHADER

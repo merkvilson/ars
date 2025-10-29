@@ -31,13 +31,11 @@ from dataclasses import dataclass, field
 from typing import Optional, Callable, Tuple, Any
 
 
-import math
 import inspect
 from theme.fonts.new_fonts import get_font
 from .widget_control import set_updated_config
 from core.cursor_modifier import CursorModifier
 
-import os
 from core.sound_manager import play_sound
 
 class SliderHandle(QGraphicsRectItem):

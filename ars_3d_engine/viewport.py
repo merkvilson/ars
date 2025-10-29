@@ -10,10 +10,8 @@ from .logic.picking_manager import CPickingManager
 from .logic.object_manager import CObjectManager
 from vispy.scene import transforms
 from .gizmo.gizmo import *
-import transforms3d.quaternions as tq
 from scipy.spatial.transform import Rotation as ScipyRotation
 from ars_cmds import bubble_cmds
-from PyQt6.QtCore import QPoint
 
 class ViewportWidget(QWidget):
     def __init__(self, parent=None,):

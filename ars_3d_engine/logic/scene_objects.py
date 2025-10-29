@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import numpy as np
 from vispy import scene
 from vispy.scene import transforms

@@ -1,6 +1,4 @@
 from vispy import scene
-import numpy as np
-import math
 
 class ArsOrbitCamera(scene.cameras.TurntableCamera):
     def __init__(self, *args, fly_bounds=None, **kwargs):

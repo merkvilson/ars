@@ -1,5 +1,5 @@
 import sys, math, numpy as np
-from vispy import app, scene
+from vispy import scene
 from vispy.visuals.transforms import MatrixTransform
 from scipy.spatial.transform import Rotation as ScipyRotation 
 from core.sound_manager import play_sound

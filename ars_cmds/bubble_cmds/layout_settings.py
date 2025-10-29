@@ -1,6 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from PyQt6.QtGui import QColor
-from PyQt6.QtCore import QPoint, Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer
 from theme.fonts import font_icons as ic
 import os
 from PyQt6.QtWidgets import QFileDialog

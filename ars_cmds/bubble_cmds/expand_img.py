@@ -1,4 +1,3 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts.font_icons import *
 
 # BBL_IMG_CONFIG ={"symbol": ICON_IMAGE }
