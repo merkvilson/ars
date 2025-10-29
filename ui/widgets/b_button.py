@@ -383,28 +383,28 @@ class BButton(QGraphicsObject):
         space_between = 4  # Pixels between words
         right_edge = self._bounding.right()
       
-        outside_offset = - 30
-        current_left = right_edge + outside_offset
+        current_left = right_edge - 30
 
         for word in words:
             text_item = QGraphicsTextItem(self)
-            text_item.setFont(QFont("Arial", 11, QFont.Weight.Bold))
+            # text_item.setFont(QFont("Arial", 11, QFont.Weight.Bold))
+            text_item.setFont(get_font(font_name="JetBrainsMono-Bold.ttf", size=13, weight=QFont.Weight.Bold))
             text_item.setDefaultTextColor(self._hotkey_text_color)
             text_item.setPlainText(word)
             bounding = text_item.boundingRect()
             text_item.setPos(current_left, -bounding.height() / 2)
             self.hotkey_text_items.append(text_item)
 
-            outline_item = RoundedRectOutline(corner_radius=6, parent=self)
+            outline_item = RoundedRectOutline(corner_radius=4, parent=self)
             outline_padding = 1
             outline_rect = QRectF(
                 current_left - outline_padding,
-                -bounding.height() / 2 - outline_padding,
+                -bounding.height() / 2 - outline_padding + 4,
                 bounding.width() + 2 * outline_padding,
-                bounding.height() + 2 * outline_padding
+                bounding.height() + 2 * outline_padding - 8
             )
             outline_item.setRect(outline_rect)
-            outline_item.setPen(QPen(self._hotkey_text_color, 1))
+            outline_item.setPen(QPen(self._hotkey_text_color, 2))
             # Set background to match the button's current brush
             outline_item.setBrush(self.current_brush)
             outline_item.setZValue(-1)
