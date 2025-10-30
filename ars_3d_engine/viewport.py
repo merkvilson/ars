@@ -214,7 +214,7 @@ class ViewportWidget(QWidget):
 
 
     def attach_headlight(self, manager):
-        initial_view_light_dir = (-150, -150, -150)
+        initial_view_light_dir = (-350, -250, -150)
         initial_world_light_dir = self._view.camera.transform.imap(initial_view_light_dir)
         
         def update_lights():
