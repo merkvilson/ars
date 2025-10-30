@@ -556,25 +556,3 @@ class CText3D(CGeometry):
     def get_text(self) -> str:
         return self._text
     
-#TODO: Examine and convert this code into a method of CText3D class
-""" 
-# convert test mesh into pyvista compitable code
-
-import trimesh
-import pyvista as pv
-
-# Create 3D text mesh using a system font
-mesh = trimesh.creation.text(
-    text="Hello PyVista",
-    font="Arial.ttf",
-    height=1.0
-)
-
-# Convert trimesh to PyVista mesh
-pv_mesh = pv.wrap(mesh)
-
-plotter = pv.Plotter()
-plotter.add_mesh(pv_mesh, color='gold')
-plotter.show()
-
-"""
