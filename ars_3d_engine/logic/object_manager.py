@@ -1,6 +1,6 @@
 from typing import List, Optional
 from vispy import scene
-from .scene_objects import CGeometry
+from ..mesh_objects.scene_objects import CGeometry
 from .picking_manager import CPickingManager
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 
