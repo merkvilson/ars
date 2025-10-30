@@ -8,7 +8,7 @@ BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
 def BBL_OBJECT(self, position):
     config = ContextMenuConfig()
 
-    options_list =  ["X",
+    options_list =  [
                      ic.ICON_OBJ_TXT_ABC,
                      ic.ICON_OBJ_SPRITE,
                      ic.ICON_OBJ_BOX,
@@ -23,16 +23,15 @@ def BBL_OBJECT(self, position):
                      ]
 
     config.callbackL = {
-        "X":                      lambda: add_primitive(self),
-        ic.ICON_OBJ_TXT_ABC:           lambda: add_text3d(self),
+        ic.ICON_OBJ_TXT_ABC:       lambda: add_text3d(self),
         ic.ICON_OBJ_SPRITE:        lambda: add_sprite(self, animated=True),
-        ic.ICON_OBJ_BOX:           lambda: add_mesh(self, os.path.join("res","mesh files", 'box.obj'      ), animated = True),
-        ic.ICON_OBJ_SPHERE:        lambda: add_mesh(self, os.path.join("res","mesh files", 'sphere.obj'   ), animated = True),
-        ic.ICON_OBJ_CYLINDER:      lambda: add_mesh(self, os.path.join("res","mesh files", 'cylinder.obj' ), animated = True),
-        ic.ICON_OBJ_CONE:          lambda: add_mesh(self, os.path.join("res","mesh files", 'cone.obj'     ), animated = True),
-        ic.ICON_OBJ_PYRAMID:       lambda: add_mesh(self, os.path.join("res","mesh files", 'pyramid.obj'  ), animated = True),
-        ic.ICON_OBJ_PLANE:         lambda: add_mesh(self, os.path.join("res","mesh files", 'plane.obj'    ), animated = True),
-        ic.ICON_OBJ_TORUS:         lambda: add_mesh(self, os.path.join("res","mesh files", 'torus.obj'    ), animated = True),
+        ic.ICON_OBJ_BOX:           lambda: add_primitive(self, primitive_type='cube', animated=True         ),
+        ic.ICON_OBJ_SPHERE:        lambda: add_primitive(self, primitive_type='sphere', animated=True       ),
+        ic.ICON_OBJ_CYLINDER:      lambda: add_primitive(self, primitive_type='cylinder', animated=True     ),
+        ic.ICON_OBJ_CONE:          lambda: add_primitive(self, primitive_type='cone', animated=True         ),
+        ic.ICON_OBJ_PYRAMID:       lambda: add_primitive(self, primitive_type='pyramid', animated=True      ),
+        ic.ICON_OBJ_PLANE:         lambda: add_primitive(self, primitive_type='plane', animated=True        ),
+        ic.ICON_OBJ_TORUS:         lambda: add_primitive(self, primitive_type='torus', animated=True        ),
         ic.ICON_ORIGAMI:           lambda: add_mesh(self, os.path.join("res","mesh files", "origami.obj"  ), animated = True),
         ic.ICON_FILE_3D:           lambda: add_mesh(self),
     }

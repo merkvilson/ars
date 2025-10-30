@@ -11,6 +11,7 @@ from PyQt6.QtCore import QTimer
 import time
 from prefs.pref_controller import get_path
 from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation, delete_bbox_animations
+
 mesh_files = "(*.obj *.stl *.ply *.off *.dae *.glb *.gltf *.3mf)"
 
 def process_mesh_file(file_path):
@@ -46,60 +47,55 @@ def add_mesh(self, file_path=None, animated=False):
     if file_path is None:
         file_path, _ = QFileDialog.getOpenFileName(None, "Select Mesh", get_path("output"), f"Mesh Files {mesh_files}")
     
-    # Exit if no file is selected
-    if not file_path:
-        print("No file selected.")
+    initial_y = 2 if animated else 0
+    if file_path is None:
+        print("No file path provided.")
         return
-    try:
+    
+    elif isinstance(file_path, str):
         # Process the file (triangulate or convert if needed)
         processed_path = process_mesh_file(file_path)
-        
-        # Use file name (without extension) as mesh name
         name = os.path.splitext(os.path.basename(file_path))[0]
-        
-        # Determine initial position
-        initial_y = 2 if animated else 0
-        
-        # Create mesh object
         obj = CMesh.create(translate=(0, initial_y, 0), name=name, file_path=processed_path)
+    else:
+        obj = file_path
+        
+    # Add to viewport
+    self.viewport._objectManager.add_object(obj)
+    self.viewport._view.camera.view_changed()
 
-        # Add to viewport
-        self.viewport._objectManager.add_object(obj)
-        self.viewport._view.camera.view_changed()
-
-        if animated:
-            # Start the animation sequence after adding the object
-            def start_animation():
-                start_time = time.time()
-                duration = 0.150
-                
-                timer = QTimer()
-                
-                def update_position():
-                    elapsed = time.time() - start_time
-                    if elapsed >= duration:
-                        timer.stop()
-                        obj.set_position(0, 0, 0)
-                        play_sound("obj-drop-deep")
-                        self.viewport._view.camera.view_changed()
-                        return
-                    
-                    t = elapsed / duration
-                    ease = t ** 2  # Ease-in quadratic
-                    y = 2 - 2 * ease
-                    obj.set_position(0, y, 0)
-                    self.viewport._view.camera.view_changed()
-                
-                timer.timeout.connect(update_position)
-                timer.start(10)  # Update every 10 ms for smooth animation
+    if animated:
+        # Start the animation sequence after adding the object
+        def start_animation():
+            start_time = time.time()
+            duration = 0.150
             
-            # Wait 50 ms before starting the movement
-            QTimer.singleShot(50, start_animation)
+            timer = QTimer()
+            
+            def update_position():
+                elapsed = time.time() - start_time
+                if elapsed >= duration:
+                    timer.stop()
+                    obj.set_position(0, 0, 0)
+                    play_sound("obj-drop-deep")
+                    self.viewport._view.camera.view_changed()
+                    return
+                
+                t = elapsed / duration
+                ease = t ** 2  # Ease-in quadratic
+                y = 2 - 2 * ease
+                obj.set_position(0, y, 0)
+                self.viewport._view.camera.view_changed()
+            
+            timer.timeout.connect(update_position)
+            timer.start(10)  # Update every 10 ms for smooth animation
+        
+        # Wait 50 ms before starting the movement
+        QTimer.singleShot(50, start_animation)
 
-        print(f"Added mesh: {name}")
-        return obj
-    except Exception as e:
-        print(f"Failed to add mesh: {e}")
+    print(f"Added mesh: {name}")
+    return obj
+
 
 
 def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", animated=False):
@@ -130,11 +126,10 @@ def add_text3d(self):
     return obj
 
 
-def add_primitive(self):
-    obj = CPrimitive.create()
-    self.viewport._objectManager.add_object(obj)
-    self.viewport._view.camera.view_changed()
-    return obj
+def add_primitive(self, animated=False, **params, ):
+    obj = CPrimitive.create(**params)
+    obj.set_position(0, 2 if animated else 0, 0)
+    return add_mesh(self, file_path=obj, animated=animated)
 
 def selected_object(self):
     selected = self.viewport._objectManager.get_selected_objects()

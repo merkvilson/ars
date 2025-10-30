@@ -27,7 +27,7 @@ class CPrimitive(CGeometry):
         Create a parametric primitive mesh.
         
         Args:
-            primitive_type: Type of primitive ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid')
+            primitive_type: Type of primitive ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus')
             color: RGBA color tuple
             translate: Position tuple (x, y, z)
             **params: Additional parameters like radius, width, height, depth, resolution, direction
@@ -44,7 +44,7 @@ class CPrimitive(CGeometry):
         Dynamically switch the primitive type and regenerate the mesh.
         
         Args:
-            primitive_type: New primitive type ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid')
+            primitive_type: New primitive type ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus')
             **params: Optional new parameters (radius, width, height, depth, resolution, direction)
                      If not provided, will use existing stored parameters
         """
@@ -115,19 +115,16 @@ class CPrimitive(CGeometry):
         
         # Generate PyVista mesh based on type
         if primitive_type == 'sphere':
-            pv_mesh = pv.Sphere(radius=radius, theta_resolution=resolution, phi_resolution=resolution)
             pv_mesh = pv.Sphere(
-                
-            radius = 1,
+            radius = radius,
             center = (0.0, 0.0, 0.0),
             direction = (0.0, 0.0, 1.0),
-            theta_resolution = 30,
-            phi_resolution = 30,
+            theta_resolution = resolution,
+            phi_resolution = resolution,
             start_theta = 0.0,
             end_theta = 360.0,
             start_phi = 0.0,
             end_phi = 180.0,
-
             )
 
 
@@ -144,6 +141,9 @@ class CPrimitive(CGeometry):
             pv_mesh.rotate_y(45, inplace=True)
         elif primitive_type == 'disc':
             pv_mesh = pv.Disc(center=(0, 0, 0), inner=0, outer=radius, normal=direction, r_res=resolution, c_res=resolution)
+        elif primitive_type == 'torus':
+            pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=radius/2,)
+            pv_mesh.rotate_x(90, inplace=True)
         else:
             raise ValueError(f"Unknown primitive type: {primitive_type}")
         
