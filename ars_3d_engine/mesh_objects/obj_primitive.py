@@ -16,7 +16,7 @@ class CPrimitive(CGeometry):
         self.width = params.get('width', 2.0)
         self.height = params.get('height', 2.0)
         self.depth = params.get('depth', 2.0)
-        self.resolution = params.get('resolution', 10)
+        self.resolution = params.get('resolution', 30)
         self.direction = params.get('direction', (0, 1, 0))
 
 
@@ -27,7 +27,7 @@ class CPrimitive(CGeometry):
         Create a parametric primitive mesh.
         
         Args:
-            primitive_type: Type of primitive ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc')
+            primitive_type: Type of primitive ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid')
             color: RGBA color tuple
             translate: Position tuple (x, y, z)
             **params: Additional parameters like radius, width, height, depth, resolution, direction
@@ -44,7 +44,7 @@ class CPrimitive(CGeometry):
         Dynamically switch the primitive type and regenerate the mesh.
         
         Args:
-            primitive_type: New primitive type ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc')
+            primitive_type: New primitive type ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid')
             **params: Optional new parameters (radius, width, height, depth, resolution, direction)
                      If not provided, will use existing stored parameters
         """
@@ -126,7 +126,10 @@ class CPrimitive(CGeometry):
         elif primitive_type == 'cylinder':
             pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=resolution, direction=direction)
         elif primitive_type == 'cone':
-            pv_mesh = pv.Cone(radius=radius, height=height, resolution=resolution, direction=direction)
+            pv_mesh = pv.Cone(radius=radius, height=height, resolution=100, direction=direction)
+        elif primitive_type == 'pyramid':
+            pv_mesh = pv.Cone(radius=radius, height=height, resolution=4, direction=direction)
+            pv_mesh.rotate_y(45, inplace=True)
         elif primitive_type == 'disc':
             pv_mesh = pv.Disc(center=(0, 0, 0), inner=0, outer=radius, normal=direction, r_res=resolution, c_res=resolution)
         else:
@@ -140,7 +143,7 @@ class CPrimitive(CGeometry):
             cell_normals=False,
             point_normals=True,
             split_vertices=True,
-            feature_angle=360,
+            feature_angle=30,
             inplace=True,
         )
         vertices = pv_mesh.points.astype(np.float32)

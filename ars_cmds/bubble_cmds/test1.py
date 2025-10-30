@@ -13,19 +13,21 @@ def main(self):
     if not selected_object(self):
         return
     else: obj = selected_object(self)
-    options_list = ["1", "2", "3", "4", "5", "6", "7"]
+    options_list = ["1", "2", "3", "4", "5", "6", "7", "8"]
 
 
     config = ContextMenuConfig()
     config.auto_close = False
     #'sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc'
-
+    config.slider_values = {"8": (0, 100, 1)}
     config.callbackL={"1": lambda: obj.set_primitive_type('sphere'),
                      "2": lambda: obj.set_primitive_type('cube'),
                      "3": lambda: obj.set_primitive_type('plane'),
                      "4": lambda: obj.set_primitive_type('cylinder'),
                      "5": lambda: obj.set_primitive_type('disc'),
                      "6": lambda: obj.set_primitive_type('cone'),
+                        "7": lambda: obj.set_primitive_type('pyramid'),
+                        "8": lambda val: obj.set_primitive_type("pyramid", radius=val/100)
                      }
 
 
