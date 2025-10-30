@@ -3,6 +3,7 @@ import os
 from ars_3d_engine.mesh_objects.obj_mesh_loader import CMesh
 from ars_3d_engine.mesh_objects.obj_sprite import CSprite
 from ars_3d_engine.mesh_objects.obj_text import CText3D
+from ars_3d_engine.mesh_objects.obj_primitive import CPrimitive
 import trimesh 
 import tempfile
 from core.sound_manager import play_sound
@@ -124,12 +125,16 @@ def add_sprite(self, size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite",
 
 def add_text3d(self):
     obj = CText3D.create()
-
     self.viewport._objectManager.add_object(obj)
     self.viewport._view.camera.view_changed()
-
     return obj
 
+
+def add_primitive(self):
+    obj = CPrimitive.create()
+    self.viewport._objectManager.add_object(obj)
+    self.viewport._view.camera.view_changed()
+    return obj
 
 def selected_object(self):
     selected = self.viewport._objectManager.get_selected_objects()

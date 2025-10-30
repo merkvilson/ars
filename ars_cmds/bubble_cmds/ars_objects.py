@@ -2,13 +2,13 @@ import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 
-from ..core_cmds.load_object import add_mesh, add_sprite, add_text3d
+from ..core_cmds.load_object import add_mesh, add_sprite, add_text3d, add_primitive
 
 BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
 def BBL_OBJECT(self, position):
     config = ContextMenuConfig()
 
-    options_list =  [
+    options_list =  ["X",
                      ic.ICON_OBJ_TXT_ABC,
                      ic.ICON_OBJ_SPRITE,
                      ic.ICON_OBJ_BOX,
@@ -23,6 +23,7 @@ def BBL_OBJECT(self, position):
                      ]
 
     config.callbackL = {
+        "X":                      lambda: add_primitive(self),
         ic.ICON_OBJ_TXT_ABC:           lambda: add_text3d(self),
         ic.ICON_OBJ_SPRITE:        lambda: add_sprite(self, animated=True),
         ic.ICON_OBJ_BOX:           lambda: add_mesh(self, os.path.join("res","mesh files", 'box.obj'      ), animated = True),
@@ -51,6 +52,7 @@ def BBL_OBJECT(self, position):
     }
 
     config.hotkey_items = {
+        "X":                      'G',
         ic.ICON_OBJ_TXT_ABC:    'A',
         ic.ICON_OBJ_SPRITE: 'D',
         ic.ICON_OBJ_BOX:    'C', 
