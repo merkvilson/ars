@@ -239,7 +239,18 @@ class CGeometry(ABC):
 
         self.texture_path = image_path  # Store the texture path
 
-    def clone(self) -> 'CGeometry':
+    def get_params(self):
+        """
+        Override this method in subclasses to provide additional constructor parameters for cloning.
+        Returns a dictionary of parameters to pass to the constructor.
+        """
+        return {}
+
+    def clone(self):
+        """
+        Create a deep copy of this geometry object.
+        Subclasses can override get_params() to provide their specific constructor parameters.
+        """
         # Copy mesh data
         md = self._visual.mesh_data
         verts = md.get_vertices().copy() if md.get_vertices() is not None else None
@@ -265,32 +276,12 @@ class CGeometry(ABC):
             shading=None  # Shading will be set later
         )
 
+        # Get subclass-specific parameters
+        clone_params = self.get_params()
+        clone_params['name'] = self.name + "_copy"
+        
         # Create new object of the same class type
-        # Prepare constructor kwargs for subclass-specific attributes
-        kwargs = {'name': self.name + "_copy"}
-        
-        # For CSprite: preserve cfg
-        if hasattr(self, 'cfg'):
-            kwargs['cfg'] = self.cfg
-            
-        # For CText3D: preserve text, depth, angle, font_name
-        if hasattr(self, '_text'):
-            kwargs['text'] = self._text
-            kwargs['depth'] = self._depth
-            kwargs['angle'] = self._angle
-            kwargs['font_name'] = self._font_name
-            
-        # For CPrimitive: preserve primitive parameters
-        if hasattr(self, 'primitive_type'):
-            kwargs['primitive_type'] = self.primitive_type
-            kwargs['radius'] = self.radius
-            kwargs['width'] = self.width
-            kwargs['height'] = self.height
-            kwargs['depth'] = self.depth
-            kwargs['resolution'] = self.resolution
-            kwargs['direction'] = self.direction
-        
-        new_obj = type(self)(new_visual, **kwargs)
+        new_obj = type(self)(new_visual, **clone_params)
 
         # Copy texture if applied
         if hasattr(self, 'texture_filter') and self.texture_filter is not None and self.texture_path:

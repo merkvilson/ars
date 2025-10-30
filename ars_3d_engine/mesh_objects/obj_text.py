@@ -32,6 +32,15 @@ class CText3D(CGeometry):
         obj.set_position(*translate)
         return obj
 
+    def get_params(self):
+        """Provide CText3D-specific parameters for cloning."""
+        return {
+            'text': self._text,
+            'depth': self._depth,
+            'angle': self._angle,
+            'font_name': self._font_name
+        }
+
     @staticmethod
     def _generate_mesh_data_with_breaking_angle(text, depth, angle, font_name="Dosis"):
         if not text or text.isspace():

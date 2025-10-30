@@ -76,7 +76,9 @@ class CSprite(CGeometry):
         
         return obj 
     
-
+    def get_params(self):
+        """Provide CSprite-specific parameters for cloning."""
+        return {'cfg': self.cfg}
 
     def _update_gl_state(self):
 

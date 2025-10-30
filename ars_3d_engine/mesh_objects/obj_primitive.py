@@ -84,6 +84,18 @@ class CPrimitive(CGeometry):
         
         print(f"Switched primitive to {primitive_type}")
 
+    def get_params(self):
+        """Provide CPrimitive-specific parameters for cloning."""
+        return {
+            'primitive_type': self.primitive_type,
+            'radius': self.radius,
+            'width': self.width,
+            'height': self.height,
+            'depth': self.depth,
+            'resolution': self.resolution,
+            'direction': self.direction
+        }
+
     @staticmethod
     def _generate_mesh(primitive_type='sphere', **params):
         """
