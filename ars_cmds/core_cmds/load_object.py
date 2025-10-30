@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QFileDialog
 import os
-from ars_3d_engine.logic.scene_objects import CMesh, CSprite, CText3D
+from ars_3d_engine.mesh_objects.obj_mesh_loader import CMesh
+from ars_3d_engine.mesh_objects.obj_sprite import CSprite
+from ars_3d_engine.mesh_objects.obj_text import CText3D
 import trimesh 
 import tempfile
 from core.sound_manager import play_sound
