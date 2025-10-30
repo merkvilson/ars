@@ -9,7 +9,6 @@ from vispy.geometry import MeshData
 from vispy.io import imread 
 from vispy.visuals.filters import TextureFilter 
 
-
 class CGeometry(ABC):
 
     def __init__(self, visual, name="Object"):
@@ -266,8 +265,32 @@ class CGeometry(ABC):
             shading=None  # Shading will be set later
         )
 
-        # Create new object (moved up here so it's defined before setting attributes)
-        new_obj = CMesh(new_visual, name=self.name + "_copy")
+        # Create new object of the same class type
+        # Prepare constructor kwargs for subclass-specific attributes
+        kwargs = {'name': self.name + "_copy"}
+        
+        # For CSprite: preserve cfg
+        if hasattr(self, 'cfg'):
+            kwargs['cfg'] = self.cfg
+            
+        # For CText3D: preserve text, depth, angle, font_name
+        if hasattr(self, '_text'):
+            kwargs['text'] = self._text
+            kwargs['depth'] = self._depth
+            kwargs['angle'] = self._angle
+            kwargs['font_name'] = self._font_name
+            
+        # For CPrimitive: preserve primitive parameters
+        if hasattr(self, 'primitive_type'):
+            kwargs['primitive_type'] = self.primitive_type
+            kwargs['radius'] = self.radius
+            kwargs['width'] = self.width
+            kwargs['height'] = self.height
+            kwargs['depth'] = self.depth
+            kwargs['resolution'] = self.resolution
+            kwargs['direction'] = self.direction
+        
+        new_obj = type(self)(new_visual, **kwargs)
 
         # Copy texture if applied
         if hasattr(self, 'texture_filter') and self.texture_filter is not None and self.texture_path:
