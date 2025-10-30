@@ -196,4 +196,3 @@ class CText3D(CGeometry):
 
     def get_text(self) -> str:
         return self._text
-    
