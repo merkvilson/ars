@@ -119,7 +119,7 @@ class CPrimitive(CGeometry):
             pv_mesh = pv.Sphere(
             radius = radius,
             center = (0.0, 0.0, 0.0),
-            direction = (0.0, 1.0, 0.0),  # Y-up orientation
+            direction = direction,
             theta_resolution = resolution,
             phi_resolution = resolution,
             start_theta = 0.0,
@@ -297,31 +297,52 @@ class CPrimitive(CGeometry):
             texcoords = np.column_stack([u, v]).astype(np.float32)
             
         elif primitive_type == 'disc':
-            # Radial UV mapping for disc - map circle to square texture
+            # Polar/radial UV mapping for disc - proper circular mapping
+            # Disc default: normal=(0,1,0) means disc is in XZ plane (Y is up)
             x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            normals = pv_mesh.point_normals
             
-            # Find which plane the disc is in by checking variation
-            x_range = x.max() - x.min()
-            y_range = y.max() - y.min()
-            z_range = z.max() - z.min()
+            # Use average normal to determine disc orientation
+            avg_normal = np.mean(np.abs(normals), axis=0)
             
-            # Use the two dimensions with most variation
-            if x_range > y_range and x_range > z_range:
-                # Disc in YZ plane
+            # Determine which axis is the normal (perpendicular to disc)
+            if avg_normal[0] > avg_normal[1] and avg_normal[0] > avg_normal[2]:
+                # Normal is along X-axis, disc is in YZ plane
                 u_coord, v_coord = y, z
-            elif y_range > x_range and y_range > z_range:
-                # Disc in XZ plane
+            elif avg_normal[1] > avg_normal[0] and avg_normal[1] > avg_normal[2]:
+                # Normal is along Y-axis, disc is in XZ plane
                 u_coord, v_coord = x, z
             else:
-                # Disc in XY plane
+                # Normal is along Z-axis, disc is in XY plane
                 u_coord, v_coord = x, y
             
-            # Normalize to 0-1 centered at 0.5
-            u_range = u_coord.max() - u_coord.min()
-            v_range = v_coord.max() - v_coord.min()
+            # Center the coordinates
+            u_center = (u_coord.max() + u_coord.min()) / 2
+            v_center = (v_coord.max() + v_coord.min()) / 2
             
-            u = (u_coord - u_coord.min()) / (u_range + 1e-8)
-            v = (v_coord - v_coord.min()) / (v_range + 1e-8)
+            # Get relative positions from center
+            u_rel = u_coord - u_center
+            v_rel = v_coord - v_center
+            
+            # Calculate radius for each point
+            radius = np.sqrt(u_rel**2 + v_rel**2)
+            max_radius = radius.max()
+            
+            # Normalize radius to 0-1
+            if max_radius > 1e-8:
+                normalized_radius = radius / max_radius
+            else:
+                normalized_radius = np.zeros(n_points)
+            
+            # Calculate angle (theta) for each point
+            theta = np.arctan2(v_rel, u_rel)
+            
+            # Convert polar coordinates to UV
+            # Map radius to distance from center (0.5, 0.5)
+            # Points at center have UV = (0.5, 0.5)
+            # Points at edge are at distance 0.5 from center
+            u = 0.5 + 0.5 * normalized_radius * np.cos(theta)
+            v = 0.5 + 0.5 * normalized_radius * np.sin(theta)
             
             texcoords = np.column_stack([u, v]).astype(np.float32)
             
