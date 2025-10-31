@@ -13,32 +13,8 @@ def main(self):
     if not selected_object(self):
         return
     else: obj = selected_object(self)
-    options_list = ["1", "2", "3", "4", "5", "6", "7", "8"]
-
-
-    config = ContextMenuConfig()
-    config.auto_close = False
-    #'sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc'
-    config.slider_values = {"8": (0, 100, 1)}
-    config.callbackL={"1": lambda: obj.set_primitive_type('sphere'),
-                     "2": lambda: obj.set_primitive_type('cube'),
-                     "3": lambda: obj.set_primitive_type('plane'),
-                     "4": lambda: obj.set_primitive_type('cylinder'),
-                     "5": lambda: obj.set_primitive_type('disc'),
-                     "6": lambda: obj.set_primitive_type('cone'),
-                        "7": lambda: obj.set_primitive_type('pyramid'),
-                        "8": lambda val: obj.set_primitive_type("pyramid", radius=val/100)
-                     }
-
-
-    ctx = open_context(
-        parent=self.central_widget,
-        items=options_list,
-        position=QPoint(0, 0),
-        config=config
-    )
-
-
+    
+    obj.set_shading(None)
 
 def execute_plugin(window):
     main(window)
