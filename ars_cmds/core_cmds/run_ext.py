@@ -28,20 +28,3 @@ def run_ext(path, ars_window):
     except Exception:
         print("Failed to load with SourceFileLoader:")
         traceback.print_exc()
-
-
-
-"""
-#runs py scripts
-import importlib
-
-def run_ext(path, self):
-
-    # Load module dynamically each time
-    spec = importlib.util.spec_from_file_location("ext", path)
-    ext = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(ext)
-
-    # Call the function from the external file
-    ext.execute_plugin(self)
-"""
