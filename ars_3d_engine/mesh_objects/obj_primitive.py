@@ -7,10 +7,11 @@ from vispy.geometry import MeshData
 
 
 class CPrimitive(CGeometry):
-    def __init__(self, visual, name="CPrimitive", **params):
-        super().__init__(visual, name)
+    def __init__(self, visual, **params):
+        super().__init__(visual)
         
         # Store primitive parameters
+        self.name = params.get('primitive_type', 'Object').capitalize()
         self.primitive_type = params.get('primitive_type', 'sphere')
         self.radius = params.get('radius', 1.0)
         self.width = params.get('width', 2.0)
@@ -158,6 +159,10 @@ class CPrimitive(CGeometry):
             feature_angle=30,
             inplace=True,
         )
+        
+        # Generate texture coordinates
+        texcoords = CPrimitive._generate_texture_coords(pv_mesh, primitive_type)
+        
         vertices = pv_mesh.points.astype(np.float32)
         
         # After triangulation, all faces should be triangles (4 values: [3, v0, v1, v2])
@@ -167,6 +172,152 @@ class CPrimitive(CGeometry):
         md = MeshData(vertices=vertices, faces=faces)
         if normals.shape[0] > 0:
             md._vertex_normals = normals
+        if texcoords is not None and texcoords.shape[0] > 0:
+            md._vertex_tex_coords = texcoords
             
         return md
+
+    @staticmethod
+    def _generate_texture_coords(pv_mesh, primitive_type):
+        """
+        Generate UV texture coordinates for the mesh based on primitive type.
+        """
+        vertices = pv_mesh.points
+        n_points = vertices.shape[0]
+        
+        if primitive_type == 'sphere':
+            # Spherical UV mapping
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            # Convert to spherical coordinates
+            r = np.sqrt(x**2 + y**2 + z**2)
+            r = np.maximum(r, 1e-8)  # Avoid division by zero
+            
+            # U: longitude (0 to 1)
+            u = 0.5 + np.arctan2(x, z) / (2 * np.pi)
+            # V: latitude (0 to 1)
+            v = 0.5 - np.arcsin(np.clip(y / r, -1, 1)) / np.pi
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        elif primitive_type == 'cube':
+            # Box/cubic UV mapping - project to dominant face
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            abs_x, abs_y, abs_z = np.abs(x), np.abs(y), np.abs(z)
+            
+            u = np.zeros(n_points)
+            v = np.zeros(n_points)
+            
+            # Determine dominant axis for each vertex
+            # +X face
+            mask = (abs_x >= abs_y) & (abs_x >= abs_z) & (x > 0)
+            u[mask] = -z[mask] / abs_x[mask] * 0.5 + 0.5
+            v[mask] = y[mask] / abs_x[mask] * 0.5 + 0.5
+            
+            # -X face
+            mask = (abs_x >= abs_y) & (abs_x >= abs_z) & (x < 0)
+            u[mask] = z[mask] / abs_x[mask] * 0.5 + 0.5
+            v[mask] = y[mask] / abs_x[mask] * 0.5 + 0.5
+            
+            # +Y face
+            mask = (abs_y >= abs_x) & (abs_y >= abs_z) & (y > 0)
+            u[mask] = x[mask] / abs_y[mask] * 0.5 + 0.5
+            v[mask] = -z[mask] / abs_y[mask] * 0.5 + 0.5
+            
+            # -Y face
+            mask = (abs_y >= abs_x) & (abs_y >= abs_z) & (y < 0)
+            u[mask] = x[mask] / abs_y[mask] * 0.5 + 0.5
+            v[mask] = z[mask] / abs_y[mask] * 0.5 + 0.5
+            
+            # +Z face
+            mask = (abs_z >= abs_x) & (abs_z >= abs_y) & (z > 0)
+            u[mask] = x[mask] / abs_z[mask] * 0.5 + 0.5
+            v[mask] = y[mask] / abs_z[mask] * 0.5 + 0.5
+            
+            # -Z face
+            mask = (abs_z >= abs_x) & (abs_z >= abs_y) & (z < 0)
+            u[mask] = -x[mask] / abs_z[mask] * 0.5 + 0.5
+            v[mask] = y[mask] / abs_z[mask] * 0.5 + 0.5
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        elif primitive_type == 'plane':
+            # Simple planar UV mapping
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            
+            # Normalize to 0-1 range
+            x_min, x_max = x.min(), x.max()
+            y_min, y_max = y.min(), y.max()
+            
+            if x_max - x_min > 1e-8:
+                u = (x - x_min) / (x_max - x_min)
+            else:
+                u = np.zeros(n_points)
+                
+            if y_max - y_min > 1e-8:
+                v = (y - y_min) / (y_max - y_min)
+            else:
+                v = np.zeros(n_points)
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        elif primitive_type in ['cylinder', 'cone', 'pyramid']:
+            # Cylindrical UV mapping
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            
+            # U: angle around the axis (0 to 1)
+            u = 0.5 + np.arctan2(x, z) / (2 * np.pi)
+            
+            # V: height along the axis (0 to 1)
+            y_min, y_max = y.min(), y.max()
+            if y_max - y_min > 1e-8:
+                v = (y - y_min) / (y_max - y_min)
+            else:
+                v = np.full(n_points, 0.5)
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        elif primitive_type == 'disc':
+            # Radial UV mapping for disc
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            
+            # Normalize position to 0-1 range from center
+            r = np.sqrt(x**2 + y**2)
+            r_max = r.max()
+            if r_max > 1e-8:
+                r_normalized = r / r_max
+            else:
+                r_normalized = np.zeros(n_points)
+            
+            # U and V from -1 to 1, then to 0 to 1
+            u = x / (r_max + 1e-8) * 0.5 + 0.5
+            v = y / (r_max + 1e-8) * 0.5 + 0.5
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        elif primitive_type == 'torus':
+            # Toroidal UV mapping
+            x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
+            
+            # U: angle around major radius
+            u = 0.5 + np.arctan2(y, x) / (2 * np.pi)
+            
+            # V: angle around minor radius (tube)
+            # Calculate distance from center axis
+            r_major = np.sqrt(x**2 + y**2)
+            v = 0.5 + np.arctan2(z, r_major - r_major.mean()) / (2 * np.pi)
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+            
+        else:
+            # Fallback: simple planar projection
+            x, y = vertices[:, 0], vertices[:, 1]
+            x_min, x_max = x.min(), x.max()
+            y_min, y_max = y.min(), y.max()
+            
+            u = (x - x_min) / (x_max - x_min + 1e-8)
+            v = (y - y_min) / (y_max - y_min + 1e-8)
+            
+            texcoords = np.column_stack([u, v]).astype(np.float32)
+        
+        return texcoords
 
