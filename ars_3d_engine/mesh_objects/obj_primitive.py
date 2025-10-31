@@ -17,8 +17,9 @@ class CPrimitive(CGeometry):
         self.width = params.get('width', 2.0)
         self.height = params.get('height', 2.0)
         self.depth = params.get('depth', 2.0)
-        self.resolution = params.get('resolution', 30)
+        self.lod = params.get('lod', 30)
         self.direction = params.get('direction', (0, 1, 0))
+        self.slice_start = params.get('slice_start', 0)
 
 
     @classmethod
@@ -31,7 +32,7 @@ class CPrimitive(CGeometry):
             primitive_type: Type of primitive ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus')
             color: RGBA color tuple
             translate: Position tuple (x, y, z)
-            **params: Additional parameters like radius, width, height, depth, resolution, direction
+            **params: Additional parameters like radius, width, height, depth, lod, direction, slice_start
         """
         md = cls._generate_mesh(primitive_type, **params)
         v = scene.visuals.Mesh(meshdata=md, color=color, shading=None)
@@ -46,7 +47,7 @@ class CPrimitive(CGeometry):
         
         Args:
             primitive_type: New primitive type ('sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus')
-            **params: Optional new parameters (radius, width, height, depth, resolution, direction)
+            **params: Optional new parameters (radius, width, height, depth, lod, direction, slice_start)
                      If not provided, will use existing stored parameters
         """
         # Update primitive type
@@ -61,10 +62,12 @@ class CPrimitive(CGeometry):
             self.height = params['height']
         if 'depth' in params:
             self.depth = params['depth']
-        if 'resolution' in params:
-            self.resolution = params['resolution']
+        if 'lod' in params:
+            self.lod = params['lod']
         if 'direction' in params:
             self.direction = params['direction']
+        if 'slice_start' in params:
+            self.slice_start = params['slice_start']
         
         # Prepare parameters dict for mesh generation
         mesh_params = {
@@ -72,8 +75,9 @@ class CPrimitive(CGeometry):
             'width': self.width,
             'height': self.height,
             'depth': self.depth,
-            'resolution': self.resolution,
-            'direction': self.direction
+            'lod': self.lod,
+            'direction': self.direction,
+            'slice_start': self.slice_start
         }
         
         # Regenerate mesh with new type
@@ -83,7 +87,6 @@ class CPrimitive(CGeometry):
         # Note: self._visual is the actual Mesh object, self.visual is the Node wrapper
         self._visual.set_data(meshdata=md)
         
-        print(f"Switched primitive to {primitive_type}")
 
     def get_params(self):
         """Provide CPrimitive-specific parameters for cloning."""
@@ -93,8 +96,9 @@ class CPrimitive(CGeometry):
             'width': self.width,
             'height': self.height,
             'depth': self.depth,
-            'resolution': self.resolution,
-            'direction': self.direction
+            'lod': self.lod,
+            'direction': self.direction,
+            'slice_start': self.slice_start
         }
 
     @staticmethod
@@ -104,15 +108,16 @@ class CPrimitive(CGeometry):
         
         Args:
             primitive_type: Type of primitive to generate
-            **params: radius, width, height, depth, resolution, etc.
+            **params: radius, width, height, depth, lod, etc.
         """
         # Extract common parameters with defaults
         radius = params.get('radius', 1.0)
         width = params.get('width', 2.0)
         height = params.get('height', 2.0)
         depth = params.get('depth', 2.0)
-        resolution = params.get('resolution', 30)
+        lod = params.get('lod', 30)
         direction = params.get('direction', (0, 1, 0))
+        slice_start = params.get('slice_start', 0)
         
         # Generate PyVista mesh based on type
         if primitive_type == 'sphere':
@@ -120,9 +125,9 @@ class CPrimitive(CGeometry):
             radius = radius,
             center = (0.0, 0.0, 0.0),
             direction = direction,
-            theta_resolution = resolution,
-            phi_resolution = resolution,
-            start_theta = 0.0,
+            theta_resolution = lod,
+            phi_resolution = lod,
+            start_theta = slice_start,
             end_theta = 360.0,
             start_phi = 0.0,
             end_phi = 180.0,
@@ -134,14 +139,14 @@ class CPrimitive(CGeometry):
         elif primitive_type == 'plane':
             pv_mesh = pv.Plane(center=(0, 0, 0), i_size=width, j_size=height, direction=direction)
         elif primitive_type == 'cylinder':
-            pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=resolution, direction=direction)
+            pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
         elif primitive_type == 'cone':
-            pv_mesh = pv.Cone(radius=radius, height=height, resolution=100, direction=direction)
+            pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction)
         elif primitive_type == 'pyramid':
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=4, direction=direction)
             pv_mesh.rotate_y(45, inplace=True)
         elif primitive_type == 'disc':
-            pv_mesh = pv.Disc(center=(0, 0, 0), inner=0, outer=radius, normal=direction, r_res=resolution, c_res=resolution)
+            pv_mesh = pv.Disc(center=(0, 0, 0), inner=0, outer=radius, normal=direction, r_res=lod, c_res=lod)
         elif primitive_type == 'torus':
             pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=radius/2,)
             pv_mesh.rotate_x(90, inplace=True)
