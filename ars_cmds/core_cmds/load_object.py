@@ -59,6 +59,7 @@ def add_mesh(self, file_path=None, animated=False):
         obj = CMesh.create(translate=(0, initial_y, 0), name=name, file_path=processed_path)
     else:
         obj = file_path
+        name = obj.name
         
     # Add to viewport
     self.viewport._objectManager.add_object(obj)
