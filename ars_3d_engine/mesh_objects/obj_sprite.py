@@ -102,7 +102,6 @@ class CSprite(CGeometry):
             self.set_texture(self.texture_path)
         
         self._visual.update()
-        print("Sprite geometry reverted to standard quad.")
 
     def cutout(self):
         """
@@ -203,5 +202,4 @@ class CSprite(CGeometry):
         self.set_texture(self.texture_path)
         
         self._visual.update()
-        print(f"Cutout complete. New mesh has {num_vertices} vertices and {faces.shape[0]} faces.")
 
