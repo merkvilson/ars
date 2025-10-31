@@ -2,7 +2,7 @@
     "bubbles": [
         {
             "symbol": "\ue94f",
-            "grid_x": 24,
+            "grid_x": 23,
             "grid_y": 0
         },
         {
@@ -82,7 +82,7 @@
         },
         {
             "symbol": "\ue90e",
-            "grid_x": 23,
+            "grid_x": 2,
             "grid_y": 0
         },
         {
