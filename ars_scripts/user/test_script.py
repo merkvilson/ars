@@ -1,0 +1,1 @@
+print(obj.get_position())

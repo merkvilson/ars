@@ -2,8 +2,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtCore import QPoint
-
+from ars_scripts.editor.ars_code_editor import ars_script_wrapper
 
 import os
 import subprocess
@@ -31,6 +30,9 @@ def open_file(path):
 
 
 
+
+
+
 BBL_TEST_CONFIG = {"symbol": ic.ICON_CODE_PYTHON}
 def BBL_CODE_PYTHON(self, position):
 
@@ -43,10 +45,10 @@ def BBL_CODE_PYTHON(self, position):
         "2": "Open Script",
         "3": "Close",
     }
-    file_path = r"C:\Users\gmerk\Downloads\ARS\ars_cmds\bubble_cmds\test_script.py"
+    file_path = os.path.join("ars_scripts", "user", "test_script.py")
 
     config.callbackL = {
-                        "1": lambda: run_ext(file_path, self),
+                        "1": lambda: run_ext(file_path, self, ars_script_wrapper),
                         "2": lambda: open_file(file_path),
                         "3": lambda: ctx.close_animated(),
                         }

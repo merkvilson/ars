@@ -1,30 +1,51 @@
 import os
 import uuid
 import traceback
-from importlib.machinery import SourceFileLoader
 import importlib.util
+from importlib.machinery import SourceFileLoader
+from types import CodeType
 
-def run_ext(path, ars_window):
-    """Load & execute a Python source file at `path` (works with any extension)."""
+def run_ext(path, ars_window, edit_func=None):
+    """Load & execute a Python source file at `path` (works with any extension).
+    
+    Args:
+        path: File path to the Python script.
+        ars_window: Object passed to the plugin's entrypoint.
+        edit_func: Optional callable that takes raw file content (str) and returns edited content (str).
+                   If None, no edits are applied.
+    """
     if not os.path.isfile(path):
         print("File not found:", path)
         return
 
-    # make module name unique so repeated loads don't clash
+    # Make module name unique to avoid clashes
     module_name = f"ext_{uuid.uuid4().hex}"
 
     try:
-        loader = SourceFileLoader(module_name, path)
-        spec = importlib.util.spec_from_loader(module_name, loader)
-        module = importlib.util.module_from_spec(spec)
-        loader.exec_module(module)   # executes the file as a module
+        # Read raw content
+        with open(path, 'r', encoding='utf-8') as f:
+            raw_content = f.read()
 
-        # call the plugin entrypoint if it exists
+        # Apply edits if provided
+        content = edit_func(raw_content) if edit_func else raw_content
+
+        # Create module
+        spec = importlib.util.spec_from_loader(module_name, loader=None)
+        module = importlib.util.module_from_spec(spec)
+
+        # Compile and execute the (edited) content in the module's namespace
+        code_obj = compile(content, path, 'exec')
+        exec(code_obj, module.__dict__)
+
+        # Call the plugin entrypoint if it exists
         if hasattr(module, "execute_plugin"):
             module.execute_plugin(ars_window)
         else:
             print("execute_plugin() not found in", path)
 
+    except SyntaxError as e:
+        print(f"Syntax error in {path} (after edits): {e}")
+        traceback.print_exc()
     except Exception:
-        print("Failed to load with SourceFileLoader:")
+        print("Failed to load/execute:")
         traceback.print_exc()
