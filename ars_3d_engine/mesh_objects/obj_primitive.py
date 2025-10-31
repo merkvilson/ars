@@ -119,7 +119,7 @@ class CPrimitive(CGeometry):
             pv_mesh = pv.Sphere(
             radius = radius,
             center = (0.0, 0.0, 0.0),
-            direction = (0.0, 0.0, 1.0),
+            direction = (0.0, 1.0, 0.0),  # Y-up orientation
             theta_resolution = resolution,
             phi_resolution = resolution,
             start_theta = 0.0,
@@ -197,13 +197,15 @@ class CPrimitive(CGeometry):
                 pass
         
         if primitive_type == 'sphere':
-            # Spherical UV mapping
+            # Spherical UV mapping - Y is up (poles are at Y-axis extremes)
             x, y, z = vertices[:, 0], vertices[:, 1], vertices[:, 2]
             
-            # U: longitude (0 to 1) - using atan2(z, x) for proper wrapping
-            u = 0.5 + np.arctan2(z, x) / (2 * np.pi)
+            # U: longitude (0 to 1) - angle around Y-axis in XZ plane
+            # Front (Z+) should be at U=0.5, right (X+) at U=0.25, back (Z-) at U=0.75, left (X-) at U=0 or 1
+            u = 0.5 - np.arctan2(x, z) / (2 * np.pi)
             
-            # V: latitude (0 to 1) - from bottom to top
+            # V: latitude (0 to 1) - height along Y-axis
+            # V=0 at bottom (south pole, Y=-radius), V=1 at top (north pole, Y=+radius)
             r = np.sqrt(x**2 + y**2 + z**2)
             r = np.maximum(r, 1e-8)  # Avoid division by zero
             v = 0.5 + np.arcsin(np.clip(y / r, -1, 1)) / np.pi
