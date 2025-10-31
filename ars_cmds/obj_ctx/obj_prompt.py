@@ -38,7 +38,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
 
-    options_list = [["T"],
+    options_list = [
     ["   ","A","   ",],
 
     [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
