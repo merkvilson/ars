@@ -67,6 +67,7 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_LOD3: lambda val: obj.set_primitive_type(obj.primitive_type, lod=int(val)),
         ic.ICON_RADIUS: lambda val: obj.set_primitive_type(obj.primitive_type, radius=val),
         ic.ICON_ANGLE: lambda val: obj.set_primitive_type(obj.primitive_type, slice_start=val),
+        ic.ICON_RADIUS_INNER: lambda val: obj.set_primitive_type(obj.primitive_type, radius_inner=val),
 
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }

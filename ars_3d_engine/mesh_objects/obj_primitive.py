@@ -20,6 +20,7 @@ class CPrimitive(CGeometry):
         self.lod = params.get('lod', 30)
         self.direction = params.get('direction', (0, 1, 0))
         self.slice_start = params.get('slice_start', 0)
+        self.radius_inner = params.get('radius_inner', 0.0)
 
 
     @classmethod
@@ -68,6 +69,8 @@ class CPrimitive(CGeometry):
             self.direction = params['direction']
         if 'slice_start' in params:
             self.slice_start = params['slice_start']
+        if 'radius_inner' in params:
+            self.radius_inner = params['radius_inner']
         
         # Prepare parameters dict for mesh generation
         mesh_params = {
@@ -77,7 +80,8 @@ class CPrimitive(CGeometry):
             'depth': self.depth,
             'lod': self.lod,
             'direction': self.direction,
-            'slice_start': self.slice_start
+            'slice_start': self.slice_start,
+            'radius_inner': self.radius_inner
         }
         
         # Regenerate mesh with new type
@@ -98,7 +102,8 @@ class CPrimitive(CGeometry):
             'depth': self.depth,
             'lod': self.lod,
             'direction': self.direction,
-            'slice_start': self.slice_start
+            'slice_start': self.slice_start,
+            'radius_inner': self.radius_inner
         }
 
     @staticmethod
@@ -118,6 +123,7 @@ class CPrimitive(CGeometry):
         lod = params.get('lod', 30)
         direction = params.get('direction', (0, 1, 0))
         slice_start = params.get('slice_start', 0)
+        radius_inner = params.get('radius_inner', 0.0)
         
         # Generate PyVista mesh based on type
         if primitive_type == 'sphere':
@@ -141,14 +147,16 @@ class CPrimitive(CGeometry):
         elif primitive_type == 'cylinder':
             pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
         elif primitive_type == 'cone':
-            pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction)
+            pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction, capping = True)
         elif primitive_type == 'pyramid':
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=4, direction=direction)
             pv_mesh.rotate_y(45, inplace=True)
         elif primitive_type == 'disc':
-            pv_mesh = pv.Disc(center=(0, 0, 0), inner=0, outer=radius, normal=direction, r_res=lod, c_res=lod)
+            pv_mesh = pv.Disc(center=(0, 0, 0), inner=radius_inner, outer=radius, normal=direction, r_res=lod, c_res=lod)
         elif primitive_type == 'torus':
-            pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=radius/2,)
+            # If radius_inner is 0, use radius/2 as cross-section, otherwise use radius_inner
+            cross_radius = radius_inner if radius_inner > 0 else 0.01
+            pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=cross_radius, v_res=lod, u_res=lod, w_res=lod)
             pv_mesh.rotate_x(90, inplace=True)
         else:
             raise ValueError(f"Unknown primitive type: {primitive_type}")
