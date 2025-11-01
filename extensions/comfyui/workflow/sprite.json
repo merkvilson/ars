@@ -29,7 +29,7 @@
   },
   "7": {
     "inputs": {
-      "text": "text, watermark",
+      "text": "out of frame, cropped, cut off, partially visible, off center, off screen, misaligned, out of focus, zoomed in too close, zoomed out too far, subject too small, subject too large, distorted proportions, tilted, rotated, incorrect framing, extreme perspective, fisheye, cut edges, truncated, bad composition, low resolution",
       "clip": [
         "4",
         1
@@ -179,7 +179,7 @@
         "30",
         0
       ],
-      "string_b": ",\ncentered,\nThe subject is isolated on a black background.",
+      "string_b": ", Isolated on a black background.",
       "delimiter": ""
     },
     "class_type": "StringConcatenate",
