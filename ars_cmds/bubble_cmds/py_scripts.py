@@ -38,13 +38,20 @@ def BBL_CODE_PYTHON(self, position):
 
     config = ContextMenuConfig()
     config.auto_close = False
+    config.close_on_outside=False
 
     options_list = [ "1","2","3"]
     config.additional_texts = {
-        "1": "Run Script",
-        "2": "Open Script",
+        "1": "Run",
+        "2": "Edit",
         "3": "Close",
     }
+    config.hotkey_items = {
+        "1": "R",
+        "2": "E",
+    }
+
+
     file_path = os.path.join("ars_scripts", "user", "test_script.py")
 
     config.callbackL = {
