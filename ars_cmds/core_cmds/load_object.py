@@ -127,8 +127,9 @@ def add_text3d(self):
     return obj
 
 
-def add_primitive(self, animated=False, **params, ):
+def add_primitive(self, **params, ):
     obj = CPrimitive.create(**params)
+    animated = params.get("animated")
     obj.set_position(0, 2 if animated else 0, 0)
     return add_mesh(self, file_path=obj, animated=animated)
 
