@@ -10,8 +10,17 @@ from prefs.pref_controller import get_path
 from PyQt6.QtCore import QPoint
 import os
 from PyQt6.QtGui import QColor
+from ars_cmds.core_cmds.load_object import selected_object
+from ars_cmds.render_cmds.generate_render import generate_render
+from ars_cmds.render_cmds.render_pass import save_depth, save_render
 
 def prompt_ctx(self, position, default_object = None, callback = None):
+    def close_callback(arg=None):
+        pass
+    if not callback:
+        callback = close_callback 
+
+    print("Opening prompt context menu")
 
     config = ContextMenuConfig()
     config.auto_close = False
@@ -19,7 +28,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.use_extended_shape = False
     config.distribution_mode = "x"
     config.anchor = "+y"
-    config.custom_height = 260
+    config.custom_height = 260 + (350 if default_object == self else 0)
     config.custom_width = 410
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
@@ -35,6 +44,11 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     ["   ",ic.ICON_CLOSE_RADIAL,"   "],
     ]
 
+    if default_object == self: options_list.insert(0, [ic.ICON_IMAGE])
+    config.image_items = {ic.ICON_IMAGE: r" "}
+    config.use_extended_shape_items = {ic.ICON_IMAGE: True}
+    config.per_item_radius = { ic.ICON_IMAGE: 50,}
+
     config.slider_values = {
         ic.ICON_STEPS: (1, 50, default_object.steps),
         ic.ICON_GIZMO_SCALE: (25, 1024, 512),
@@ -43,8 +57,11 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     }
 
     def start_render(seed_step = 0):
-        delete_all_files_in_folder( get_path('steps') )
         default_object.seed += seed_step
+
+        save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+        save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+
 
         if type(default_object).__name__ == "CSprite":
             default_object.revert_cutout()
@@ -57,8 +74,11 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         self.render_manager.set_userdata("steps", int(ctx.get_value(ic.ICON_STEPS))),
         self.render_manager.set_userdata("positive", default_object.prompt)
 
+        delete_all_files_in_folder( get_path('steps') )
         if type(default_object).__name__ == "CSprite":
             generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
+        else:
+            generate_render(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
 
     def convert_sprite_to_mesh():
         delete_obj(self, position)
@@ -87,11 +107,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     prompt_widget.setFixedSize(400, 140)
 
     config.custom_widget_items = {"prompt_widget": prompt_widget}
-    
-    def test1():
-        print("test1")
-
-    self.viewport._objectManager.set_selection_state.connect(test1)
 
 
 
