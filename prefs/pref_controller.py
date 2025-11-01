@@ -48,6 +48,9 @@ def get_path(key = "image"):
     if key == "custom_nodes":     res = opj("extensions","comfyui")
     if key == "extra_model_yaml": res = opj(cui, "extra_model_paths.yaml")
 
+    if not os.path.exists(res):
+        os.makedirs(res, exist_ok=True)
+
     return os.path.abspath(res)
 
 
