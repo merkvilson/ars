@@ -35,6 +35,12 @@ class MainWindow(QMainWindow):
         set_default_cursor("cursor")
 
 
+        #render data
+        self.steps = 25
+        self.seed = 0
+        self.prompt = "marble texture, high detail, 8k"
+
+
 
     def execute_startup_commands(self):
         def startup_commands(self):
