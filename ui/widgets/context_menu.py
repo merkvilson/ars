@@ -387,6 +387,7 @@ class ContextButtonWindow(QWidget):
     def close_animated(self, duration: int = 250, end_radius: int = 50):
         play_sound("back")
         animated_effects.close_effect(self, duration, end_radius)
+        self.destroy()
 
     def open_animated(self, duration: int = 200, start_radius: int = 50):
         if len(self.processed_items) < 20:
@@ -505,3 +506,45 @@ def open_context(parent, items, position=None, config=None):
     ctx_window.raise_()
     ctx_window.activateWindow()
     return ctx_window
+
+
+def find_all_open_context_menus(widget=None):
+    """
+    Find all open context menus (ContextButtonWindow instances) in the application.
+    
+    Args:
+        widget: Optional widget to search from. If None, searches from QApplication.
+                Can be the main window, central widget, or any parent widget.
+    
+    Returns:
+        list: A list of all visible ContextButtonWindow instances.
+    
+    Example:
+        # Find all open context menus from main window
+        open_menus = find_all_open_context_menus(main_window)
+        
+        # Find all open context menus globally
+        open_menus = find_all_open_context_menus()
+        
+        # Check if any menus are open
+        if find_all_open_context_menus():
+            print("Context menus are currently open")
+        
+        # Close all open context menus
+        for menu in find_all_open_context_menus():
+            menu.close_animated()
+    """
+    if widget is None:
+        # Search from the application's top-level widgets
+        app = QApplication.instance()
+        if app is None:
+            return []
+        all_menus = []
+        for top_widget in app.topLevelWidgets():
+            all_menus.extend(top_widget.findChildren(ContextButtonWindow))
+    else:
+        # Search from the provided widget
+        all_menus = widget.findChildren(ContextButtonWindow)
+    
+    # Filter to only return visible (open) menus
+    return [menu for menu in all_menus if menu.isVisible()]
