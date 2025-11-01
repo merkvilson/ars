@@ -13,6 +13,7 @@ from PyQt6.QtGui import QColor
 from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.render_pass import save_depth, save_render
+from ars_cmds.render_cmds.check import check_queue
 
 def prompt_ctx(self, position, default_object = None, callback = None):
     def close_callback(arg=None):
@@ -57,6 +58,10 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     }
 
     def start_render(seed_step = 0):
+        if check_queue(): 
+            print("Render queue is busy, cannot start a new render.")
+            return
+    
         default_object.seed += seed_step
 
         save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
