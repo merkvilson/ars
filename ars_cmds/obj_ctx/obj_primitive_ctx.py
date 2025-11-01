@@ -26,6 +26,7 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_AXIS_Y,
         ic.ICON_AXIS_Z,
         ic.ICON_RADIUS,
+        ic.ICON_RADIUS_INNER,
         ic.ICON_LOD3,
         ic.ICON_ANGLE,
         ic.ICON_CLOSE_RADIAL,
@@ -43,8 +44,8 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_AXIS_Z: "Size Z",
         ic.ICON_ANGLE: "Slice",
         ic.ICON_LOD3: "LOD",
-        
-        ic.ICON_RADIUS: "Radius",
+        ic.ICON_RADIUS_INNER: "Inner Radius",
+        ic.ICON_RADIUS: "Outer Radius",
     }
 
     config.slider_values = {
@@ -52,6 +53,7 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_AXIS_Y: (1,10,1),
         ic.ICON_AXIS_Z: (1,10,1),
         ic.ICON_RADIUS: (1,10,1),
+        ic.ICON_RADIUS_INNER: (0,10,0),
         ic.ICON_LOD3: (1,50,30),
         ic.ICON_ANGLE: (0,360,360),
         ic.ICON_CLOSE_RADIAL: (0,1,0),
