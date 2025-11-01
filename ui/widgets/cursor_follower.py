@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt, QTimer, QPoint, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QCursor, QColor, QFont
 from .b_button import BButton, BButtonConfig
 import theme.fonts.new_fonts as RRRFONT
+from theme.fonts import font_icons as ic
 
 class CursorFollowerWidget(QWidget):
     def __init__(self, parent=None):
@@ -17,7 +18,7 @@ class CursorFollowerWidget(QWidget):
         # Graphics view for BButton
         self.graphics_view = QGraphicsView(self)
         self.graphics_view.setStyleSheet("background: transparent; border: none;")
-        self.graphics_view.setFixedSize(200, 80)  # Size for radius=16 extended shape
+        self.graphics_view.setFixedSize(250, 100)  # Size for radius=16 extended shape
         self.scene = QGraphicsScene(self)
         self.scene.setSceneRect(-100, -40, 200, 80)  # Match view size
         self.graphics_view.setScene(self.scene)
@@ -28,10 +29,6 @@ class CursorFollowerWidget(QWidget):
             symbol="?",  # Matches ICON_INFO
             radius=20,
             clip_to_shape = False,
-            color=QColor(70, 70, 70, 150),
-            hover_color=QColor(70, 70, 70, 100),  # Same as normal color
-            symbol_color=QColor(255, 255, 255, 220),
-            additional_text_color=QColor(255, 255, 255, 180),
             font=RRRFONT.get_font(20),
             additional_font=QFont("Arial", 10),
             hover_scale=1.0,  # No scaling
@@ -57,15 +54,18 @@ class CursorFollowerWidget(QWidget):
         self.resize(200, 80)  # Match view size
         self.hide()  # Start hidden
 
-    def UP(self, key = "additional_text", value = "0.0",  symbol = "?", auto_close = 500):
+    def UP(self, key = "additional_text", value = "0.0",  symbol = ic.ICON_MSG, auto_close = 1000):
         """Update BButton's additional text using set_updated_config."""
-        self.b_button.set_updated_config(key, value)
-        self.b_button.set_updated_config("symbol", symbol)
+
+        if not self.isVisible(): self.animated_show()        
+
         if len(value) > 13: self.b_button.set_updated_config("use_extended_shape", False)
         else: self.b_button.set_updated_config("use_extended_shape", True)
-        self.b_button.set_updated_config("color", QColor(70, 70, 70, 255))
-        if not self.isVisible():
-            self.animated_show()
+       
+        self.b_button.set_updated_config(key, value)
+        self.b_button.set_updated_config("symbol", symbol)        
+        self.b_button.set_updated_config("color", QColor(200, 200, 200, 60))
+        
         if auto_close: self.hide_timer.start(auto_close) 
 
     def update_position(self):
@@ -73,10 +73,7 @@ class CursorFollowerWidget(QWidget):
             parent = self.parent()
             if parent:
                 global_cursor = QCursor.pos()
-                local_cursor = parent.mapFromGlobal(global_cursor)
-                offset = QPoint(20, 0)  # 20 pixels right, top-aligned
-                local_pos = local_cursor + offset
-                # Clamp to parent bounds (local coordinates)
+                local_pos = parent.mapFromGlobal(global_cursor)
                 local_pos.setX(max(0, min(local_pos.x(), parent.width() - self.width())))
                 local_pos.setY(max(0, min(local_pos.y(), parent.height() - self.height())))
                 self.move(local_pos)
