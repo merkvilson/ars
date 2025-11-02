@@ -56,11 +56,6 @@
             "grid_y": 0
         },
         {
-            "symbol": "\ue910",
-            "grid_x": 4,
-            "grid_y": 0
-        },
-        {
             "symbol": "\ue902",
             "grid_x": 8,
             "grid_y": 0
@@ -73,6 +68,11 @@
         {
             "symbol": "\ue943",
             "grid_x": 7,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue943",
+            "grid_x": 4,
             "grid_y": 0
         },
         {
