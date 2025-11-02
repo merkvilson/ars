@@ -23,7 +23,7 @@ import json
 
 from PyQt6.QtGui import QColor
 
-def BBL_RENDER(self, position, workflow = None):
+def old_bbl_render(self, position, workflow = None):
     
     workflow = workflow if workflow else self.render_manager.workflow_name
 
