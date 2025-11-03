@@ -12,7 +12,7 @@ def BBL_TEST3(self, position):
 def doit(self):
     config = ContextMenuConfig()
     options_list = [
-        ["0","1", "2", "3", "4", ],
+        ["0","1", "2", "3", "4", "5", "6"],
     ]
     
     config.slider_values = {ic.ICON_GIZMO_MOVE: (0,1,0)}
@@ -25,6 +25,8 @@ def doit(self):
     "2": "Render Workflow",
     "3": "Mesh Img Workflow",
     "4": "Sprite Workflow",
+    "5": "Video Workflow",
+    "6": "Start Render",
     }
 
 
@@ -35,6 +37,8 @@ def doit(self):
                         "2": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
                         "3": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
                         "4": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
+                        "5": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+                        "6": lambda: self.render_manager.send_render(),
                         }
 
     ctx = open_context(

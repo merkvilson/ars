@@ -15,11 +15,11 @@ class RenderDataManager(QObject):
         # Load default workflow JSON if provided (like your default.json)
         self.workflow_template = None
         if default_workflow_path and os.path.exists(default_workflow_path):
-            with open(default_workflow_path, 'r') as f:
+            with open(default_workflow_path, 'r', encoding='utf-8') as f:
                 self.workflow_template = json.load(f)
 
     def set_workflow(self, workflow_json):
-        with open(workflow_json, 'r') as f:
+        with open(workflow_json, 'r', encoding='utf-8') as f:
             self.workflow_template = json.load(f)
             self.workflow_name = os.path.splitext(os.path.basename(workflow_json))[0]
  

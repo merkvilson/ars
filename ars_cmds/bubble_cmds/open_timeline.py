@@ -3,6 +3,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ui.widgets.timeline import TimelineWidget
 from prefs.pref_controller import get_path
+from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 
 BBL_TIMELINE_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
 def BBL_TIMELINE(self, position):
@@ -36,8 +37,13 @@ def BBL_TIMELINE(self, position):
 
         items = [os.path.join(get_path("keyframes"),img) for img in os.listdir(get_path("keyframes"))]
 
+        def define_img(img_path):
+            ctx.update_item(keyframe, "image_path",  img_path)
+            copy_file_to_dir(file_path=img_path, destination_dir=get_path("input"), copy_as=keyframe)
+
+
         imgs_dict = {
-            img: (lambda img=img: ctx.update_item(keyframe, "image_path",  img))
+            img: (lambda img=img: define_img(img_path=img))
             for img in items
         }
 
