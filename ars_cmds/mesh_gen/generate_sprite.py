@@ -1,11 +1,7 @@
 from theme.fonts import font_icons as ic
-from PyQt6.QtCore import QFileSystemWatcher, QTimer
+from PyQt6.QtCore import QTimer
 import os
 from prefs.pref_controller import get_path
-from ars_cmds.core_cmds.load_object import add_mesh
-
-from ars_cmds.mesh_gen.animated_bbox import bbox_loading_animation, remove_bbox_loading_animation
-from ars_cmds.render_cmds.check import check_queue
 
 def generate_sprite(self, ctx, max_steps):
     """
@@ -19,12 +15,9 @@ def generate_sprite(self, ctx, max_steps):
         return
     
     sprite_plane = selected[0]
-    #sprite_plane.revert_cutout()
-
     sprite_plane.set_color((1,1,1,0.3)) # Set to white to ensure textures are visible
 
 
-    #ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)
     self.render_manager.send_render()
     sprite_dir = get_path("steps")
 
