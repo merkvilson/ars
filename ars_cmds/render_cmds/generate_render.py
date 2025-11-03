@@ -33,6 +33,9 @@ def generate_render(self, ctx, max_steps):
                 pixmap = QPixmap(latest_file)
                 if not pixmap.isNull():
                     ctx.update_item(ic.ICON_IMAGE, "image_path", latest_file)
+                    if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
+                        self.img.open_image(get_path('last_step'))
+
             except:
                 pass
     
