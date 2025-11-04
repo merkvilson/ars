@@ -14,6 +14,7 @@ from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.render_pass import save_depth, save_render
 from ars_cmds.render_cmds.check import check_queue
+from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 
 def prompt_ctx(self, position, default_object = None, callback = None):
     def close_callback(arg=None):
@@ -89,11 +90,21 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         delete_obj(self, position)
         generate_mesh(self, ctx)
 
+
+    def save_output(name = self.render_manager.workflow_name):
+        if name == "mesh_image":
+            copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
+        elif name == "render":
+            copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
+
+
+
     config.callbackL = {
         ic.ICON_PLAYER_PLAY: lambda: start_render(0),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
+        ic.ICON_SAVE: lambda: save_output("render"),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
         "T": lambda: print(prompt_widget.text_edit.toPlainText()),
     }
