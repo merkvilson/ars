@@ -2,6 +2,7 @@ from PyQt6.QtCore import QTimer, QUrl, QFileSystemWatcher
 from PyQt6.QtWebSockets import QWebSocket
 from PyQt6.QtNetwork import QAbstractSocket
 from PyQt6.QtGui import QCursor
+from ui.widgets.multi_line_input import MultiLineInputWidget
 
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
@@ -24,6 +25,7 @@ import json
 from PyQt6.QtGui import QColor
 
 def BBL_9(self, position, workflow = None):
+    default_object = self
     
     workflow = workflow if workflow else self.render_manager.workflow_name
 
@@ -35,10 +37,34 @@ def BBL_9(self, position, workflow = None):
     config.use_extended_shape_items = {ic.ICON_IMAGE: True}
     config.color = {ic.ICON_IMAGE: QColor(0, 0, 0,0)}
 
-    options_list = [ [ic.ICON_IMAGE], [ ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", ic.ICON_RENDER, "   ", ic.ICON_SAVE, "x",]]
-    config.per_item_radius = {
-        ic.ICON_IMAGE: 45,}
+    def set_text_from_prompt():
+        default_object.prompt = prompt_widget.text_edit.toPlainText()
+
+    prompt_widget = MultiLineInputWidget()
+    prompt_widget.text_edit.setPlainText(default_object.prompt)
+    prompt_widget.text_edit.textChanged.connect(set_text_from_prompt)
+
+    prompt_widget.setFixedSize(400, 140)
+
+    config.custom_widget_items = {"prompt_widget": prompt_widget}
+
+
+    options_list = [
+    ["   ","prompt_widget","   ",],
+
+    [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
+    ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", 
+    ic.ICON_OBJ_HEXAGONS ,ic.ICON_SAVE], 
+
+    ["   ",ic.ICON_CLOSE_RADIAL,"   "],
+    ]
+
+    if default_object == self: options_list.insert(0, [ic.ICON_IMAGE])
     config.image_items = {ic.ICON_IMAGE: r" "}
+    config.use_extended_shape_items = {ic.ICON_IMAGE: True}
+    config.per_item_radius = { ic.ICON_IMAGE: 50,}
+
+
 
     config.additional_texts = {
         ic.ICON_RENDER: "Start Render",
