@@ -11,6 +11,7 @@ from PyQt6.QtCore import QTimer
 import time
 from prefs.pref_controller import get_path
 from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation, delete_bbox_animations
+from ars_3d_engine.mesh_objects.obj_point import CPoint
 
 mesh_files = "(*.obj *.stl *.ply *.off *.dae *.glb *.gltf *.3mf)"
 
@@ -126,6 +127,11 @@ def add_text3d(self):
     self.viewport._view.camera.view_changed()
     return obj
 
+def add_point(self):
+    obj = CPoint.create()
+    self.viewport._objectManager.add_object(obj)
+    self.viewport._view.camera.view_changed()
+    return obj
 
 def add_primitive(self, **params, ):
     obj = CPrimitive.create(**params)
