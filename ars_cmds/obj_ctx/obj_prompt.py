@@ -18,9 +18,10 @@ from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
 
 def prompt_ctx(self, position, default_object = None, callback = None):
-    def close_callback(arg=None):
-        pass
+
     if not callback:
+        def close_callback(arg=None):
+            pass        
         callback = close_callback 
 
     print("Opening prompt context menu")
@@ -83,9 +84,10 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
         delete_all_files_in_folder( get_path('steps') )
         if type(default_object).__name__ == "CSprite":
-            generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
+            generate_sprite(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
+
         else:
-            generate_render(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)))
+            generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
 
     def convert_sprite_to_mesh():
         delete_obj(self, position)

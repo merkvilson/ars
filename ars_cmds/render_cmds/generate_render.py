@@ -4,7 +4,7 @@ from PyQt6.QtGui import QPixmap
 import os
 from prefs.pref_controller import get_path
 
-def generate_render(self, ctx, max_steps):
+def generate_render(self, ctx, max_steps, default_object):
 
     self.render_manager.send_render()
     
@@ -32,7 +32,10 @@ def generate_render(self, ctx, max_steps):
             try:
                 pixmap = QPixmap(latest_file)
                 if not pixmap.isNull():
-                    ctx.update_item(ic.ICON_IMAGE, "image_path", latest_file)
+                    if type(default_object).__name__ == "CPoint":
+                        self.viewport.bg.set_image(latest_file)
+                    else:
+                        ctx.update_item(ic.ICON_IMAGE, "image_path", latest_file)
                     if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
                         self.img.open_image(get_path('last_step'))
 
