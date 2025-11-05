@@ -1,7 +1,3 @@
-from ars_cmds.core_cmds.load_object import add_primitive
+from ars_cmds.core_cmds.load_object import add_point
 
-#add_primitive(ars_window, primitive_type = "cube", animated = False)
-	
-ars_window.CF.UP(value = "Hello")
-
-obj.set_shading("smooth")
+add_point(ars_window)
