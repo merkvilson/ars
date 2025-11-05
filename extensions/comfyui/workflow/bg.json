@@ -1,0 +1,244 @@
+{
+  "4": {
+    "inputs": {
+      "ckpt_name": [
+        "34",
+        0
+      ]
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": [
+        "30",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "text, watermark",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "15": {
+    "inputs": {
+      "seed": [
+        "33",
+        0
+      ],
+      "tileX": 0,
+      "tileY": 0,
+      "steps": [
+        "25",
+        0
+      ],
+      "cfg": 8,
+      "sampler_name": "euler",
+      "scheduler": "exponential",
+      "denoise": [
+        "43",
+        0
+      ],
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "Asymmetric Tiled KSampler",
+    "_meta": {
+      "title": "Asymmetric Tiled KSampler"
+    }
+  },
+  "16": {
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "25": {
+    "inputs": {
+      "ud_name": "steps",
+      "output": 20
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "27": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "images": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
+    }
+  },
+  "30": {
+    "inputs": {
+      "ud_name": "positive",
+      "output": ""
+    },
+    "class_type": "Airen_Str",
+    "_meta": {
+      "title": "Airen Text"
+    }
+  },
+  "33": {
+    "inputs": {
+      "ud_name": "seed",
+      "output": 5
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "34": {
+    "inputs": {
+      "ud_name": "ckpt_name",
+      "output": "dreamshaper_8.safetensors"
+    },
+    "class_type": "Airen_Checkpoint",
+    "_meta": {
+      "title": "Airen Checkpoint"
+    }
+  },
+  "37": {
+    "inputs": {
+      "model_name": "RealESRGAN_x4plus.safetensors"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "38": {
+    "inputs": {
+      "upscale_model": [
+        "37",
+        0
+      ],
+      "image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale Image (using Model)"
+    }
+  },
+  "39": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "images": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen Save Image"
+    }
+  },
+  "41": {
+    "inputs": {
+      "ud_name": "",
+      "weight": 10,
+      "output": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "Airen_Progress_Reader",
+    "_meta": {
+      "title": "Airen_Progress_Reader"
+    }
+  },
+  "43": {
+    "inputs": {
+      "ud_name": "denoise",
+      "output": 0.8
+    },
+    "class_type": "Airen_Float",
+    "_meta": {
+      "title": "Airen_Float"
+    }
+  },
+  "44": {
+    "inputs": {
+      "width": [
+        "45",
+        0
+      ],
+      "height": [
+        "45",
+        0
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "45": {
+    "inputs": {
+      "ud_name": "size",
+      "output": 512
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  }
+}

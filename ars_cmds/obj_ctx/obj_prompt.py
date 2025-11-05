@@ -74,7 +74,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         if type(default_object).__name__ == "CSprite":
             default_object.revert_cutout()
             self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
-        
+        if type(default_object).__name__ == "CPoint":
+            self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "bg.json")),
+            
         else:
             self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
 
