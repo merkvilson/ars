@@ -4,6 +4,7 @@ from vispy import scene
 from vispy.geometry import MeshData  
 
 from PIL import Image
+import os
 
 
 from ars_3d_engine.mesh_objects.scene_objects import CGeometry
@@ -97,9 +98,14 @@ class CSprite(CGeometry):
         # Update the visual with the new (simple) geometry
         self._visual.set_data(meshdata=new_md)
         
-        # Re-apply the texture if it exists
+        # Re-apply the texture if it exists and the file is still available
         if self.texture_path:
-            self.set_texture(self.texture_path)
+            if os.path.exists(self.texture_path):
+                self.set_texture(self.texture_path)
+            else:
+                print(f"Warning: Texture file not found: {self.texture_path}")
+                # Clear the texture path since the file doesn't exist
+                self.texture_path = None
         
         self._visual.update()
 

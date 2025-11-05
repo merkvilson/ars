@@ -1,7 +1,6 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ui.widgets.multi_line_input import MultiLineInputWidget
-from ars_cmds.mesh_gen.generate_sprite import generate_sprite
 from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
 from PyQt6.QtGui import QCursor
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
@@ -67,17 +66,18 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     
         default_object.seed += seed_step
 
-        save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-        save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
 
 
         if type(default_object).__name__ == "CSprite":
             default_object.revert_cutout()
             self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
-        if type(default_object).__name__ == "CPoint":
+        
+        elif type(default_object).__name__ == "CPoint":
             self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "bg.json")),
             
         else:
+            save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+            save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
             self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
 
         self.render_manager.set_userdata("seed", default_object.seed)
@@ -85,11 +85,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         self.render_manager.set_userdata("positive", default_object.prompt)
 
         delete_all_files_in_folder( get_path('steps') )
-        if type(default_object).__name__ == "CSprite":
-            generate_sprite(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
 
-        else:
-            generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
+        generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
+
 
     def convert_sprite_to_mesh():
         delete_obj(self, position)
