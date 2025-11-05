@@ -15,6 +15,7 @@ from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.render_pass import save_depth, save_render
 from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.render_cmds.make_screenshot import make_screenshot
 
 def prompt_ctx(self, position, default_object = None, callback = None):
     def close_callback(arg=None):
@@ -98,6 +99,26 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
 
 
+    def swap_imge(self):
+        image_path = os.path.join(get_path('input'), "vp_screenshot.png")
+        if self.viewport.isVisible():
+            def post_screenshot():
+                ctx.update_item(ic.ICON_IMAGE, "image_path", image_path)
+                files = os.listdir(get_path('steps')) 
+                full_paths = [os.path.join(get_path('steps'), f) for f in files]
+                if full_paths:
+                    latest_file = max(full_paths, key=os.path.getmtime)
+                    if hasattr(self, 'img') and self.img:
+                        self.img.open_image(latest_file)
+                self.swap_widgets()
+            
+            make_screenshot(self, callback=post_screenshot, x=200, y=200, name="vp_screenshot.png")
+        else:
+            self.swap_widgets()
+            #if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
+               # self.img.open_image(get_path('last_step'))
+
+
 
     config.callbackL = {
         ic.ICON_PLAYER_PLAY: lambda: start_render(0),
@@ -106,10 +127,12 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_SAVE: lambda: save_output("render"),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
-        "T": lambda: print(prompt_widget.text_edit.toPlainText()),
+        ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
+
     }
-    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
-    }
+
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )}
+
     config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
 
 

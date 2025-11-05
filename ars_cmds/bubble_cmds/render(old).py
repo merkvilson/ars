@@ -121,9 +121,6 @@ def BBL_9(self, position, workflow = None):
 
     weights =self.render_manager.get_weights()
     
-    for weight_item, weight_value in weights.items():
-        print(f"Weight Item: {weight_item}, Weight Value: {weight_value}")
-
 
     def on_text_message(message):
         data = json.loads(message)
@@ -137,7 +134,7 @@ def BBL_9(self, position, workflow = None):
             for weight_item, weight_value in weights.items():
                 if node_id == weight_item:
                     percent = int((value / max_val) * 100)
-                    print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
+                    #print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
                     ctx.update_item(ic.ICON_PLAYER_PLAY, "progress", percent)
                     ctx.update_item(ic.ICON_PLAYER_PLAY, "additional_text", f"Rendering... {percent}%")
                     if percent == 100:
@@ -234,7 +231,7 @@ def BBL_9(self, position, workflow = None):
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
         ic.ICON_STEPS: lambda value: setattr(default_object, 'steps', value),
-        ic.ICON_GIZMO_SCALE: lambda value: print(value),
+        #ic.ICON_GIZMO_SCALE: lambda value: print(value),
         ic.ICON_SAVE: lambda: save_output(),
         ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
 
