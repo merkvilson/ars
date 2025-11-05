@@ -332,9 +332,3 @@ class ImageViewerWidget(QWidget):
             self.view.minimap.update_viewport_rect()
             self.view.update_minimap_visibility()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    widget = ImageViewerWidget()
-    widget.open_image()
-    widget.show()
-    sys.exit(app.exec())
