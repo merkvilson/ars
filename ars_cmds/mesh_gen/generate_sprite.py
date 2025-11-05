@@ -3,18 +3,9 @@ from PyQt6.QtCore import QTimer
 import os
 from prefs.pref_controller import get_path
 
-def generate_sprite(self, ctx, max_steps):
-    """
-    Generates a sprite by monitoring a directory for new images and creating a sprite sheet.
-    sprite images are saved in the 'steps' directory.
-    
-    """
+def generate_sprite(self, ctx, max_steps, default_object):
 
-    selected = self.viewport._objectManager.get_selected_objects()
-    if not selected:
-        return
-    
-    sprite_plane = selected[0]
+    sprite_plane = default_object
     sprite_plane.set_color((1,1,1,0.3)) # Set to white to ensure textures are visible
 
 
