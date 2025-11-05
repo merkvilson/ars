@@ -32,10 +32,13 @@ def BBL_9(self, position, workflow = None):
 
     config = ContextMenuConfig()
     config.auto_close = False
-    config.distribution_mode = 'x'
+    config.close_on_outside = False
     config.use_extended_shape = False
-    config.use_extended_shape_items = {ic.ICON_IMAGE: True}
-    config.color = {ic.ICON_IMAGE: QColor(0, 0, 0,0)}
+    config.distribution_mode = "x"
+    config.anchor = "+y"
+    config.custom_height = 260 + (350 if default_object == self else 0)
+    config.custom_width = 410
+    config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
     def set_text_from_prompt():
         default_object.prompt = prompt_widget.text_edit.toPlainText()
@@ -67,7 +70,7 @@ def BBL_9(self, position, workflow = None):
 
 
     config.additional_texts = {
-        ic.ICON_RENDER: "Start Render",
+        ic.ICON_PLAYER_PLAY: "Start Render",
         ic.ICON_STEPS: "Steps",
         ic.ICON_SAVE: "Save"
     }
@@ -79,7 +82,7 @@ def BBL_9(self, position, workflow = None):
 
     config.show_value_items = {
         ic.ICON_STEPS: True,
-        ic.ICON_RENDER: True,
+        ic.ICON_PLAYER_PLAY: True,
         ic.ICON_GIZMO_SCALE: True,
     }
 
@@ -135,8 +138,8 @@ def BBL_9(self, position, workflow = None):
                 if node_id == weight_item:
                     percent = int((value / max_val) * 100)
                     print(f"KSampler progress: node_id={node_id}, value={value}, max={max_val}, percent={percent}")
-                    ctx.update_item(ic.ICON_RENDER, "progress", percent)
-                    ctx.update_item(ic.ICON_RENDER, "additional_text", f"Rendering... {percent}%")
+                    ctx.update_item(ic.ICON_PLAYER_PLAY, "progress", percent)
+                    ctx.update_item(ic.ICON_PLAYER_PLAY, "additional_text", f"Rendering... {percent}%")
                     if percent == 100:
                         check_queue(revert_to_normal)
 
@@ -187,8 +190,8 @@ def BBL_9(self, position, workflow = None):
             update_image()
 
     def revert_to_normal():
-        ctx.update_item(ic.ICON_RENDER, "progress_bar", 0)
-        ctx.update_item(ic.ICON_RENDER, "additional_text", "Start Render")
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "progress_bar", 0)
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "additional_text", "Start Render")
         stop_polling()
         print("Render complete")
         if queue_timer.isActive():
@@ -206,28 +209,31 @@ def BBL_9(self, position, workflow = None):
 
 
 
-    def start_render():
+    def start_render(seed_step = 0):
         delete_all_files_in_folder( get_path('steps') )
-        self.render_manager.set_userdata("seed", self.render_manager.get_userdata("seed") + 1 if key_check("shift") else -1 if key_check("ctrl") else 0)
-        
-        if workflow in ("render", "mesh_image"):
-            ctx.update_item(ic.ICON_RENDER, "progress_bar", 1)
-            ctx.update_item(ic.ICON_RENDER, "progress", 0)
-            ctx.update_item(ic.ICON_RENDER, "additional_text", "Rendering... 0%")
-            connect_websocket()
-            save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-            save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-            self.render_manager.send_render()
-            start_polling()
-            queue_timer.start(500)
-        elif workflow == "mesh":
-            generate_mesh(self, ctx)
-        elif workflow == "sprite":
-            generate_sprite(self, ctx, max_steps=int(ctx.get_value(ic.ICON_STEPS)) )
+        default_object.seed += seed_step
+
+        self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
+        self.render_manager.set_userdata("seed", default_object.seed)
+        self.render_manager.set_userdata("positive", default_object.prompt)
+        self.render_manager.set_userdata("steps", default_object.steps)
+
+
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "progress_bar", 1)
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "progress", 0)
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "additional_text", "Rendering... 0%")
+        connect_websocket()
+        save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+        save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+        self.render_manager.send_render()
+        start_polling()
+        queue_timer.start(500)
 
     config.callbackL = {
-        ic.ICON_RENDER: lambda: start_render(),
-        ic.ICON_STEPS: lambda value: self.render_manager.set_userdata("steps", value),
+        ic.ICON_PLAYER_PLAY: lambda: start_render(),
+        ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
+        ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
+        ic.ICON_STEPS: lambda value: setattr(default_object, 'steps', value),
         ic.ICON_GIZMO_SCALE: lambda value: print(value),
         ic.ICON_SAVE: lambda: save_output(),
         ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
