@@ -80,14 +80,15 @@ def edit_pref(key = "cui_root", value = ""):
 
 
 
-yaml = f"\nairen:\n    base_path: {read_pref("extra_model_paths")}\n"
+#TODO: Replace temporal solution with proper logic.
+if os.path.exists(read_pref("extra_model_paths")):
+    yaml = f"\nairen:\n    base_path: {read_pref("extra_model_paths")}\n"
+    for new_path in os.listdir(read_pref("extra_model_paths")):
+        yaml += f"    {new_path}: {new_path}\n"
 
-for new_path in os.listdir(read_pref("extra_model_paths")):
-    yaml += f"    {new_path}: {new_path}\n"
 
+    yaml +=  f"\nairen_nodes:\n    base_path: {get_path("custom_nodes")}\n"
+    yaml += "    custom_nodes: custom_nodes"
 
-yaml +=  f"\nairen_nodes:\n    base_path: {get_path("custom_nodes")}\n"
-yaml += "    custom_nodes: custom_nodes"
-
-with open(get_path("extra_model_yaml"), "w", encoding="utf-8") as file:
-    file.write(yaml)
+    with open(get_path("extra_model_yaml"), "w", encoding="utf-8") as file:
+        file.write(yaml)
