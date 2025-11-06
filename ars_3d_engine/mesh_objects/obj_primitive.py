@@ -152,6 +152,7 @@ class CPrimitive(CGeometry):
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=4, direction=direction)
             pv_mesh.rotate_y(45, inplace=True)
         elif primitive_type == 'disc':
+            if radius_inner == radius: radius+=0.01  # Avoid zero-area disc
             pv_mesh = pv.Disc(center=(0, 0, 0), inner=radius_inner, outer=radius, normal=direction, r_res=lod, c_res=lod)
         elif primitive_type == 'torus':
             # If radius_inner is 0, use radius/2 as cross-section, otherwise use radius_inner
