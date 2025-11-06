@@ -655,6 +655,9 @@ class BButton(QGraphicsObject):
         if self._is_dragging:
             self._is_dragging = False
             self._drag_button = None
+            # Update handle position to final value when drag ends
+            if self.slider_values and not self.incremental_value:
+                self._update_handle_position()
             self.update()
         super().mouseReleaseEvent(event)
 
@@ -674,7 +677,6 @@ class BButton(QGraphicsObject):
             progress_ratio = relative_x / self._bounding.width()
             progress_ratio = max(0.0, min(1.0, progress_ratio))
             self._slider_value = min_val + progress_ratio * (max_val - min_val)
-            self._update_handle_position()
             self._update_additional_text()
             if self._drag_button == Qt.MouseButton.LeftButton and self.callbackL:
                 if len(inspect.signature(self.callbackL).parameters) > 0:
