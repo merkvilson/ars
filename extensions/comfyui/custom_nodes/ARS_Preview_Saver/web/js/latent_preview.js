@@ -1,4 +1,4 @@
-// Video Preview Saver - Latent Preview Only
+// ARS Preview Saver - Unified Latent Preview
 import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 
@@ -15,20 +15,20 @@ function getNodeById(id, graph=app.graph) {
 let latentPreviewNodes = new Set()
 
 app.registerExtension({
-    name: 'VideoPreviewSaver.LatentPreview',
+    name: 'ARS.PreviewSaver.LatentPreview',
     settings: [
         {
-            id: 'VideoPreviewSaver.LatentPreview',
-            category: ['📹 Video Preview Saver', 'Sampling', 'Latent Previews'],
+            id: 'ARS_PreviewSaver.LatentPreview',
+            category: ['🎨 ARS Preview Saver', 'Sampling', 'Latent Previews'],
             name: 'Display animated previews when sampling',
             type: 'boolean',
-            defaultValue: true,  // Changed to true by default
+            defaultValue: true,
             onChange(value) {
                 if (!value) {
                     //Remove any previewWidgets
                     for (let id of latentPreviewNodes) {
                         let n = app.graph.getNodeById(id)
-                        let i = n?.widgets?.findIndex((w) => w.name == 'videopreviewsaver_latentpreview')
+                        let i = n?.widgets?.findIndex((w) => w.name == 'ars_previewsaver_latentpreview')
                         if (i >= 0) {
                             n.widgets.splice(i,1)[0].onRemove()
                         }
@@ -38,8 +38,8 @@ app.registerExtension({
             },
         },
         {
-            id: "VideoPreviewSaver.LatentPreviewRate",
-            category: ['📹 Video Preview Saver', 'Sampling', 'Latent Preview Rate'],
+            id: "ARS_PreviewSaver.LatentPreviewRate",
+            category: ['🎨 ARS Preview Saver', 'Sampling', 'Latent Preview Rate'],
             name: "Playback rate override.",
             type: 'number',
             attrs: {
@@ -55,8 +55,8 @@ app.registerExtension({
         let originalGraphToPrompt = app.graphToPrompt
         let graphToPrompt = async function() {
             let res = await originalGraphToPrompt.apply(this, arguments);
-            res.workflow.extra['VideoPreviewSaver_latentpreview'] = app.ui.settings.getSettingValue("VideoPreviewSaver.LatentPreview")
-            res.workflow.extra['VideoPreviewSaver_latentpreviewrate'] = app.ui.settings.getSettingValue("VideoPreviewSaver.LatentPreviewRate")
+            res.workflow.extra['ARS_PreviewSaver_latentpreview'] = app.ui.settings.getSettingValue("ARS_PreviewSaver.LatentPreview")
+            res.workflow.extra['ARS_PreviewSaver_latentpreviewrate'] = app.ui.settings.getSettingValue("ARS_PreviewSaver.LatentPreviewRate")
             return res
         }
         app.graphToPrompt = graphToPrompt
@@ -69,10 +69,10 @@ function getLatentPreviewCtx(id, width, height) {
         return undefined
     }
 
-    let previewWidget = node.widgets.find((w) => w.name == "videopreviewsaver_latentpreview")
+    let previewWidget = node.widgets.find((w) => w.name == "ars_previewsaver_latentpreview")
     if (!previewWidget) {
         let canvasEl = document.createElement("canvas")
-        previewWidget = node.addDOMWidget("videopreviewsaver_latentpreview", "videopreviewsaver_canvas", canvasEl, {
+        previewWidget = node.addDOMWidget("ars_previewsaver_latentpreview", "ars_canvas", canvasEl, {
             serialize: false,
             hideOnZoom: false,
         });
@@ -154,7 +154,7 @@ function beginLatentPreview(id, previewImages, rate) {
 }
 
 let previewImagesDict = {}
-api.addEventListener('VideoPreviewSaver_latentpreview', ({ detail }) => {
+api.addEventListener('ARS_PreviewSaver_latentpreview', ({ detail }) => {
     if (detail.id == null) {
         return
     }
