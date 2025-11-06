@@ -21,7 +21,7 @@ def main(self):
 
     def set_img_by_index(val):
         val = int(val)
-        images_path = get_path("steps")
+        images_path = get_path("frames")
         images_list = os.listdir(images_path)
         if images_list:
             # Map slider value (0-100) to image index (0 to len-1)
