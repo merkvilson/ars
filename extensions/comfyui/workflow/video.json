@@ -1,7 +1,10 @@
 {
   "6": {
     "inputs": {
-      "text": "",
+      "text": [
+        "100",
+        0
+      ],
       "clip": [
         "38",
         0
@@ -110,13 +113,22 @@
   "57": {
     "inputs": {
       "add_noise": "enable",
-      "noise_seed": 984937593540091,
-      "steps": 4,
+      "noise_seed": [
+        "95",
+        0
+      ],
+      "steps": [
+        "93",
+        0
+      ],
       "cfg": 1,
       "sampler_name": "euler",
       "scheduler": "simple",
       "start_at_step": 0,
-      "end_at_step": 2,
+      "end_at_step": [
+        "94",
+        0
+      ],
       "return_with_leftover_noise": "enable",
       "model": [
         "54",
@@ -144,11 +156,17 @@
     "inputs": {
       "add_noise": "disable",
       "noise_seed": 0,
-      "steps": 4,
+      "steps": [
+        "93",
+        0
+      ],
       "cfg": 1,
       "sampler_name": "euler",
       "scheduler": "simple",
-      "start_at_step": 2,
+      "start_at_step": [
+        "94",
+        0
+      ],
       "end_at_step": 10000,
       "return_with_leftover_noise": "disable",
       "model": [
@@ -173,34 +191,6 @@
       "title": "KSampler (Advanced)"
     }
   },
-  "60": {
-    "inputs": {
-      "fps": 16,
-      "images": [
-        "8",
-        0
-      ]
-    },
-    "class_type": "CreateVideo",
-    "_meta": {
-      "title": "Create Video"
-    }
-  },
-  "61": {
-    "inputs": {
-      "filename_prefix": "video/ComfyUI",
-      "format": "auto",
-      "codec": "auto",
-      "video": [
-        "60",
-        0
-      ]
-    },
-    "class_type": "SaveVideo",
-    "_meta": {
-      "title": "Save Video"
-    }
-  },
   "62": {
     "inputs": {
       "image": "1.png"
@@ -212,9 +202,18 @@
   },
   "67": {
     "inputs": {
-      "width": 368,
-      "height": 368,
-      "length": 29,
+      "width": [
+        "96",
+        0
+      ],
+      "height": [
+        "96",
+        0
+      ],
+      "length": [
+        "97",
+        0
+      ],
       "batch_size": 1,
       "positive": [
         "6",
@@ -229,11 +228,11 @@
         0
       ],
       "start_image": [
-        "68",
+        "62",
         0
       ],
       "end_image": [
-        "62",
+        "68",
         0
       ]
     },
@@ -277,6 +276,79 @@
     "class_type": "LoraLoaderModelOnly",
     "_meta": {
       "title": "LoraLoaderModelOnly"
+    }
+  },
+  "93": {
+    "inputs": {
+      "ud_name": "steps",
+      "output": 4
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "94": {
+    "inputs": {
+      "ud_name": "start-stop",
+      "output": 2
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "95": {
+    "inputs": {
+      "ud_name": "seed",
+      "output": 12345
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "96": {
+    "inputs": {
+      "ud_name": "size",
+      "output": 512
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "97": {
+    "inputs": {
+      "ud_name": "frames",
+      "output": 40
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen Integer"
+    }
+  },
+  "99": {
+    "inputs": {
+      "filename_prefix": "video_frames/frame",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "100": {
+    "inputs": {
+      "ud_name": "positive",
+      "output": ""
+    },
+    "class_type": "Airen_Str",
+    "_meta": {
+      "title": "Airen Text"
     }
   }
 }
