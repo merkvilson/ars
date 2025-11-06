@@ -35,10 +35,11 @@ def get_path(key = "image"):
     if key == "image": res = opj(output,"images")
 
     if key == "input":            res = opj(cui,"input")
-    if key == "steps":            res = opj(output,"steps")
     if key == "mesh":             res = opj(output,"mesh")
+    if key == "steps":            res = opj(output,"steps")
+    if key == "frames":           res = opj(output,"frames")
     if key == "keyframes":        res = opj(output,"keyframes")
-    if key == "sprite":           res = opj(output,"sprite")    
+    if key == "sprite":           res = opj(output,"sprite")
     if key == "last_step":        
         if last_step_path:
             return last_step_path  # Return the file path directly without abspath
