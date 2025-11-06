@@ -39,7 +39,7 @@ def main(self):
     ctx = open_context(
         parent=self.central_widget,
         items=['A'],
-        position=None,
+        position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
