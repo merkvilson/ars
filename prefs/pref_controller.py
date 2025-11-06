@@ -38,6 +38,7 @@ def get_path(key = "image"):
     if key == "mesh":             res = opj(output,"mesh")
     if key == "steps":            res = opj(output,"steps")
     if key == "frames":           res = opj(output,"frames")
+    if key == "video_frames":     res = opj(output,"video_frames")
     if key == "keyframes":        res = opj(output,"keyframes")
     if key == "sprite":           res = opj(output,"sprite")
     if key == "last_step":        
