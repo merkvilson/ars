@@ -21,15 +21,15 @@ def main(self):
 
     def set_img_by_index(val):
         val = int(val)
-        print(f'Slider A changed to {int(val)}')
         images_path = get_path("steps")
         images_list = os.listdir(images_path)
         if images_list:
-            index = val * (len(images_list) - 1) // 100
-            image_path = os.path.join(images_path, images_list[index])
-
-
-        self.viewport.bg.set_image(image_path)
+            # Map slider value (0-100) to image index (0 to len-1)
+            max_index = len(images_list) - 1
+            image_index = int((val / 100) * max_index)
+            selected_image = images_list[image_index]
+            image_path = os.path.join(images_path, selected_image)
+        self.img.open_image(image_path)
     
     config.callbackL = {
         'A': lambda val: set_img_by_index(val),
