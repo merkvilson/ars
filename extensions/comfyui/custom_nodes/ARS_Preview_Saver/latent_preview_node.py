@@ -110,13 +110,11 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
         return None
     
     def _initialize_session(self, num_frames):
-        """Create session directory and notify browser"""
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
-        node_id = (serv.last_node_id or "unknown").replace(":", "_")
-        self.session_dir = os.path.join(FRAMES_DIR, f"{timestamp}_{node_id}")
+        """Initialize session and notify browser"""
+        self.session_dir = FRAMES_DIR
         os.makedirs(self.session_dir, exist_ok=True)
         
-        print(f"[ARS Preview Saver] Animated frames saved to: {self.session_dir}")
+        print(f"[ARS Preview Saver] Animated frames → {self.session_dir}")
         
         # Notify browser
         serv.send_sync("ARS_PreviewSaver_latentpreview", {
