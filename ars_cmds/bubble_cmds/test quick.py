@@ -16,7 +16,7 @@ def main(self, position):
     config = ContextMenuConfig()
     config.auto_close = False
 
-    options_list = [ "a", ("b",), ("c",), "d"]
+    options_list = [ "a", ("b",), ("c",)]
     config.additional_texts = {
         "a": "ComfyUI",
         "b": "Server",
@@ -27,12 +27,13 @@ def main(self, position):
         cui_root = read_pref("cui_root")
         cui_python = os.path.join(cui_root, "python_embeded", "python.exe")
         cmd = f'"{cui_python}" -s "{os.path.join(cui_root, "ComfyUI", "main.py")}" {"--cpu" if cpu else ""} --windows-standalone-build {"--listen 0.0.0.0 --port 8188" if server else ""}'
-        subprocess.run(cmd, shell=True)
+        subprocess.Popen(cmd, shell=True)  # Use Popen instead of run to avoid blocking
 
 
 
     config.callbackL = {
-        "a": lambda: start_comfy(server=ctx.get_value("b"), cpu=ctx.get_value("c")),
+        "a": lambda: (start_comfy(server=ctx.get_value("b"), cpu=ctx.get_value("c")), 
+                      ctx.close_animated() ),
                         }
 
     ctx = open_context(
