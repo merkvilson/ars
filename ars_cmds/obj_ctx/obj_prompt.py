@@ -49,8 +49,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
     if default_object == self: options_list.insert(0, [ic.ICON_IMAGE])
     config.image_items = {ic.ICON_IMAGE: r" "}
-    config.use_extended_shape_items = {ic.ICON_IMAGE: True}
-    config.per_item_radius = { ic.ICON_IMAGE: 50,}
+    config.use_extended_shape_items = {ic.ICON_IMAGE: (9, 6)}
+    # config.per_item_radius = { ic.ICON_IMAGE: 50,}
 
     config.slider_values = {
         ic.ICON_STEPS: (1, 50, default_object.steps),

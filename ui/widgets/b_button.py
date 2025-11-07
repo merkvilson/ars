@@ -227,10 +227,14 @@ class BButton(QGraphicsObject):
 
         if self.use_extended_shape:
             height = (6 * self.radius) if self.image_path else (2 * self.radius)
+            width =  (6 * self.radius)
             if isinstance(self.use_extended_shape, tuple):
-                if self.use_extended_shape[1]: height = 6 * self.radius
+                if self.use_extended_shape[0]: width = (self.use_extended_shape[0] * self.radius) * 2
+                else: width = 8 * self.radius
+                if self.use_extended_shape[1]: height = (self.use_extended_shape[1] * self.radius) * 2
                 else: height = 2 * self.radius
-            self._bounding = QRectF( -self.radius,  -self.radius, 8 * self.radius, height)
+
+            self._bounding = QRectF( -self.radius,  -self.radius, width, height)
         else:
             self._bounding = QRectF(-self.radius, -self.radius, 2 * self.radius, 2 * self.radius)
 

@@ -22,6 +22,10 @@ def main(self):
         self._loop_index = 0
 
     config = ContextMenuConfig()
+    config.use_extended_shape_items = {"A": (10, 1)}
+    config.auto_close = False
+    # config.expand = "xy"
+
 
     config.slider_values = {
         'A': (0, 100, 50),
