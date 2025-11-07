@@ -334,7 +334,6 @@ class BButton(QGraphicsObject):
                 self._cursor_modifier = CursorModifier(
                     trigger_widget=self.slider_handle,
                     axis="x",
-                    bg_color=QColor(70, 70, 70, 200),
                     target = None,
                     cursor_type=("invisible"),
                     anchor="center",
