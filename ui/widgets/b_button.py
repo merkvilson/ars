@@ -675,8 +675,7 @@ class BButton(QGraphicsObject):
         if self.incremental_value:
             # Use accumulated offset from cursor modifier
             distance = self._cursor_modifier.get_accumulated_offset().x()
-            sensitivity = self.incremental_value / max_val
-            delta = (distance / self._bounding.width()) * (max_val - min_val) * sensitivity
+            delta = distance * (self.incremental_value / 10)
             new_value = self._initial_slider_value + delta
             self._slider_value = max(min_val, min(max_val, new_value))
             self._update_additional_text()

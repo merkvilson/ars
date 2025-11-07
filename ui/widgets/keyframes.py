@@ -48,7 +48,7 @@ class KeyframesWidget(QWidget):
             font=QFont("Arial", 14, QFont.Weight.Bold),
             slider_values=(0, 999, self.frame_count),
             slider_color=QColor(0, 0, 0, 0),
-            incremental_value=5,
+            incremental_value=1,
             show_value=False,
             callbackL=self.update_frame_count
         )
