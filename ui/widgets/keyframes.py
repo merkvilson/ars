@@ -10,7 +10,7 @@ from .b_button import BButton, BButtonConfig
 def clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
-class TimelineWidget(QWidget):
+class KeyframesWidget(QWidget):
     def __init__(self, frame_count=50, parent=None):
         super().__init__(parent)
         self.frame_count = frame_count
@@ -70,7 +70,7 @@ class TimelineWidget(QWidget):
         # Geometry
         width = float(self.width())
         height = float(self.height())
-        timeline_y = height / 2.0
+        keyframe_y = height / 2.0
         center_x = width / 2.0
         radius = 22.0
         diameter = 2.0 * radius
@@ -115,7 +115,7 @@ class TimelineWidget(QWidget):
                 alpha_rad = math.asin(sin_arg)
                 alpha_deg = math.degrees(alpha_rad)
 
-                arc_rect = QRectF(center_x - R, timeline_y - R, 2.0 * R, 2.0 * R)
+                arc_rect = QRectF(center_x - R, keyframe_y - R, 2.0 * R, 2.0 * R)
 
                 path_left = QPainterPath()
                 start_left = 180.0 - alpha_deg

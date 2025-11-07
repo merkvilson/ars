@@ -1,12 +1,12 @@
 import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
-from ui.widgets.timeline import TimelineWidget
+from ui.widgets.keyframes import KeyframesWidget
 from prefs.pref_controller import get_path
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 
-BBL_TIMELINE_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
-def BBL_TIMELINE(self, position):
+BBL_KEYFRAMES_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
+def BBL_KEYFRAMES(self, position):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
@@ -16,10 +16,10 @@ def BBL_TIMELINE(self, position):
 
     options_list = ["1","   ", "A","   ","2"]
 
-    timeline_widget = TimelineWidget()
-    timeline_widget.setFixedSize(600, 140)
+    keyframes_widget = KeyframesWidget()
+    keyframes_widget.setFixedSize(600, 140)
 
-    config.custom_widget_items = {"A": timeline_widget,}
+    config.custom_widget_items = {"A": keyframes_widget,}
 
     config.image_items = {
     "1": r" ",
