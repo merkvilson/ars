@@ -18,7 +18,6 @@ class ViewportWidget(QWidget):
         super().__init__(parent)
         self.setStyleSheet("border: none; background-color: black;")
         self._canvas = scene.SceneCanvas(keys=None, bgcolor=(39/255, 41/255, 45/255, 1), size=(100,100), show=False)
-        #self.fps_counter = FPSCounter(self._canvas, self._canvas.native)
 
         self._view = self._canvas.central_widget.add_view()
         bounds = ((-150, 150), (0.5, 100), (-150, 150))
