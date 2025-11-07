@@ -102,7 +102,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     def swap_imge(self):
-        image_path = os.path.join(get_path('input'), "vp_screenshot.png")
+        image_path = os.path.join(get_path('input'), "vp_screenshot.png")       
         if self.viewport.isVisible():
             def post_screenshot():
                 ctx.update_item(ic.ICON_IMAGE, "image_path", image_path)
@@ -113,7 +113,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
                     if hasattr(self, 'img') and self.img:
                         self.img.open_image(latest_file)
                 self.swap_widgets()
-            
+                if full_paths: self.img.fit_image()
             make_screenshot(self, callback=post_screenshot, x=200, y=200, name="vp_screenshot.png")
         else:
             self.swap_widgets()
@@ -129,7 +129,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_SAVE: lambda: save_output("render"),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
-        ic.ICON_IMAGE: lambda: (swap_imge(self), self.img.fit_image()),
+        ic.ICON_IMAGE: lambda: swap_imge(self),
 
     }
 

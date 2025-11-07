@@ -45,12 +45,14 @@ def main(self):
         val = int(val)
         images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
         images_list = os.listdir(images_path)
-        if images_list:
-            # Map slider value (0-100) to image index (0 to len-1)
-            max_index = len(images_list) - 1
-            image_index = int((val / 100) * max_index)
-            selected_image = images_list[image_index]
-            image_path = os.path.join(images_path, selected_image)
+        if not images_list:
+            return
+        
+        # Map slider value (0-100) to image index (0 to len-1)
+        max_index = len(images_list) - 1
+        image_index = int((val / 100) * max_index)
+        selected_image = images_list[image_index]
+        image_path = os.path.join(images_path, selected_image)
         self.img.open_image(image_path)
 
 
