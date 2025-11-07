@@ -338,7 +338,9 @@ class BButton(QGraphicsObject):
                     target = None,
                     cursor_type=("invisible"),
                     anchor="center",
-                    teleport_back=self.incremental_value)
+                    teleport_back=self.incremental_value,
+                    infinite_movement=True)
+
 
 
         # Ripple effect
@@ -672,10 +674,8 @@ class BButton(QGraphicsObject):
             return
         min_val, max_val, _ = self.slider_values
         if self.incremental_value:
-            # Distance-based incremental adjustment
-            distance = pos.x() - self.slider_handle.initial_click_x
-            # Use incremental_value as sensitivity multiplier
-            # Positive distance = increase, negative = decrease
+            # Use accumulated offset from cursor modifier
+            distance = self._cursor_modifier.get_accumulated_offset().x()
             sensitivity = self.incremental_value / max_val
             delta = (distance / self._bounding.width()) * (max_val - min_val) * sensitivity
             new_value = self._initial_slider_value + delta

@@ -136,6 +136,7 @@ class CursorModifier(QObject):
                  anchor: str = "top_left",
                  axis: str = "xy",
                  mouse_button: Qt.MouseButton = Qt.MouseButton.LeftButton,
+                 infinite_movement: bool = False,
                  parent: QObject | None = None):
         super().__init__(parent)
         if axis not in ("xy", "x", "y"):
@@ -150,6 +151,8 @@ class CursorModifier(QObject):
         self.bg_color = bg_color
         self.anchor = anchor
         self.axis = axis
+        self.infinite_movement = infinite_movement
+        
         self._cursor_variants: list[QCursor] = []
         self._custom_cursor: QCursor | None = None
         if isinstance(cursor_type, str):
@@ -165,6 +168,11 @@ class CursorModifier(QObject):
         self._start_pos: QPoint | None = None
         self._icon_widget: CursorIconWidget | None = None
         self._current_cursor_obj: QCursor | None = None
+        
+        # For infinite movement tracking
+        self._last_global_pos: QPoint | None = None
+        self._accumulated_offset = QPoint(0, 0)
+        
         self._has_install = hasattr(self.trigger_widget, "installEventFilter") and callable(getattr(self.trigger_widget, "installEventFilter"))
         if self._has_install:
             try:
@@ -178,6 +186,14 @@ class CursorModifier(QObject):
 
     def _make_cursor(self, name: str) -> QCursor:
         return create_qcursor(name, self.bg_color, self.anchor)
+    
+    def get_accumulated_offset(self) -> QPoint:
+        """Returns the accumulated offset when infinite_movement is enabled."""
+        return QPoint(self._accumulated_offset) if self.infinite_movement else QPoint(0, 0)
+    
+    def reset_accumulated_offset(self):
+        """Resets the accumulated offset to zero."""
+        self._accumulated_offset = QPoint(0, 0)
 
     def _start_modification(self):
         if self._is_active:
@@ -187,6 +203,19 @@ class CursorModifier(QObject):
         self._start_pos = QPoint(self._original_pos)
         self._lock_pos = QPoint(self.target_pos) if self.target_pos is not None else QPoint(self._original_pos)
         self._current_cursor_obj = self._custom_cursor or (self._cursor_variants[0] if self._cursor_variants else None)
+        
+        # Initialize infinite movement tracking
+        if self.infinite_movement:
+            # Get screen center for cursor reset point
+            screen = QApplication.primaryScreen()
+            if screen:
+                self._reset_center = screen.geometry().center()
+            else:
+                self._reset_center = QPoint(960, 540)  # Fallback
+            # Start cursor at center
+            QCursor.setPos(self._reset_center)
+            self._last_global_pos = self._reset_center
+            self._accumulated_offset = QPoint(0, 0)
 
         if self.axis in ('x', 'y') and self._current_cursor_obj:
             QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
@@ -209,19 +238,35 @@ class CursorModifier(QObject):
     def _stop_modification(self):
         if not self._is_active:
             return
-        if self._icon_widget and self._current_cursor_obj:
-            hotspot = self._current_cursor_obj.hotSpot()
-            final_pos = self._icon_widget.pos() + hotspot
-            QCursor.setPos(final_pos)
-            self._icon_widget.hide()
-            self._icon_widget.deleteLater()
-            self._icon_widget = None
-        QApplication.restoreOverrideCursor()
-        if self.teleport_back and self._original_pos is not None:
-            QCursor.setPos(self._original_pos)
+        
+        # For infinite movement, restore cursor to original starting position
+        if self.infinite_movement:
+            if self._icon_widget:
+                self._icon_widget.hide()
+                self._icon_widget.deleteLater()
+                self._icon_widget = None
+            QApplication.restoreOverrideCursor()
+            # Teleport back to where user originally clicked
+            if self._original_pos is not None:
+                QCursor.setPos(self._original_pos)
+        else:
+            # Normal behavior for non-infinite movement
+            if self._icon_widget and self._current_cursor_obj:
+                hotspot = self._current_cursor_obj.hotSpot()
+                final_pos = self._icon_widget.pos() + hotspot
+                QCursor.setPos(final_pos)
+                self._icon_widget.hide()
+                self._icon_widget.deleteLater()
+                self._icon_widget = None
+            QApplication.restoreOverrideCursor()
+            if self.teleport_back and self._original_pos is not None:
+                QCursor.setPos(self._original_pos)
+        
         self._original_pos = None
         self._lock_pos = None
         self._start_pos = None
+        self._last_global_pos = None
+        self._accumulated_offset = QPoint(0, 0)
         self._is_active = False
 
     def _is_press_on_graphics_trigger(self, watched_obj, event: QMouseEvent) -> bool:
@@ -251,6 +296,17 @@ class CursorModifier(QObject):
 
         if self._is_active and event.type() == QEvent.Type.MouseMove and isinstance(event, QMouseEvent):
             current_pos = event.globalPosition().toPoint()
+            
+            # Handle infinite movement - accumulate delta then reset cursor to center
+            if self.infinite_movement:
+                delta = current_pos - self._last_global_pos
+                self._accumulated_offset += delta
+                
+                # Reset cursor to center for next movement
+                QCursor.setPos(self._reset_center)
+                self._last_global_pos = self._reset_center
+                current_pos = self._reset_center
+            
             if self._icon_widget:
                 hotspot = self._current_cursor_obj.hotSpot()
                 new_widget_pos = QPoint()
