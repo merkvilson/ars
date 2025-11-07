@@ -48,7 +48,7 @@ class SliderHandle(QGraphicsRectItem):
         self._is_dragging = False
         self._drag_button = None
         self.is_incremental = parent.incremental_value
-        self.drag_offset = 0.0
+        self.initial_click_x = 0.0
 
     def mousePressEvent(self, event):
         if self.parent_button.slider_values and self.parent_button.editable:
@@ -56,11 +56,12 @@ class SliderHandle(QGraphicsRectItem):
             self._drag_button = event.button()
             self.parent_button._is_dragging = True
             self.parent_button._drag_button = self._drag_button
-            self.drag_offset = event.pos().x()
+            self.initial_click_x = event.pos().x()
             self.grabMouse()
             if self.is_incremental:
-                self.parent_button.update_timer.start()
-            self.parent_button._update_slider_value(self.mapToParent(event.pos()))
+                self.parent_button._initial_slider_value = self.parent_button._slider_value
+            else:
+                self.parent_button._update_slider_value(self.mapToParent(event.pos()))
             event.accept()
 
     def mouseReleaseEvent(self, event):
@@ -75,7 +76,6 @@ class SliderHandle(QGraphicsRectItem):
             self.parent_button._drag_button = None
 
             if self.is_incremental:
-                self.parent_button.update_timer.stop()
                 self.parent_button._snap_handle_to_center()
             event.accept()
 
@@ -317,7 +317,7 @@ class BButton(QGraphicsObject):
         if self.slider_values and interact:
             self.slider_handle = SliderHandle(self)
             self.center_x = self._bounding.center().x()
-            self.current_offset = 0.0
+            self._initial_slider_value = self._slider_value
             cy = self._bounding.center().y()
             h = self._bounding.height()
 
@@ -327,11 +327,6 @@ class BButton(QGraphicsObject):
             self.slider_handle.setBrush(QBrush(QColor(0, 0, 0, 0)))
             self.slider_handle.setPen(QPen(Qt.PenStyle.NoPen))
 
-            if self.incremental_value:
-                self.update_timer = QTimer(self)
-                self.update_timer.setInterval(50)
-                self.update_timer.timeout.connect(self._increment_value)
-
             self._update_handle_position()
             self.slider_handle.setZValue(1.0)
 
@@ -339,9 +334,9 @@ class BButton(QGraphicsObject):
                 self._cursor_modifier = CursorModifier(
                     trigger_widget=self.slider_handle,
                     axis="x",
-                    bg_color=QColor(70, 70, 70, 200) if self.incremental_value else None,
+                    bg_color=QColor(70, 70, 70, 200),
                     target = None,
-                    cursor_type=("arrow-bar-both","arrow-bar-left","arrow-bar-right") ,
+                    cursor_type=("arrow-bar-both","arrow-bar-left","arrow-bar-right"),
                     anchor="center",
                     teleport_back=self.incremental_value)
 
@@ -677,66 +672,47 @@ class BButton(QGraphicsObject):
             return
         min_val, max_val, _ = self.slider_values
         if self.incremental_value:
-            desired_x = pos.x() - self.slider_handle.drag_offset
-            left_limit = self._bounding.left() + self.handle_r
-            right_limit = self._bounding.right() - self.handle_r
-            clamped_x = max(left_limit, min(desired_x, right_limit))
-            self.slider_handle.setPos(QPointF(clamped_x, self._bounding.center().y()))
-            self.current_offset = desired_x - self.center_x
+            # Distance-based incremental adjustment
+            distance = pos.x() - self.slider_handle.initial_click_x
+            # Use incremental_value as sensitivity multiplier
+            # Positive distance = increase, negative = decrease
+            sensitivity = self.incremental_value / max_val
+            delta = (distance / self._bounding.width()) * (max_val - min_val) * sensitivity
+            new_value = self._initial_slider_value + delta
+            self._slider_value = max(min_val, min(max_val, new_value))
+            self._update_additional_text()
+            self._trigger_callback()
+            self.update()
         else:
             relative_x = pos.x() - self._bounding.left()
             progress_ratio = relative_x / self._bounding.width()
             progress_ratio = max(0.0, min(1.0, progress_ratio))
             self._slider_value = min_val + progress_ratio * (max_val - min_val)
             self._update_additional_text()
-            if self._drag_button == Qt.MouseButton.LeftButton and self.callbackL:
-                if len(inspect.signature(self.callbackL).parameters) > 0:
-                    self.callbackL(self._slider_value)
-                else:
-                    self.callbackL()
-            elif self._drag_button == Qt.MouseButton.RightButton and self.callbackR:
-                if len(inspect.signature(self.callbackR).parameters) > 0:
-                    self.callbackR(self._slider_value)
-                else:
-                    self.callbackR()
-            elif self._drag_button == Qt.MouseButton.MiddleButton and self.callbackM:
-                if len(inspect.signature(self.callbackM).parameters) > 0:
-                    self.callbackM(self._slider_value)
-                else:
-                    self.callbackM()
+            self._trigger_callback()
             self.update()
 
-    def _increment_value(self):
-        if not self._is_dragging or not self.slider_values:
-            return
-        min_val, max_val, _ = self.slider_values
-        half_width = self._bounding.width() / 2
-        normalized = self.current_offset / half_width
-        delta = normalized * (max_val - min_val) * (self.incremental_value/(max_val*100))
-        new_value = max(min_val, min(max_val, self._slider_value + delta))
-        if new_value != self._slider_value:
-            self._slider_value = new_value
-            self._update_additional_text()
-            self.update()
-            if self._drag_button == Qt.MouseButton.LeftButton and self.callbackL:
-                if len(inspect.signature(self.callbackL).parameters) > 0:
-                    self.callbackL(self._slider_value)
-                else:
-                    self.callbackL()
-            elif self._drag_button == Qt.MouseButton.RightButton and self.callbackR:
-                if len(inspect.signature(self.callbackR).parameters) > 0:
-                    self.callbackR(self._slider_value)
-                else:
-                    self.callbackR()
-            elif self._drag_button == Qt.MouseButton.MiddleButton and self.callbackM:
-                if len(inspect.signature(self.callbackM).parameters) > 0:
-                    self.callbackM(self._slider_value)
-                else:
-                    self.callbackM()
+    def _trigger_callback(self):
+        """Helper method to trigger the appropriate callback based on drag button."""
+        if self._drag_button == Qt.MouseButton.LeftButton and self.callbackL:
+            if len(inspect.signature(self.callbackL).parameters) > 0:
+                self.callbackL(self._slider_value)
+            else:
+                self.callbackL()
+        elif self._drag_button == Qt.MouseButton.RightButton and self.callbackR:
+            if len(inspect.signature(self.callbackR).parameters) > 0:
+                self.callbackR(self._slider_value)
+            else:
+                self.callbackR()
+        elif self._drag_button == Qt.MouseButton.MiddleButton and self.callbackM:
+            if len(inspect.signature(self.callbackM).parameters) > 0:
+                self.callbackM(self._slider_value)
+            else:
+                self.callbackM()
 
     def _snap_handle_to_center(self):
+        """Reset handle to center position after incremental drag ends."""
         self.slider_handle.setPos(QPointF(self.center_x, self._bounding.center().y()))
-        self.current_offset = 0.0
         self.update()
 
     def _update_handle_position(self):
