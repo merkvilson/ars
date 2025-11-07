@@ -336,7 +336,7 @@ class BButton(QGraphicsObject):
                     axis="x",
                     bg_color=QColor(70, 70, 70, 200),
                     target = None,
-                    cursor_type=("arrow-bar-both","arrow-bar-left","arrow-bar-right"),
+                    cursor_type=("invisible"),
                     anchor="center",
                     teleport_back=self.incremental_value)
 
