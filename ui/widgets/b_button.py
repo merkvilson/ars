@@ -324,7 +324,7 @@ class BButton(QGraphicsObject):
             handle_size = 300
             self.handle_r = handle_size / 2
             self.slider_handle.setRect(QRectF(-self.handle_r, self._bounding.top() - cy, handle_size, h))
-            self.slider_handle.setBrush(QBrush(QColor(255, 255, 255, 0)))
+            self.slider_handle.setBrush(QBrush(QColor(0, 0, 0, 0)))
             self.slider_handle.setPen(QPen(Qt.PenStyle.NoPen))
 
             if self.incremental_value:
