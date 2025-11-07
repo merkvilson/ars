@@ -31,8 +31,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.use_extended_shape = False
     config.distribution_mode = "x"
     config.anchor = "+y"
-    config.custom_height = 260 + (350 if default_object == self else 0)
-    config.custom_width = 410
+    config.custom_height = 260 + (300 if default_object == self else 0)
+    config.custom_width = 450
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
 
@@ -49,8 +49,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
     if default_object == self: options_list.insert(0, [ic.ICON_IMAGE])
     config.image_items = {ic.ICON_IMAGE: r" "}
-    config.use_extended_shape_items = {ic.ICON_IMAGE: (9, 6)}
-    # config.per_item_radius = { ic.ICON_IMAGE: 50,}
+    config.use_extended_shape_items = {ic.ICON_IMAGE: (9.5, 6)}
+    config.per_item_radius = { ic.ICON_IMAGE: 23,}
 
     config.slider_values = {
         ic.ICON_STEPS: (1, 50, default_object.steps),
@@ -145,7 +145,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     prompt_widget.text_edit.setPlainText(default_object.prompt)
     prompt_widget.text_edit.textChanged.connect(set_text_from_prompt)
 
-    prompt_widget.setFixedSize(400, 140)
+    prompt_widget.setFixedSize(440, 140)
 
     config.custom_widget_items = {"prompt_widget": prompt_widget}
 
