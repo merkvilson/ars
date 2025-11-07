@@ -145,8 +145,8 @@ class BButtonConfig:
     toggle_values: Optional[Any] = None
     toggle_color: QColor = field(default_factory=lambda: QColor(100, 120, 170, 200))
     toggle_hover_color: QColor = field(default_factory=lambda: QColor(120, 150, 255, 230))
-    toggle_disabled_color: QColor = field(default_factory=lambda: QColor(0, 0, 0, 100))
-    toggle_disabled_hover_color: QColor = field(default_factory=lambda: QColor(0, 0, 50, 100))
+    toggle_disabled_color: QColor = field(default_factory=lambda: QColor(0, 0, 10, 100))
+    toggle_disabled_hover_color: QColor = field(default_factory=lambda: QColor(60, 75, 125, 200))
     show_value: bool = False
     show_symbol: bool = True
     editable: bool = True
