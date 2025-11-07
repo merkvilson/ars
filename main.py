@@ -22,7 +22,7 @@ class Application:
     def run(self) -> None:
         self._app = QApplication(sys.argv)
         self._main_window = MainWindow()
-        self._main_window.resize(1280, 720)
+        self._main_window.resize(1920, 1080)
         self._main_window.show()
         #self._main_window.showMaximized()
         #self._main_window.showFullScreen()
