@@ -145,6 +145,8 @@ class BButtonConfig:
     toggle_values: Optional[Any] = None
     toggle_color: QColor = field(default_factory=lambda: QColor(100, 120, 170, 200))
     toggle_hover_color: QColor = field(default_factory=lambda: QColor(120, 150, 255, 230))
+    toggle_disabled_color: QColor = field(default_factory=lambda: QColor(0, 0, 0, 100))
+    toggle_disabled_hover_color: QColor = field(default_factory=lambda: QColor(0, 0, 50, 100))
     show_value: bool = False
     show_symbol: bool = True
     editable: bool = True
@@ -172,6 +174,8 @@ class BButton(QGraphicsObject):
         self.slider_color = config.slider_color
         self.toggle_color = config.toggle_color
         self.toggle_hover_color = config.toggle_hover_color
+        self.toggle_disabled_color = config.toggle_disabled_color
+        self.toggle_disabled_hover_color = config.toggle_disabled_hover_color
         self.show_value = config.show_value
         self.show_symbol = config.show_symbol
         self.editable = config.editable
@@ -416,6 +420,9 @@ class BButton(QGraphicsObject):
         if self.toggle_values and self._toggle_value > 0:
             self.normal_color = self.toggle_color
             self.hover_color = self.toggle_hover_color
+        elif self.toggle_values and self._toggle_value == 0:
+            self.normal_color = self.toggle_disabled_color
+            self.hover_color = self.toggle_disabled_hover_color
         else:
             self.normal_color = self.config.color
             self.hover_color = self.config.hover_color
