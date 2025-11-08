@@ -21,10 +21,23 @@ def main(self):
     if not hasattr(self, '_loop_index'):
         self._loop_index = 0
 
+
     config = ContextMenuConfig()
-    config.use_extended_shape_items = {"A": (10, 1)}
+    config.use_extended_shape_items = {"A": (self.width() / (config.item_radius * 2), 1)}
+    config.hover_scale_items = {"A": 0.95}
     config.auto_close = False
-    # config.expand = "xy"
+    config.extra_distance = [0,99999]
+    config.distribution_mode = "x"
+    config.custom_height = 150
+    #config.custom_width = 450
+
+    print(self.width() / (config.item_radius * 2),)
+
+    options_list=    [
+        ["   ", 'A', "   ",],
+        ["   ", "R", "L", "   ",]
+        ]
+    config.expand = "x"
 
 
     config.slider_values = {
@@ -88,6 +101,7 @@ def main(self):
             # Load current frame
             image_path = os.path.join(images_path, images_list[self._loop_index])
             self.img.open_image(image_path)
+            ctx.update_item('A', "progress", (self._loop_index / len(images_list)) * 100 )
             
             # Move to next frame
             self._loop_index = (self._loop_index + 1) % len(images_list)
@@ -137,7 +151,7 @@ def main(self):
 
     ctx = open_context(
         parent=self.central_widget,
-        items=['A',"R","L"],
+        items=options_list,
         position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
