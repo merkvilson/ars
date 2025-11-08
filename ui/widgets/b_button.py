@@ -665,26 +665,22 @@ class BButton(QGraphicsObject):
         super().mouseReleaseEvent(event)
 
     def _update_slider_value(self, pos):
-        if not self.editable or not self.slider_values:
+        if not (self.editable and self.slider_values):
             return
         min_val, max_val, _ = self.slider_values
-        if self.incremental_value:
-            # Use accumulated offset from cursor modifier
+        if self.incremental_value: # Calculate new value using cursor offset
             distance = self._cursor_modifier.get_accumulated_offset().x()
             delta = distance * (self.incremental_value / 100)
             new_value = self._initial_slider_value + delta
-            self._slider_value = max(min_val, min(max_val, new_value))
-            self._update_additional_text()
-            self._trigger_callback()
-            self.update()
-        else:
+        else: # Calculate new value based on position ratio
             relative_x = pos.x() - self._bounding.left()
             progress_ratio = relative_x / self._bounding.width()
             progress_ratio = max(0.0, min(1.0, progress_ratio))
-            self._slider_value = min_val + progress_ratio * (max_val - min_val)
-            self._update_additional_text()
-            self._trigger_callback()
-            self.update()
+            new_value = min_val + progress_ratio * (max_val - min_val)
+        self._slider_value = max(min_val, min(max_val, new_value))    # Clamp and assign the final value
+        self._update_additional_text()
+        self._trigger_callback()
+        self.update()    # Update visuals and trigger related logic
 
     def _trigger_callback(self):
         """Helper method to trigger the appropriate callback based on drag button."""
