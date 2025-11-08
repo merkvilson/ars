@@ -53,7 +53,7 @@ class ContextMenuConfig:
         self.hover_color = {}
         self.additional_texts = {}
         self.hotkey_items = {}
-        self.use_extended_shape = (4, 1)
+        self.use_extended_shape = True # Options: bool or tuple (width_multiplier, height_multiplier)
         self.use_extended_shape_items = {}
         self.auto_close = True
         self.slider_values = {}
