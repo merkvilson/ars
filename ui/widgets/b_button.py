@@ -4,8 +4,7 @@ from PyQt6.QtWidgets import (
     QGraphicsRectItem,
     QGraphicsItem,
     QGraphicsProxyWidget, 
-    QWidget,
-    )
+    QWidget,)
 
 from PyQt6.QtGui import (
     QPainter,
@@ -23,8 +22,7 @@ from PyQt6.QtCore import (
     QParallelAnimationGroup,
     pyqtProperty,
     QRectF,
-    QPointF,
-    QTimer,)
+    QPointF,)
 
 
 from dataclasses import dataclass, field
@@ -75,8 +73,6 @@ class SliderHandle(QGraphicsRectItem):
             self.parent_button._is_dragging = False
             self.parent_button._drag_button = None
 
-            if self.is_incremental:
-                self.parent_button._snap_handle_to_center()
             event.accept()
 
 
@@ -191,7 +187,7 @@ class BButton(QGraphicsObject):
             self.pixmap = QPixmap(self.image_path) 
             if self.pixmap.isNull():
                 self.pixmap = None
-                print(f"Warning: Failed to load image from {self.image_path}") 
+                print(f"Warning: Failed to load image from '{self.image_path}'") 
 
 
         if self.progress_bar:
@@ -228,7 +224,7 @@ class BButton(QGraphicsObject):
         
 
         if self.use_extended_shape:
-            height = (8 * self.radius) if self.image_path else (2 * self.radius)
+            height = (6 * self.radius) if self.image_path else (2 * self.radius)
             width =  (8 * self.radius)
             if isinstance(self.use_extended_shape, tuple):
                 if self.use_extended_shape[0]: width = (self.use_extended_shape[0] * self.radius) * 2
@@ -323,14 +319,10 @@ class BButton(QGraphicsObject):
             cy = self._bounding.center().y()
             h = self._bounding.height()
 
-            handle_size = 300
+            handle_size = 1300
             self.handle_r = handle_size / 2
             self.slider_handle.setRect(QRectF(-self.handle_r, self._bounding.top() - cy, handle_size, h))
-            self.slider_handle.setBrush(QBrush(QColor(0, 0, 0, 0)))
-            self.slider_handle.setPen(QPen(Qt.PenStyle.NoPen))
 
-            self._update_handle_position()
-            self.slider_handle.setZValue(1.0)
 
             if self.incremental_value: 
                 self._cursor_modifier = CursorModifier(
@@ -668,9 +660,7 @@ class BButton(QGraphicsObject):
         if self._is_dragging:
             self._is_dragging = False
             self._drag_button = None
-            # Update handle position to final value when drag ends
-            if self.slider_values and not self.incremental_value:
-                self._update_handle_position()
+
             self.update()
         super().mouseReleaseEvent(event)
 
@@ -714,18 +704,6 @@ class BButton(QGraphicsObject):
             else:
                 self.callbackM()
 
-    def _snap_handle_to_center(self):
-        """Reset handle to center position after incremental drag ends."""
-        self.slider_handle.setPos(QPointF(self.center_x, self._bounding.center().y()))
-        self.update()
-
-    def _update_handle_position(self):
-        if not self.slider_handle or not self.slider_values:
-            return
-        min_val, max_val, _ = self.slider_values
-        progress_ratio = (self._slider_value - min_val) / (max_val - min_val)
-        handle_x = self.center_x if self.incremental_value else self._bounding.left() + progress_ratio * self._bounding.width()
-        self.slider_handle.setPos(QPointF(handle_x, self._bounding.center().y()))
 
     def _update_additional_text(self):
         if self.additional_text_item and (self.slider_values or self.toggle_values):
