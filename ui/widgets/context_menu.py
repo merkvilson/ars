@@ -33,6 +33,7 @@ class ContextMenuConfig:
         self.start_angle = -math.pi / 2
         self.arc_span = 2 * math.pi
         self.hover_scale = 1.0
+        self.hover_scale_items = {}
         self.distribution_mode = 'y'  # Options: "x", "y", "radial"
         self.anchor = "-y"  # Options: "-y", "+y", "-x", "+x"
         self.close_on_outside = True
@@ -151,7 +152,7 @@ class ContextButtonWindow(QWidget):
                         "font": config.font,
                         "clip_to_shape": config.clip_to_shape,
                         "additional_font": config.additional_font,
-                        "hover_scale": config.hover_scale,
+                        "hover_scale": config.hover_scale_items.get(action, config.hover_scale),
                         "tooltip": config.tooltips.get(action, ""),
                         "callbackL": config.callbackL.get(action),
                         "callbackR": config.callbackR.get(action),
