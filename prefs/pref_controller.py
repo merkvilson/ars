@@ -88,9 +88,18 @@ if read_pref("extra_model_paths") and os.path.exists(read_pref("extra_model_path
 yaml += f"\nairen_nodes:\n    base_path: {get_path('custom_nodes')}\n"
 yaml += "    custom_nodes: custom_nodes"
 
-try:
+
+def create_extra_model_yaml():
+    yaml_dir = os.path.dirname(get_path("extra_model_yaml"))
+    if not os.path.exists(yaml_dir):
+        print("ComfyUI directory not set correctly. Cannot create extra_model_paths.yaml.")
+        return
     with open(get_path("extra_model_yaml"), "w", encoding="utf-8") as file:
         file.write(yaml)
+
+
+try:
+    create_extra_model_yaml()
 except PermissionError:
     # Force create the file by trying alternative methods
     import subprocess
