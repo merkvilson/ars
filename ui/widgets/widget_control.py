@@ -221,7 +221,7 @@ def set_updated_config(widget, key: str, value):
                 widget._update_colors()
                 widget._refresh_color()
                 widget._update_additional_text()
-                widget._update_handle_position()
+                    
                 widget.setAcceptHoverEvents(widget.editable)
                 widget.setAcceptedMouseButtons(Qt.MouseButton.AllButtons if widget.editable else Qt.MouseButton.NoButton)
             else:
@@ -254,7 +254,7 @@ def set_updated_config(widget, key: str, value):
                 if not hasattr(widget, 'slider_handle') or not widget.slider_handle:
                     widget._create_slider_handle()
                 widget._update_additional_text()
-                widget._update_handle_position()
+                    
                 widget._update_colors()
                 widget._refresh_color()
                 widget.update()
@@ -280,7 +280,7 @@ def set_updated_config(widget, key: str, value):
                 widget._slider_value = new_value
                 widget.slider_values = (min_val, max_val, new_value)
                 widget._update_additional_text()
-                widget._update_handle_position()
+                    
                 widget._update_colors()
                 widget._refresh_color()
                 widget.update()
