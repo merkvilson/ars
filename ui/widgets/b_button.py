@@ -228,8 +228,8 @@ class BButton(QGraphicsObject):
         
 
         if self.use_extended_shape:
-            height = (6 * self.radius) if self.image_path else (2 * self.radius)
-            width =  (6 * self.radius)
+            height = (8 * self.radius) if self.image_path else (2 * self.radius)
+            width =  (8 * self.radius)
             if isinstance(self.use_extended_shape, tuple):
                 if self.use_extended_shape[0]: width = (self.use_extended_shape[0] * self.radius) * 2
                 else: width = 8 * self.radius

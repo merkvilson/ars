@@ -218,7 +218,7 @@ def obj_color(self, position, callback=None):
         ic.ICON_IMAGE: obj.texture_path if hasattr(obj, 'texture_path') else None,
         }
     
-    config.use_extended_shape_items = {ic.ICON_IMAGE: (True,True) if obj.texture_path else True, 
+    config.use_extended_shape_items = {ic.ICON_IMAGE: (4, 3) if obj.texture_path else True, 
                                        ic.ICON_CLOSE_RADIAL: False,}
 
     def load_image(image_path):
