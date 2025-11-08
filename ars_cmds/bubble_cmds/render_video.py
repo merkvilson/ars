@@ -35,13 +35,15 @@ def main(self):
 
     options_list=    [
         ["   ", 'A', "   ",],
-        ["   ", "R", "L", "   ",]
+        ["   ", "R", "L", "S","   ",]
         ]
     config.expand = "x"
-
+    config.additional_texts = {"S": "Speed"}
+    
 
     config.slider_values = {
         'A': (0, 100, 50),
+        "S": (1, 100, 40),
     }
     config.show_value_items = {'A': True}
 
@@ -109,7 +111,7 @@ def main(self):
             # Dynamically adjust FPS based on directory
             current_fps = fps
             if images_path == get_path("frames"):
-                current_fps = fps / 4
+                current_fps = fps / ( 10 - (ctx.get_value("S") / 10) + 0.01)
             
             # Update timer interval if it changed
             new_interval = int(1000 / current_fps)
