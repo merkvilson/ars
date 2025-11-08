@@ -44,6 +44,8 @@ class ContextMenuConfig:
         self.callbackL = {}
         self.callbackR = {}
         self.callbackM = {}
+        self.callback_hover_in = {}
+        self.callback_hover_out = {}
         self.callback_on_close = None
         self.tooltips = {}
         self.symbol_colors = {}
@@ -51,7 +53,7 @@ class ContextMenuConfig:
         self.hover_color = {}
         self.additional_texts = {}
         self.hotkey_items = {}
-        self.use_extended_shape = True
+        self.use_extended_shape = (4, 1)
         self.use_extended_shape_items = {}
         self.auto_close = True
         self.slider_values = {}
@@ -154,6 +156,8 @@ class ContextButtonWindow(QWidget):
                         "callbackL": config.callbackL.get(action),
                         "callbackR": config.callbackR.get(action),
                         "callbackM": config.callbackM.get(action),
+                        "callback_hover_in": config.callback_hover_in.get(action),
+                        "callback_hover_out": config.callback_hover_out.get(action),
                         "use_extended_shape": config.use_extended_shape_items.get(action, config.use_extended_shape),
                         "auto_close": config.auto_close,
                         "slider_values": config.slider_values.get(action),

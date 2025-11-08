@@ -136,6 +136,8 @@ class BButtonConfig:
     callbackL: Optional[Callable] = None
     callbackR: Optional[Callable] = None
     callbackM: Optional[Callable] = None
+    callback_hover_in: Optional[Callable] = None
+    callback_hover_out: Optional[Callable] = None
     additional_text: Optional[str] = None
     hotkey_text: Optional[str] = None
     use_extended_shape: bool = False
@@ -571,9 +573,11 @@ class BButton(QGraphicsObject):
             painter.restore()
 
     def hoverEnterEvent(self, event):
+        if not self.editable:return
+
         play_sound("hover")
-        if not self.editable:
-            return
+        if self.config.callback_hover_in:
+            self.config.callback_hover_in()
         self.itemColor = self.hover_color
         self.setScale(self.hover_scale)
         if self.additional_text_item:
@@ -584,8 +588,10 @@ class BButton(QGraphicsObject):
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        if not self.editable:
-            return
+        if not self.editable:return
+
+        if self.config.callback_hover_out:
+            self.config.callback_hover_out()
         was_ripple_active = False
         if self.ripple_anim_group:
             self.ripple_anim_group.stop()
