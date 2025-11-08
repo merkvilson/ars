@@ -41,6 +41,9 @@ def doit(self):
                         "6": lambda: self.render_manager.send_render(),
                         }
 
+    config.callback_hover_in = {"0": lambda: self.CF.UP("render_workflow")}
+    config.callback_hover_out = {"0": lambda: self.CF.UP("render_manager")}
+
     ctx = open_context(
         parent=self.central_widget,
         items=options_list,
