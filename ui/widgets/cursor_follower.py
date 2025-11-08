@@ -51,7 +51,7 @@ class CursorFollowerWidget(QWidget):
         self.hide_timer.setSingleShot(True)
         self.hide_timer.timeout.connect(self.animated_hide)
         
-        self.resize(200, 80)  # Match view size
+        self.resize(250, 80)  # Match view size
         self.hide()  # Start hidden
 
     def UP(self, key = "additional_text", value = "0.0",  symbol = ic.ICON_MSG, auto_close = 1000):
