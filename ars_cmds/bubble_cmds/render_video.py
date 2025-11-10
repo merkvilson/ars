@@ -15,7 +15,7 @@ def BBL_TEST(self, position):
 
 def main(self):
     
-    # Timer and state for loop_gif
+    # Timer and state for play_video
     if not hasattr(self, '_loop_timer'):
         self._loop_timer = None
     if not hasattr(self, '_loop_index'):
@@ -23,43 +23,60 @@ def main(self):
 
 
     config = ContextMenuConfig()
-    config.use_extended_shape_items = {"A": (self.width() / (config.item_radius * 2), 1)}
-    config.hover_scale_items = {"A": 0.95}
+    config.use_extended_shape_items = {"timeline": (self.width() / (40), 1)} #40 stands for item diameter
+    config.hover_scale_items = {"timeline": 0.95}
     config.auto_close = False
+    config.use_extended_shape = False
     config.extra_distance = [0,99999]
     config.distribution_mode = "x"
     config.custom_height = 150
     #config.custom_width = 450
 
-    print(self.width() / (config.item_radius * 2),)
 
     options_list=    [
-        ["   ", 'A', "   ",],
-        ["   ", "R", "L", "S","   ",]
+        ["   ", "timeline", "   ",],
+        [
+        "   ", 
+        ic.ICON_RENDER, 
+        "   ",
+        #ic.ICON_PLAYER_TRACK_BACK,
+        ic.ICON_PLAYER_SKIP_BACK, 
+        ic.ICON_PLAYER_PLAY, 
+        ic.ICON_PLAYER_SKIP_FORWARD, 
+        #ic.ICON_PLAYER_TRACK_NEXT,
+        "   ",
+        ic.ICON_SPEED_UP,
+        "   ",
+        ]
         ]
     config.expand = "x"
-    config.additional_texts = {"S": "Speed"}
+    config.additional_texts = {ic.ICON_SPEED_UP: "Speed"}
     
 
     config.slider_values = {
-        'A': (0, 100, 50),
-        "S": (1, 100, 40),
+        "timeline": (0, 100, 50),
+        ic.ICON_SPEED_UP: (1, 250, 40),
     }
-    config.show_value_items = {'A': True}
+
+    config.per_item_radius = { "timeline": 20,}
 
 
-    def stop_loop():
+    def pause_video():
         # Stop existing timer if running
         if self._loop_timer is not None:
             self._loop_timer.stop()
             self._loop_timer.deleteLater()
             self._loop_timer = None
             print("Loop stopped")
+            ctx.update_item(ic.ICON_PLAYER_PAUSE, "symbol", ic.ICON_PLAYER_PLAY)
+
+            return True
+        
 
 
     def set_img_by_index(val):
         # Stop existing timer if running
-        stop_loop()
+        pause_video()
         
         val = int(val)
         images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
@@ -74,19 +91,22 @@ def main(self):
         image_path = os.path.join(images_path, selected_image)
         self.img.open_image(image_path)
 
+        self._loop_index = image_index
 
 
 
-    def loop_gif(fps=16):
-        print("L pressed")
+    self._loop_index = 0
+
+    def play_video():
+
+        if pause_video(): return
+
+        ctx.update_item(ic.ICON_PLAYER_PLAY, "symbol", ic.ICON_PLAYER_PAUSE)
+
+        fps = ctx.get_value(ic.ICON_SPEED_UP)
         
-        # Stop existing timer if running
-        stop_loop()
         
-
-        self._loop_index = 0
-        
-        def next_frame():
+        def frame_next():
 
             images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
 
@@ -103,16 +123,16 @@ def main(self):
             # Load current frame
             image_path = os.path.join(images_path, images_list[self._loop_index])
             self.img.open_image(image_path)
-            ctx.update_item('A', "progress", (self._loop_index / len(images_list)) * 100 )
+            ctx.update_item("timeline", "progress", (self._loop_index / len(images_list)) * 100 )
             
             # Move to next frame
             self._loop_index = (self._loop_index + 1) % len(images_list)
             
             # Dynamically adjust FPS based on directory
-            current_fps = fps
+            current_fps = ctx.get_value(ic.ICON_SPEED_UP)
             if images_path == get_path("frames"):
-                current_fps = fps / ( 10 - (ctx.get_value("S") / 10) + 0.01)
-            
+                current_fps = ctx.get_value(ic.ICON_SPEED_UP) / 4
+
             # Update timer interval if it changed
             new_interval = int(1000 / current_fps)
             if self._loop_timer and self._loop_timer.interval() != new_interval:
@@ -120,7 +140,7 @@ def main(self):
         
         # Create and start timer
         self._loop_timer = QTimer()
-        self._loop_timer.timeout.connect(next_frame)
+        self._loop_timer.timeout.connect(frame_next)
         
         # Initial interval calculation
         initial_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
@@ -131,7 +151,9 @@ def main(self):
         print(f"Loop started at {initial_fps} fps")
         
         # Show first frame immediately
-        next_frame()
+        frame_next()
+
+        
 
     
     def start_render():
@@ -141,13 +163,26 @@ def main(self):
 
         self.render_manager.send_render()
         
-        loop_gif(fps=16)
+        play_video()
 
-    
+    def frame_next():
+        frame = ctx.get_value("timeline")
+        set_img_by_index(frame + 1)
+        ctx.update_item("timeline", "progress", frame + 1)
+
+    def frame_back():
+        frame = ctx.get_value("timeline")
+        set_img_by_index(frame - 1)
+        ctx.update_item("timeline", "progress", frame - 1)
+
     config.callbackL = {
-        'A': lambda val: set_img_by_index(val),
-        'R': lambda: start_render(),
-        'L': lambda: loop_gif(),
+        "timeline": lambda val: set_img_by_index(val),
+        ic.ICON_RENDER: lambda: start_render(),
+        ic.ICON_PLAYER_TRACK_BACK: lambda: set_img_by_index(0),
+        ic.ICON_PLAYER_SKIP_BACK: lambda: frame_back(),
+        ic.ICON_PLAYER_SKIP_FORWARD: lambda: frame_next(),
+
+        ic.ICON_PLAYER_PLAY: lambda: play_video(),
         }
 
 
