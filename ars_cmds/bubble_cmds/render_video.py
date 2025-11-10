@@ -8,6 +8,7 @@ from prefs.pref_controller import get_path
 import os
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.render_cmds.check import check_queue
+from ars_cmds.core_cmds.key_check import key_check_continuous
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(self, position):
@@ -179,9 +180,9 @@ def main(self):
     config.callbackL = {
         "timeline": lambda val: set_img_by_index(val),
         ic.ICON_RENDER: lambda: start_render(),
-        ic.ICON_PLAYER_TRACK_BACK: lambda: set_img_by_index(0),
-        ic.ICON_PLAYER_SKIP_BACK: lambda: frame_back(),
-        ic.ICON_PLAYER_SKIP_FORWARD: lambda: frame_next(),
+
+        ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
+        ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
 
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
         }
