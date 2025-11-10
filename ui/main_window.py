@@ -44,7 +44,6 @@ class MainWindow(QMainWindow):
 
     def execute_startup_commands(self):
         def startup_commands(self):
-            self.hierarchy.call_toggle_minimize()
             self.bubbles_overlay.load_layout(os.path.join("saved_layouts", "bubble_layout.arsl"))
             define_hotkeys(self)
             self.viewport.grid.start_animation(duration=2)

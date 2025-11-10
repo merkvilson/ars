@@ -8,31 +8,10 @@ from PyQt6.QtWidgets import (
     QMenu, 
     QApplication
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QPoint
+from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QIcon, QAction, QFont
 from theme import StyleSheets
 from util_functions.colorize_png import colorize_icon
-
-
-def toggle_minimize(anim_max, anim_min, animation_group,
-                    is_minimized, full_height,):
-
-    if is_minimized:
-        # Expand
-        anim_max.setStartValue(0)
-        anim_max.setEndValue(full_height)
-        anim_min.setStartValue(0)
-        anim_min.setEndValue(full_height)
-    else:
-        # Collapse
-        anim_max.setStartValue(full_height)
-        anim_max.setEndValue(0)
-        anim_min.setStartValue(full_height)
-        anim_min.setEndValue(0)
-
-    animation_group.start()
-    is_minimized = not is_minimized
-    return is_minimized
 
 
 class HierarchyTree(QTreeWidget):
@@ -110,26 +89,8 @@ class ObjectHierarchyWindow(QWidget):
 
         self.layout.addWidget(self.tree)
 
-        # Animation setup
-        self.is_minimized = False
-        self.full_height = self.container.height()
-        self._animation_group = QParallelAnimationGroup(self)
-        self.anim_max = QPropertyAnimation(self.container, b"maximumHeight")
-        self.anim_min = QPropertyAnimation(self.container, b"minimumHeight")
-        for anim in [self.anim_max, self.anim_min]:
-            anim.setDuration(250)
-        self._animation_group.addAnimation(self.anim_max)
-        self._animation_group.addAnimation(self.anim_min)
-
         # Populate from existing objects
         self.populate_from_manager()
-
-    def call_toggle_minimize(self):
-        """Wrapper to call toggle_minimize with instance attributes."""
-        self.is_minimized = toggle_minimize(
-            self.anim_max, self.anim_min, self._animation_group,
-            self.is_minimized, self.full_height,
-        )
 
     def populate_from_manager(self):
         self.tree.clear()
