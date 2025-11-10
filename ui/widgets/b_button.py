@@ -180,7 +180,8 @@ class BButton(QGraphicsObject):
         self.progress_bar = config.progress_bar
         self.incremental_value = config.incremental_value
 
-
+        if len(self.symbol) > 2: self.show_symbol = False
+        
         self.image_path = config.image_path  
         self.pixmap = None 
         if self.image_path:
@@ -316,13 +317,8 @@ class BButton(QGraphicsObject):
             self.slider_handle = SliderHandle(self)
             self.center_x = self._bounding.center().x()
             self._initial_slider_value = self._slider_value
-            cy = self._bounding.center().y()
-            h = self._bounding.height()
 
-            handle_size = 1300
-            self.handle_r = handle_size / 2
-            self.slider_handle.setRect(QRectF(-self.handle_r, self._bounding.top() - cy, handle_size, h))
-
+            self.slider_handle.setRect(QRectF(-9999/2, -50/2, 9999, 50))
 
             if self.incremental_value: 
                 self._cursor_modifier = CursorModifier(
