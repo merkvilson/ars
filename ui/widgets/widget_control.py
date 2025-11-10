@@ -281,8 +281,8 @@ def set_updated_config(widget, key: str, value):
                 widget.slider_values = (min_val, max_val, new_value)
                 widget._update_additional_text()
                     
-                widget._update_colors()
-                widget._refresh_color()
+                #widget._update_colors()
+                #widget._refresh_color()
                 widget.update()
 
 
