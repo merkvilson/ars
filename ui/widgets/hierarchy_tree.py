@@ -4,12 +4,10 @@ from PyQt6.QtWidgets import (
     QTreeWidget, 
     QTreeWidgetItem, 
     QHeaderView,
-    QPushButton, 
     QMenu, 
-    QApplication
 )
 from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QIcon, QAction, QFont
+from PyQt6.QtGui import QAction
 from theme import StyleSheets
 from util_functions.colorize_png import colorize_icon
 
