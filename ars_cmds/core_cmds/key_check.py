@@ -56,7 +56,7 @@ def key_check_continuous(callback=None, key='l', interval=100, callback_start=No
             check_timer.deleteLater()
     
     check_timer.timeout.connect(check_key_state)
-    check_timer.start(interval)
+    check_timer.start(int(interval))
     
     # Execute once immediately
     check_key_state()
