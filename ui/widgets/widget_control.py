@@ -344,4 +344,4 @@ def set_updated_config(widget, key: str, value):
             widget.update()
 
     else:
-        raise ValueError(f"Unsupported widget type: {type(widget)}")
+        print(f"Unsupported widget type: {type(widget)}")
