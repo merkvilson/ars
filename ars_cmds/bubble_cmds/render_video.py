@@ -31,7 +31,7 @@ def main(self):
     config.use_extended_shape = False
     config.extra_distance = [0,99999]
     config.distribution_mode = "x"
-    config.custom_height = 150
+    config.custom_height = 110
     #config.custom_width = 450
 
 
@@ -57,7 +57,7 @@ def main(self):
 
     config.slider_values = {
         "timeline": (0, 100, 50),
-        ic.ICON_SPEED_UP: (1, 250, 40),
+        ic.ICON_SPEED_UP: (1, 60, 30),
     }
 
     config.per_item_radius = { "timeline": 20,}
@@ -91,7 +91,7 @@ def main(self):
         image_index = int((val / 100) * max_index)
         selected_image = images_list[image_index]
         image_path = os.path.join(images_path, selected_image)
-        self.img.open_image(image_path)
+        self.img.open_image(image_path, auto_fit=False)
 
         self._loop_index = image_index
 
@@ -124,7 +124,7 @@ def main(self):
             
             # Load current frame
             image_path = os.path.join(images_path, images_list[self._loop_index])
-            self.img.open_image(image_path)
+            self.img.open_image(image_path, auto_fit=False)
             ctx.update_item("timeline", "progress", (self._loop_index / len(images_list)) * 100 )
             
             # Move to next frame

@@ -101,7 +101,7 @@ class ImageViewerWidget(QWidget):
     def fit_image(self):
         self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
 
-    def open_image(self, file_path=None):
+    def open_image(self, file_path=None, auto_fit=True):
         if not file_path:
             file_path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
         if file_path:
@@ -115,7 +115,8 @@ class ImageViewerWidget(QWidget):
             padding = 500.0
             self.scene.setSceneRect(-padding - pixmap.width() / 2, -padding - pixmap.height() / 2, pixmap.width() + 2 * padding, pixmap.height() + 2 * padding)
             self.view.image_rect = item.sceneBoundingRect()
-            self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
+            if auto_fit:
+                self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
             self.view._user_interacted = False  # Reset flag on new load
 
     def resizeEvent(self, event):
