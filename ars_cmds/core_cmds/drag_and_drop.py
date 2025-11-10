@@ -11,6 +11,11 @@ from .run_ext import run_ext
 def dd_drag(self, event):
 
     files = [u.toLocalFile() for u in event.mimeData().urls()]
+    
+    if not files:
+        event.ignore()
+        return
+    
     first_file = os.path.basename(files[0])
     count = len(files)
     one = count == 1
