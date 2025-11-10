@@ -1,4 +1,4 @@
-from ars_cmds.core_cmds.key_check import key_check
+from ars_cmds.core_cmds.key_check import key_check_continuous
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -26,37 +26,12 @@ def main(self, position):
     "2": "Button 2",
     }
 
-    check_timer = None
-
     def on_button_1_pressed():
-        nonlocal check_timer
-        print("Button 1 was pressed!")
-        
-        # Stop any existing timer
-        if check_timer is not None:
-            check_timer.stop()
-            check_timer.deleteLater()
-        
-        # Create a new timer to check key state
-        check_timer = QTimer()
-        
-        def check_key_state():
-            if key_check("left"):
-                print("Left mouse button is being held down!")
-            else:
-                # Stop timer when key is released
-                print("Left mouse button released.")
-                check_timer.stop()
-                check_timer.deleteLater()
-        
-        check_timer.timeout.connect(check_key_state)
-        check_timer.start(100)  # Check every 100 milliseconds
-        
-        # Also execute once immediately
-        check_key_state()
+        print("Button 1 pressed")
+
 
     config.callbackL = {
-        "1": lambda: on_button_1_pressed(),
+        "1": lambda: key_check_continuous(callback=on_button_1_pressed),
         "2": lambda: print("Button 2 pressed"),
     }
 
