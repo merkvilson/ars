@@ -9,8 +9,8 @@ import os
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.render_cmds.check import check_queue
 
-BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
-def BBL_TEST(self, position):
+BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
+def BBL_VIDEO(self, position):
     run_ext(__file__, self)
 
 def main(self):
@@ -26,6 +26,7 @@ def main(self):
     config.use_extended_shape_items = {"timeline": (self.width() / (40), 1)} #40 stands for item diameter
     config.hover_scale_items = {"timeline": 0.95}
     config.auto_close = False
+    config.close_on_outside = False
     config.use_extended_shape = False
     config.extra_distance = [0,99999]
     config.distribution_mode = "x"

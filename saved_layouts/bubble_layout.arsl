@@ -51,13 +51,13 @@
             "grid_y": 0
         },
         {
-            "symbol": "\ue948",
-            "grid_x": 1,
+            "symbol": "\ue902",
+            "grid_x": 8,
             "grid_y": 0
         },
         {
-            "symbol": "\ue902",
-            "grid_x": 8,
+            "symbol": "\ue948",
+            "grid_x": 1,
             "grid_y": 0
         },
         {
@@ -66,13 +66,13 @@
             "grid_y": 0
         },
         {
-            "symbol": "9",
-            "grid_x": 2,
+            "symbol": "\ue943",
+            "grid_x": 4,
             "grid_y": 0
         },
         {
-            "symbol": "\ue943",
-            "grid_x": 4,
+            "symbol": "\ue93a",
+            "grid_x": 25,
             "grid_y": 0
         },
         {
@@ -87,8 +87,8 @@
         },
         {
             "symbol": "\ue90e",
-            "grid_x": 25,
-            "grid_y": 0
+            "grid_x": 0,
+            "grid_y": 4
         },
         {
             "symbol": "\ue99b",
