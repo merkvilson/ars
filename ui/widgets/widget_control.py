@@ -116,10 +116,6 @@ def set_updated_config(widget, key: str, value):
                 widget.update()
         
 
-        elif key == "tooltip":
-            widget.setToolTip(value)
-        
-
         elif key == "callbackL":
             widget.callbackL = value
         

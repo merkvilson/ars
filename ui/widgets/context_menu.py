@@ -48,7 +48,6 @@ class ContextMenuConfig:
         self.callback_hover_in = {}
         self.callback_hover_out = {}
         self.callback_on_close = None
-        self.tooltips = {}
         self.symbol_colors = {}
         self.color = {}
         self.hover_color = {}
@@ -153,7 +152,6 @@ class ContextButtonWindow(QWidget):
                         "clip_to_shape": config.clip_to_shape,
                         "additional_font": config.additional_font,
                         "hover_scale": config.hover_scale_items.get(action, config.hover_scale),
-                        "tooltip": config.tooltips.get(action, ""),
                         "callbackL": config.callbackL.get(action),
                         "callbackR": config.callbackR.get(action),
                         "callbackM": config.callbackM.get(action),

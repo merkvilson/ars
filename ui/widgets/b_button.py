@@ -128,7 +128,6 @@ class BButtonConfig:
     font: QFont = field(default_factory=lambda: get_font(16))
     additional_font: QFont = field(default_factory=lambda: QFont("Arial", 10))
     hover_scale: float = 1.0
-    tooltip: str = ""
     callbackL: Optional[Callable] = None
     callbackR: Optional[Callable] = None
     callbackM: Optional[Callable] = None
@@ -263,7 +262,6 @@ class BButton(QGraphicsObject):
         self.hover_scale = float(config.hover_scale)
         self.setScale(self.original_scale)
         self.setOpacity(1.0)
-        self.setToolTip(config.tooltip if not self.additional_text and not self.hotkey_text else "")
 
         self.setTransformOriginPoint(self.boundingRect().center())
 
