@@ -2,7 +2,6 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt, QTimer
 import os
 
-from ui.widgets.hierarchy_tree import ObjectHierarchyWindow
 from ars_3d_engine.viewport import ViewportWidget
 from ui.widgets.bubble_layout import FloatingBubblesManager
 from core.render_data import RenderDataManager
@@ -74,12 +73,6 @@ class MainWindow(QMainWindow):
         # Initialize hotkey_manager
         self.hotkey_manager = HotkeyManager(self.viewport._canvas.native)
 
-        # Add hierarchy panel (top-right)
-        self.hierarchy = ObjectHierarchyWindow(self.viewport)
-        self.hierarchy.setParent(self.central_widget)
-        self.hierarchy.show()
-        #self.hierarchy.hide()
-
         # Floating bubbles overlay
         self.bubbles_overlay = FloatingBubblesManager(parent=self.central_widget)
         self.bubbles_overlay.setGeometry(self.central_widget.rect())
@@ -110,10 +103,8 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        # Update hierarchy window position
-        self.hierarchy.move(self.width() - self.hierarchy.width() - 5, 5)
-        # Make the overlay always cover the central widget
-        if self.bubbles_overlay:
+
+        if self.bubbles_overlay: # Make the overlay always cover the central widget
             self.bubbles_overlay.setGeometry(self.centralWidget().rect())
             self.bubbles_overlay.reinitialize_bubbles()
 

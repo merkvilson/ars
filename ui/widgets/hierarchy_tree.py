@@ -53,7 +53,6 @@ class ObjectHierarchyWindow(QWidget):
         self.container.setGeometry(0, 0, self.width(), self.height())
 
         self.layout = QVBoxLayout(self.container)
-        self.layout.setContentsMargins(0, 90, 0, 0)
 
         # Tree widget
         self.tree = HierarchyTree(self.container)

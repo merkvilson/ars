@@ -1,3 +1,49 @@
+from ars_cmds.core_cmds.key_check import key_check_continuous
+from ui.widgets.context_menu import ContextMenuConfig, open_context
+from theme.fonts import font_icons as ic
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
+from ars_cmds.core_cmds.load_object import selected_object
+from PyQt6.QtCore import QPoint, QTimer
+from ui.widgets.hierarchy_tree import ObjectHierarchyWindow
+
+
+BBL_LIST_CONFIG ={"symbol": ic.ICON_LIST }
 def BBL_LIST(self, position):
-	pass
-	#self.hierarchy.call_toggle_minimize()
+    run_ext(__file__, self)
+
+
+def main(self, position):
+    config = ContextMenuConfig()
+    config.expand = "y"
+    config.auto_close = False
+    config.close_on_outside = False
+
+
+    options_list = [
+        ["1", "hierarchy"],
+    ]
+    
+    hierarchy = ObjectHierarchyWindow(self.viewport)
+
+    config.custom_widget_items = {"hierarchy": hierarchy}
+
+    config.additional_texts = {
+    "1": "Close Hierarchy",
+    }
+
+
+    config.callbackL = {
+        "1": lambda: ctx.close_animated(),
+    }
+
+    ctx = open_context(
+        parent=self.central_widget,
+        items=options_list,
+        position=position,
+        config=config
+    )
+
+
+def execute_plugin(window):
+    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))
