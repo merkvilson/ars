@@ -4,10 +4,8 @@ from PyQt6.QtWidgets import (
     QTreeWidget, 
     QTreeWidgetItem, 
     QHeaderView,
-    QMenu, 
 )
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
 from theme import StyleSheets
 from util_functions.colorize_png import colorize_icon
 
@@ -72,10 +70,6 @@ class ObjectHierarchyWindow(QWidget):
 
         # Context menu
         self.tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-
-        # Set icons
-        self.icon_expand = colorize_icon(r"theme/icons/objects.png", "white")
-        self.icon_collapse = colorize_icon(r"theme/icons/objects.png", "white")
 
         # Connect signals
         self.manager.object_added.connect(self.on_object_added)
