@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QColor, QFont, QBrush, QPen, QPixmap
+from PyQt6.QtGui import QColor, QBrush, QPen, QPixmap
 from PyQt6.QtWidgets import QGraphicsTextItem, QGraphicsItem
 from PyQt6.QtCore import Qt, QRectF
 
@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QRectF
 
 def set_updated_config(widget, key: str, value):
     # Import widget classes inside the function to avoid circular imports
-    from .b_button import BButton, RoundedRectOutline
+    from .b_button import BButton
 
     # Common color conversion for keys ending with '_color'
     if key.endswith("_color") and isinstance(value, str):
