@@ -55,7 +55,7 @@ class ObjectHierarchyWindow(QWidget):
         self.container.setGeometry(0, 0, self.width(), self.height())
 
         self.layout = QVBoxLayout(self.container)
-        self.layout.setContentsMargins(0, 60, 0, 0)
+        self.layout.setContentsMargins(0, 90, 0, 0)
 
         # Tree widget
         self.tree = HierarchyTree(self.container)
@@ -72,7 +72,6 @@ class ObjectHierarchyWindow(QWidget):
 
         # Context menu
         self.tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.tree.customContextMenuRequested.connect(self.open_context_menu)
 
         # Set icons
         self.icon_expand = colorize_icon(r"theme/icons/objects.png", "white")
@@ -113,7 +112,33 @@ class ObjectHierarchyWindow(QWidget):
     def on_object_added(self, index, obj):
         uid = id(obj)
         self.id_to_obj[uid] = obj
-        self.add_tree_item(index, obj, uid)
+        
+        # Check if object has a parent
+        parent_obj = getattr(obj, '_parent', None)
+        if parent_obj:
+            # Find parent's tree item
+            parent_uid = id(parent_obj)
+            parent_item, _ = self.find_item_by_uid(parent_uid)
+            if parent_item:
+                # Add as child of parent
+                item = QTreeWidgetItem([obj.name])
+                item.setIcon(0, self.get_icon_for(obj))
+                item.setData(0, Qt.ItemDataRole.UserRole, uid)
+                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+                parent_item.addChild(item)
+                parent_item.setExpanded(True)
+                return
+        
+        # Add as top-level item - calculate correct position
+        top_level_index = 0
+        for i in range(index):
+            if i < len(self.manager._objects):
+                check_obj = self.manager._objects[i]
+                # Only count objects without parents (top-level objects)
+                if not getattr(check_obj, '_parent', None):
+                    top_level_index += 1
+        
+        self.add_tree_item(top_level_index, obj, uid)
 
     def find_item_by_uid(self, uid):
         def search(parent_item=None):
@@ -163,7 +188,8 @@ class ObjectHierarchyWindow(QWidget):
             obj = self.id_to_obj.get(uid)
             if obj:
                 index = self.manager._objects.index(obj)
-                self.manager.set_active(index)
+                # Set selection state which triggers selection_changed signal
+                self.manager.set_selection_state([index], index)
 
     def on_item_renamed(self, item, column):
         if column == 0:
@@ -213,47 +239,3 @@ class ObjectHierarchyWindow(QWidget):
 
         self.manager._objects = all_objs
         self.manager._rebuild_picking()
-
-    # Update bold for selected items (non-recursive bug fix)
-    def update_bold(self):
-        # Reset all
-        def reset(item):
-            f = item.font(0)
-            f.setBold(False)
-            item.setFont(0, f)
-            for i in range(item.childCount()):
-                reset(item.child(i))
-
-        for i in range(self.tree.topLevelItemCount()):
-            reset(self.tree.topLevelItem(i))
-
-        # Apply bold only to selected
-        for item in self.tree.selectedItems():
-            f = item.font(0)
-            f.setBold(True)
-            item.setFont(0, f)
-
-    # Context menu for rename/delete
-    def open_context_menu(self, pos: QPoint):
-        item = self.tree.itemAt(pos)
-        if not item:
-            return
-
-        menu = QMenu(self)
-        rename_action = QAction("Rename", self)
-        delete_action = QAction("Delete", self)
-
-        rename_action.triggered.connect(lambda: self.tree.editItem(item, 0))
-        delete_action.triggered.connect(lambda: self.delete_item(item))
-
-        menu.addAction(rename_action)
-        menu.addAction(delete_action)
-        menu.exec(self.tree.viewport().mapToGlobal(pos))
-
-    def delete_item(self, item: QTreeWidgetItem):
-        uid = item.data(0, Qt.ItemDataRole.UserRole)
-        obj = self.id_to_obj.get(uid)
-        if obj:
-            index = self.manager._objects.index(obj)
-            self.viewport.remove_object_at(index)
-        # The removal from tree is handled by the object_removed signal
