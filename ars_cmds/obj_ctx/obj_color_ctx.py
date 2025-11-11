@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import QFileDialog
 from ars_cmds.core_cmds.load_object import selected_object
 from PyQt6.QtGui import QCursor, QColor
 from PyQt6.QtCore import QPoint
+from ars_cmds.core_cmds.key_check import key_check_continuous
 
 from ars_cmds.util_cmds.color_convert import rgb_to_hsv, hsv_to_rgb
 
@@ -147,7 +148,7 @@ def obj_color(self, position, callback=None):
     config = ContextMenuConfig()
     config.anchor = "+y"
     config.close_on_outside = False
-    config.auto_close = True
+    config.auto_close = False
 #
     options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_CLOSE_RADIAL,]
 
@@ -235,11 +236,8 @@ def obj_color(self, position, callback=None):
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self))
     }
 
-    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
-    }
-    config.slider_values = {ic.ICON_CLOSE_RADIAL: (0,1,0)}
-    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
-
+    def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
 
 
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]

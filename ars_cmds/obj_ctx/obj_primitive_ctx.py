@@ -1,5 +1,6 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
+from ars_cmds.core_cmds.key_check import key_check_continuous
 
 
 from PyQt6.QtGui import QCursor, QColor
@@ -17,7 +18,7 @@ def obj_primitive_ctx(self, position, callback):
     config = ContextMenuConfig()
     config.anchor = "+y"
     config.close_on_outside = False
-    config.auto_close = True
+    config.auto_close = False
     config.show_value = True
 
 
@@ -56,7 +57,6 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_RADIUS_INNER: (0,10,0),
         ic.ICON_LOD3: (1,50,30),
         ic.ICON_ANGLE: (0,360,360),
-        ic.ICON_CLOSE_RADIAL: (0,1,0),
         }
 
     
@@ -72,12 +72,8 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
     }
 
-    config.callbackR = { 
-        ic.ICON_CLOSE_RADIAL: lambda value: ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
-    }
-
-    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
-
+    def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
 
 
     ctx = open_context(

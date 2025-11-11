@@ -56,7 +56,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.slider_values = {
         ic.ICON_STEPS: (1, 50, default_object.steps),
         ic.ICON_GIZMO_SCALE: (25, 1024, 512),
-       # ic.ICON_CLOSE_RADIAL: (0,1,0),
 
     }
 
@@ -133,11 +132,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_IMAGE: lambda: swap_imge(self),
 
     }
-    def move_ctx():
-        ctx.move(  self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
+    def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
 
-    config.slider_color = {ic.ICON_CLOSE_RADIAL: QColor(150, 150, 150, 0)}
 
 
     def set_text_from_prompt():

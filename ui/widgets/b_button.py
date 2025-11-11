@@ -56,10 +56,11 @@ class SliderHandle(QGraphicsRectItem):
             self.parent_button._drag_button = self._drag_button
             self.initial_click_x = event.pos().x()
             self.grabMouse()
-            if self.is_incremental:
-                self.parent_button._initial_slider_value = self.parent_button._slider_value
-            else:
-                self.parent_button._update_slider_value(self.mapToParent(event.pos()))
+            if event.button() == Qt.MouseButton.LeftButton:
+                if self.is_incremental:
+                    self.parent_button._initial_slider_value = self.parent_button._slider_value
+                else:
+                    self.parent_button._update_slider_value(self.mapToParent(event.pos()))
             event.accept()
 
     def mouseReleaseEvent(self, event):
@@ -67,6 +68,9 @@ class SliderHandle(QGraphicsRectItem):
             self.parent_button.ripple_center = self.mapToParent(event.pos())
             self.parent_button._start_ripple()
             self.ungrabMouse()
+
+            if event.button() != Qt.MouseButton.LeftButton:
+                self.parent_button._trigger_callback()
 
             self._is_dragging = False
             self._drag_button = None
@@ -78,8 +82,9 @@ class SliderHandle(QGraphicsRectItem):
 
     def mouseMoveEvent(self, event):
         if self._is_dragging and self.parent_button.slider_values and self.parent_button.editable:
-            parent_pos = self.mapToParent(event.pos())
-            self.parent_button._update_slider_value(parent_pos)
+            if self._drag_button == Qt.MouseButton.LeftButton:
+                parent_pos = self.mapToParent(event.pos())
+                self.parent_button._update_slider_value(parent_pos)
             event.accept()
 
     def paint(self, painter, option, widget=None):
