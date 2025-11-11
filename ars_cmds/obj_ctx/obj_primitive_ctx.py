@@ -14,6 +14,8 @@ def obj_primitive_ctx(self, position, callback):
         return
     obj = selected[0]
 
+    ptp = obj.primitive_type
+
 
     config = ContextMenuConfig()
     config.anchor = "+y"
@@ -21,15 +23,22 @@ def obj_primitive_ctx(self, position, callback):
     config.auto_close = False
     config.show_value = True
 
+    objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus']
+
+    xyz_size_objs = ["cube", "plane", ]
+    radius_objs = ["cylinder", "cone", "sphere", 'torus', ]
+    radius_inner_objs = ["disc", 'torus', ]
+    lod_objs = ["sphere", "cylinder", "cone", "disc", "torus", ]
+    angle_objs = ["sphere", ]
 
     options_list = [
-        ic.ICON_AXIS_X,
-        ic.ICON_AXIS_Y,
-        ic.ICON_AXIS_Z,
-        ic.ICON_RADIUS,
-        ic.ICON_RADIUS_INNER,
-        ic.ICON_LOD3,
-        ic.ICON_ANGLE,
+        ic.ICON_AXIS_X if ptp in xyz_size_objs else None,
+        ic.ICON_AXIS_Y if ptp in xyz_size_objs else None,
+        ic.ICON_AXIS_Z if ptp in xyz_size_objs else None,
+        ic.ICON_RADIUS if ptp in radius_objs else None,
+        ic.ICON_RADIUS_INNER if ptp in radius_inner_objs else None,
+        ic.ICON_LOD3 if ptp in lod_objs else None,
+        ic.ICON_ANGLE if ptp in angle_objs else None,
         ic.ICON_CLOSE_RADIAL,
     ]
 
