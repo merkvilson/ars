@@ -127,29 +127,14 @@ class CPrimitive(CGeometry):
         
         # Generate PyVista mesh based on type
         if primitive_type == 'sphere':
-            pv_mesh = pv.Sphere(
-            radius = radius,
-            center = (0.0, 0.0, 0.0),
-            direction = direction,
-            theta_resolution = lod,
-            phi_resolution = lod,
-            start_theta = slice_start,
-            end_theta = 360.0,
-            start_phi = 0.0,
-            end_phi = 180.0,
-            )
-
-
+            pv_mesh = pv.Sphere(radius=radius, center=(0.0, 0.0, 0.0), direction=direction, theta_resolution=lod, phi_resolution=lod, start_theta=slice_start, end_theta=360.0, start_phi=0.0, end_phi=180.0)
         elif primitive_type == 'cube':
             pv_mesh = pv.Cube(center=(0, 0, 0), x_length=width, y_length=height, z_length=depth)
         elif primitive_type == 'plane':
             pv_mesh = pv.Plane(center=(0, 0, 0), i_size=width, j_size=height, direction=direction)
         elif primitive_type == 'cylinder':
-            if radius_inner < 0.005:
-                pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
-            else:
-                pv_mesh = pv.CylinderStructured( radius=np.linspace(radius_inner, radius, lod), height=height, theta_resolution=lod, z_resolution=lod, direction=direction)
-
+            if radius_inner < 0.005: pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
+            else: pv_mesh = pv.CylinderStructured( radius=np.linspace(radius_inner, radius, lod), height=height, theta_resolution=lod, z_resolution=lod, direction=direction)
         elif primitive_type == 'cone':
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction, capping=True)
         elif primitive_type == 'pyramid':
@@ -159,9 +144,8 @@ class CPrimitive(CGeometry):
             if radius_inner == radius: radius+=0.01  # Avoid zero-area disc
             pv_mesh = pv.Disc(center=(0, 0, 0), inner=radius_inner, outer=radius, normal=direction, r_res=lod, c_res=lod)
         elif primitive_type == 'torus':
-            # If radius_inner is 0, use radius/2 as cross-section, otherwise use radius_inner
             cross_radius = radius_inner if radius_inner > 0 else 0.01
-            pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=cross_radius, v_res=lod, u_res=lod, w_res=lod)
+            pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=cross_radius, v_res=lod, u_res=lod, w_res=lod, )
             pv_mesh.rotate_x(90, inplace=True)
         else:
             raise ValueError(f"Unknown primitive type: {primitive_type}")
