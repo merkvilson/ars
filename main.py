@@ -18,7 +18,7 @@ class Application:
     def __init__(self):
         self._app = None
         self._main_window = None
-    
+
     def run(self) -> None:
         self._app = QApplication(sys.argv)
         self._main_window = MainWindow()

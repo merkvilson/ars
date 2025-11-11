@@ -1,21 +1,19 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
-from PyQt6.QtCore import Qt, QTimer
 import os
 
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
+
 from ars_3d_engine.viewport import ViewportWidget
-from ui.widgets.bubble_layout import FloatingBubblesManager
-from core.render_data import RenderDataManager
-from ui.widgets.cursor_follower import CursorFollowerWidget
-
-from hotkeys.hotkey_manager import HotkeyManager
-from ars_cmds.core_cmds.distribute_bubbles import distribute_bubbles
 from ars_cmds.core_cmds.define_hotkeys import define_hotkeys
+from ars_cmds.core_cmds.distribute_bubbles import distribute_bubbles
 from ars_cmds.core_cmds.drag_and_drop import dd_drag, dd_drop
-
-from .img_viewer import ImageViewerWidget
 from core.cursor_modifier import set_default_cursor
-
+from core.render_data import RenderDataManager
 from core.sound_manager import play_sound
+from hotkeys.hotkey_manager import HotkeyManager
+from ui.widgets.bubble_layout import FloatingBubblesManager
+from ui.widgets.cursor_follower import CursorFollowerWidget
+from ui.img_viewer import ImageViewerWidget
 
 
 class MainWindow(QMainWindow):

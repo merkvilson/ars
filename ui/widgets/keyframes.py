@@ -1,10 +1,9 @@
-import sys
 import math
-from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QWidget, QSlider, QHBoxLayout, QGraphicsView, QGraphicsScene
-)
-from PyQt6.QtCore import Qt, QRectF
-from PyQt6.QtGui import QPainter, QColor, QFont, QPainterPath, QPen
+
+from PyQt6.QtCore import QRectF, Qt
+from PyQt6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
+from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView, QVBoxLayout, QWidget
+
 from .b_button import BButton, BButtonConfig
 
 def clamp(v, lo, hi):

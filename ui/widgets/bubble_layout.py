@@ -1,11 +1,10 @@
-import sys
 import math
 
 from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QPoint, QPointF, pyqtSignal, QRectF, pyqtProperty, QParallelAnimationGroup
-from PyQt6.QtGui import QPainter, QBrush, QColor, QPen, QFont, QPainterPath, QCursor
-from PyQt6.QtWidgets import QWidget, QApplication, QCheckBox
+from PyQt6.QtGui import QPainter, QBrush, QColor, QPen, QPainterPath, QCursor
+from PyQt6.QtWidgets import QWidget
 
-import theme.fonts.new_fonts as RRRFONT
+from theme.fonts.new_fonts import get_font
 
 import json
 import os
@@ -21,7 +20,7 @@ class BubbleConfig:
         self.callbackM = lambda: print("middle clicked")
         self.radius = 22
         self.symbol_color = QColor(255, 255, 255, 220)
-        self.font = RRRFONT.get_font(20)
+        self.font = get_font(20)
 
 class BubbleWidget(QWidget):
     bubble_moved = pyqtSignal(object)
