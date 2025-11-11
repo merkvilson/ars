@@ -39,18 +39,18 @@ def BBL_OBJECT(self, position):
     }
 
     config.additional_texts = {
-        ic.ICON_OBJ_TXT_ABC:   'Text',
-        ic.ICON_OBJ_SPRITE: '2D Sprite',
-        ic.ICON_OBJ_BOX:   'Cube', 
-        ic.ICON_OBJ_SPHERE: 'Sphere', 
+        ic.ICON_OBJ_TXT_ABC:  'Text',
+        ic.ICON_OBJ_SPRITE:   '2D Sprite',
+        ic.ICON_OBJ_BOX:      'Cube', 
+        ic.ICON_OBJ_SPHERE:   'Sphere', 
         ic.ICON_OBJ_CYLINDER: 'Cylinder',
-        ic.ICON_OBJ_CONE:   'Cone',
-        ic.ICON_OBJ_PYRAMID: 'Pyramid',
-        ic.ICON_OBJ_PLANE: 'Plane',
-        ic.ICON_OBJ_DISC: 'Disc',
-        ic.ICON_OBJ_TORUS: 'Torus',
-        ic.ICON_FILE_3D: 'Load Object',
-        ic.ICON_ORIGAMI: 'Test Mesh',
+        ic.ICON_OBJ_CONE:     'Cone',
+        ic.ICON_OBJ_PYRAMID:  'Pyramid',
+        ic.ICON_OBJ_PLANE:    'Plane',
+        ic.ICON_OBJ_DISC:     'Disc',
+        ic.ICON_OBJ_TORUS:    'Torus',
+        ic.ICON_FILE_3D:      'Load Object',
+        ic.ICON_ORIGAMI:      'Test Mesh',
     }
 
     config.hotkey_items = {
