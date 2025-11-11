@@ -23,14 +23,14 @@ def obj_primitive_ctx(self, position, callback):
     config.auto_close = False
     config.show_value = True
 
-    objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus', 'tube']
+    objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus', ]
 
     size_x_objs = ["cube", "plane", ]
-    size_y_objs = ["cube", "cylinder", "cone", "tube",]
+    size_y_objs = ["cube", "cylinder", "cone", ]
     size_z_objs = ["cube", "plane", ]
-    radius_objs = ["cylinder", "cone", "sphere", 'torus', 'tube']
-    radius_inner_objs = ["disc", 'torus', 'tube', ]
-    lod_objs = ["sphere", "cylinder", "cone", "disc", "torus", "tube"]
+    radius_objs = ["cylinder", "cone", "sphere", 'torus']
+    radius_inner_objs = ["disc", 'torus', 'cylinder',]
+    lod_objs = ["sphere", "cylinder", "cone", "disc", "torus"]
     angle_objs = ["sphere", ]
 
     options_list = [

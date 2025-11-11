@@ -145,7 +145,11 @@ class CPrimitive(CGeometry):
         elif primitive_type == 'plane':
             pv_mesh = pv.Plane(center=(0, 0, 0), i_size=width, j_size=height, direction=direction)
         elif primitive_type == 'cylinder':
-            pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
+            if radius_inner < 0.005:
+                pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
+            else:
+                pv_mesh = pv.CylinderStructured( radius=np.linspace(radius_inner, radius, lod), height=height, theta_resolution=lod, z_resolution=lod, direction=direction)
+
         elif primitive_type == 'cone':
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction, capping=True)
         elif primitive_type == 'pyramid':
@@ -159,9 +163,6 @@ class CPrimitive(CGeometry):
             cross_radius = radius_inner if radius_inner > 0 else 0.01
             pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=cross_radius, v_res=lod, u_res=lod, w_res=lod)
             pv_mesh.rotate_x(90, inplace=True)
-        elif primitive_type == 'tube':
-            pv_mesh = pv.CylinderStructured( radius=np.linspace(radius_inner, radius, lod), height=height, theta_resolution=lod, z_resolution=lod, direction=direction)
-
         else:
             raise ValueError(f"Unknown primitive type: {primitive_type}")
         
