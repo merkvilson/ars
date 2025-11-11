@@ -33,7 +33,7 @@ def BBL_OBJECT(self, position):
         ic.ICON_OBJ_PYRAMID:       lambda: add_primitive(self, primitive_type='pyramid', animated=True      ),
         ic.ICON_OBJ_PLANE:         lambda: add_primitive(self, primitive_type='plane', animated=True        ),
         ic.ICON_OBJ_DISC:          lambda: add_primitive(self, primitive_type='disc', animated=True         ),
-        ic.ICON_OBJ_TORUS:         lambda: add_primitive(self, primitive_type='torus', animated=True        ),
+        ic.ICON_OBJ_TORUS:         lambda: add_primitive(self, primitive_type='torus', radius_inner = 0.25, animated=True        ),
         ic.ICON_ORIGAMI:           lambda: add_mesh(self, os.path.join("res","mesh files", "origami.obj"  ), animated = True),
         ic.ICON_FILE_3D:           lambda: add_mesh(self),
     }
