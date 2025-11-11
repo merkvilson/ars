@@ -1,21 +1,21 @@
-from ars_cmds.core_cmds.key_check import key_check_continuous
-from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts import font_icons as ic
-from ui.widgets.multi_line_input import MultiLineInputWidget
-from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
-from PyQt6.QtGui import QCursor
-from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
-from ars_cmds.mesh_gen.generate_mesh import generate_mesh
-from prefs.pref_controller import get_path
-from PyQt6.QtCore import QPoint
 import os
-from PyQt6.QtGui import QColor
-from ars_cmds.core_cmds.load_object import selected_object
-from ars_cmds.render_cmds.generate_render import generate_render
-from ars_cmds.render_cmds.render_pass import save_depth, save_render
+
+from PyQt6.QtCore import QPoint
+from PyQt6.QtGui import QCursor
+
+from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
+from ars_cmds.core_cmds.key_check import key_check_continuous
+from ars_cmds.mesh_gen.generate_mesh import generate_mesh
 from ars_cmds.render_cmds.check import check_queue
-from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
+from ars_cmds.render_cmds.render_pass import save_depth, save_render
+from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
+from prefs.pref_controller import get_path
+from theme.fonts import font_icons as ic
+from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.multi_line_input import MultiLineInputWidget
 
 def prompt_ctx(self, position, default_object = None, callback = None):
 

@@ -2,7 +2,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.key_check import key_check_continuous
 
-from PyQt6.QtGui import QCursor, QColor
+from PyQt6.QtGui import QCursor
 from PyQt6.QtCore import QPoint
 
 def obj_scale(self, position, callback):
@@ -41,12 +41,12 @@ def obj_scale(self, position, callback):
     }
 
     config.slider_values = {
-        ic.ICON_AXIS_X: (1,10000,obj.get_scale()[0]*100),
-        ic.ICON_AXIS_Y: (1,10000,obj.get_scale()[1]*100),
-        ic.ICON_AXIS_Z: (1,10000,obj.get_scale()[2]*100),
+        ic.ICON_AXIS_X: (0.01,10000,obj.get_scale()[0]*100),
+        ic.ICON_AXIS_Y: (0.01,10000,obj.get_scale()[1]*100),
+        ic.ICON_AXIS_Z: (0.01,10000,obj.get_scale()[2]*100),
         }
 
-    config.incremental_values = {ic.ICON_AXIS_X: 100, ic.ICON_AXIS_Y: 100, ic.ICON_AXIS_Z: 100,}
+    config.incremental_values = {ic.ICON_AXIS_X: 3, ic.ICON_AXIS_Y: 3, ic.ICON_AXIS_Z: 3,}
     
     config.callbackL = {
         ic.ICON_AXIS_X:       lambda value: obj.set_scale((value/100, obj.get_scale()[1], obj.get_scale()[2])),

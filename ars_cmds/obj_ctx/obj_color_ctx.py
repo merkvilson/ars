@@ -1,19 +1,14 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts import font_icons as ic
-import numpy as np
-import theme.fonts.new_fonts as RRRFONT
+from PyQt6.QtCore import QPoint, QRectF, Qt
+from PyQt6.QtGui import QColor, QCursor, QLinearGradient, QPainter, QPen
+from PyQt6.QtWidgets import QFileDialog, QSlider, QStyle, QStyleOptionSlider
 from vispy.color import Color as VispyColor
-from PyQt6.QtWidgets import QWidget, QSlider, QHBoxLayout, QLabel, QStyleOptionSlider, QStyle
-from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
-from PyQt6.QtCore import Qt, QRectF
-from core.sound_manager import play_sound
-from PyQt6.QtWidgets import QFileDialog
-from ars_cmds.core_cmds.load_object import selected_object
-from PyQt6.QtGui import QCursor, QColor
-from PyQt6.QtCore import QPoint
-from ars_cmds.core_cmds.key_check import key_check_continuous
 
-from ars_cmds.util_cmds.color_convert import rgb_to_hsv, hsv_to_rgb
+from ars_cmds.core_cmds.key_check import key_check_continuous
+from ars_cmds.core_cmds.load_object import selected_object
+from ars_cmds.util_cmds.color_convert import hsv_to_rgb, rgb_to_hsv
+from core.sound_manager import play_sound
+from theme.fonts import font_icons as ic
+from ui.widgets.context_menu import ContextMenuConfig, open_context
 
 class HSVSlider(QSlider):
     """

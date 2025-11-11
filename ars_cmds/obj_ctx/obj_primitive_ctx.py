@@ -3,7 +3,7 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.key_check import key_check_continuous
 
 
-from PyQt6.QtGui import QCursor, QColor
+from PyQt6.QtGui import QCursor
 from PyQt6.QtCore import QPoint
 
 def obj_primitive_ctx(self, position, callback):
