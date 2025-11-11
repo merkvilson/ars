@@ -23,18 +23,20 @@ def obj_primitive_ctx(self, position, callback):
     config.auto_close = False
     config.show_value = True
 
-    objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus']
+    objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus', 'tube']
 
-    xyz_size_objs = ["cube", "plane", ]
-    radius_objs = ["cylinder", "cone", "sphere", 'torus', ]
-    radius_inner_objs = ["disc", 'torus', ]
-    lod_objs = ["sphere", "cylinder", "cone", "disc", "torus", ]
+    size_x_objs = ["cube", "plane", ]
+    size_y_objs = ["cube", "cylinder", "cone", "tube",]
+    size_z_objs = ["cube", "plane", ]
+    radius_objs = ["cylinder", "cone", "sphere", 'torus', 'tube']
+    radius_inner_objs = ["disc", 'torus', 'tube', ]
+    lod_objs = ["sphere", "cylinder", "cone", "disc", "torus", "tube"]
     angle_objs = ["sphere", ]
 
     options_list = [
-        ic.ICON_AXIS_X if ptp in xyz_size_objs else None,
-        ic.ICON_AXIS_Y if ptp in xyz_size_objs else None,
-        ic.ICON_AXIS_Z if ptp in xyz_size_objs else None,
+        ic.ICON_AXIS_X if ptp in size_x_objs else None,
+        ic.ICON_AXIS_Y if ptp in size_y_objs else None,
+        ic.ICON_AXIS_Z if ptp in size_z_objs else None,
         ic.ICON_RADIUS if ptp in radius_objs else None,
         ic.ICON_RADIUS_INNER if ptp in radius_inner_objs else None,
         ic.ICON_LOD3 if ptp in lod_objs else None,
@@ -59,11 +61,11 @@ def obj_primitive_ctx(self, position, callback):
     }
 
     config.slider_values = {
-        ic.ICON_AXIS_X: (1,10,1),
-        ic.ICON_AXIS_Y: (1,10,1),
-        ic.ICON_AXIS_Z: (1,10,1),
-        ic.ICON_RADIUS: (1,10,1),
-        ic.ICON_RADIUS_INNER: (0,10,0),
+        ic.ICON_AXIS_X: (0.001,10,1),
+        ic.ICON_AXIS_Y: (0.001,10,1),
+        ic.ICON_AXIS_Z: (0.001,10,1),
+        ic.ICON_RADIUS: (0.001,10,1),
+        ic.ICON_RADIUS_INNER: (0.001,10,0),
         ic.ICON_LOD3: (1,50,30),
         ic.ICON_ANGLE: (0,360,360),
         }

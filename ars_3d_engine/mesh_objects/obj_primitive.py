@@ -147,7 +147,7 @@ class CPrimitive(CGeometry):
         elif primitive_type == 'cylinder':
             pv_mesh = pv.Cylinder(radius=radius, height=height, resolution=lod, direction=direction)
         elif primitive_type == 'cone':
-            pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction, capping = True)
+            pv_mesh = pv.Cone(radius=radius, height=height, resolution=lod, direction=direction, capping=True)
         elif primitive_type == 'pyramid':
             pv_mesh = pv.Cone(radius=radius, height=height, resolution=4, direction=direction)
             pv_mesh.rotate_y(45, inplace=True)
@@ -159,12 +159,19 @@ class CPrimitive(CGeometry):
             cross_radius = radius_inner if radius_inner > 0 else 0.01
             pv_mesh = pv.ParametricTorus(ringradius=radius, crosssectionradius=cross_radius, v_res=lod, u_res=lod, w_res=lod)
             pv_mesh.rotate_x(90, inplace=True)
+        elif primitive_type == 'tube':
+            pv_mesh = pv.CylinderStructured( radius=np.linspace(radius_inner, radius, lod), height=height, theta_resolution=lod, z_resolution=lod, direction=direction)
+
         else:
             raise ValueError(f"Unknown primitive type: {primitive_type}")
         
         # Always triangulate to ensure consistent face format
-        pv_mesh = pv_mesh.triangulate()
+        
+        # Ensure we have a PolyData object (some primitives like CylinderStructured return UnstructuredGrid)
+        if not isinstance(pv_mesh, pv.PolyData):
+            pv_mesh = pv_mesh.extract_surface()
 
+        pv_mesh = pv_mesh.triangulate()
         # Compute normals BEFORE generating texture coordinates
         # because compute_normals with split_vertices=True creates new vertices
         pv_mesh.compute_normals(
