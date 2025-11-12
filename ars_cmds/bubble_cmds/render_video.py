@@ -52,7 +52,6 @@ def main(self):
         ]
         ]
     config.expand = "x"
-    config.additional_texts = {ic.ICON_SPEED_UP: "Speed"}
     
 
     config.slider_values = {
