@@ -75,6 +75,7 @@ class ContextMenuConfig:
         self.expand = None  # options: None, "x", "y", "xy"
         self.custom_widget_items = {}
         self.inner_widgets = {}
+        self.incremental_value = False
         self.incremental_values = {}
         self.custom_width = None
         self.custom_height = None
@@ -166,7 +167,7 @@ class ContextButtonWindow(QWidget):
                         "progress_bar": config.progress_bar_items.get(action, config.progress_bar),
                         "hotkey_text": config.hotkey_items.get(action),
                         "image_path": config.image_items.get(action),
-                        "incremental_value": config.incremental_values.get(action),
+                        "incremental_value": config.incremental_values.get(action, config.incremental_value),
                         "inner_widget": config.inner_widgets.get(action),
                     }
                     if action in config.additional_texts:
