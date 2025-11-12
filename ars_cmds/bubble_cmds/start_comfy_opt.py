@@ -10,7 +10,7 @@ from PyQt6.QtGui import QCursor
 import socket
 import pyperclip
 
-def BBL_TEST2(self, position):
+def BBL_C(self, position):
     run_ext(__file__, self)
 
     
