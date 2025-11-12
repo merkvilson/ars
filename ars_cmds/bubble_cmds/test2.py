@@ -17,6 +17,8 @@ def main(self, position):
 
     config.slider_values = {
         "1": (0, 100, 50),
+        "2": (0, 100, 50),
+
     }
     config.auto_close = False
     config.incremental_values = {
@@ -29,8 +31,8 @@ def main(self, position):
  
 
     config.additional_texts = {
-    "1": "Slider",
-    "2": "Button 2",
+    "1": "Slider INCR",
+    "2": "Slider FREE",
     }
 
 
