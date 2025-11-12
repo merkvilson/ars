@@ -22,7 +22,8 @@ from PyQt6.QtCore import (
     QParallelAnimationGroup,
     pyqtProperty,
     QRectF,
-    QPointF,)
+    QPointF,
+    QTimer,)
 
 
 from dataclasses import dataclass, field
@@ -183,6 +184,10 @@ class BButton(QGraphicsObject):
         self.editable = config.editable
         self.progress_bar = config.progress_bar
         self.incremental_value = config.incremental_value
+        
+        # Timer for reverting symbol back after showing value
+        self._original_symbol = self.symbol
+        self._revert_timer = None
 
         if len(self.symbol) > 2: self.show_symbol = False
         
@@ -679,6 +684,21 @@ class BButton(QGraphicsObject):
         self._slider_value = max(min_val, min(max_val, new_value))    # Clamp and assign the final value
         self._update_additional_text()
         self._trigger_callback()
+        
+        # Temporarily show value in symbol if incremental_value is active
+        if self.incremental_value:
+            self.main_symbol_item.setPlainText(str(int(round(self._slider_value))))
+            self.main_symbol_item.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+            bounding = self.main_symbol_item.boundingRect()
+            self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+            
+            if self._revert_timer:
+                self._revert_timer.stop()
+            self._revert_timer = QTimer()
+            self._revert_timer.setSingleShot(True)
+            self._revert_timer.timeout.connect(self._revert_symbol)
+            self._revert_timer.start(500)
+        
         self.update()    # Update visuals and trigger related logic
 
     def _trigger_callback(self):
@@ -698,6 +718,15 @@ class BButton(QGraphicsObject):
                 self.callbackM(self._slider_value)
             else:
                 self.callbackM()
+
+    def _revert_symbol(self):
+        """Revert the symbol back to its original text after showing the value."""
+        if not self._original_symbol.replace('.', '', 1).replace('-', '', 1).isdigit():
+            self.main_symbol_item.setPlainText(self._original_symbol)
+            self.main_symbol_item.setFont(self._font)
+            bounding = self.main_symbol_item.boundingRect()
+            self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+            self.update()
 
 
     def _update_additional_text(self):
