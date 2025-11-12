@@ -26,6 +26,7 @@ def obj_att_mng(self, ):
     config.use_extended_shape = False
     config.background_color = (255, 255, 255, 0)
     config.set_arc_range(-180,0)
+    config.auto_close = False
 
 
     
