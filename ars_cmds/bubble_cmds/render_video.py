@@ -59,7 +59,9 @@ def main(self):
         "timeline": (0, 100, 50),
         ic.ICON_SPEED_UP: (1, 60, 30),
     }
-
+    config.incremental_values = {
+        ic.ICON_SPEED_UP: 1,
+    }
     config.per_item_radius = { "timeline": 20,}
 
 
