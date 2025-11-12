@@ -693,8 +693,9 @@ class BButton(QGraphicsObject):
         
         # Temporarily show value in symbol if incremental_value is active
         if self.incremental_value and not self.use_extended_shape:
-            self.main_symbol_item.setPlainText(str(int(round(self._slider_value))))
-            self.main_symbol_item.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+            value_txt = str(int(round(self._slider_value)))
+            self.main_symbol_item.setPlainText(value_txt)
+            self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
             bounding = self.main_symbol_item.boundingRect()
             self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
             
