@@ -35,6 +35,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.custom_height = 260 + (300 if default_object == self else 0)
     config.custom_width = 450
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
+    config.incremental_value = True
 
 
 
@@ -58,6 +59,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_GIZMO_SCALE: (25, 1024, 512),
 
     }
+
+    # config.incremental_values = {ic.ICON_STEPS: 1, ic.ICON_GIZMO_SCALE: 1}
+
 
     def start_render(seed_step = 0):
         if check_queue(): 

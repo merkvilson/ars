@@ -69,8 +69,19 @@ def obj_primitive_ctx(self, position, callback):
         ic.ICON_LOD3: (1,50,30),
         ic.ICON_ANGLE: (0,360,360),
         }
-
     
+    config.incremental_value = True
+
+    # config.incremental_values = {
+    # ic.ICON_AXIS_X:1,
+    # ic.ICON_AXIS_Y:1,
+    # ic.ICON_AXIS_Z:1,
+    # ic.ICON_RADIUS:1,
+    # ic.ICON_RADIUS_INNER:1,
+    # ic.ICON_LOD3:1,
+    # ic.ICON_ANGLE:1,
+    # }
+
     config.callbackL = {
         ic.ICON_AXIS_X: lambda val: obj.set_primitive_type(obj.primitive_type, width=val),
         ic.ICON_AXIS_Y: lambda val: obj.set_primitive_type(obj.primitive_type, height=val),
