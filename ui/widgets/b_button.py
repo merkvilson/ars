@@ -77,6 +77,9 @@ class SliderHandle(QGraphicsRectItem):
             self._drag_button = None
             self.parent_button._is_dragging = False
             self.parent_button._drag_button = None
+            
+            # Start revert timer after button release
+            self.parent_button._start_revert_timer()
 
             event.accept()
 
@@ -664,6 +667,9 @@ class BButton(QGraphicsObject):
         if self._is_dragging:
             self._is_dragging = False
             self._drag_button = None
+            
+            # Start revert timer after button release
+            self._start_revert_timer()
 
             self.update()
         super().mouseReleaseEvent(event)
@@ -692,12 +698,9 @@ class BButton(QGraphicsObject):
             bounding = self.main_symbol_item.boundingRect()
             self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
             
+            # Stop any existing timer but don't start a new one while dragging
             if self._revert_timer:
                 self._revert_timer.stop()
-            self._revert_timer = QTimer()
-            self._revert_timer.setSingleShot(True)
-            self._revert_timer.timeout.connect(self._revert_symbol)
-            self._revert_timer.start(500)
         
         self.update()    # Update visuals and trigger related logic
 
@@ -727,6 +730,16 @@ class BButton(QGraphicsObject):
             bounding = self.main_symbol_item.boundingRect()
             self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
             self.update()
+
+    def _start_revert_timer(self):
+        """Start the timer to revert symbol after button release."""
+        if self.incremental_value and not self.use_extended_shape:
+            if self._revert_timer:
+                self._revert_timer.stop()
+            self._revert_timer = QTimer()
+            self._revert_timer.setSingleShot(True)
+            self._revert_timer.timeout.connect(self._revert_symbol)
+            self._revert_timer.start(500)
 
 
     def _update_additional_text(self):
