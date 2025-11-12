@@ -631,8 +631,8 @@ class BButton(QGraphicsObject):
                         self.callbackL(value)
                     else:
                         self.callbackL()
-                if self.auto_close and scene and hasattr(scene, 'hide_radial_menu'):
-                    scene.hide_radial_menu()
+                # if self.auto_close and scene and hasattr(scene, 'hide_radial_menu'):
+                #     scene.hide_radial_menu()
             elif event.button() == Qt.MouseButton.RightButton:
                 if self.toggle_values:
                     value = self._toggle_value
