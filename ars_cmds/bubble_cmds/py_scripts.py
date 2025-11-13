@@ -1,8 +1,7 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.run_ext import run_ext
-from ars_scripts.editor.ars_code_editor import ars_script_wrapper
+from ars_cmds.core_cmds.run_ext import run_ext, run_raw_script
 
 import os
 import subprocess
@@ -55,7 +54,7 @@ def BBL_CODE_PYTHON(self, position):
     file_path = os.path.join("ars_scripts", "user", "test_script.py")
 
     config.callbackL = {
-                        "1": lambda: run_ext(file_path, self, ars_script_wrapper),
+                        "1": lambda: run_raw_script(file_path, self),
                         "2": lambda: open_file(file_path),
                         "3": lambda: ctx.close_animated(),
                         }

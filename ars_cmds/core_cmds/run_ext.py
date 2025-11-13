@@ -5,6 +5,7 @@ import importlib.util
 from importlib.machinery import SourceFileLoader
 from types import CodeType
 
+#finds and runs execute_plugin in the given file
 def run_ext(path, ars_window, edit_func=None):
     """Load & execute a Python source file at `path` (works with any extension).
     
@@ -42,6 +43,46 @@ def run_ext(path, ars_window, edit_func=None):
             module.execute_plugin(ars_window)
         else:
             print("execute_plugin() not found in", path)
+
+    except SyntaxError as e:
+        print(f"Syntax error in {path} (after edits): {e}")
+        traceback.print_exc()
+    except Exception:
+        print("Failed to load/execute:")
+        traceback.print_exc()
+
+
+#runs without edits
+def run_raw_script(path, ars_window ):
+    """Load & execute a Python source file at `path` (works with any extension).
+    
+    Args:
+        path: File path to the Python script.
+        ars_window: Object passed to the plugin's entrypoint.
+    """
+    if not os.path.isfile(path):
+        print("File not found:", path)
+        return
+
+    # Make module name unique to avoid clashes
+    module_name = f"ext_{uuid.uuid4().hex}"
+
+    try:
+        # Read raw content
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Create module
+        spec = importlib.util.spec_from_loader(module_name, loader=None)
+        module = importlib.util.module_from_spec(spec)
+
+        # Inject ars_window into the module's namespace
+        module.__dict__['ars_window'] = ars_window
+
+        # Compile and execute the (edited) content in the module's namespace
+        code_obj = compile(content, path, 'exec')
+        exec(code_obj, module.__dict__)
+
 
     except SyntaxError as e:
         print(f"Syntax error in {path} (after edits): {e}")
