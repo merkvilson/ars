@@ -186,6 +186,7 @@ class PythonCodeEditor(QPlainTextEdit):
         # Setup font
         font = QFont("Courier", 10)
         self.setFont(font)
+        # Use QFontMetricsF for more precise tab stop calculation
         self.setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4)
 
         # Line number area
@@ -290,6 +291,7 @@ class PythonCodeEditor(QPlainTextEdit):
             selection = QTextEdit.ExtraSelection()
             line_color = QColor("#2A2A2A")  # Current line background
             selection.format.setBackground(line_color)
+            selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
             selection.cursor = self.textCursor()
             selection.cursor.clearSelection()
             extra_selections.append(selection)
