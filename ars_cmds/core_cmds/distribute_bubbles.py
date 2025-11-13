@@ -1,5 +1,5 @@
 from   ui.widgets.bubble_layout import BubbleConfig
-import ars_cmds.bubble_cmds as Bcmd
+from ars_cmds.core_cmds.DROPDOWN import r_dropdown
 from   PyQt6.QtCore import QPoint
 from   theme.fonts.font_icons import *
 import os
@@ -32,4 +32,4 @@ def distribute_bubbles(self):
                     config.symbol = symbol
                     bubble = self.bubbles_overlay.add_bubble(config)
                     bubble.config.callbackL = lambda bb=bubble, f=func: f(self, bubble_pos(bb))
-                    bubble.config.callbackR = lambda bb=bubble: Bcmd.r_dropdown(self, bubble_pos(bb))
+                    bubble.config.callbackR = lambda bb=bubble: r_dropdown(self, bubble_pos(bb))
