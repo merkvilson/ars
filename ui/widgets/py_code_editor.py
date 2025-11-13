@@ -57,7 +57,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         # Atom One Dark inspired palette
         self.fmt_keyword = mkfmt("#c678dd", bold=True)
         self.fmt_builtin = mkfmt("#56b6c2")
-        self.fmt_number = mkfmt("#d19a66")
+        self.fmt_number = mkfmt("#d16666")
         self.fmt_string = mkfmt("#98c379")
         self.fmt_docstring = mkfmt("#9dcc8b", italic=True)
         self.fmt_comment = mkfmt("#5c6370", italic=True)
@@ -417,7 +417,7 @@ class PythonEditorWidget(QWidget):
         except Exception:
             fixed = QFont("Monospace")
             fixed.setStyleHint(QFont.StyleHint.TypeWriter)
-        fixed.setPointSize(fixed.pointSize() + 1)
+        fixed.setPointSize(fixed.pointSize() + 4)
         self.editor.setFont(fixed)
 
         self._apply_atom_one_dark_theme()
@@ -451,6 +451,7 @@ class PythonEditorWidget(QWidget):
             "QPlainTextEdit {"
             "background-color: #282c34;"
             "color: #abb2bf;"
+            "border: none;"
             "selection-color: #ffffff;"
             "selection-background-color: #3e4451;"
             "}"

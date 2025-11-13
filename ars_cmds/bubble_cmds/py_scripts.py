@@ -38,6 +38,9 @@ def main(self, position):
     config.auto_close = False
     config.close_on_outside=True
     config.show_symbol = False
+    config.expand = "x"
+    config.distribution_mode = "x"
+    config.extra_distance = [0,99999]
 
     user_script_dir = os.path.join("ars_scripts", "user")
 
@@ -65,6 +68,8 @@ def main(self, position):
 
     options_list += ["PythonEditorWidget"]
     code_editor = PythonEditorWidget()
+    code_editor.setFixedSize(600, 140)
+    
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
 
