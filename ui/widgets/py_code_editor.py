@@ -3,7 +3,7 @@ import re
 import keyword
 import builtins
 
-from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize
+from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF
 from PyQt6.QtGui import (
     QColor,
     QTextCharFormat,
@@ -13,6 +13,7 @@ from PyQt6.QtGui import (
     QPalette,
     QTextCursor,
     QPainter,
+    QPainterPath,
 )
 from PyQt6.QtWidgets import (
     QApplication,
@@ -430,12 +431,6 @@ class PythonEditorWidget(QWidget):
         self.setLayout(layout)
         self.setWindowTitle("Python Editor Widget")
 
-    # Convenience methods (optional)
-    def setText(self, text: str):
-        self.editor.setPlainText(text)
-
-    def text(self) -> str:
-        return self.editor.toPlainText()
 
     def _apply_atom_one_dark_theme(self):
         palette = self.editor.palette()
@@ -452,6 +447,7 @@ class PythonEditorWidget(QWidget):
             "background-color: #282c34;"
             "color: #abb2bf;"
             "border: none;"
+            "border-radius: 10px;"
             "selection-color: #ffffff;"
             "selection-background-color: #3e4451;"
             "}"
@@ -464,6 +460,7 @@ class LineNumberArea(QWidget):
     def __init__(self, editor):
         super().__init__(editor)
         self.editor = editor
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def sizeHint(self):
         return QSize(self.editor.line_number_area_width(), 0)
@@ -625,7 +622,13 @@ class CodeEditor(QPlainTextEdit):
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
-        painter.fillRect(event.rect(), QColor("#21252b"))
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Draw rounded rectangle background
+        path = QPainterPath()
+        rect = QRectF(self.line_number_area.rect())
+        path.addRoundedRect(rect, 10, 10)
+        painter.fillPath(path, QColor("#21252b"))
 
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
