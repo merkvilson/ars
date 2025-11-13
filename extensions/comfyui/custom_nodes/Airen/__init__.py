@@ -8,6 +8,7 @@ from PIL import Image
 import numpy as np
 import torch
 import hashlib
+from .convert_layer import save_images_as_layers
 
 
 class Airen_Str:
@@ -141,12 +142,34 @@ class Airen_SaveImage:
             full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
                 filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
             results = []
+            saved_files = []
             for image in images:
                 i = 255. * image.cpu().numpy()
                 img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
                 file = f"{filename}{len(os.listdir(full_output_folder)):03d}.png"
-                img.save(os.path.join(full_output_folder, file), compress_level=4)
+                full_path = os.path.join(full_output_folder, file)
+                img.save(full_path, compress_level=4)
+                saved_files.append(full_path)
                 results.append({"filename": file, "subfolder": subfolder, "type": "output"})
+            
+            # After saving the last image in "steps" category, create layered TIFF
+            if category == "steps" and saved_files:
+                try:
+                    last_image_path = saved_files[-1]
+                    steps_folder = full_output_folder
+                    
+                    # Create TIFF filename based on the last saved image
+                    tiff_filename = f"{filename}{len(os.listdir(full_output_folder)):03d}.tiff"
+                    tiff_path = os.path.join(full_output_folder, tiff_filename)
+                    
+                    # Call convert_layer to save all steps as layers
+                    save_images_as_layers(last_image_path, steps_folder, tiff_path)
+                    
+                    # Add the TIFF to results
+                    results.append({"filename": tiff_filename, "subfolder": subfolder, "type": "output"})
+                except Exception as e:
+                    print(f"Error creating layered TIFF: {e}")
+            
             return {"ui": {"images": results}}
         elif category in ["mesh"]:
             output_dir = folder_paths.get_input_directory()
