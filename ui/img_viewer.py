@@ -3,8 +3,9 @@ from PyQt6.QtWidgets import (
     QGraphicsView, QGraphicsScene, QGraphicsPixmapItem,
     QVBoxLayout, QWidget, QFileDialog
 )
-from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainter, QBrush
+from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainter, QBrush, QImage
 from PyQt6.QtCore import Qt, QRectF, QPointF
+from PIL import Image, ImageSequence
 
 class ImageViewer(QGraphicsView):
     def __init__(self, scene, parent=None):
@@ -101,13 +102,56 @@ class ImageViewerWidget(QWidget):
     def fit_image(self):
         self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
 
-    def open_image(self, file_path=None, auto_fit=True):
+    def open_image(self, file_path=None, layer = -1, auto_fit=True):
         if not file_path:
-            file_path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
+            file_path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff)")
         if file_path:
-            pixmap = QPixmap(file_path)
-            if pixmap.isNull():
+            pixmap = None
+            
+            # Check if it's a multi-layer image (TIFF)
+            if file_path.lower().endswith(('.tif', '.tiff')):
+                try:
+                    pil_image = Image.open(file_path)
+                    
+                    # Count total frames/layers
+                    n_frames = getattr(pil_image, 'n_frames', 1)
+                    
+                    # Handle layer index
+                    layer_index = layer
+                    if layer_index == -1:
+                        layer_index = n_frames - 1  # Last layer
+                    elif layer_index >= n_frames:
+                        layer_index = 0  # Default to first if out of range
+                    
+                    # Seek to the correct frame
+                    pil_image.seek(layer_index)
+                    
+                    # Copy the current frame to avoid reference issues
+                    selected_layer = pil_image.copy()
+                    
+                    # Convert PIL image to QPixmap
+                    if selected_layer.mode == "RGBA":
+                        data = selected_layer.tobytes("raw", "RGBA")
+                        qimage = QImage(data, selected_layer.width, selected_layer.height, QImage.Format.Format_RGBA8888)
+                    elif selected_layer.mode == "RGB":
+                        data = selected_layer.tobytes("raw", "RGB")
+                        qimage = QImage(data, selected_layer.width, selected_layer.height, QImage.Format.Format_RGB888)
+                    else:
+                        selected_layer = selected_layer.convert("RGBA")
+                        data = selected_layer.tobytes("raw", "RGBA")
+                        qimage = QImage(data, selected_layer.width, selected_layer.height, QImage.Format.Format_RGBA8888)
+                    
+                    pixmap = QPixmap.fromImage(qimage)
+                except Exception as e:
+                    print(f"Error loading TIFF layer: {e}")
+                    pixmap = QPixmap(file_path)  # Fallback to default loading
+            else:
+                # Regular image loading
+                pixmap = QPixmap(file_path)
+            
+            if pixmap is None or pixmap.isNull():
                 return
+            
             self.scene.clear()
             item = QGraphicsPixmapItem(pixmap)
             item.setPos(-pixmap.width() / 2, -pixmap.height() / 2)
