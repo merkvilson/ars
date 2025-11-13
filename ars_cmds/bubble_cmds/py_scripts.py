@@ -28,38 +28,41 @@ def open_file(path):
 
 
 
-
-
-
-
 BBL_TEST_CONFIG = {"symbol": ic.ICON_CODE_PYTHON}
 def BBL_CODE_PYTHON(self, position):
+    run_ext(__file__, self)
 
+def main(self, position):
     config = ContextMenuConfig()
     config.auto_close = False
-    config.close_on_outside=False
+    config.close_on_outside=True
+    config.show_symbol = False
 
-    options_list = [ "1","2","3"]
-    config.additional_texts = {
-        "1": "Run",
-        "2": "Edit",
-        "3": "Close",
-    }
-    config.hotkey_items = {
-        "1": "R",
-        "2": "E",
-    }
+    user_script_dir = os.path.join("ars_scripts", "user")
+    all_files = os.listdir(user_script_dir)
 
+    # Filter for .py files only
+    py_files = [f for f in all_files if f.endswith('.py')]
 
-    file_path = os.path.join("ars_scripts", "user", "test_script.py")
+    # Create options list as string numbers
+    options_list = [str(i) for i in range(len(py_files))]
 
-    config.callbackL = {
-                        "1": lambda: run_raw_script(file_path, self),
-                        "2": lambda: open_file(file_path),
-                        "3": lambda: ctx.close_animated(),
-                        }
+    # Dynamically create dictionaries for all Python files
+    config.additional_texts = {}
+    config.callbackL = {}
+    config.callbackR = {}
 
-    
+    for i, filename in enumerate(py_files):
+        index_str = str(i)
+        full_path = os.path.join(user_script_dir, filename)
+        config.additional_texts[index_str] = filename  # Key matches the item (string number)
+        config.callbackL[index_str] = lambda f=full_path: run_raw_script(f, self)
+        config.callbackR[index_str] = lambda f=full_path: open_file(f)
+
+    options_list.append(str(len(py_files)))  #"Open Scripts Folder" option
+    config.additional_texts[str(len(py_files))] = "Open Scripts Folder"
+    config.callbackL[str(len(py_files))] = lambda: open_file(user_script_dir)
+
 
     ctx = open_context(
         parent=self.central_widget,
@@ -70,3 +73,5 @@ def BBL_CODE_PYTHON(self, position):
 
 
 
+def execute_plugin(window):
+    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))
