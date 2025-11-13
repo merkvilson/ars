@@ -3,7 +3,7 @@ import re
 import keyword
 import builtins
 
-from PyQt6.QtCore import QRegularExpression, Qt
+from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize
 from PyQt6.QtGui import (
     QColor,
     QTextCharFormat,
@@ -12,6 +12,7 @@ from PyQt6.QtGui import (
     QFontDatabase,
     QPalette,
     QTextCursor,
+    QPainter,
 )
 from PyQt6.QtWidgets import (
     QApplication,
@@ -456,10 +457,35 @@ class PythonEditorWidget(QWidget):
         )
 
 
+class LineNumberArea(QWidget):
+    """Line number display widget for CodeEditor."""
+
+    def __init__(self, editor):
+        super().__init__(editor)
+        self.editor = editor
+
+    def sizeHint(self):
+        return QSize(self.editor.line_number_area_width(), 0)
+
+    def paintEvent(self, event):
+        self.editor.line_number_area_paint_event(event)
+
+
 class CodeEditor(QPlainTextEdit):
     """Lightweight conveniences for typing Python."""
 
     INDENT = " " * 4
+    MIN_FONT_SIZE = 6
+    MAX_FONT_SIZE = 48
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.line_number_area = LineNumberArea(self)
+
+        self.blockCountChanged.connect(self.update_line_number_area_width)
+        self.updateRequest.connect(self.update_line_number_area)
+
+        self.update_line_number_area_width(0)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -481,6 +507,16 @@ class CodeEditor(QPlainTextEdit):
             return
 
         super().keyPressEvent(event)
+
+    def wheelEvent(self, event):
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            delta = event.angleDelta().y()
+            if delta != 0:
+                step = 1 if delta > 0 else -1
+                self._change_font_size(step)
+            event.accept()
+            return
+        super().wheelEvent(event)
 
     def _handle_pair_chars(self, text: str, modifiers) -> bool:
         # Ignore if control/alt modifiers involved
@@ -551,6 +587,61 @@ class CodeEditor(QPlainTextEdit):
         if not ch or ch == "\x00":
             return ""
         return ch
+
+    def _change_font_size(self, step: int):
+        font = self.font()
+        current_size = font.pointSize()
+        if current_size <= 0:
+            current_size = self.fontMetrics().height()
+        new_size = max(self.MIN_FONT_SIZE, min(self.MAX_FONT_SIZE, current_size + step))
+        if new_size == current_size:
+            return
+        font.setPointSize(new_size)
+        self.setFont(font)
+        self.document().setDefaultFont(font)
+
+    def line_number_area_width(self):
+        digits = len(str(max(1, self.blockCount())))
+        space = 20 + self.fontMetrics().horizontalAdvance('9') * digits
+        return space
+
+    def update_line_number_area_width(self, _):
+        self.setViewportMargins(self.line_number_area_width(), 0, 0, 0)
+
+    def update_line_number_area(self, rect, dy):
+        if dy:
+            self.line_number_area.scroll(0, dy)
+        else:
+            self.line_number_area.update(0, rect.y(), self.line_number_area.width(), rect.height())
+
+        if rect.contains(self.viewport().rect()):
+            self.update_line_number_area_width(0)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        cr = self.contentsRect()
+        self.line_number_area.setGeometry(QRect(cr.left(), cr.top(), self.line_number_area_width(), cr.height()))
+
+    def line_number_area_paint_event(self, event):
+        painter = QPainter(self.line_number_area)
+        painter.fillRect(event.rect(), QColor("#21252b"))
+
+        block = self.firstVisibleBlock()
+        block_number = block.blockNumber()
+        top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+        bottom = top + self.blockBoundingRect(block).height()
+
+        while block.isValid() and top <= event.rect().bottom():
+            if block.isVisible() and bottom >= event.rect().top():
+                number = str(block_number + 1)
+                painter.setPen(QColor("#5c6370"))
+                painter.drawText(0, int(top), self.line_number_area.width() - 12, self.fontMetrics().height(),
+                                Qt.AlignmentFlag.AlignRight, number)
+
+            block = block.next()
+            top = bottom
+            bottom = top + self.blockBoundingRect(block).height()
+            block_number += 1
 
 
 if __name__ == "__main__":
