@@ -1,4 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.py_code_editor import PythonEditorWidget
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.run_ext import run_ext, run_raw_script
@@ -39,10 +40,9 @@ def main(self, position):
     config.show_symbol = False
 
     user_script_dir = os.path.join("ars_scripts", "user")
-    all_files = os.listdir(user_script_dir)
 
     # Filter for .py files only
-    py_files = [f for f in all_files if f.endswith('.py')]
+    py_files = [f for f in os.listdir(user_script_dir) if f.endswith('.py')]
 
     # Create options list as string numbers
     options_list = [str(i) for i in range(len(py_files))]
@@ -62,6 +62,10 @@ def main(self, position):
     options_list.append(str(len(py_files)))  #"Open Scripts Folder" option
     config.additional_texts[str(len(py_files))] = "Open Scripts Folder"
     config.callbackL[str(len(py_files))] = lambda: open_file(user_script_dir)
+
+    options_list += ["PythonEditorWidget"]
+    code_editor = PythonEditorWidget()
+    config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
 
     ctx = open_context(
