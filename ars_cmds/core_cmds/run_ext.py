@@ -90,3 +90,33 @@ def run_raw_script(path, ars_window ):
     except Exception:
         print("Failed to load/execute:")
         traceback.print_exc()
+
+
+def run_string_code(code_string: str, ars_window):
+    """Execute raw Python code from a string.
+    
+    Args:
+        code_string: The Python code to execute.
+        ars_window: Object passed to the code's namespace.
+    """
+    try:
+        # Create a unique module name
+        module_name = f"ext_{uuid.uuid4().hex}"
+
+        # Create module
+        spec = importlib.util.spec_from_loader(module_name, loader=None)
+        module = importlib.util.module_from_spec(spec)
+
+        # Inject ars_window into the module's namespace
+        module.__dict__['ars_window'] = ars_window
+
+        # Compile and execute the code in the module's namespace
+        code_obj = compile(code_string, '<string>', 'exec')
+        exec(code_obj, module.__dict__)
+
+    except SyntaxError as e:
+        print(f"Syntax error in provided code string: {e}")
+        traceback.print_exc()
+    except Exception:
+        print("Failed to execute code string:")
+        traceback.print_exc()   
