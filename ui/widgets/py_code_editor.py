@@ -22,7 +22,13 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QVBoxLayout,
 )    
-from ars_cmds.core_cmds.run_ext import run_string_code
+try: from ars_cmds.core_cmds.run_ext import run_string_code
+except ImportError:
+    def run_string_code(code: str):
+        """Placeholder function when ars_cmds is unavailable."""
+        print("ars_cmds.core_cmds.run_ext.run_string_code is unavailable.")
+        print("Code to run:")
+        print(code)
 
 class PythonHighlighter(QSyntaxHighlighter):
     """
@@ -58,14 +64,14 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         # Atom One Dark inspired palette
         self.fmt_keyword = mkfmt("#c678dd", bold=True)
-        self.fmt_builtin = mkfmt("#56b6c2")
+        self.fmt_builtin = mkfmt("#c25656")
         self.fmt_number = mkfmt("#d16666")
         self.fmt_string = mkfmt("#98c379")
         self.fmt_docstring = mkfmt("#9dcc8b", italic=True)
         self.fmt_comment = mkfmt("#5c6370", italic=True)
         self.fmt_todo = mkfmt("#e5c07b", bold=True)
         self.fmt_decorator = mkfmt("#c678dd")
-        self.fmt_operator = mkfmt("#56b6c2")
+        self.fmt_operator = mkfmt("#00e1ff")
         self.fmt_brace = mkfmt("#abb2bf", bold=True)
         self.fmt_defname = mkfmt("#61afef", bold=True)
         self.fmt_classname = mkfmt("#e5c07b", bold=True)
