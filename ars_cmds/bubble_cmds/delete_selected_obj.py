@@ -3,11 +3,18 @@ from core.sound_manager import play_sound
 from PyQt6.QtCore import QTimer
 import time
 import numpy as np
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
+
 
 BBL_TRASH_CONFIG = {'symbol': ic.ICON_TRASH, 'hotkey': 'del'}
-def BBL_TRASH(self, position):
-    if self.viewport.is_not_empty():
-        om = self.viewport._objectManager
+def BBL_TRASH(*args):
+    run_ext(__file__)
+
+
+def execute_plugin(ars_window):
+    if ars_window.viewport.is_not_empty():
+        om = ars_window.viewport._objectManager
         index = om._active_idx
         if index < 0 or index >= len(om._objects):
             return
@@ -61,7 +68,7 @@ def BBL_TRASH(self, position):
             start_time = time.time()
             duration = 0.050
             
-            timer = QTimer(self)
+            timer = QTimer(ars_window)
             
             def update_scale():
                 elapsed = time.time() - start_time
@@ -73,7 +80,7 @@ def BBL_TRASH(self, position):
                 t = elapsed / duration
                 f = 1 + 0.2 * t  # Linear scale up
                 obj.set_scale((sx * f, sy * f, sz * f))
-                self.viewport._canvas.update()
+                ars_window.viewport._canvas.update()
             
             timer.timeout.connect(update_scale)
             timer.start(10)  # Update every 10 ms
@@ -85,21 +92,21 @@ def BBL_TRASH(self, position):
             start_time = time.time()
             duration = 0.150
             
-            timer = QTimer(self)
+            timer = QTimer(ars_window)
             
             def update_scale():
                 elapsed = time.time() - start_time
                 if elapsed >= duration:
                     timer.stop()
                     obj.visual.parent = None
-                    self.viewport._canvas.update()
+                    ars_window.viewport._canvas.update()
                     return
                 
                 t = elapsed / duration
                 ease = t ** 2  # Ease-in quadratic
                 f = 1.2 - 1.2 * ease
                 obj.set_scale((sx * f, sy * f, sz * f))
-                self.viewport._canvas.update()
+                ars_window.viewport._canvas.update()
             
             timer.timeout.connect(update_scale)
             timer.start(10)

@@ -23,17 +23,17 @@ except:
 
 
 BBL_CKPTLIST_CONFIG={"symbol": ic.ICON_BRAIN}
-def BBL_CKPTLIST(self, position):
-    run_ext(__file__, self)
+def BBL_CKPTLIST(*args):
+    run_ext(__file__)
 
-def doit(self):
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
     config.item_radius = 15
 
     config.show_symbol = False
     def set_ckpt(ckpt_name):
-        self.render_manager.set_userdata("ckpt_name", ckpt_name)
+        ars_window.render_manager.set_userdata("ckpt_name", ckpt_name)
 
     ckpt_index_list = [str(i + 1) for i in range(len(ckpt_list))]
 
@@ -41,18 +41,16 @@ def doit(self):
 
     config.callbackL = {str(i + 1): lambda x=obj: set_ckpt(x) for i, obj in enumerate(ckpt_list)} 
 
-    print(self.render_manager.get_userdata("ckpt_name"))
+    print(ars_window.render_manager.get_userdata("ckpt_name"))
 
     #config.toggle_values = {str(i + 1): (0, 1, 0) for i in range(len(ckpt_list))}  
     
     #config.toggle_groups = [ckpt_index_list]
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=ckpt_index_list,
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
-def execute_plugin(window):
-    doit(window)

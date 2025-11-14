@@ -10,8 +10,8 @@ import platform
 
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_CODE_PYTHON}
-def BBL_CODE_PYTHON(self, position):
-    run_ext(__file__, )
+def BBL_CODE_PYTHON(*args):
+    run_ext(__file__)
 
 
 

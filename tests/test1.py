@@ -7,11 +7,11 @@ from PyQt6.QtCore import QPoint, QTimer
 
 
 BBL_TEST_CONFIG ={"symbol": ic.ICON_TEST }
-def BBL_TEST(self, position):
-    run_ext(__file__, self)
+def BBL_TEST(*args):
+    run_ext(__file__)
 
 
-def main(self, position):
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
 
@@ -31,12 +31,9 @@ def main(self, position):
     }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
-
-def execute_plugin(window):
-    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))

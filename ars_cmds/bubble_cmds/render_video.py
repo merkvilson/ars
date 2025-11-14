@@ -11,20 +11,20 @@ from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check_continuous
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
-def BBL_VIDEO(self, position):
-    run_ext(__file__, self)
+def BBL_VIDEO(*args):
+    run_ext(__file__)
 
-def main(self):
+def execute_plugin(ars_window):
     
     # Timer and state for play_video
-    if not hasattr(self, '_loop_timer'):
-        self._loop_timer = None
-    if not hasattr(self, '_loop_index'):
-        self._loop_index = 0
+    if not hasattr(ars_window, '_loop_timer'):
+        ars_window._loop_timer = None
+    if not hasattr(ars_window, '_loop_index'):
+        ars_window._loop_index = 0
 
 
     config = ContextMenuConfig()
-    config.use_extended_shape_items = {"timeline": (self.width() / (40), 1)} #40 stands for item diameter
+    config.use_extended_shape_items = {"timeline": (ars_window.width() / (40), 1)} #40 stands for item diameter
     config.hover_scale_items = {"timeline": 0.95}
     config.auto_close = False
     config.close_on_outside = False
@@ -66,10 +66,10 @@ def main(self):
 
     def pause_video():
         # Stop existing timer if running
-        if self._loop_timer is not None:
-            self._loop_timer.stop()
-            self._loop_timer.deleteLater()
-            self._loop_timer = None
+        if ars_window._loop_timer is not None:
+            ars_window._loop_timer.stop()
+            ars_window._loop_timer.deleteLater()
+            ars_window._loop_timer = None
             print("Loop stopped")
             ctx.update_item(ic.ICON_PLAYER_PAUSE, "symbol", ic.ICON_PLAYER_PLAY)
 
@@ -92,13 +92,13 @@ def main(self):
         image_index = int((val / 100) * max_index)
         selected_image = images_list[image_index]
         image_path = os.path.join(images_path, selected_image)
-        self.img.open_image(image_path, auto_fit=False)
+        ars_window.img.open_image(image_path, auto_fit=False)
 
-        self._loop_index = image_index
+        ars_window._loop_index = image_index
 
 
 
-    self._loop_index = 0
+    ars_window._loop_index = 0
 
     def play_video():
 
@@ -121,15 +121,15 @@ def main(self):
                 return
             
             # Wrap index if list size changed
-            self._loop_index = self._loop_index % len(images_list)
+            ars_window._loop_index = ars_window._loop_index % len(images_list)
             
             # Load current frame
-            image_path = os.path.join(images_path, images_list[self._loop_index])
-            self.img.open_image(image_path, auto_fit=False)
-            ctx.update_item("timeline", "progress", (self._loop_index / len(images_list)) * 100 )
+            image_path = os.path.join(images_path, images_list[ars_window._loop_index])
+            ars_window.img.open_image(image_path, auto_fit=False)
+            ctx.update_item("timeline", "progress", (ars_window._loop_index / len(images_list)) * 100 )
             
             # Move to next frame
-            self._loop_index = (self._loop_index + 1) % len(images_list)
+            ars_window._loop_index = (ars_window._loop_index + 1) % len(images_list)
             
             # Dynamically adjust FPS based on directory
             current_fps = ctx.get_value(ic.ICON_SPEED_UP)
@@ -138,19 +138,19 @@ def main(self):
 
             # Update timer interval if it changed
             new_interval = int(1000 / current_fps)
-            if self._loop_timer and self._loop_timer.interval() != new_interval:
-                self._loop_timer.setInterval(new_interval)
+            if ars_window._loop_timer and ars_window._loop_timer.interval() != new_interval:
+                ars_window._loop_timer.setInterval(new_interval)
         
         # Create and start timer
-        self._loop_timer = QTimer()
-        self._loop_timer.timeout.connect(frame_next)
+        ars_window._loop_timer = QTimer()
+        ars_window._loop_timer.timeout.connect(frame_next)
         
         # Initial interval calculation
         initial_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
         initial_fps = fps if initial_path != get_path("frames") else fps / 4
         interval = int(1000 / initial_fps)
         
-        self._loop_timer.start(interval)
+        ars_window._loop_timer.start(interval)
         print(f"Loop started at {initial_fps} fps")
         
         # Show first frame immediately
@@ -164,7 +164,7 @@ def main(self):
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
 
-        self.render_manager.send_render()
+        ars_window.render_manager.send_render()
         
         play_video()
 
@@ -190,11 +190,8 @@ def main(self):
 
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
-
-def execute_plugin(window):
-    main(window)

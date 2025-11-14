@@ -9,11 +9,11 @@ from ui.widgets.hierarchy_tree import ObjectHierarchyWindow
 
 
 BBL_LIST_CONFIG ={"symbol": ic.ICON_LIST }
-def BBL_LIST(self, position):
-    run_ext(__file__, self)
+def BBL_LIST(*args):
+    run_ext(__file__)
 
 
-def main(self, position):
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.expand = "y"
     config.auto_close = False
@@ -24,7 +24,7 @@ def main(self, position):
         ["1", "hierarchy"],
     ]
     
-    hierarchy = ObjectHierarchyWindow(self.viewport)
+    hierarchy = ObjectHierarchyWindow(ars_window.viewport)
 
     config.custom_widget_items = {"hierarchy": hierarchy}
 
@@ -38,12 +38,10 @@ def main(self, position):
     }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
 
-def execute_plugin(window):
-    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))

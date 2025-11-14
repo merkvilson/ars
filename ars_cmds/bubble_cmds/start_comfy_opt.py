@@ -10,11 +10,12 @@ from PyQt6.QtGui import QCursor
 import socket
 import pyperclip
 
-def BBL_C(self, position):
-    run_ext(__file__, self)
+def BBL_C(*args):
+    run_ext(__file__)
 
     
-def main(self, position):
+
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
 
@@ -47,13 +48,10 @@ def main(self, position):
                         }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
 
-
-def execute_plugin(window):
-    main(window, QPoint(0, 0))

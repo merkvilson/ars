@@ -7,11 +7,11 @@ from ars_cmds.core_cmds.load_object import selected_object
 from PyQt6.QtCore import QPoint, QTimer
 
 
-def BBL_2(self, postion):
+def BBL_2(*args):
     run_ext(__file__)
 
 
-def execute_plugin(window):
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.show_value = True
 
@@ -42,8 +42,8 @@ def execute_plugin(window):
     }
 
     ctx = open_context(
-        parent=window.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=window.central_widget.mapFromGlobal(QCursor.pos()),
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )

@@ -4,9 +4,14 @@ from theme.fonts import font_icons as ic
 from ui.widgets.keyframes import KeyframesWidget
 from prefs.pref_controller import get_path
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
 
 BBL_KEYFRAMES_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
-def BBL_KEYFRAMES(self, position):
+def BBL_KEYFRAMES(*args):
+    run_ext(__file__)
+
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
@@ -56,9 +61,9 @@ def BBL_KEYFRAMES(self, position):
         config2.callbackL = imgs_dict
 
         ctx2=open_context(
-            parent=self.central_widget,
+            parent=ars_window.central_widget,
             items=items,
-            position=position,
+            position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
             config=config2
         )
 
@@ -68,9 +73,9 @@ def BBL_KEYFRAMES(self, position):
         }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 

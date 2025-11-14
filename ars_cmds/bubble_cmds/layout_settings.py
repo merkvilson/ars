@@ -3,12 +3,14 @@ from PyQt6.QtCore import Qt, QTimer
 from theme.fonts import font_icons as ic
 import os
 from PyQt6.QtWidgets import QFileDialog
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
 
-def save_layout_as(main_window, path = None):
+def save_layout_as(ars_window, path = None):
     # open "Save As" dialog
     if not path:
         path, _ = QFileDialog.getSaveFileName(
-            main_window,                          # parent widget
+            ars_window,                          # parent widget
             "Save Layout As",                     # dialog title
             os.path.join(os.getcwd(),"saved_layouts", "bubble_layout.arsl"),                                   # starting directory / default path
             "Layout Files (*.arsl *);;All Files (*)"  # file filter
@@ -16,11 +18,16 @@ def save_layout_as(main_window, path = None):
 
     # if user pressed cancel, path will be empty
     if path:
-        main_window.bubbles_overlay.save_layout(path)
+        ars_window.bubbles_overlay.save_layout(path)
 
 
 
-def BBL_MENU(main_window, position):
+def BBL_MENU(*args):
+    run_ext(__file__)
+
+
+
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
     options_list = [ic.ICON_POWER, ic.ICON_WINDOW_FULLSCREEN, ic.ICON_SAVE,ic.ICON_FILE_DOWNLOAD, ic.ICON_LAYOUT]
@@ -31,25 +38,25 @@ def BBL_MENU(main_window, position):
         ic.ICON_FILE_DOWNLOAD: "Save Layout As",
         ic.ICON_LAYOUT: "Load Layout"
     }
-    def toggle_fullscreen_maximized(main_window):
-        if main_window.windowState() & Qt.WindowState.WindowFullScreen:
+    def toggle_fullscreen_maximized(ars_window):
+        if ars_window.windowState() & Qt.WindowState.WindowFullScreen:
             # Currently fullscreen → switch to maximized
-            main_window.setWindowState(Qt.WindowState.WindowMaximized)
+            ars_window.setWindowState(Qt.WindowState.WindowMaximized)
         else:
             # Currently not fullscreen → switch to fullscreen
-            main_window.setWindowState(Qt.WindowState.WindowFullScreen)
+            ars_window.setWindowState(Qt.WindowState.WindowFullScreen)
     config.callbackL = {
-        ic.ICON_POWER: lambda: QTimer.singleShot(250, lambda: main_window.close()),
-        ic.ICON_WINDOW_FULLSCREEN: lambda: toggle_fullscreen_maximized(main_window),
-        ic.ICON_SAVE: lambda: save_layout_as(main_window, os.path.join(os.getcwd(),"saved_layouts", "bubble_layout.arsl")),
-        ic.ICON_FILE_DOWNLOAD: lambda: save_layout_as(main_window, ),
-        ic.ICON_LAYOUT: lambda: main_window.bubbles_overlay.load_layout(os.path.join("saved_layouts", "bubble_layout.arsl")),
+        ic.ICON_POWER: lambda: QTimer.singleShot(250, lambda: ars_window.close()),
+        ic.ICON_WINDOW_FULLSCREEN: lambda: toggle_fullscreen_maximized(ars_window),
+        ic.ICON_SAVE: lambda: save_layout_as(ars_window, os.path.join(os.getcwd(),"saved_layouts", "bubble_layout.arsl")),
+        ic.ICON_FILE_DOWNLOAD: lambda: save_layout_as(ars_window, ),
+        ic.ICON_LAYOUT: lambda: ars_window.bubbles_overlay.load_layout(os.path.join("saved_layouts", "bubble_layout.arsl")),
     }
 
 
     ctx = open_context(
-        parent=main_window.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )

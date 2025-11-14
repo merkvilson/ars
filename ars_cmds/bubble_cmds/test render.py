@@ -6,8 +6,8 @@ from PyQt6.QtGui import QCursor, QColor
 import random
 from PyQt6.QtCore import QPoint
 
-def BBL_TEST3(self, position):
-    run_ext(__file__, self)
+def BBL_TEST3(*args):
+    run_ext(__file__)
 
 
 def execute_plugin(self):

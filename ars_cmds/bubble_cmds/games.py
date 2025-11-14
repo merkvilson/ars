@@ -2,6 +2,8 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt, QTimer, QPointF
 from PyQt6.QtGui import QPainter, QColor, QPen
 import random
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
 
 class SnakeGameOverlay(QWidget):
     def __init__(self, parent=None):
@@ -213,9 +215,12 @@ class SnakeGameOverlay(QWidget):
 from theme.fonts import font_icons as ic
 
 BBL_GAME_CONFIG = {"symbol": ic.ICON_SPEED_SNAIL}
-def BBL_GAME(self, position):
+def BBL_GAME(*args):
+    run_ext(__file__)
+
+def execute_plugin(ars_window):
     print("start")
     # Create and start the snake game overlay
-    if not hasattr(self, 'snake_game'):
-        self.snake_game = SnakeGameOverlay(self)
-    self.snake_game.start_game()
+    if not hasattr(ars_window, 'snake_game'):
+        ars_window.snake_game = SnakeGameOverlay(ars_window)
+    ars_window.snake_game.start_game()

@@ -1,12 +1,17 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from prefs.pref_controller import edit_pref, read_pref
-import json
+from ars_cmds.core_cmds.run_ext import run_ext
+from PyQt6.QtGui import QCursor
 
 
 
 BBL_X_CONFIG ={"symbol": ic.ICON_SETTINGS }
-def BBL_X(self, position):
+def BBL_X(*args):
+    run_ext(__file__)
+
+
+def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
 
@@ -26,8 +31,8 @@ def BBL_X(self, position):
     }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
