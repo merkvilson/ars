@@ -5,7 +5,7 @@ import importlib.util
 from importlib.machinery import SourceFileLoader
 from types import CodeType
 from util_functions.ars_window import ars_window
-from ars_cmds.core_cmds.load_object import selected_object
+from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 
 #finds and runs execute_plugin in the given file
 def run_ext(path, window = None, edit_func=None):
@@ -74,6 +74,7 @@ def run_string_code(code_string: str):
         module.__dict__['ars_window'] = ars_window()
         module.__dict__['sel'] = selected_object()
         module.__dict__['msg'] = ars_window().msg
+        module.__dict__['add_primitive'] = add_primitive
 
         # Compile and execute the code in the module's namespace
         code_obj = compile(code_string, '<string>', 'exec')
