@@ -9,7 +9,8 @@ from PyQt6.QtCore import QPoint
 def BBL_TEST3(self, position):
     run_ext(__file__, self)
 
-def doit(self):
+
+def execute_plugin(self):
     config = ContextMenuConfig()
     options_list = [
         ["0","1", "2", "3", "4", "5", "6"],
@@ -50,6 +51,3 @@ def doit(self):
         position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
-
-def execute_plugin(window):
-    doit(window)
