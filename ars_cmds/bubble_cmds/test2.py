@@ -7,11 +7,11 @@ from ars_cmds.core_cmds.load_object import selected_object
 from PyQt6.QtCore import QPoint, QTimer
 
 
-def BBL_2(self, position):
-    run_ext(__file__, self)
+def BBL_2(self, postion):
+    run_ext(__file__)
 
 
-def main(self, position):
+def execute_plugin(window):
     config = ContextMenuConfig()
     config.show_value = True
 
@@ -31,8 +31,8 @@ def main(self, position):
  
 
     config.additional_texts = {
-    "1": "Slider INCR",
-    "2": "Slider FREE",
+    "1": "Slider A",
+    "2": "Slider B",
     }
 
 
@@ -42,12 +42,8 @@ def main(self, position):
     }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=window.central_widget,
         items=options_list,
-        position=position,
+        position=window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
-
-
-def execute_plugin(window):
-    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))
