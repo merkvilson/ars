@@ -2,7 +2,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ui.widgets.py_code_editor import PythonEditorWidget
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.run_ext import run_ext, run_string_code
+from ars_cmds.core_cmds.run_ext import run_ext
 
 import os
 import subprocess
@@ -11,7 +11,7 @@ import platform
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_CODE_PYTHON}
 def BBL_CODE_PYTHON(self, position):
-    run_ext(__file__, self)
+    run_ext(__file__, )
 
 
 
@@ -50,7 +50,7 @@ def _list_user_scripts():
 
 
 
-def scripts_ctx(self, callback_ctx):
+def scripts_ctx(ars_window, callback_ctx):
     py_files = _list_user_scripts()
     config = ContextMenuConfig()
     config.auto_close = True
@@ -76,14 +76,15 @@ def scripts_ctx(self, callback_ctx):
 
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items= [str(i) for i in range(len(py_files))],
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
 
-def main(self, position):
+
+def execute_plugin(ars_window):
     py_files = _list_user_scripts()
     if not py_files:
         print("No python scripts found in ars_scripts/user")
@@ -101,7 +102,7 @@ def main(self, position):
 
     options_list = [["1", "2", "3", "4", "5"], ["PythonEditorWidget"]]
     code_editor = PythonEditorWidget()
-    code_editor.setFixedSize(self.width() - int(44*4.5), 44*5)
+    code_editor.setFixedSize(ars_window.width() - int(44*4.5), 44*5)
     code_editor.editor.setPlainText(current_code_text)
 
     config.additional_texts = {"1": "Scripts List", "2": "Scripts Folder", "3": "Execute", "4": "Save" }
@@ -123,18 +124,15 @@ def main(self, position):
 
 
 
-    config.callbackL = {"1": lambda: scripts_ctx(self, read_code_file),
+    config.callbackL = {"1": lambda: scripts_ctx(ars_window, read_code_file),
                         "2": lambda: open_file(os.path.join("ars_scripts", "user")),
-                        "3": lambda: run_string_code(code_editor.editor.toPlainText()),
+                        "3": lambda: code_editor.run_code(),
                         "4": lambda: save_script()
                         }
 
     ctx = open_context(
-        parent=self.central_widget,
+        parent=ars_window.central_widget,
         items=options_list,
-        position=position,
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
-
-def execute_plugin(window):
-    main(window, position=window.central_widget.mapFromGlobal(QCursor.pos()))
