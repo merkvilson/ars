@@ -7,7 +7,7 @@ from types import CodeType
 from util_functions.ars_window import ars_window
 
 #finds and runs execute_plugin in the given file
-def run_ext(path, ars_window, edit_func=None):
+def run_ext(path, window = None, edit_func=None):
     """Load & execute a Python source file at `path` (works with any extension).
     
     Args:
@@ -41,7 +41,7 @@ def run_ext(path, ars_window, edit_func=None):
 
         # Call the plugin entrypoint if it exists
         if hasattr(module, "execute_plugin"):
-            module.execute_plugin(ars_window)
+            module.execute_plugin(ars_window())
         else:
             print("execute_plugin() not found in", path)
 
