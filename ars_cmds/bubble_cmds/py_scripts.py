@@ -2,7 +2,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ui.widgets.py_code_editor import PythonEditorWidget
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.run_ext import run_ext, run_raw_script, run_string_code
+from ars_cmds.core_cmds.run_ext import run_ext, run_string_code
 
 import os
 import subprocess
@@ -70,7 +70,7 @@ def scripts_ctx(self, callback_ctx):
         index_str = str(i)
         full_path = os.path.join(user_script_dir, filename)
         config.additional_texts[index_str] = filename  # Key matches the item (string number)
-        config.callbackL[index_str] = lambda f=full_path: callback_ctx(f)#run_raw_script(f, self)
+        config.callbackL[index_str] = lambda f=full_path: callback_ctx(f)  # Use lambda to capture current full_path
         config.callbackR[index_str] = lambda f=full_path: open_file(f)
 
 
@@ -125,7 +125,7 @@ def main(self, position):
 
     config.callbackL = {"1": lambda: scripts_ctx(self, read_code_file),
                         "2": lambda: open_file(os.path.join("ars_scripts", "user")),
-                        "3": lambda: run_string_code(code_editor.editor.toPlainText(), self),
+                        "3": lambda: run_string_code(code_editor.editor.toPlainText()),
                         "4": lambda: save_script()
                         }
 
