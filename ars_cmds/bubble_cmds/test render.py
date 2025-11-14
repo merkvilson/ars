@@ -42,8 +42,8 @@ def execute_plugin(self):
                         "6": lambda: self.render_manager.send_render(),
                         }
 
-    config.callback_hover_in = {"0": lambda: self.ttip("render_workflow")}
-    config.callback_hover_out = {"0": lambda: self.ttip("render_manager")}
+    config.callback_hover_in = {"0": lambda: self.msg("render_workflow")}
+    config.callback_hover_out = {"0": lambda: self.msg("render_manager")}
 
     ctx = open_context(
         parent=self.central_widget,
