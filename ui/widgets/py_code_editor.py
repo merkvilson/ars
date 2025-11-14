@@ -494,6 +494,19 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        if key == Qt.Key.Key_Slash and modifiers & Qt.KeyboardModifier.ControlModifier:
+            self._toggle_comment()
+            event.accept()
+            return
+
+        if (
+            key in (Qt.Key.Key_Return, Qt.Key.Key_Enter)
+            and modifiers & Qt.KeyboardModifier.ControlModifier
+        ):
+            self._insert_line_below()
+            event.accept()
+            return
+
         if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self._handle_newline()
             event.accept()
@@ -522,9 +535,13 @@ class CodeEditor(QPlainTextEdit):
         if modifiers & blocked:
             return False
 
+        # Expandable pairing map keeps behavior centralized
         pairs = {
             '"': '"',
+            "'": "'",
             "(": ")",
+            "[": "]",
+            "{": "}",
         }
 
         if text not in pairs:
@@ -554,6 +571,81 @@ class CodeEditor(QPlainTextEdit):
         self.setTextCursor(cursor)
         return True
 
+    def _toggle_comment(self):
+        cursor = self.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(QTextCursor.SelectionType.LineUnderCursor)
+
+        selection_start = cursor.selectionStart()
+        selection_end = cursor.selectionEnd()
+
+        doc = self.document()
+        start_block = doc.findBlock(selection_start)
+        # Ensure we include the block where the selection ends when caret is at column 0
+        end_index = max(selection_start, selection_end - 1)
+        end_block = doc.findBlock(end_index)
+
+        block = start_block
+        should_comment = False
+        while block.isValid():
+            text = block.text()
+            stripped = text.lstrip()
+            if stripped and not stripped.startswith("#"):
+                should_comment = True
+                break
+            if block == end_block:
+                break
+            block = block.next()
+
+        edit_cursor = QTextCursor(doc)
+        edit_cursor.beginEditBlock()
+
+        block = start_block
+        while block.isValid():
+            text = block.text()
+            indent_len = len(text) - len(text.lstrip())
+            block_cursor = QTextCursor(doc)
+            block_cursor.setPosition(block.position())
+            block_cursor.movePosition(
+                QTextCursor.MoveOperation.Right,
+                QTextCursor.MoveMode.MoveAnchor,
+                indent_len,
+            )
+
+            if should_comment:
+                if text.strip():
+                    block_cursor.insertText("# ")
+            else:
+                remainder = text[indent_len:]
+                if remainder.startswith("# "):
+                    block_cursor.movePosition(
+                        QTextCursor.MoveOperation.Right,
+                        QTextCursor.MoveMode.KeepAnchor,
+                        2,
+                    )
+                    block_cursor.removeSelectedText()
+                elif remainder.startswith("#"):
+                    block_cursor.movePosition(
+                        QTextCursor.MoveOperation.Right,
+                        QTextCursor.MoveMode.KeepAnchor,
+                        1,
+                    )
+                    block_cursor.removeSelectedText()
+
+            if block == end_block:
+                break
+            block = block.next()
+
+        edit_cursor.endEditBlock()
+
+        new_cursor = self.textCursor()
+        new_cursor.setPosition(start_block.position())
+        new_cursor.setPosition(
+            end_block.position() + end_block.length() - 1,
+            QTextCursor.MoveMode.KeepAnchor,
+        )
+        self.setTextCursor(new_cursor)
+
     def _handle_newline(self):
         cursor = self.textCursor()
         current_line = cursor.block().text()
@@ -568,6 +660,22 @@ class CodeEditor(QPlainTextEdit):
             cursor.removeSelectedText()
         cursor.insertBlock()
         cursor.insertText(base_indent + extra_indent)
+        cursor.endEditBlock()
+        self.setTextCursor(cursor)
+
+    def _insert_line_below(self):
+        cursor = self.textCursor()
+        cursor.beginEditBlock()
+
+        # Move to end of current block
+        cursor.movePosition(QTextCursor.MoveOperation.EndOfBlock)
+        cursor.insertBlock()
+
+        current_line = cursor.block().previous().text()
+        indent_match = re.match(r"\s*", current_line)
+        indent = indent_match.group(0) if indent_match else ""
+        cursor.insertText(indent)
+
         cursor.endEditBlock()
         self.setTextCursor(cursor)
 
