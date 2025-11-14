@@ -37,12 +37,23 @@ def open_file(path):
 
 # Filter for .py files only
 user_script_dir = os.path.join("ars_scripts", "user")
-py_files = [f for f in os.listdir(user_script_dir) if f.endswith('.py')]
+temp_script = os.path.join("ars_scripts", "temp_script.py")
 
-# Create options list as string numbers
-options_list = [str(i) for i in range(len(py_files))]
+
+def _list_user_scripts():
+    """Return current list of user python scripts (sorted for stability)."""
+    try:
+        return sorted(
+            f for f in os.listdir(user_script_dir)
+            if f.endswith('.py') and os.path.isfile(os.path.join(user_script_dir, f))
+        )
+    except FileNotFoundError:
+        return []
+
+
 
 def scripts_ctx(self, callback_ctx):
+    py_files = _list_user_scripts()
     config = ContextMenuConfig()
     config.auto_close = True
     config.close_on_outside=False
@@ -66,13 +77,17 @@ def scripts_ctx(self, callback_ctx):
 
     ctx = open_context(
         parent=self.central_widget,
-        items=options_list,
+        items= [str(i) for i in range(len(py_files))],
         position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
 
 def main(self, position):
+    py_files = _list_user_scripts()
+    if not py_files:
+        print("No python scripts found in ars_scripts/user")
+        return
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside=False
@@ -84,32 +99,41 @@ def main(self, position):
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [["1","2","3"],["PythonEditorWidget"]]
+    options_list = [["1", "2", "3", "4"], ["PythonEditorWidget"]]
     code_editor = PythonEditorWidget()
-    code_editor.setFixedSize(self.width() - 44*5, 140)
+    code_editor.setFixedSize(self.width() - 44*5, 300)
     code_editor.editor.setPlainText(current_code_text)
 
-    config.additional_texts = {"1": "Scripts List", "2": "Scripts Folder", "3": "Execute"}
+    config.additional_texts = {"1": "Scripts List", "2": "Scripts Folder", "3": "Execute", "4": "Save" }
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
-    def save_and_run():
+    def save_temp_and_exec():
         # Save current code to the file
-        with open(current_code_file, 'w', encoding='utf-8') as f:
+        with open(temp_script, 'w', encoding='utf-8') as f:
             f.write(code_editor.editor.toPlainText())
         # Run the saved script
-        run_raw_script(current_code_file, self)
+        run_raw_script(temp_script, self)
     
-    def update_current_code_file(new_file):
+
+    def read_code_file(new_file):
         nonlocal current_code_file
         current_code_file = new_file
-        with open(current_code_file, 'r', encoding='utf-8') as f:
-            current_code_text = f.read()
-        code_editor.editor.setPlainText(current_code_text)
+        with open(new_file, 'r', encoding='utf-8') as f:
+            new_file = f.read()
+        code_editor.editor.setPlainText(new_file)
 
-    config.callbackL = {"1": lambda: scripts_ctx(self, update_current_code_file),
+    
+    def save_script():
+        with open(current_code_file, 'w', encoding='utf-8') as f:
+            f.write(code_editor.editor.toPlainText())
+
+
+
+    config.callbackL = {"1": lambda: scripts_ctx(self, read_code_file),
                         "2": lambda: open_file(os.path.join("ars_scripts", "user")),
-                        "3": lambda: save_and_run()
+                        "3": lambda: save_temp_and_exec(),
+                        "4": lambda: save_script()
                         }
 
     ctx = open_context(
