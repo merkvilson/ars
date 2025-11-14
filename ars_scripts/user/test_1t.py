@@ -1,1 +1,1 @@
-print (ars_window)
+ars_window.ttip("hello")

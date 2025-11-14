@@ -60,3 +60,6 @@ desktop.ini
 *.bak
 *.swp
 *.tmp
+
+# --- User scripts ---
+ars_scripts/user/
