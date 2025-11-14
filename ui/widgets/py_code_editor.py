@@ -500,6 +500,20 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        if modifiers & Qt.KeyboardModifier.ControlModifier:
+            if key in (
+                Qt.Key.Key_Plus,
+                Qt.Key.Key_Equal,
+                Qt.Key.Key_BracketRight,
+            ):
+                self._change_font_size(1)
+                event.accept()
+                return
+            if key in (Qt.Key.Key_Minus, Qt.Key.Key_Underscore, Qt.Key.Key_BracketLeft):
+                self._change_font_size(-1)
+                event.accept()
+                return
+
         if (
             key in (Qt.Key.Key_Return, Qt.Key.Key_Enter)
             and modifiers & Qt.KeyboardModifier.ControlModifier
@@ -513,8 +527,15 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
-        if key == Qt.Key.Key_Tab:
-            self._insert_text(self.INDENT)
+        if key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
+            is_shift = bool(modifiers & Qt.KeyboardModifier.ShiftModifier) or key == Qt.Key.Key_Backtab
+            if is_shift:
+                self._adjust_selection_indent(decrease=True)
+            else:
+                if self._selection_spans_multiple_blocks():
+                    self._adjust_selection_indent(decrease=False)
+                else:
+                    self._insert_text(self.INDENT)
             event.accept()
             return
 
@@ -663,6 +684,92 @@ class CodeEditor(QPlainTextEdit):
         cursor.insertText(base_indent + extra_indent)
         cursor.endEditBlock()
         self.setTextCursor(cursor)
+
+    def _adjust_selection_indent(self, decrease: bool):
+        cursor = self.textCursor()
+        doc = self.document()
+
+        has_selection = cursor.hasSelection()
+        sel_start = cursor.selectionStart() if has_selection else cursor.position()
+        sel_end = cursor.selectionEnd() if has_selection else cursor.position()
+
+        start_block = doc.findBlock(sel_start)
+        end_index = max(sel_start, sel_end - 1)
+        end_block = doc.findBlock(end_index)
+
+        caret_block_number = cursor.block().blockNumber()
+        caret_column = cursor.position() - cursor.block().position()
+        removed_on_caret_line = 0
+
+        cursor.beginEditBlock()
+
+        block = start_block
+        while block.isValid():
+            block_cursor = QTextCursor(doc)
+            block_cursor.setPosition(block.position())
+
+            if decrease:
+                text = block.text()
+                remove_chars = 0
+                idx = 0
+                while idx < len(text) and remove_chars < len(self.INDENT):
+                    ch = text[idx]
+                    if ch == " ":
+                        idx += 1
+                        remove_chars += 1
+                    elif ch == "\t":
+                        idx += 1
+                        remove_chars = len(self.INDENT)
+                        break
+                    else:
+                        break
+
+                if idx > 0:
+                    block_cursor.movePosition(
+                        QTextCursor.MoveOperation.Right,
+                        QTextCursor.MoveMode.KeepAnchor,
+                        idx,
+                    )
+                    block_cursor.removeSelectedText()
+                    if block.blockNumber() == caret_block_number and not has_selection:
+                        removed_on_caret_line = idx
+            else:
+                block_cursor.insertText(self.INDENT)
+
+            if block == end_block:
+                break
+            block = block.next()
+
+        cursor.endEditBlock()
+
+        if has_selection:
+            new_cursor = self.textCursor()
+            new_cursor.setPosition(start_block.position())
+            new_cursor.setPosition(
+                end_block.position() + end_block.length() - 1,
+                QTextCursor.MoveMode.KeepAnchor,
+            )
+            self.setTextCursor(new_cursor)
+        else:
+            block = doc.findBlockByNumber(caret_block_number)
+            new_column = max(0, caret_column - removed_on_caret_line)
+            new_pos = block.position() + new_column
+            new_cursor = QTextCursor(doc)
+            new_cursor.setPosition(new_pos)
+            self.setTextCursor(new_cursor)
+
+    def _selection_spans_multiple_blocks(self) -> bool:
+        cursor = self.textCursor()
+        if not cursor.hasSelection():
+            return False
+        start = cursor.selectionStart()
+        end = cursor.selectionEnd()
+        if start == end:
+            return False
+        doc = self.document()
+        start_block = doc.findBlock(start)
+        end_block = doc.findBlock(max(start, end - 1))
+        return start_block != end_block
 
     def _insert_line_below(self):
         cursor = self.textCursor()
