@@ -38,7 +38,7 @@ def main(self, position):
 
     config.callbackL = {
         "1": lambda value: print(value),
-        "2": lambda: print("Button 2 pressed"),
+        "2": lambda value: print(value),
     }
 
     ctx = open_context(
