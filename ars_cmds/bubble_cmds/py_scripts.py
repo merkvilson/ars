@@ -2,7 +2,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ui.widgets.py_code_editor import PythonEditorWidget
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.run_ext import run_ext, run_raw_script
+from ars_cmds.core_cmds.run_ext import run_ext, run_raw_script, run_string_code
 
 import os
 import subprocess
@@ -37,8 +37,6 @@ def open_file(path):
 
 # Filter for .py files only
 user_script_dir = os.path.join("ars_scripts", "user")
-temp_script = os.path.join("ars_scripts", "temp_script.py")
-
 
 def _list_user_scripts():
     """Return current list of user python scripts (sorted for stability)."""
@@ -59,6 +57,8 @@ def scripts_ctx(self, callback_ctx):
     config.close_on_outside=False
     config.show_symbol = False
     config.anchor = "+y"
+    config.extra_distance = [-99999,-20]
+
 
 
     # Dynamically create dictionaries for all Python files
@@ -99,22 +99,15 @@ def main(self, position):
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [["1", "2", "3", "4"], ["PythonEditorWidget"]]
+    options_list = [["1", "2", "3", "4", "5"], ["PythonEditorWidget"]]
     code_editor = PythonEditorWidget()
-    code_editor.setFixedSize(self.width() - 44*5, 300)
+    code_editor.setFixedSize(self.width() - int(44*4.5), 44*5)
     code_editor.editor.setPlainText(current_code_text)
 
     config.additional_texts = {"1": "Scripts List", "2": "Scripts Folder", "3": "Execute", "4": "Save" }
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
-    def save_temp_and_exec():
-        # Save current code to the file
-        with open(temp_script, 'w', encoding='utf-8') as f:
-            f.write(code_editor.editor.toPlainText())
-        # Run the saved script
-        run_raw_script(temp_script, self)
-    
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -132,7 +125,7 @@ def main(self, position):
 
     config.callbackL = {"1": lambda: scripts_ctx(self, read_code_file),
                         "2": lambda: open_file(os.path.join("ars_scripts", "user")),
-                        "3": lambda: save_temp_and_exec(),
+                        "3": lambda: run_string_code(code_editor.editor.toPlainText(), self),
                         "4": lambda: save_script()
                         }
 
