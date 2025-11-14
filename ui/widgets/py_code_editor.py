@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QVBoxLayout,
 )
+from ars_cmds.core_cmds.run_ext import run_string_code
 
 
 class PythonHighlighter(QSyntaxHighlighter):
