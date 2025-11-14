@@ -532,7 +532,7 @@ class CodeEditor(QPlainTextEdit):
             if is_shift:
                 self._adjust_selection_indent(decrease=True)
             else:
-                if self._selection_spans_multiple_blocks():
+                if self.textCursor().hasSelection():
                     self._adjust_selection_indent(decrease=False)
                 else:
                     self._insert_text(self.INDENT)
@@ -759,6 +759,7 @@ class CodeEditor(QPlainTextEdit):
             self.setTextCursor(new_cursor)
 
     def _selection_spans_multiple_blocks(self) -> bool:
+        """Check if the current selection spans multiple text blocks (lines)."""
         cursor = self.textCursor()
         if not cursor.hasSelection():
             return False
@@ -770,6 +771,7 @@ class CodeEditor(QPlainTextEdit):
         start_block = doc.findBlock(start)
         end_block = doc.findBlock(max(start, end - 1))
         return start_block != end_block
+
 
     def _insert_line_below(self):
         cursor = self.textCursor()
