@@ -88,8 +88,8 @@ class MainWindow(QMainWindow):
         # Run startup commands
         self.execute_startup_commands()
 
-    def ttip(self, text: str):
-        self.CF.UP("additional_text", text)
+    def msg(self, text: str, auto_close: int = 2000):
+        self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
 
     def swap_widgets(self):
         if self.viewport.isVisible():
