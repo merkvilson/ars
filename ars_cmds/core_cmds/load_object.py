@@ -12,6 +12,7 @@ import time
 from prefs.pref_controller import get_path
 from ars_cmds.mesh_gen.animated_bbox import plane_fill_animation, delete_bbox_animations
 from ars_3d_engine.mesh_objects.obj_point import CPoint
+from util_functions.ars_window import ars_window
 
 mesh_files = "(*.obj *.stl *.ply *.off *.dae *.glb *.gltf *.3mf)"
 
@@ -139,8 +140,8 @@ def add_primitive(self, **params, ):
     obj.set_position(0, 2 if animated else 0, 0)
     return add_mesh(self, file_path=obj, animated=animated)
 
-def selected_object(self):
-    selected = self.viewport._objectManager.get_selected_objects()
+def selected_object(self=None):
+    selected = ars_window().viewport._objectManager.get_selected_objects()
     if selected:
         return selected[0]
     return None
