@@ -2,6 +2,7 @@ import sys
 import re
 import keyword
 import builtins
+from pathlib import Path
 
 from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF
 from PyQt6.QtGui import (
@@ -20,9 +21,8 @@ from PyQt6.QtWidgets import (
     QWidget,
     QPlainTextEdit,
     QVBoxLayout,
-)
+)    
 from ars_cmds.core_cmds.run_ext import run_string_code
-
 
 class PythonHighlighter(QSyntaxHighlighter):
     """
@@ -432,6 +432,10 @@ class PythonEditorWidget(QWidget):
         self.setLayout(layout)
         self.setWindowTitle("Python Editor Widget")
 
+    def run_code(self):
+        """Execute the current editor buffer."""
+        self.editor.run_code()
+
 
     def _apply_atom_one_dark_theme(self):
         palette = self.editor.palette()
@@ -487,12 +491,20 @@ class CodeEditor(QPlainTextEdit):
 
         self.update_line_number_area_width(0)
 
+    def run_code(self):
+        run_string_code(self.toPlainText())
+
     def keyPressEvent(self, event):
         key = event.key()
         text = event.text()
         modifiers = event.modifiers()
 
         if self._handle_pair_chars(text, modifiers):
+            event.accept()
+            return
+
+        if key == Qt.Key.Key_R and modifiers & Qt.KeyboardModifier.ControlModifier:
+            self.run_code()
             event.accept()
             return
 
