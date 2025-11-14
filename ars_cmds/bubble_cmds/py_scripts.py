@@ -9,8 +9,7 @@ import subprocess
 import platform
 
 
-BBL_TEST_CONFIG = {"symbol": ic.ICON_CODE_PYTHON}
-def BBL_CODE_PYTHON(*args):
+def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
 
 
@@ -100,12 +99,12 @@ def execute_plugin(ars_window):
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [["1", "2", "3", "4", "5"], ["PythonEditorWidget"]]
+    options_list = [[ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_CODE_PYTHON, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL], ["PythonEditorWidget"]]
     code_editor = PythonEditorWidget()
     code_editor.setFixedSize(ars_window.width() - int(44*4.5), 44*5)
     code_editor.editor.setPlainText(current_code_text)
 
-    config.additional_texts = {"1": "Scripts List", "2": "Scripts Folder", "3": "Execute", "4": "Save" }
+    config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_CODE_PYTHON: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
@@ -124,10 +123,11 @@ def execute_plugin(ars_window):
 
 
 
-    config.callbackL = {"1": lambda: scripts_ctx(ars_window, read_code_file),
-                        "2": lambda: open_file(os.path.join("ars_scripts", "user")),
-                        "3": lambda: code_editor.run_code(),
-                        "4": lambda: save_script()
+    config.callbackL = {ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
+                       ic.ICON_FOLDER_OPEN: lambda: open_file(os.path.join("ars_scripts", "user")),
+                        ic.ICON_CODE_PYTHON: lambda: code_editor.run_code(),
+                        ic.ICON_SAVE: lambda: save_script(),
+                        ic.ICON_CODE_TERMINAL: lambda: open_file(current_code_file)
                         }
 
     ctx = open_context(
