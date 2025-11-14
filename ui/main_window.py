@@ -2,7 +2,6 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
-
 from ars_3d_engine.viewport import ViewportWidget
 from ars_cmds.core_cmds.define_hotkeys import define_hotkeys
 from ars_cmds.core_cmds.distribute_bubbles import distribute_bubbles
@@ -90,8 +89,7 @@ class MainWindow(QMainWindow):
 
     def msg(self, text: str, auto_close: int = 1500):
         text = str(text)
-        self.CF.UP(key="additional_text", value=text, auto_close = 500, symbol = "X")
-        QTimer.singleShot(300, lambda:self.CF.UP(key="additional_text", value=text, auto_close = auto_close))
+        self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
 
     def swap_widgets(self):
         if self.viewport.isVisible():
