@@ -71,7 +71,7 @@ def generate_mesh(self, ctx):
                 # New file was created
                 new_file = new_files.pop()
                 print(f"New file detected: {new_file}")
-                if add_mesh(self, os.path.join(mesh_dir, new_file), animated=False): cleanup()
+                if add_mesh(os.path.join(mesh_dir, new_file), animated=False): cleanup()
                 
             else:
                 # Queue is empty but no new file = generation was skipped
@@ -88,7 +88,7 @@ def generate_mesh(self, ctx):
             new_file = new_files.pop()
             print(f"New file detected: {new_file}")
             cleanup()
-            mesh = add_mesh(self, os.path.join(mesh_dir, new_file), animated=False)
+            mesh = add_mesh(os.path.join(mesh_dir, new_file), animated=False)
             mesh.set_scale((2,2,2))
     # Connect signals
     self._mesh_watcher.directoryChanged.connect(on_directory_changed)
