@@ -88,7 +88,8 @@ class MainWindow(QMainWindow):
         # Run startup commands
         self.execute_startup_commands()
 
-    def msg(self, text: str, auto_close: int = 2000):
+    def msg(self, text: str, auto_close: int = 1500):
+        text = str(text)
         self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
 
     def swap_widgets(self):
