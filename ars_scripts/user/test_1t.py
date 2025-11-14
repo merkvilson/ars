@@ -1,1 +1,0 @@
-ars_window.ttip("hello")
