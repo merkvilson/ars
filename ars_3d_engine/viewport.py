@@ -12,6 +12,7 @@ from vispy.scene import transforms
 from .gizmo.gizmo import *
 from scipy.spatial.transform import Rotation as ScipyRotation
 from ars_cmds import bubble_cmds
+from ars_cmds.obj_ctx.obj_att_mng import obj_att_mng
 
 class ViewportWidget(QWidget):
     def __init__(self, parent=None,):
@@ -251,7 +252,7 @@ class ViewportWidget(QWidget):
 
 
         if event.button == 2:
-            bubble_cmds.obj_att_mng(self.window())
+            obj_att_mng(self.window())
             self.controller.set_handles([])
 
 
