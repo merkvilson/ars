@@ -90,7 +90,8 @@ class MainWindow(QMainWindow):
 
     def msg(self, text: str, auto_close: int = 1500):
         text = str(text)
-        self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
+        self.CF.UP(key="additional_text", value=text, auto_close = 500, symbol = "X")
+        QTimer.singleShot(300, lambda:self.CF.UP(key="additional_text", value=text, auto_close = auto_close))
 
     def swap_widgets(self):
         if self.viewport.isVisible():
