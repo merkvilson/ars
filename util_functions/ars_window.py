@@ -9,24 +9,46 @@ Usage
 """
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Type
+
+from importlib import import_module
 
 from PyQt6.QtWidgets import QApplication, QWidget
 
-from ui.main_window import MainWindow
-
 if TYPE_CHECKING:  # pragma: no cover - type checking only
     from typing import Iterable
+    from ui.main_window import MainWindow
 
-_cached_window: Optional[MainWindow] = None
+_cached_window: Optional["MainWindow"] = None
+_main_window_type: Optional[Type["MainWindow"]] = None
+
+
+def _get_main_window_type() -> Optional[Type["MainWindow"]]:
+    """Load and cache the ``ui.main_window.MainWindow`` type lazily."""
+
+    global _main_window_type
+
+    if _main_window_type is None:
+        try:
+            module = import_module("ui.main_window")
+            _main_window_type = getattr(module, "MainWindow")
+        except (ImportError, AttributeError):
+            return None
+
+    return _main_window_type
 
 
 def _is_valid_window(widget: Optional[QWidget]) -> bool:
     """Return True when *widget* is an existing MainWindow instance."""
     if widget is None:
         return False
+
+    main_window_type = _get_main_window_type()
+    if main_window_type is None:
+        return False
+
     try:
-        return isinstance(widget, MainWindow)
+        return isinstance(widget, main_window_type)
     except RuntimeError:
         # Happens when the underlying C++ object has been deleted.
         return False
