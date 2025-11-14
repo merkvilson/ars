@@ -473,12 +473,13 @@ class CodeEditor(QPlainTextEdit):
     """Lightweight conveniences for typing Python."""
 
     INDENT = " " * 4
-    MIN_FONT_SIZE = 6
+    MIN_FONT_SIZE = 10
     MAX_FONT_SIZE = 48
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.line_number_area = LineNumberArea(self)
+        self.line_number_area.setFont(self.font())
 
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
@@ -705,6 +706,9 @@ class CodeEditor(QPlainTextEdit):
         font.setPointSize(new_size)
         self.setFont(font)
         self.document().setDefaultFont(font)
+        self.line_number_area.setFont(font)
+        self.update_line_number_area_width(0)
+        self.line_number_area.update()
 
     def line_number_area_width(self):
         digits = len(str(max(1, self.blockCount())))
