@@ -111,3 +111,7 @@ def execute_plugin(ars_window):
         items=options_list,
         config=config
     )
+
+    ctx.symbol = "py_scripts_ctx"
+
+    return ctx, code_editor
