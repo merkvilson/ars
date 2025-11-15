@@ -470,12 +470,12 @@ class PythonEditorWidget(QWidget):
         )
 
         # Monospaced font - use Consolas (common on Windows) or Courier New
-        fixed = QFont("Consolas", 12)
-        if not fixed.exactMatch():
-            fixed = QFont("Courier New", 12)
-        if not fixed.exactMatch():
-            fixed = QFont("Monospace", 12)
-            fixed.setStyleHint(QFont.StyleHint.TypeWriter)
+        fixed = QFont("Consolas", 14)
+        # if not fixed.exactMatch():
+        #     fixed = QFont("Courier New", 12)
+        # if not fixed.exactMatch():
+        #     fixed = QFont("Monospace", 12)
+        #     fixed.setStyleHint(QFont.StyleHint.TypeWriter)
         fixed.setWeight(QFont.Weight.Medium)
         self.editor.setFont(fixed)
 
@@ -525,6 +525,13 @@ class CodeEditor(QPlainTextEdit):
         self.updateRequest.connect(self.update_line_number_area)
 
         self.update_line_number_area_width(0)
+
+    def setFont(self, font):
+        """Override setFont to keep line number area in sync."""
+        super().setFont(font)
+        if hasattr(self, 'line_number_area'):
+            self.line_number_area.setFont(font)
+            self.update_line_number_area_width(0)
 
     def run_code(self):
         run_string_code(self.toPlainText())
