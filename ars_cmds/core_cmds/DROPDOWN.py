@@ -3,6 +3,7 @@ from PyQt6.QtGui import QCursor
 from PyQt6.QtCore import Qt, QTimer
 from theme.fonts import font_icons as ic
 import theme.fonts.new_fonts as RRRFONT
+from ars_cmds.util_cmds.open_file import open_file
 
 def unlock_function(self):
     new_state = Qt.CheckState.Unchecked if self.bubbles_overlay.locked else Qt.CheckState.Checked
@@ -11,7 +12,8 @@ def unlock_function(self):
 
 
 
-def r_dropdown(self, path = None):
+def r_dropdown(self, code_path = None):
+    print("Dropdown path:", code_path)
     config = ContextMenuConfig()
     config.item_radius = 15
     config.font = RRRFONT.get_font(15)
@@ -40,6 +42,7 @@ def r_dropdown(self, path = None):
                                unlock_function(self),
                                ctx.update_item(ic.ICON_LOCK_state, "symbol", ic.ICON_LOCK if self.bubbles_overlay.locked else ic.ICON_LOCK_OPEN),
             ),
+        ic.ICON_CODE_TERMINAL: lambda: open_file(code_path),
         ic.ICON_POWER: lambda: QTimer.singleShot(500, self.close),
     }
 

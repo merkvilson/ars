@@ -24,8 +24,12 @@ def distribute_bubbles(self):
                             symbol = stem
                     else:
                         symbol = globals().get(f'ICON_{stem.upper()}', stem)
+                    
+                    # Get the full file path of the module
+                    module_file_path = os.path.abspath(module.__file__)
+                    
                     config = BubbleConfig()
                     config.symbol = symbol
                     bubble = self.bubbles_overlay.add_bubble(config)
                     bubble.config.callbackL = lambda  f=func: f(self, )
-                    bubble.config.callbackR = lambda: r_dropdown(self, path = None)
+                    bubble.config.callbackR = lambda p=module_file_path: r_dropdown(self, code_path=p)
