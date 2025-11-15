@@ -2,8 +2,6 @@ import os
 import uuid
 import traceback
 import importlib.util
-from importlib.machinery import SourceFileLoader
-from types import CodeType
 from util_functions.ars_window import ars_window
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 
