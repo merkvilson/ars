@@ -4,6 +4,7 @@ from vispy import scene
 from ars_3d_engine.mesh_objects.scene_objects import CGeometry
 import pyvista as pv
 from vispy.geometry import MeshData
+from theme.fonts import font_icons as ic
 
 
 class CPrimitive(CGeometry):
@@ -21,7 +22,12 @@ class CPrimitive(CGeometry):
         self.direction = params.get('direction', (0, 1, 0))
         self.slice_start = params.get('slice_start', 0)
         self.radius_inner = params.get('radius_inner', 0.0)
-
+        self.symbol = self._get_symbol_for_type(self.primitive_type)
+    
+    def _get_symbol_for_type(self, ptype):
+        return {'sphere': ic.ICON_OBJ_SPHERE, 'cube': ic.ICON_OBJ_BOX, 'plane': ic.ICON_OBJ_PLANE, 
+                'cylinder': ic.ICON_OBJ_CYLINDER, 'cone': ic.ICON_OBJ_CONE, 'disc': ic.ICON_OBJ_DISC, 
+                'pyramid': ic.ICON_OBJ_PYRAMID, 'torus': ic.ICON_OBJ_TORUS}.get(ptype, ic.ICON_OBJ_BBOX)
 
     @classmethod
     def create(cls, primitive_type='sphere', color=(102/255, 108/255, 120/255, 1.0), 
@@ -53,6 +59,7 @@ class CPrimitive(CGeometry):
         """
         # Update primitive type
         self.primitive_type = primitive_type
+        self.symbol = self._get_symbol_for_type(primitive_type)
         
         # Update parameters if provided, otherwise keep existing ones
         if 'radius' in params:

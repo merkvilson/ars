@@ -9,6 +9,7 @@ import freetype
 from shapely.geometry import Polygon as ShapelyPolygon
 from shapely.ops import unary_union
 import mapbox_earcut as earcut
+from theme.fonts import font_icons as ic
 
 
 class CText3D(CGeometry):
@@ -23,6 +24,8 @@ class CText3D(CGeometry):
         self._angle = angle
         self._font_name = font_name
 
+        self.symbol = ic.ICON_OBJ_TXT_ABC
+        
     @classmethod
     def create(cls, text="text", depth=0.5, color=(102/255, 108/255, 120/255, 1.0), translate=(0.0, 0.0, 0.0), name="Text3D", angle=30.0, font_name="Dosis"):
         md = CText3D._generate_mesh_data_with_breaking_angle(text, depth, angle, font_name)

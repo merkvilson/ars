@@ -8,6 +8,7 @@ import os
 
 
 from ars_3d_engine.mesh_objects.scene_objects import CGeometry
+from theme.fonts import font_icons as ic
 
 
 class CSprite(CGeometry):
@@ -19,6 +20,7 @@ class CSprite(CGeometry):
         # Add CSprite-specific attributes
         self.cfg = cfg
         self.sprite_size = (2.0, 2.0) # Default size
+        self.symbol = ic.ICON_OBJ_SPRITE
 
     @staticmethod
     def _create_quad_meshdata(size):

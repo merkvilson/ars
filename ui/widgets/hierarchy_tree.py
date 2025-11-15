@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from theme import StyleSheets
-from util_functions.colorize_png import colorize_icon
 
 
 class HierarchyTree(QTreeWidget):
@@ -91,16 +90,11 @@ class ObjectHierarchyWindow(QWidget):
             self.add_tree_item(i, obj, uid)
 
     def add_tree_item(self, index, obj, uid):
-        item = QTreeWidgetItem([obj.name])
-        item.setIcon(0, self.get_icon_for(obj))
+        item = QTreeWidgetItem([f"{obj.symbol}  {obj.name}"])
         item.setData(0, Qt.ItemDataRole.UserRole, uid)
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
         self.tree.insertTopLevelItem(index, item)
 
-    def get_icon_for(self, obj):
-        # Placeholder: Customize based on object type
-        color = "white"  # Can map to type, e.g., if isinstance(obj, CSphere): color = "orange"
-        return colorize_icon(r"theme/icons/objects.png", color)
 
     def on_object_added(self, index, obj):
         uid = id(obj)
@@ -114,8 +108,7 @@ class ObjectHierarchyWindow(QWidget):
             parent_item, _ = self.find_item_by_uid(parent_uid)
             if parent_item:
                 # Add as child of parent
-                item = QTreeWidgetItem([obj.name])
-                item.setIcon(0, self.get_icon_for(obj))
+                item = QTreeWidgetItem([f"{obj.symbol}  {obj.name}"])
                 item.setData(0, Qt.ItemDataRole.UserRole, uid)
                 item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
                 parent_item.addChild(item)

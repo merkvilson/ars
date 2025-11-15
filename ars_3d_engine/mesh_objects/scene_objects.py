@@ -5,9 +5,9 @@ from vispy.scene import transforms
 from vispy.visuals.transforms import NullTransform
 from vispy.visuals.filters import ShadingFilter
 from vispy.geometry import MeshData  
-
 from vispy.io import imread 
 from vispy.visuals.filters import TextureFilter 
+from theme.fonts import font_icons as ic
 
 class CGeometry(ABC):
 
@@ -36,6 +36,8 @@ class CGeometry(ABC):
         self.workflow = None
         self.resolution = (512, 512)
         self.texture_path = None
+
+        self.symbol = ic.ICON_OBJ_BBOX
 
         # Attach shading filter for directional light
         self.shading_filter = None
