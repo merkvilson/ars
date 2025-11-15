@@ -46,7 +46,7 @@ def dd_drop(self, event):
     for f in files:
 
         if f.endswith(objs):
-            Bcmd.add_mesh(self, f, True)
+            Bcmd.add_mesh(f, True)
             ttip, sym = "Object Loaded!", ic.ICON_FILE_CHECK
 
         elif f.endswith(imgs):
@@ -58,12 +58,12 @@ def dd_drop(self, event):
             ttip, sym = "Layout Loaded!", ic.ICON_FILE_CHECK
     
         elif f.endswith(".py"):
-            run_ext(f, self)
+            run_ext(f)
             ttip, sym = "Script Loaded!", ic.ICON_FILE_CHECK
 
     
         elif f.endswith(".arsp"):
-            run_ext(f, self)
+            run_ext(f)
             ttip, sym = "Script Loaded!", ic.ICON_FILE_CHECK
 
 
