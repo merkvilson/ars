@@ -147,9 +147,9 @@ def obj_color(self, position, callback=None):
 #
     options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_CLOSE_RADIAL,]
 
-    if not selected_object(self):
+    if not selected_object():
         return
-    obj = selected_object(self)
+    obj = selected_object()
 
     # get current color in rgba float [0..1]
 

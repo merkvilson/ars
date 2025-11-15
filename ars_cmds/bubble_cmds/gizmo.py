@@ -11,7 +11,7 @@ def BBL_GIZMO_MOVE(*args):
 
 
 def execute_plugin(ars_window):
-    if not selected_object(ars_window):
+    if not selected_object():
         return
 
     config = ContextMenuConfig()
