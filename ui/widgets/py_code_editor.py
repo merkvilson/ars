@@ -458,7 +458,7 @@ class PythonEditorWidget(QWidget):
             "background-color: #282c34;"
             "color: #abb2bf;"
             "border: none;"
-            "border-radius: 10px;"
+            "border-radius: 20px;"
             "selection-color: #ffffff;"
             "selection-background-color: #3e4451;"
             "}"
@@ -840,7 +840,7 @@ class CodeEditor(QPlainTextEdit):
 
     def line_number_area_width(self):
         digits = len(str(max(1, self.blockCount())))
-        space = 20 + self.fontMetrics().horizontalAdvance('9') * digits
+        space = 30 + self.fontMetrics().horizontalAdvance('9') * digits
         return space
 
     def update_line_number_area_width(self, _):
@@ -867,7 +867,7 @@ class CodeEditor(QPlainTextEdit):
         # Draw rounded rectangle background
         path = QPainterPath()
         rect = QRectF(self.line_number_area.rect())
-        path.addRoundedRect(rect, 10, 10)
+        path.addRoundedRect(rect, 20, 20)
         painter.fillPath(path, QColor("#21252b"))
 
         block = self.firstVisibleBlock()
