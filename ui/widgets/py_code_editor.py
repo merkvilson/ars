@@ -199,13 +199,23 @@ class PythonHighlighter(QSyntaxHighlighter):
         else:
             cursor = 0
 
-        # 2) Scan for triple-quoted strings opened/closed within this block
+        # 2) Single-line strings FIRST (with optional prefixes, including f-strings)
+        # This prevents triple quotes inside strings from being misdetected
+        self._highlight_single_line_strings(text, protected)
+
+        # 3) Scan for triple-quoted strings opened/closed within this block
+        # Only scan areas not already protected by single-line strings
         pos = cursor
         out_state = 0
         while pos < len(text):
+            # Skip positions already in protected ranges
+            if self._overlaps(protected, pos, 1):
+                pos += 1
+                continue
+                
             idx_sq = text.find(self.triple_sq, pos)
             idx_dq = text.find(self.triple_dq, pos)
-            candidates = [i for i in (idx_sq, idx_dq) if i != -1]
+            candidates = [i for i in (idx_sq, idx_dq) if i != -1 and not self._overlaps(protected, i, 3)]
             if not candidates:
                 break
             nxt = min(candidates)
@@ -250,9 +260,6 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         if out_state:
             self.setCurrentBlockState(out_state)
-
-        # 3) Single-line strings (with optional prefixes, including f-strings)
-        self._highlight_single_line_strings(text, protected)
 
         # 4) Comments (ensure not inside strings)
         self._highlight_comments(text, protected)
