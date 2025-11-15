@@ -1,0 +1,19 @@
+from ui.widgets.context_menu import ContextMenuConfig, open_context
+from PyQt6.QtGui import QCursor
+from ui.widgets.bubble_layout import BubbleConfig
+from ars_cmds import bubble_cmds as Bcmd
+from theme.fonts import font_icons as ic
+
+import os
+
+
+def plugin_1(ars_window):
+    ars_window.msg("Test Plugin Activated")
+
+def execute_plugin(window):
+
+    config = BubbleConfig()
+    config.symbol = ic.ICON_TEST3
+    bubble = window.bubbles_overlay.add_bubble(config)
+    bubble.config.callbackL = lambda: plugin_1(window)
+
