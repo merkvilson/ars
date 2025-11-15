@@ -6,10 +6,6 @@ import os
 import importlib
 import inspect
 
-def bubble_pos(bubble):
-    res = bubble.pos() + QPoint(bubble.width() // 2, bubble.height() // 2)
-    return res
-
 def distribute_bubbles(self):
 
     for filename in os.listdir(os.path.join('ars_cmds','bubble_cmds')):
