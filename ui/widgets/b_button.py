@@ -32,6 +32,7 @@ from typing import Optional, Callable, Tuple, Any
 
 import inspect
 from theme.fonts.new_fonts import get_font
+from theme import colors
 from .widget_control import set_updated_config
 from core.cursor_modifier import CursorModifier
 
@@ -129,11 +130,11 @@ class RoundedRectOutline(QGraphicsRectItem):
 class BButtonConfig:
     symbol: str = ""
     radius: int = 22
-    color: QColor = field(default_factory=lambda: QColor(70, 70, 70, 200))
-    hover_color: QColor = field(default_factory=lambda: QColor(150, 150, 150, 200))
-    symbol_color: QColor = field(default_factory=lambda: QColor(255, 255, 255, 180))
-    additional_text_color: QColor = field(default_factory=lambda: QColor(255, 255, 255, 180))
-    hotkey_text_color: QColor = field(default_factory=lambda: QColor(255, 255, 255, 180))
+    color: QColor = field(default_factory=lambda: colors.button_color)
+    hover_color: QColor = field(default_factory=lambda: colors.hover_color)
+    symbol_color: QColor = field(default_factory=lambda: colors.symbol_color)
+    additional_text_color: QColor = field(default_factory=lambda: colors.additional_text_color)
+    hotkey_text_color: QColor = field(default_factory=lambda: colors.hotkey_text_color)
     font: QFont = field(default_factory=lambda: get_font(16))
     additional_font: QFont = field(default_factory=lambda: QFont("Arial", 10))
     hover_scale: float = 1.0
@@ -147,12 +148,12 @@ class BButtonConfig:
     use_extended_shape: bool = False
     auto_close: bool = False
     slider_values: Optional[Tuple[int, int, int]] = None
-    slider_color: QColor = field(default_factory=lambda: QColor(150, 150, 150, 150))
+    slider_color: QColor = field(default_factory=lambda: colors.slider_color)
     toggle_values: Optional[Any] = None
-    toggle_color: QColor = field(default_factory=lambda: QColor(100, 120, 170, 200))
-    toggle_hover_color: QColor = field(default_factory=lambda: QColor(120, 150, 255, 230))
-    toggle_disabled_color: QColor = field(default_factory=lambda: QColor(0, 0, 10, 100))
-    toggle_disabled_hover_color: QColor = field(default_factory=lambda: QColor(60, 75, 125, 200))
+    toggle_color: QColor = field(default_factory=lambda: colors.toggle_color)
+    toggle_hover_color: QColor = field(default_factory=lambda: colors.toggle_hover_color)
+    toggle_disabled_color: QColor = field(default_factory=lambda: colors.toggle_disabled_color)
+    toggle_disabled_hover_color: QColor = field(default_factory=lambda: colors.toggle_disabled_hover_color)
     show_value: bool = False
     show_symbol: bool = True
     editable: bool = True
@@ -206,7 +207,7 @@ class BButton(QGraphicsObject):
         if self.progress_bar:
             self.slider_values = (0, 100, 0)
             self._slider_value = 0
-            self.slider_color = QColor(120, 150, 255, 230)
+            self.slider_color = colors.slider_progress_color
             self.editable = False
         self._is_dragging = False
         self._drag_button = None
