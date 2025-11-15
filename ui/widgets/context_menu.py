@@ -86,11 +86,12 @@ class ContextMenuConfig:
 
 
 class ContextButtonWindow(QWidget):
-    def __init__(self, parent, items, config, position):
+    def __init__(self, parent, items, config, position, symbol = None):
         super().__init__(parent)
 
         self.config = config
         self.items = items
+        self.symbol = symbol
 
         # ---- Window flags / transparency ----
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint)
