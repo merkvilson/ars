@@ -1087,7 +1087,13 @@ class CodeEditor(QPlainTextEdit):
 
 
 if __name__ == "__main__":
+    import os
     app = QApplication(sys.argv)
     widget = PythonEditorWidget()
+
+    with open(os.path.join("tests", "sample_editor_script.py"), 'r', encoding='utf-8') as f:
+        new_file = f.read()
+    widget.editor.setPlainText(new_file)
+    widget.resize(1280, 720)
     widget.show()
     sys.exit(app.exec())
