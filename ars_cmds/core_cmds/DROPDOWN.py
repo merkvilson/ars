@@ -27,7 +27,7 @@ def r_dropdown(self, position):
         "?",
         ic.ICON_MENU,
         ic.ICON_PIN,
-        ic.ICON_SAVE,
+        ic.ICON_CODE_TERMINAL,
         ic.ICON_POWER,
     ]
 
@@ -50,15 +50,13 @@ def r_dropdown(self, position):
         "?": "Help",
         ic.ICON_MENU: "Settings",
         ic.ICON_PIN: "Pin",
-        ic.ICON_SAVE: "Save",
+        ic.ICON_CODE_TERMINAL: "Edit Code",
         ic.ICON_POWER: "Exit",
     }
 
 
 
     ctx = open_context(
-        parent=self.central_widget,
         items=options_list,
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
