@@ -71,9 +71,10 @@ def run_string_code(code_string: str):
         module = importlib.util.module_from_spec(spec)
 
         # Inject ars_window into the module's namespace
-        module.__dict__['ars_window'] = ars_window()
+        window = ars_window()
+        module.__dict__['ars_window'] = window
         module.__dict__['sel'] = selected_object()
-        module.__dict__['msg'] = ars_window().msg
+        module.__dict__['msg'] = window.msg
         module.__dict__['add_primitive'] = add_primitive
 
         # Compile and execute the code in the module's namespace
