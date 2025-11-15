@@ -11,7 +11,7 @@ def unlock_function(self):
 
 
 
-def r_dropdown(self, position):
+def r_dropdown(self):
     config = ContextMenuConfig()
     config.item_radius = 15
     config.font = RRRFONT.get_font(15)

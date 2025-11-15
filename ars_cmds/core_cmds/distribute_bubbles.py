@@ -31,5 +31,5 @@ def distribute_bubbles(self):
                     config = BubbleConfig()
                     config.symbol = symbol
                     bubble = self.bubbles_overlay.add_bubble(config)
-                    bubble.config.callbackL = lambda bb=bubble, f=func: f(self, bubble_pos(bb))
-                    bubble.config.callbackR = lambda bb=bubble: r_dropdown(self, bubble_pos(bb))
+                    bubble.config.callbackL = lambda  f=func: f(self, )
+                    bubble.config.callbackR = lambda: r_dropdown(self, )
