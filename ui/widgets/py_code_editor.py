@@ -535,6 +535,11 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        if key == Qt.Key.Key_Backspace and not modifiers:
+            if self._handle_smart_backspace():
+                event.accept()
+                return
+
         if key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
             is_shift = bool(modifiers & Qt.KeyboardModifier.ShiftModifier) or key == Qt.Key.Key_Backtab
             if is_shift:
@@ -675,6 +680,77 @@ class CodeEditor(QPlainTextEdit):
             QTextCursor.MoveMode.KeepAnchor,
         )
         self.setTextCursor(new_cursor)
+
+    def _handle_smart_backspace(self) -> bool:
+        """
+        Handle smart backspace for:
+        1. Paired symbol deletion - if cursor is between matching pairs, delete both
+        2. Indentation - delete in blocks of 4 spaces when in leading whitespace
+        Returns True if handled, False to use default behavior
+        """
+        cursor = self.textCursor()
+        
+        # Don't handle if there's a selection
+        if cursor.hasSelection():
+            return False
+        
+        # Check for paired symbol deletion first
+        pairs = {'(': ')', '[': ']', '{': '}', '"': '"', "'": "'"}
+        pos = cursor.position()
+        doc = self.document()
+        
+        # Get character before and after cursor
+        char_before = doc.characterAt(pos - 1) if pos > 0 else ''
+        char_after = doc.characterAt(pos) if pos < doc.characterCount() else ''
+        
+        # If we're between a matching pair, delete both
+        if char_before in pairs and pairs[char_before] == char_after:
+            cursor.beginEditBlock()
+            cursor.deletePreviousChar()  # Delete opening character
+            cursor.deleteChar()  # Delete closing character
+            cursor.endEditBlock()
+            return True
+        
+        # Handle indentation deletion
+        block = cursor.block()
+        text = block.text()
+        pos_in_block = cursor.positionInBlock()
+        
+        # If cursor is at the start of line, use default behavior
+        if pos_in_block == 0:
+            return False
+        
+        # Get text to the left of cursor
+        text_before_cursor = text[:pos_in_block]
+        
+        # Check if we're only in leading whitespace (only spaces before cursor)
+        if not text_before_cursor or not all(c == ' ' for c in text_before_cursor):
+            return False
+        
+        # Count spaces before cursor
+        space_count = len(text_before_cursor)
+        
+        # Determine how many spaces to remove
+        if space_count % 4 == 0:
+            # Divisible by 4: remove exactly 4 spaces
+            chars_to_remove = 4
+        else:
+            # Not divisible by 4: remove to align to nearest 4-space boundary
+            chars_to_remove = space_count % 4
+        
+        # Perform the deletion
+        cursor.beginEditBlock()
+        cursor.movePosition(
+            QTextCursor.MoveOperation.Left,
+            QTextCursor.MoveMode.KeepAnchor,
+            chars_to_remove
+        )
+        cursor.removeSelectedText()
+        cursor.endEditBlock()
+        self.setTextCursor(cursor)
+        
+        return True
+
 
     def _handle_newline(self):
         cursor = self.textCursor()
