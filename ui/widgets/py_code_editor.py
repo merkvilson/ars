@@ -2,7 +2,6 @@ import sys
 import re
 import keyword
 import builtins
-from pathlib import Path
 
 from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF
 from PyQt6.QtGui import (
@@ -10,8 +9,6 @@ from PyQt6.QtGui import (
     QTextCharFormat,
     QSyntaxHighlighter,
     QFont,
-    QFontDatabase,
-    QPalette,
     QTextCursor,
     QPainter,
     QPainterPath,
