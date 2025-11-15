@@ -466,15 +466,16 @@ def calc_positions(config, center_pos, count):
 def open_context(parent = None, items = ["1", "2", "3"], position=None, config=None):
     play_sound("hover2")
     if parent is None:
-        parent = QApplication.activeWindow()
+        if hasattr(QApplication.activeWindow(), "central_widget"): parent = QApplication.activeWindow().central_widget
+        else: parent = QApplication.activeWindow()
 
     if config is None: config = ContextMenuConfig()
+    if position is None:
+        position = parent.mapFromGlobal(QCursor.pos())
 
     # Now create the grid window with processed BButton instances
     global ctx_window
     ctx_window = ContextButtonWindow(parent, items, config, position)
-    if position is None:
-        position = parent.mapFromGlobal(QCursor.pos())
 
     if config.distribution_mode == 'radial':
         radial_center = ctx_window.radial_center
