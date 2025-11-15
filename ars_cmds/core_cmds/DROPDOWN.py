@@ -13,7 +13,6 @@ def unlock_function(self):
 
 
 def r_dropdown(self, code_path = None):
-    print("Dropdown path:", code_path)
     config = ContextMenuConfig()
     config.item_radius = 15
     config.font = RRRFONT.get_font(15)
@@ -46,6 +45,11 @@ def r_dropdown(self, code_path = None):
         ic.ICON_POWER: lambda: QTimer.singleShot(500, self.close),
     }
 
+
+    config.callbackR = {
+        ic.ICON_CODE_TERMINAL: lambda: open_file(code_path),
+    }
+        
 
 
     config.additional_texts = {
