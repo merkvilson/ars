@@ -956,7 +956,7 @@ class CodeEditor(QPlainTextEdit):
         return space
 
     def update_line_number_area_width(self, _):
-        self.setViewportMargins(self.line_number_area_width() + 10, 0, 0, 0)
+        self.setViewportMargins(self.line_number_area_width() + 5, 0, 0, 0)
 
     def update_line_number_area(self, rect, dy):
         if dy:
