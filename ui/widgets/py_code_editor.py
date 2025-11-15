@@ -968,6 +968,11 @@ class CodeEditor(QPlainTextEdit):
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
 
+        # Get current selection range
+        cursor = self.textCursor()
+        selection_start = cursor.selectionStart()
+        selection_end = cursor.selectionEnd()
+        
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
         top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
@@ -976,7 +981,18 @@ class CodeEditor(QPlainTextEdit):
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
                 number = str(block_number + 1)
-                painter.setPen(QColor("#5c6370"))
+                
+                # Check if this line is part of the selection
+                block_start = block.position()
+                block_end = block_start + block.length()
+                is_selected = (block_start < selection_end and block_end > selection_start)
+                
+                # Use brighter color for selected lines
+                if is_selected:
+                    painter.setPen(QColor("#abb2bf"))  # Brighter color
+                else:
+                    painter.setPen(QColor("#5c6370"))  # Normal color
+                    
                 painter.drawText(0, int(top), self.line_number_area.width() - 12, self.fontMetrics().height(),
                                 Qt.AlignmentFlag.AlignRight, number)
 
@@ -991,4 +1007,3 @@ if __name__ == "__main__":
     widget = PythonEditorWidget()
     widget.show()
     sys.exit(app.exec())
-    
