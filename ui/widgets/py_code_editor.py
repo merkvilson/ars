@@ -72,7 +72,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         self.fmt_todo = mkfmt("#e5c07b", bold=True)
         self.fmt_decorator = mkfmt("#c678dd")
         self.fmt_operator = mkfmt("#00e1ff")
-        self.fmt_brace = mkfmt("#abb2bf", bold=True)
+        self.fmt_brace = mkfmt("#e5c07b", bold=True)
         self.fmt_defname = mkfmt("#61afef", bold=True)
         self.fmt_classname = mkfmt("#e5c07b", bold=True)
         self.fmt_self = mkfmt("#e06c75", italic=True)
@@ -958,3 +958,4 @@ if __name__ == "__main__":
     widget = PythonEditorWidget()
     widget.show()
     sys.exit(app.exec())
+    
