@@ -967,13 +967,6 @@ class CodeEditor(QPlainTextEdit):
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
-        # Draw rounded rectangle background
-        path = QPainterPath()
-        rect = QRectF(self.line_number_area.rect())
-        path.addRoundedRect(rect, 0, 0)
-        painter.fillPath(path, QColor("#21252b"))
 
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
