@@ -463,8 +463,10 @@ def calc_positions(config, center_pos, count):
     return modes.get(config.distribution_mode, lambda: [])()
 
 
-def open_context(parent, items, position=None, config=None):
+def open_context(parent = None, items = ["1", "2", "3"], position=None, config=None):
     play_sound("hover2")
+    if parent is None:
+        parent = QApplication.activeWindow()
 
     if config is None: config = ContextMenuConfig()
 
@@ -472,7 +474,7 @@ def open_context(parent, items, position=None, config=None):
     global ctx_window
     ctx_window = ContextButtonWindow(parent, items, config, position)
     if position is None:
-        position = QCursor.pos()
+        position = parent.mapFromGlobal(QCursor.pos())
 
     if config.distribution_mode == 'radial':
         radial_center = ctx_window.radial_center
