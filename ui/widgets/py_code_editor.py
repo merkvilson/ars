@@ -19,8 +19,11 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QVBoxLayout,
 )    
-try: from ars_cmds.core_cmds.run_ext import run_string_code
+try: 
+    from ars_cmds.core_cmds.run_ext import run_string_code
+    STANDALONE = False
 except ImportError:
+    STANDALONE = True
     def run_string_code(code: str):
         """Placeholder function when ars_cmds is unavailable."""
         print("ars_cmds.core_cmds.run_ext.run_string_code is unavailable.")
@@ -515,6 +518,7 @@ class CodeEditor(QPlainTextEdit):
     INDENT = " " * 4
     MIN_FONT_SIZE = 10
     MAX_FONT_SIZE = 48
+    DEFAULT_FONT_SIZE = 14
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -566,6 +570,10 @@ class CodeEditor(QPlainTextEdit):
                 return
             if key in (Qt.Key.Key_Minus, Qt.Key.Key_Underscore, Qt.Key.Key_BracketLeft):
                 self._change_font_size(-1)
+                event.accept()
+                return
+            if key == Qt.Key.Key_0:
+                self._reset_font_size()
                 event.accept()
                 return
 
@@ -944,6 +952,15 @@ class CodeEditor(QPlainTextEdit):
         if new_size == current_size:
             return
         font.setPointSize(new_size)
+        self.setFont(font)
+        self.document().setDefaultFont(font)
+        self.line_number_area.setFont(font)
+        self.update_line_number_area_width(0)
+        self.line_number_area.update()
+
+    def _reset_font_size(self):
+        font = self.font()
+        font.setPointSize(self.DEFAULT_FONT_SIZE)
         self.setFont(font)
         self.document().setDefaultFont(font)
         self.line_number_area.setFont(font)
