@@ -455,12 +455,12 @@ class PythonEditorWidget(QWidget):
     def _init_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-
+        "#282c34f1"
         self.editor = CodeEditor(self)
         self.editor.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.editor.setStyleSheet(
             "QPlainTextEdit {"
-            "background-color: #282c34;"
+            "background-color: rgba(40, 44, 52, 0.85);"
             "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
@@ -972,7 +972,7 @@ class CodeEditor(QPlainTextEdit):
         # Draw rounded rectangle background
         path = QPainterPath()
         rect = QRectF(self.line_number_area.rect())
-        path.addRoundedRect(rect, 20, 20)
+        path.addRoundedRect(rect, 0, 0)
         painter.fillPath(path, QColor("#21252b"))
 
         block = self.firstVisibleBlock()
