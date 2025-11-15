@@ -559,6 +559,11 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        if key == Qt.Key.Key_D and modifiers & Qt.KeyboardModifier.ControlModifier:
+            self._duplicate_line()
+            event.accept()
+            return
+
         if modifiers & Qt.KeyboardModifier.ControlModifier:
             if key in (
                 Qt.Key.Key_Plus,
@@ -735,6 +740,61 @@ class CodeEditor(QPlainTextEdit):
             QTextCursor.MoveMode.KeepAnchor,
         )
         self.setTextCursor(new_cursor)
+
+    def _duplicate_line(self):
+        """Duplicate current line or selected lines."""
+        cursor = self.textCursor()
+        doc = self.document()
+        
+        if cursor.hasSelection():
+            # Duplicate selected lines
+            selection_start = cursor.selectionStart()
+            selection_end = cursor.selectionEnd()
+            
+            start_block = doc.findBlock(selection_start)
+            end_block = doc.findBlock(selection_end - 1 if selection_end > selection_start else selection_end)
+            
+            # Collect all text from selected blocks
+            lines_text = []
+            block = start_block
+            while block.isValid():
+                lines_text.append(block.text())
+                if block == end_block:
+                    break
+                block = block.next()
+            
+            # Insert duplicated lines after the last selected block
+            cursor.beginEditBlock()
+            cursor.setPosition(end_block.position() + end_block.length() - 1)
+            cursor.movePosition(QTextCursor.MoveOperation.EndOfBlock)
+            for line_text in lines_text:
+                cursor.insertBlock()
+                cursor.insertText(line_text)
+            cursor.endEditBlock()
+            
+            # Select the newly duplicated lines
+            new_start = end_block.position() + end_block.length()
+            new_cursor = QTextCursor(doc)
+            new_cursor.setPosition(new_start)
+            # Move to end of last duplicated line
+            for _ in range(len(lines_text) - 1):
+                new_cursor.movePosition(QTextCursor.MoveOperation.NextBlock)
+            new_cursor.movePosition(QTextCursor.MoveOperation.EndOfBlock)
+            end_pos = new_cursor.position()
+            new_cursor.setPosition(new_start)
+            new_cursor.setPosition(end_pos, QTextCursor.MoveMode.KeepAnchor)
+            self.setTextCursor(new_cursor)
+        else:
+            # Duplicate single line
+            current_block = cursor.block()
+            line_text = current_block.text()
+            
+            cursor.beginEditBlock()
+            cursor.movePosition(QTextCursor.MoveOperation.EndOfBlock)
+            cursor.insertBlock()
+            cursor.insertText(line_text)
+            cursor.endEditBlock()
+            self.setTextCursor(cursor)
 
     def _handle_smart_backspace(self) -> bool:
         """
