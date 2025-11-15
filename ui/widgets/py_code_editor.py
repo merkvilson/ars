@@ -418,6 +418,16 @@ class PythonEditorWidget(QWidget):
 
         self.editor = CodeEditor(self)
         self.editor.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.editor.setStyleSheet(
+            "QPlainTextEdit {"
+            "background-color: #282c34;"
+            "color: #abb2bf;"
+            "border: none;"
+            "border-radius: 20px;"
+            "selection-color: #ffffff;"
+            "selection-background-color: #3e4451;"
+            "}"
+        )
 
         # Monospaced font
         try:
@@ -427,8 +437,6 @@ class PythonEditorWidget(QWidget):
             fixed.setStyleHint(QFont.StyleHint.TypeWriter)
         fixed.setPointSize(fixed.pointSize() + 4)
         self.editor.setFont(fixed)
-
-        self._apply_atom_one_dark_theme()
 
         layout.addWidget(self.editor)
 
@@ -443,26 +451,6 @@ class PythonEditorWidget(QWidget):
         self.editor.run_code()
 
 
-    def _apply_atom_one_dark_theme(self):
-        palette = self.editor.palette()
-        palette.setColor(QPalette.ColorRole.Base, QColor("#282c34"))
-        palette.setColor(QPalette.ColorRole.Text, QColor("#abb2bf"))
-        palette.setColor(QPalette.ColorRole.Highlight, QColor("#3e4451"))
-        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
-        palette.setColor(QPalette.ColorRole.PlaceholderText, QColor("#5c6370"))
-        palette.setColor(QPalette.ColorRole.Window, QColor("#282c34"))
-        palette.setColor(QPalette.ColorRole.WindowText, QColor("#abb2bf"))
-        self.editor.setPalette(palette)
-        self.editor.setStyleSheet(
-            "QPlainTextEdit {"
-            "background-color: #282c34;"
-            "color: #abb2bf;"
-            "border: none;"
-            "border-radius: 20px;"
-            "selection-color: #ffffff;"
-            "selection-background-color: #3e4451;"
-            "}"
-        )
 
 
 class LineNumberArea(QWidget):
