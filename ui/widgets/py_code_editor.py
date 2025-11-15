@@ -463,7 +463,7 @@ class PythonEditorWidget(QWidget):
         self.editor.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.editor.setStyleSheet(
             "QPlainTextEdit {"
-            "background-color: rgba(40, 44, 52, 0.85);"
+            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.85});"
             "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
