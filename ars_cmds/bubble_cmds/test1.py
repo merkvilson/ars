@@ -11,8 +11,6 @@ def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
     ctx = open_context(
-        parent=ars_window.central_widget,
         items=["1", "2"],
-        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )

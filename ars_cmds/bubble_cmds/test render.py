@@ -46,8 +46,6 @@ def execute_plugin(self):
     config.callback_hover_out = {"0": lambda: self.msg("render_manager")}
 
     ctx = open_context(
-        parent=self.central_widget,
         items=options_list,
-        position=self.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )

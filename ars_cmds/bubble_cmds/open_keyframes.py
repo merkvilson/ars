@@ -73,9 +73,7 @@ def execute_plugin(ars_window):
         }
 
     ctx = open_context(
-        parent=ars_window.central_widget,
         items=options_list,
-        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
