@@ -429,13 +429,14 @@ class PythonEditorWidget(QWidget):
             "}"
         )
 
-        # Monospaced font
-        try:
-            fixed = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
-        except Exception:
-            fixed = QFont("Monospace")
+        # Monospaced font - use Consolas (common on Windows) or Courier New
+        fixed = QFont("Consolas", 12)
+        if not fixed.exactMatch():
+            fixed = QFont("Courier New", 12)
+        if not fixed.exactMatch():
+            fixed = QFont("Monospace", 12)
             fixed.setStyleHint(QFont.StyleHint.TypeWriter)
-        fixed.setPointSize(fixed.pointSize() + 4)
+        fixed.setWeight(QFont.Weight.Medium)
         self.editor.setFont(fixed)
 
         layout.addWidget(self.editor)
