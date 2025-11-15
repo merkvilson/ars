@@ -67,6 +67,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         self.fmt_builtin = mkfmt("#c25656")
         self.fmt_number = mkfmt("#d16666")
         self.fmt_string = mkfmt("#98c379")
+        self.fmt_string_prefix = mkfmt("#56b6c2", bold=True)  # r, f, b, u prefixes
         self.fmt_docstring = mkfmt("#9dcc8b", italic=True)
         self.fmt_comment = mkfmt("#5c6370", italic=True)
         self.fmt_todo = mkfmt("#e5c07b", bold=True)
@@ -77,22 +78,32 @@ class PythonHighlighter(QSyntaxHighlighter):
         self.fmt_classname = mkfmt("#e5c07b", bold=True)
         self.fmt_self = mkfmt("#e06c75", italic=True)
         self.fmt_dunder = mkfmt("#e06c75", bold=True)
+        self.fmt_magic = mkfmt("#c678dd", bold=True)  # magic methods like __init__
+        self.fmt_boolean = mkfmt("#d19a66", bold=True)  # True, False, None
+        self.fmt_function_call = mkfmt("#61afef")  # function calls
+        self.fmt_class_instantiation = mkfmt("#e5c07b")  # MyClass()
+        self.fmt_parameter = mkfmt("#d19a66")  # function parameters
+        self.fmt_lambda = mkfmt("#c678dd", italic=True)  # lambda keyword
         self.fmt_fplaceholder = mkfmt("#e5c07b", bold=True)  # f-string expressions
 
     def _init_regex(self):
-        # Keywords
-        kw = sorted(set(keyword.kwlist), key=len, reverse=True)
-        # Include match/case for Python 3.10 (already included in keyword.kwlist for 3.10+)
+        # Keywords (excluding True, False, None which we'll handle separately)
+        kw = sorted(set(keyword.kwlist) - {'True', 'False', 'None'}, key=len, reverse=True)
         kw_pattern = r"\b(?:%s)\b" % "|".join(re.escape(k) for k in kw)
         self.re_keyword = QRegularExpression(kw_pattern)
 
-        # Builtins (exclude dunder/private)
+        # Boolean and None literals
+        self.re_boolean = QRegularExpression(r"\b(?:True|False|None)\b")
+
+        # Lambda keyword (separate from other keywords)
+        self.re_lambda = QRegularExpression(r"\blambda\b")
+
+        # Builtins (exclude dunder/private, True, False, None)
         builtin_names = sorted(
-            {n for n in dir(builtins) if not n.startswith("_")},
+            {n for n in dir(builtins) if not n.startswith("_") and n not in {'True', 'False', 'None'}},
             key=len,
             reverse=True,
         )
-        # Escape names that may have special regex chars (unlikely but safe)
         builtin_pattern = r"\b(?:%s)\b" % "|".join(re.escape(n) for n in builtin_names)
         self.re_builtin = QRegularExpression(builtin_pattern)
 
@@ -110,13 +121,27 @@ class PythonHighlighter(QSyntaxHighlighter):
         )
         self.re_brace = QRegularExpression(r"[\[\]\{\}\(\)]")
 
-        # self and dunder
-        self.re_self = QRegularExpression(r"\bself\b")
+        # self and cls
+        self.re_self = QRegularExpression(r"\b(?:self|cls)\b")
+        
+        # Magic methods (__init__, __str__, etc.) - more specific than general dunder
+        self.re_magic = QRegularExpression(r"\b__(?:init|new|del|repr|str|bytes|format|lt|le|eq|ne|gt|ge|hash|bool|dir|get|set|delete|set_name|init_subclass|call|len|length_hint|getitem|setitem|delitem|missing|iter|reversed|contains|add|sub|mul|matmul|truediv|floordiv|mod|divmod|pow|lshift|rshift|and|xor|or|neg|pos|abs|invert|complex|int|float|index|round|trunc|floor|ceil|enter|exit|await|aiter|anext|aenter|aexit)__\b")
+        
+        # General dunder (for other double underscore names)
         self.re_dunder = QRegularExpression(r"\b__\w+__\b")
 
-        # Function and class names
+        # Function and class definitions
         self.re_funcdef = QRegularExpression(r"\b(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(")
         self.re_classdef = QRegularExpression(r"\bclass\s+([A-Za-z_]\w*)\s*(?:\(|:)")
+        
+        # Function calls: identifier followed by (
+        self.re_function_call = QRegularExpression(r"\b([A-Za-z_]\w*)\s*(?=\()")
+        
+        # Class instantiation: capitalized identifier followed by (
+        self.re_class_instantiation = QRegularExpression(r"\b([A-Z][A-Za-z0-9_]*)\s*(?=\()")
+        
+        # Function parameters: in def signature between ( and )
+        self.re_parameter = QRegularExpression(r"\(\s*([A-Za-z_]\w*)")
 
         # Triple-quote markers (we'll search with str.find, but keep these for reference)
         self.triple_sq = "'''"
@@ -234,17 +259,24 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         # 5) Tokens: keywords, builtins, numbers, operators, braces, decorators
         self._apply_regex(self.re_keyword, self.fmt_keyword, text, protected)
+        self._apply_regex(self.re_lambda, self.fmt_lambda, text, protected)
+        self._apply_regex(self.re_boolean, self.fmt_boolean, text, protected)
         self._apply_regex(self.re_builtin, self.fmt_builtin, text, protected)
         self._apply_regex(self.re_number, self.fmt_number, text, protected)
         self._apply_regex(self.re_decorator, self.fmt_decorator, text, protected)
         self._apply_regex(self.re_operator, self.fmt_operator, text, protected)
         self._apply_regex(self.re_brace, self.fmt_brace, text, protected)
         self._apply_regex(self.re_self, self.fmt_self, text, protected)
+        self._apply_regex(self.re_magic, self.fmt_magic, text, protected)
         self._apply_regex(self.re_dunder, self.fmt_dunder, text, protected)
 
-        # 6) Function and class names (highlight captured group)
+        # 6) Function and class definitions (highlight captured group)
         self._apply_regex_group(self.re_funcdef, 1, self.fmt_defname, text, protected)
         self._apply_regex_group(self.re_classdef, 1, self.fmt_classname, text, protected)
+        
+        # 7) Function calls and class instantiation
+        self._apply_regex_group(self.re_class_instantiation, 1, self.fmt_class_instantiation, text, protected)
+        self._apply_regex_group(self.re_function_call, 1, self.fmt_function_call, text, protected)
 
     def _apply_regex(self, regex: QRegularExpression, fmt: QTextCharFormat, text: str, protected):
         it = regex.globalMatch(text)
@@ -313,6 +345,10 @@ class PythonHighlighter(QSyntaxHighlighter):
                 if self._overlaps(protected, start_idx, 1):
                     i += 1
                     continue
+                
+                # Highlight string prefix if present
+                if valid_prefix and prefix:
+                    self.setFormat(prefix_start + 1, len(prefix), self.fmt_string_prefix)
 
                 # Find closing quote
                 j = i + 1
