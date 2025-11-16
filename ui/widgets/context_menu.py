@@ -477,13 +477,6 @@ def open_context(parent = None, items = ["1", "2", "3"], position=None, config=N
     # Now create the grid window with processed BButton instances
     global ctx_window
     ctx_window = ContextButtonWindow(parent, items, config, position)
-    for i in find_all_open_context_menus():
-        if not hasattr(i, 'symbol'):
-            continue
-        elif i.symbol == ctx_window.symbol:
-            i.close_animated()
-            print("Context menu already open, closing existing one.")
-            return
 
     if config.distribution_mode == 'radial':
         radial_center = ctx_window.radial_center
