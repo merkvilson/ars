@@ -1,12 +1,7 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ars_cmds.core_cmds.run_ext import run_ext
-from ars_cmds.core_cmds.load_object import selected_object
-from ui.widgets.multi_line_input import MultiLineInputWidget
-from PyQt6.QtCore import QPoint
-from prefs.pref_controller import read_pref, get_path
 import os
 import subprocess
-from PyQt6.QtGui import QCursor
 import socket
 import pyperclip
 
