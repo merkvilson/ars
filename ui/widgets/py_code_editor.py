@@ -26,13 +26,6 @@ except ImportError:
     print("executing py_code_editor.py in __main__ mode")
     STANDALONE = True
     
-    def run_string_code(code_string):
-        """Fallback implementation for standalone mode."""
-        try:
-            exec(code_string, {'__name__': '__main__'})
-        except Exception as e:
-            print(f"Error executing code: {e}")
-
 class PythonHighlighter(QSyntaxHighlighter):
     """
     Advanced Python syntax highlighter for QPlainTextEdit.
@@ -461,27 +454,11 @@ class PythonEditorWidget(QWidget):
     def _init_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        "#282c34f1"
         self.editor = CodeEditor(self)
-        self.editor.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
-        self.editor.setStyleSheet(
-            "QPlainTextEdit {"
-            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.85});"
-            "color: #abb2bf;"
-            "border: none;"
-            "border-radius: 20px;"
-            "selection-color: #ffffff;"
-            "selection-background-color: #3e4451;"
-            "}"
-        )
+
 
         # Monospaced font - use Consolas (common on Windows) or Courier New
         fixed = QFont("Consolas", 14)
-        # if not fixed.exactMatch():
-        #     fixed = QFont("Courier New", 12)
-        # if not fixed.exactMatch():
-        #     fixed = QFont("Monospace", 12)
-        #     fixed.setStyleHint(QFont.StyleHint.TypeWriter)
         fixed.setWeight(QFont.Weight.Medium)
         self.editor.setFont(fixed)
 
@@ -492,11 +469,6 @@ class PythonEditorWidget(QWidget):
 
         self.setLayout(layout)
         self.setWindowTitle("Python Editor Widget")
-
-    def run_code(self, namespace_injection=None):
-        """Execute the current editor buffer."""
-        self.editor.run_code(namespace_injection)
-
 
 
 
@@ -532,6 +504,23 @@ class CodeEditor(QPlainTextEdit):
         self.updateRequest.connect(self.update_line_number_area)
 
         self.update_line_number_area_width(0)
+        self.custom_namespace = {}
+        self.project_file_path = None
+
+        #TODO: CHECK LATER - add option to disable/enable line wrap
+        self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.setStyleSheet(
+            "QPlainTextEdit {"
+            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.85});"
+            "color: #abb2bf;"
+            "border: none;"
+            "border-radius: 20px;"
+            "selection-color: #ffffff;"
+            "selection-background-color: #3e4451;"
+            "}"
+        )
+
+
 
     def setFont(self, font):
         """Override setFont to keep line number area in sync."""
@@ -541,7 +530,10 @@ class CodeEditor(QPlainTextEdit):
             self.update_line_number_area_width(0)
 
     def run_code(self, namespace_injection=None):
-        run_string_code(self.toPlainText(), namespace_injection)
+        if namespace_injection is None: namespace_injection = self.custom_namespace
+        if not STANDALONE: run_string_code(self.toPlainText(), namespace_injection)
+        else: exec(self.toPlainText())
+
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -553,7 +545,7 @@ class CodeEditor(QPlainTextEdit):
             return
 
         if key == Qt.Key.Key_R and modifiers & Qt.KeyboardModifier.ControlModifier:
-            self.run_code()
+            self.run_code(self.custom_namespace)
             event.accept()
             return
 

@@ -105,11 +105,14 @@ def execute_plugin(ars_window):
                                 'sel': selected_object(),
                                 'msg': ars_window.msg,
                                 'add_primitive': add_primitive}
+    
+    code_editor.editor.custom_namespace = default_namespace_injection
+    code_editor.editor.project_file_path = current_code_file
 
 
     config.callbackL = {ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
                        ic.ICON_FOLDER_OPEN: lambda: open_file(os.path.join("ars_scripts", "user")),
-                        ic.ICON_CODE_PYTHON: lambda: code_editor.run_code(default_namespace_injection),
+                        ic.ICON_CODE_PYTHON: lambda: code_editor.editor.run_code(default_namespace_injection),
                         ic.ICON_SAVE: lambda: save_script(),
                         ic.ICON_CODE_TERMINAL: lambda: open_file(current_code_file)
                         }
