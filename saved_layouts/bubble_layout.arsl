@@ -32,7 +32,7 @@
         },
         {
             "symbol": "\ue905",
-            "grid_x": 16,
+            "grid_x": 14,
             "grid_y": 0
         },
         {
@@ -52,7 +52,7 @@
         },
         {
             "symbol": "\ue902",
-            "grid_x": 8,
+            "grid_x": 7,
             "grid_y": 0
         },
         {
@@ -77,12 +77,12 @@
         },
         {
             "symbol": "C",
-            "grid_x": 21,
+            "grid_x": 22,
             "grid_y": 0
         },
         {
             "symbol": "\ue9a8",
-            "grid_x": 22,
+            "grid_x": 21,
             "grid_y": 0
         },
         {
@@ -91,7 +91,7 @@
             "grid_y": 0
         },
         {
-            "symbol": "2",
+            "symbol": "\ue9a7",
             "grid_x": 20,
             "grid_y": 0
         },
