@@ -535,6 +535,11 @@ class CodeEditor(QPlainTextEdit):
         else: exec(self.toPlainText())
 
 
+    def save_script(self):
+        with open(self.project_file_path, 'w', encoding='utf-8') as f:
+            f.write(self.toPlainText())
+
+
     def keyPressEvent(self, event):
         key = event.key()
         text = event.text()
@@ -546,6 +551,12 @@ class CodeEditor(QPlainTextEdit):
 
         if key == Qt.Key.Key_R and modifiers & Qt.KeyboardModifier.ControlModifier:
             self.run_code(self.custom_namespace)
+            event.accept()
+            return
+        
+        if key == Qt.Key.Key_S and modifiers & Qt.KeyboardModifier.ControlModifier:
+            if self.project_file_path:
+                self.save_script()
             event.accept()
             return
 
