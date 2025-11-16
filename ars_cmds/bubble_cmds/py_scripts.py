@@ -5,6 +5,8 @@ from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.util_cmds.open_file import open_file
 import os
+from util_functions.ars_window import ars_window
+from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 
 def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
@@ -99,10 +101,15 @@ def execute_plugin(ars_window):
             f.write(code_editor.editor.toPlainText())
 
 
+    default_namespace_injection = {'ars_window': ars_window,
+                                'sel': selected_object(),
+                                'msg': ars_window.msg,
+                                'add_primitive': add_primitive}
+
 
     config.callbackL = {ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
                        ic.ICON_FOLDER_OPEN: lambda: open_file(os.path.join("ars_scripts", "user")),
-                        ic.ICON_CODE_PYTHON: lambda: code_editor.run_code(),
+                        ic.ICON_CODE_PYTHON: lambda: code_editor.run_code(default_namespace_injection),
                         ic.ICON_SAVE: lambda: save_script(),
                         ic.ICON_CODE_TERMINAL: lambda: open_file(current_code_file)
                         }

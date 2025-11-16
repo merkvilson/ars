@@ -50,9 +50,15 @@ def run_ext(path, window = None, edit_func=None):
     except Exception:
         print("Failed to load/execute:")
         traceback.print_exc()
+"""
+window = ars_window()
 
-
-def run_string_code(code_string: str):
+default_namespace_injection = {'ars_window': window,
+                              'sel': selected_object(),
+                              'msg': window.msg,
+                              'add_primitive': add_primitive}
+"""
+def run_string_code(code_string: str, namespace_injection: dict=None):
     """Execute raw Python code from a string.
     
     Args:
@@ -68,12 +74,10 @@ def run_string_code(code_string: str):
         spec = importlib.util.spec_from_loader(module_name, loader=None)
         module = importlib.util.module_from_spec(spec)
 
-        # Inject ars_window into the module's namespace
-        window = ars_window()
-        module.__dict__['ars_window'] = window
-        module.__dict__['sel'] = selected_object()
-        module.__dict__['msg'] = window.msg
-        module.__dict__['add_primitive'] = add_primitive
+        # Inject useful objects into the module's namespace
+        if namespace_injection:
+            for key, value in namespace_injection.items():
+                module.__dict__[key] = value
 
         # Compile and execute the code in the module's namespace
         code_obj = compile(code_string, '<string>', 'exec')

@@ -23,12 +23,15 @@ try:
     from ars_cmds.core_cmds.run_ext import run_string_code
     STANDALONE = False
 except ImportError:
+    print("executing py_code_editor.py in __main__ mode")
     STANDALONE = True
-    def run_string_code(code: str):
-        """Placeholder function when ars_cmds is unavailable."""
-        print("ars_cmds.core_cmds.run_ext.run_string_code is unavailable.")
-        print("Code to run:")
-        print(code)
+    
+    def run_string_code(code_string):
+        """Fallback implementation for standalone mode."""
+        try:
+            exec(code_string, {'__name__': '__main__'})
+        except Exception as e:
+            print(f"Error executing code: {e}")
 
 class PythonHighlighter(QSyntaxHighlighter):
     """
@@ -490,9 +493,9 @@ class PythonEditorWidget(QWidget):
         self.setLayout(layout)
         self.setWindowTitle("Python Editor Widget")
 
-    def run_code(self):
+    def run_code(self, namespace_injection=None):
         """Execute the current editor buffer."""
-        self.editor.run_code()
+        self.editor.run_code(namespace_injection)
 
 
 
@@ -537,8 +540,8 @@ class CodeEditor(QPlainTextEdit):
             self.line_number_area.setFont(font)
             self.update_line_number_area_width(0)
 
-    def run_code(self):
-        run_string_code(self.toPlainText())
+    def run_code(self, namespace_injection=None):
+        run_string_code(self.toPlainText(), namespace_injection)
 
     def keyPressEvent(self, event):
         key = event.key()
