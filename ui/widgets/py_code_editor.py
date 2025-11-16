@@ -443,33 +443,13 @@ class PythonHighlighter(QSyntaxHighlighter):
 
 
 class PythonEditorWidget(QWidget):
-    """
-    Standalone Python code editor widget with advanced syntax highlighting.
-    """
-
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._init_ui()
-
-    def _init_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         self.editor = CodeEditor(self)
-
-
-        # Monospaced font - use Consolas (common on Windows) or Courier New
-        fixed = QFont("Consolas", 14)
-        fixed.setWeight(QFont.Weight.Medium)
-        self.editor.setFont(fixed)
-
         layout.addWidget(self.editor)
-
-        # Attach highlighter
-        self.highlighter = PythonHighlighter(self.editor.document())
-
         self.setLayout(layout)
-        self.setWindowTitle("Python Editor Widget")
-
 
 
 class LineNumberArea(QWidget):
@@ -506,6 +486,15 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.custom_namespace = {}
         self.project_file_path = None
+
+        # Monospaced font - use Consolas (common on Windows) or Courier New
+        fixed = QFont("Consolas", 14)
+        fixed.setWeight(QFont.Weight.Medium)
+        self.setFont(fixed)
+
+        # Attach highlighter
+        self.highlighter = PythonHighlighter(self.document())
+
 
         #TODO: CHECK LATER - add option to disable/enable line wrap
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
