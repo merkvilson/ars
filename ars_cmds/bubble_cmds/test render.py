@@ -2,9 +2,6 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import os
-from PyQt6.QtGui import QCursor, QColor
-import random
-from PyQt6.QtCore import QPoint
 
 def BBL_TEST3(*args):
     run_ext(__file__)
@@ -12,13 +9,7 @@ def BBL_TEST3(*args):
 
 def execute_plugin(self):
     config = ContextMenuConfig()
-    options_list = [
-        ["0","1", "2", "3", "4", "5", "6"],
-    ]
-    
-    config.slider_values = {ic.ICON_GIZMO_MOVE: (0,1,0)}
-    config.slider_color = {ic.ICON_GIZMO_MOVE: QColor(150, 150, 150, 0)}
-    config.use_extended_shape_items = {ic.ICON_GIZMO_MOVE: False}
+    options_list =  ["0","1", "2", "3", "4", "5", "6"]
 
     config.additional_texts = {
     "0": "Current Workflow",
