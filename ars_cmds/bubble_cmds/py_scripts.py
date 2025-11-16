@@ -35,8 +35,7 @@ def scripts_ctx(ars_window, callback_ctx):
     config.close_on_outside=False
     config.show_symbol = False
     config.anchor = "+y"
-    config.extra_distance = [-99999,-20]
-
+    config.extra_distance = [0,-20]
 
 
     # Dynamically create dictionaries for all Python files
@@ -68,19 +67,20 @@ def execute_plugin(ars_window):
         print("No python scripts found in ars_scripts/user")
         return
     config = ContextMenuConfig()
+    config.use_extended_shape = False
     config.auto_close = False
     config.close_on_outside=False
     config.expand = "x"
-    config.distribution_mode = "y"
-    config.extra_distance = [0,99999]
+    config.distribution_mode = "x"
+    config.custom_height = ars_window.height() // 2
 
     current_code_file = os.path.join(user_script_dir, py_files[0])
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [[ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_CODE_PYTHON, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL], ["PythonEditorWidget"]]
+    options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_CODE_PYTHON, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",], ["   ","PythonEditorWidget","   ",]]
     code_editor = PythonEditorWidget()
-    code_editor.setFixedSize(ars_window.width() - int(44*4.5), 44*5)
+    code_editor.setFixedSize(ars_window.width(), config.custom_height-int(44*1.5))
     code_editor.editor.setPlainText(current_code_text)
 
     config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_CODE_PYTHON: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
@@ -121,5 +121,4 @@ def execute_plugin(ars_window):
     )
 
     ctx.symbol = "py_scripts_ctx"
-
     return ctx, code_editor
