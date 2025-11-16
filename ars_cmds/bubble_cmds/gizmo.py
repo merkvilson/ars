@@ -16,8 +16,12 @@ def execute_plugin(ars_window):
 
     config = ContextMenuConfig()
 
-
-    options_list = [ic.ICON_GIZMO_MOVE_3D, ic.ICON_GIZMO_SCALE, ic.ICON_GIZMO_ROTATE_3D, ic.ICON_GIZMO_DRAG]
+    config.options = {
+        ic.ICON_GIZMO_MOVE_3D: "Move",
+        ic.ICON_GIZMO_ROTATE_3D: "Rotate",
+        ic.ICON_GIZMO_SCALE: "Scale",
+        ic.ICON_GIZMO_DRAG: "New Gizmo",
+    }
 
     config.callbackL = {
 
@@ -35,7 +39,9 @@ def execute_plugin(ars_window):
     ic.ICON_GIZMO_DRAG: (0,1,0),
 }
 
-    config.toggle_groups = [options_list]
+    config.toggle_groups = [
+        list(config.options.keys())
+    ]
 
     config.hotkey_items = {
         ic.ICON_GIZMO_MOVE_3D:   "W",
@@ -44,15 +50,4 @@ def execute_plugin(ars_window):
         ic.ICON_GIZMO_DRAG: "Q",
     }
 
-
-    config.additional_texts = {
-        ic.ICON_GIZMO_MOVE_3D: "Move",
-        ic.ICON_GIZMO_ROTATE_3D: "Rotate",
-        ic.ICON_GIZMO_SCALE: "Scale",
-        ic.ICON_GIZMO_DRAG: "New Gizmo",
-    }
-
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

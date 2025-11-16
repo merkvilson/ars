@@ -30,14 +30,14 @@ def BBL_MENU(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
-    options_list = [ic.ICON_POWER, ic.ICON_WINDOW_FULLSCREEN, ic.ICON_SAVE,ic.ICON_FILE_DOWNLOAD, ic.ICON_LAYOUT]
-    config.additional_texts = {
+    config.options = {
         ic.ICON_POWER: "Close App",
         ic.ICON_WINDOW_FULLSCREEN: "Minimize App",
         ic.ICON_SAVE: "Save Layout",
         ic.ICON_FILE_DOWNLOAD: "Save Layout As",
         ic.ICON_LAYOUT: "Load Layout"
     }
+    
     def toggle_fullscreen_maximized(ars_window):
         if ars_window.windowState() & Qt.WindowState.WindowFullScreen:
             # Currently fullscreen → switch to maximized
@@ -54,7 +54,4 @@ def execute_plugin(ars_window):
     }
 
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

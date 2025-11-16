@@ -20,9 +20,7 @@ def BBL_RENDER(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
-    options_list = [ic.ICON_IMAGE,ic.ICON_BACKGROUND,]
-
-    config.additional_texts = {
+    config.options = {
         ic.ICON_IMAGE: "Change BG",
         ic.ICON_BACKGROUND: "Remove BG",    
         }
@@ -34,7 +32,4 @@ def execute_plugin(ars_window):
         ic.ICON_BACKGROUND: lambda: ars_window.viewport.bg.clear_image(),
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

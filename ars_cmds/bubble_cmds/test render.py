@@ -9,9 +9,8 @@ def BBL_TEST3(*args):
 
 def execute_plugin(self):
     config = ContextMenuConfig()
-    options_list =  ["0","1", "2", "3", "4", "5", "6"]
-
-    config.additional_texts = {
+    
+    config.options = {
     "0": "Current Workflow",
     "1": "Mesh Workflow",
     "2": "Render Workflow",
@@ -36,7 +35,4 @@ def execute_plugin(self):
     config.callback_hover_in = {"0": lambda: self.msg("render_workflow")}
     config.callback_hover_out = {"0": lambda: self.msg("render_manager")}
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

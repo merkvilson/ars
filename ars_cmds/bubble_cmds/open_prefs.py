@@ -14,23 +14,15 @@ def BBL_X(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
-
-    options_list = [
-        ["1", "2", "3"],
-    ]
+    config.options = {
+    "1": "ComfyUI Path",
+    "2": "Option 2",
+    "3": "Option 3",
+    }
 
     config.callbackL = {
     "1": edit_pref,
     "2": read_pref,
     }
 
-    config.additional_texts = {
-    "1": "ComfyUI Path",
-    "2": "Option 2",
-    "3": "Option 3",
-    }
-
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

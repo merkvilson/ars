@@ -12,6 +12,11 @@ def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.show_value = True
 
+    config.options = {
+    "1": "Slider A",
+    "2": "Slider B",
+    }
+
     config.slider_values = {
         "1": (0, 100, 50),
         "2": (0, 100, 50),
@@ -22,23 +27,9 @@ def execute_plugin(ars_window):
         "1": 1,
     }
 
-    options_list = [
-        ["1", "2"],
-    ]
- 
-
-    config.additional_texts = {
-    "1": "Slider A",
-    "2": "Slider B",
-    }
-
-
     config.callbackL = {
         "1": lambda value: print(value),
         "2": lambda value: print(value),
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

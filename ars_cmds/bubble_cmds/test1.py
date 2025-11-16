@@ -7,7 +7,7 @@ def BBL_TEST(*args): run_ext(__file__)
 
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
-    config.items = {
+    config.options = {
         ic.ICON_TEST: "Option A",
         ic.ICON_TEST2: "Option B",
         ic.ICON_TEST3: "Option C",}

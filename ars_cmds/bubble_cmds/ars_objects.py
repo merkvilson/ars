@@ -13,20 +13,20 @@ def BBL_OBJECT(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
 
-    options_list =  [
-                     ic.ICON_OBJ_TXT_ABC,
-                     ic.ICON_OBJ_SPRITE,
-                     ic.ICON_OBJ_BOX,
-                     ic.ICON_OBJ_SPHERE,
-                     ic.ICON_OBJ_CYLINDER,
-                     ic.ICON_OBJ_CONE,
-                     ic.ICON_OBJ_PYRAMID,
-                     ic.ICON_OBJ_TORUS,
-                     ic.ICON_OBJ_PLANE,
-                     ic.ICON_OBJ_DISC,
-                     ic.ICON_ORIGAMI,
-                     ic.ICON_FILE_3D,
-                     ]
+    config.options = {
+        ic.ICON_OBJ_TXT_ABC:  'Text',
+        ic.ICON_OBJ_SPRITE:   '2D Sprite',
+        ic.ICON_OBJ_BOX:      'Cube', 
+        ic.ICON_OBJ_SPHERE:   'Sphere', 
+        ic.ICON_OBJ_CYLINDER: 'Cylinder',
+        ic.ICON_OBJ_CONE:     'Cone',
+        ic.ICON_OBJ_PYRAMID:  'Pyramid',
+        ic.ICON_OBJ_PLANE:    'Plane',
+        ic.ICON_OBJ_DISC:     'Disc',
+        ic.ICON_OBJ_TORUS:    'Torus',
+        ic.ICON_FILE_3D:      'Load Object',
+        ic.ICON_ORIGAMI:      'Test Mesh',
+    }
 
     config.callbackL = {
         ic.ICON_OBJ_TXT_ABC:       lambda: add_text3d(),
@@ -41,21 +41,6 @@ def execute_plugin(ars_window):
         ic.ICON_OBJ_TORUS:         lambda: add_primitive(primitive_type='torus', radius_inner = 0.25, animated=True),
         ic.ICON_ORIGAMI:           lambda: add_mesh(os.path.join("res","mesh files", "origami.obj"  ), animated = True),
         ic.ICON_FILE_3D:           lambda: add_mesh(),
-    }
-
-    config.additional_texts = {
-        ic.ICON_OBJ_TXT_ABC:  'Text',
-        ic.ICON_OBJ_SPRITE:   '2D Sprite',
-        ic.ICON_OBJ_BOX:      'Cube', 
-        ic.ICON_OBJ_SPHERE:   'Sphere', 
-        ic.ICON_OBJ_CYLINDER: 'Cylinder',
-        ic.ICON_OBJ_CONE:     'Cone',
-        ic.ICON_OBJ_PYRAMID:  'Pyramid',
-        ic.ICON_OBJ_PLANE:    'Plane',
-        ic.ICON_OBJ_DISC:     'Disc',
-        ic.ICON_OBJ_TORUS:    'Torus',
-        ic.ICON_FILE_3D:      'Load Object',
-        ic.ICON_ORIGAMI:      'Test Mesh',
     }
 
     config.hotkey_items = {
@@ -74,7 +59,4 @@ def execute_plugin(ars_window):
 
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

@@ -22,13 +22,13 @@ def execute_plugin(ars_window):
     config.show_value = True
     config.auto_close = False
 
-    options_list = [
-        ic.ICON_GRID,
-        ic.ICON_AXIS_X,
-        ic.ICON_AXIS_Y,
-        ic.ICON_AXIS_Z,
-        ic.ICON_GIZMO_AXIS_3D,
-    ]
+    config.options = {
+        ic.ICON_AXIS_X: "X",
+        ic.ICON_AXIS_Y: "Y",
+        ic.ICON_AXIS_Z: "Z",
+        ic.ICON_GRID: "grid",
+        ic.ICON_GIZMO_AXIS_3D: "xyz",
+    }
 
     def update_xyz_toggle(ctx):
         new_is_xyz = grid._x_axis_visible and grid._y_axis_visible and grid._z_axis_visible
@@ -62,14 +62,6 @@ def execute_plugin(ars_window):
         ),
     }
 
-    config.additional_texts = {
-        ic.ICON_AXIS_X: "X",
-        ic.ICON_AXIS_Y: "Y",
-        ic.ICON_AXIS_Z: "Z",
-        ic.ICON_GRID: "grid",
-        ic.ICON_GIZMO_AXIS_3D: "xyz",
-    }
-
     config.toggle_values = {
         ic.ICON_GRID: is_grid,
         ic.ICON_AXIS_X: is_x,
@@ -78,7 +70,4 @@ def execute_plugin(ars_window):
         ic.ICON_GIZMO_AXIS_3D: is_xyz,
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)

@@ -23,10 +23,7 @@ def BBL_CAMERA(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
     
-    options_list = [ic.ICON_CAMERA, ic.ICON_ORBIT, ic.ICON_FLY, ic.ICON_SPEED_UP, ic.ICON_EYE_UP]
-
-
-    config.additional_texts = {
+    config.options = {
         ic.ICON_CAMERA: "Scene Camera",
         ic.ICON_ORBIT:  'Orbit Camera',
         ic.ICON_FLY:    "Fly Camera",
@@ -74,7 +71,4 @@ def execute_plugin(ars_window):
         ic.ICON_EYE_UP:    lambda value: cam_zoom(ars_window, value),
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = open_context(config)
