@@ -1,5 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from ui.widgets.py_code_editor import PythonEditorWidget
+from ui.widgets.py_code_editor import CodeEditor
 from theme.fonts import font_icons as ic
 from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -81,9 +81,9 @@ def execute_plugin(ars_window):
         current_code_text = f.read()
 
     options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_PLAYER_PLAY, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",], ["   ","PythonEditorWidget","   ",]]
-    code_editor = PythonEditorWidget()
+    code_editor = CodeEditor()
     code_editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height-int(44*1.5)))
-    code_editor.editor.setPlainText(current_code_text)
+    code_editor.setPlainText(current_code_text)
 
     config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_PLAYER_PLAY: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
     
@@ -95,26 +95,26 @@ def execute_plugin(ars_window):
         current_code_file = new_file
         with open(new_file, 'r', encoding='utf-8') as f:
             new_file = f.read()
-        code_editor.editor.setPlainText(new_file)
+        code_editor.setPlainText(new_file)
 
 
 
     default_namespace_injection = {'ars_window': ars_window,
-                                'sel': selected_object(),
+                                'get_selected': selected_object,
                                 'msg': ars_window.msg,
                                 'add_primitive': add_primitive}
     
-    code_editor.editor.custom_namespace = default_namespace_injection
-    code_editor.editor.project_file_path = current_code_file
+    code_editor.custom_namespace = default_namespace_injection
+    code_editor.project_file_path = current_code_file
 
 
     config.callbackL = {
         ic.ICON_LIST:           lambda: scripts_ctx(ars_window, read_code_file),
         ic.ICON_FOLDER_OPEN:    lambda: open_file(os.path.join("ars_scripts", "user")),
 
-        ic.ICON_PLAYER_PLAY:    lambda: code_editor.editor.run_code(default_namespace_injection),
-        ic.ICON_SAVE:           lambda: code_editor.editor.save_script(),
-        ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.editor.project_file_path)
+        ic.ICON_PLAYER_PLAY:    lambda: code_editor.run_code(default_namespace_injection),
+        ic.ICON_SAVE:           lambda: code_editor.save_script(),
+        ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path)
                         }
 
     ctx = open_context(

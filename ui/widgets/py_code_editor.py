@@ -439,16 +439,6 @@ class PythonHighlighter(QSyntaxHighlighter):
                 i += 1
 
 
-class PythonEditorWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.editor = CodeEditor(self)
-        layout.addWidget(self.editor)
-        self.setLayout(layout)
-
-
 class LineNumberArea(QWidget):
     """Line number display widget for CodeEditor."""
 
@@ -1081,11 +1071,11 @@ class CodeEditor(QPlainTextEdit):
 if __name__ == "__main__":
     import os
     app = QApplication(sys.argv)
-    widget = PythonEditorWidget()
+    widget = CodeEditor()
 
     with open(os.path.join("tests", "sample_editor_script.py"), 'r', encoding='utf-8') as f:
         new_file = f.read()
-    widget.editor.setPlainText(new_file)
+    widget.setPlainText(new_file)
     widget.resize(1280, 720)
     widget.show()
     sys.exit(app.exec())
