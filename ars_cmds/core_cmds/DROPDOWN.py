@@ -38,8 +38,9 @@ def r_dropdown(self, code_path = None):
 
     def open_in_arseditor(path):
         for ctx_menu in find_all_open_context_menus():
-            if ctx_menu.symbol == "py_scripts_ctx":
+            if "PythonEditorWidget" in str(ctx_menu.items):
                 ctx_menu.close()
+                print("Closed existing Python Editor context menu.")
         py_ctx_menu, code_editor = py_scripts.execute_plugin(self)
         with open(path, 'r', encoding='utf-8') as f:
             code_file = f.read()
