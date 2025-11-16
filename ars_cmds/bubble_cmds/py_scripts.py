@@ -70,21 +70,22 @@ def execute_plugin(ars_window):
     config.use_extended_shape = False
     config.auto_close = False
     config.close_on_outside=False
-    config.expand = "x"
+    # config.expand = "x"
     config.distribution_mode = "x"
-    config.custom_height = ars_window.height() // 2
+    config.custom_height = int(ars_window.height() / 2.5)
+    config.custom_width = ars_window.width() 
     config.extra_distance = [0, 99999]
 
     current_code_file = os.path.join(user_script_dir, py_files[0])
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_CODE_PYTHON, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",], ["   ","PythonEditorWidget","   ",]]
+    options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_PLAYER_PLAY, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",], ["   ","PythonEditorWidget","   ",]]
     code_editor = PythonEditorWidget()
-    code_editor.setFixedSize(ars_window.width(), config.custom_height-int(44*1.5))
+    code_editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height-int(44*1.5)))
     code_editor.editor.setPlainText(current_code_text)
 
-    config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_CODE_PYTHON: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
+    config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_PLAYER_PLAY: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
 
@@ -111,7 +112,7 @@ def execute_plugin(ars_window):
         ic.ICON_LIST:           lambda: scripts_ctx(ars_window, read_code_file),
         ic.ICON_FOLDER_OPEN:    lambda: open_file(os.path.join("ars_scripts", "user")),
 
-        ic.ICON_CODE_PYTHON:    lambda: code_editor.editor.run_code(default_namespace_injection),
+        ic.ICON_PLAYER_PLAY:    lambda: code_editor.editor.run_code(default_namespace_injection),
         ic.ICON_SAVE:           lambda: code_editor.editor.save_script(),
         ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.editor.project_file_path)
                         }
