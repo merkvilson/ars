@@ -390,63 +390,51 @@ class PythonHighlighter(QSyntaxHighlighter):
 
     def _highlight_fstring_placeholders(self, text: str, start: int, end: int):
         """
-        Highlight { ... } placeholder regions inside an f-string range [start, end).
-        Handles nested braces and ignores doubled braces {{ and }}.
+        Clear string formatting inside { } placeholders and highlight only the braces.
         """
-        i = start
-        # Attempt to skip the optional prefix letters and opening quote(s)
-        # Find first quote character within the region to begin scanning expressions after it
-        # Start scanning after the first quote char inside [start, end)
         j = start
         # Skip possible prefix letters
         while j < end and text[j].isalpha():
             j += 1
-        # Skip one or three starting quotes if present
+        # Skip opening quotes
         if j + 2 < end and text[j : j + 3] in (self.triple_sq, self.triple_dq):
             scan_start = j + 3
         elif j < end and text[j] in ("'", '"'):
             scan_start = j + 1
         else:
-            scan_start = start  # fallback
+            scan_start = start
 
         i = scan_start
         while i < end:
             if text[i] == "{":
-                # Handle escaped '{{'
-                if i + 1 < end and text[i + 1] == "{":
+                if i + 1 < end and text[i + 1] == "{":  # Escaped {{
                     i += 2
                     continue
+                
+                # Highlight opening brace
+                self.setFormat(i, 1, self.fmt_fplaceholder)
                 depth = 1
                 k = i + 1
+                content_start = k
+                
                 while k < end and depth > 0:
-                    if text[k] == "{":
-                        if not (k + 1 < end and text[k + 1] == "{"):
-                            depth += 1
-                            k += 1
-                            continue
-                        else:
-                            k += 2
-                            continue
-                    elif text[k] == "}":
-                        if not (k + 1 < end and text[k + 1] == "}"):
-                            depth -= 1
-                            k += 1
-                            continue
-                        else:
-                            k += 2
-                            continue
-                    else:
+                    if text[k] == "{" and not (k + 1 < end and text[k + 1] == "{"):
+                        depth += 1
                         k += 1
-                placeholder_end = min(k, end)
-                if placeholder_end > i:
-                    self.setFormat(i, placeholder_end - i, self.fmt_fplaceholder)
-                i = placeholder_end
-            elif text[i] == "}":
-                # Handle escaped '}}'
-                if i + 1 < end and text[i + 1] == "}":
-                    i += 2
-                else:
-                    i += 1
+                    elif text[k] == "}" and not (k + 1 < end and text[k + 1] == "}"):
+                        depth -= 1
+                        if depth == 0:
+                            # Clear formatting on content, highlight closing brace
+                            if k > content_start:
+                                self.setFormat(content_start, k - content_start, QTextCharFormat())
+                            self.setFormat(k, 1, self.fmt_fplaceholder)
+                        k += 1
+                    else:
+                        if text[k : k + 2] in ("{{", "}}"):
+                            k += 2
+                        else:
+                            k += 1
+                i = k
             else:
                 i += 1
 
