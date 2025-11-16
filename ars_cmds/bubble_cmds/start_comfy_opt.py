@@ -1,5 +1,6 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ars_cmds.core_cmds.run_ext import run_ext
+from prefs.pref_controller import read_pref
 import os
 import subprocess
 import socket
