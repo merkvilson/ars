@@ -63,7 +63,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         self.fmt_builtin = mkfmt("#c25656")
         self.fmt_number = mkfmt("#d16666")
         self.fmt_string = mkfmt("#98c379")
-        self.fmt_string_prefix = mkfmt("#56b6c2", bold=True)  # r, f, b, u prefixes
+        self.fmt_string_prefix = mkfmt("#56b6c2", bold=True, italic=True)  # r, f, b, u prefixes
         self.fmt_docstring = mkfmt("#9dcc8b", italic=True)
         self.fmt_comment = mkfmt("#5c6370", italic=True)
         self.fmt_todo = mkfmt("#e5c07b", bold=True)
@@ -232,6 +232,9 @@ class PythonHighlighter(QSyntaxHighlighter):
             if end_idx == -1:
                 # Multi-line starts here
                 self.setFormat(start_idx, len(text) - start_idx, self.fmt_docstring)
+                # Highlight prefix after docstring format (so it doesn't get overwritten)
+                if valid_prefix and prefix:
+                    self.setFormat(prefix_start + 1, len(prefix), self.fmt_string_prefix)
                 self._add_range(protected, start_idx, len(text))
                 if is_f:
                     self._highlight_fstring_placeholders(text, start_idx, len(text))
@@ -249,6 +252,9 @@ class PythonHighlighter(QSyntaxHighlighter):
             else:
                 end_pos = end_idx + len(delim)
                 self.setFormat(start_idx, end_pos - start_idx, self.fmt_docstring)
+                # Highlight prefix after docstring format (so it doesn't get overwritten)
+                if valid_prefix and prefix:
+                    self.setFormat(prefix_start + 1, len(prefix), self.fmt_string_prefix)
                 self._add_range(protected, start_idx, end_pos)
                 if is_f:
                     self._highlight_fstring_placeholders(text, start_idx, end_pos)
@@ -348,10 +354,6 @@ class PythonHighlighter(QSyntaxHighlighter):
                 if self._overlaps(protected, start_idx, 1):
                     i += 1
                     continue
-                
-                # Highlight string prefix if present
-                if valid_prefix and prefix:
-                    self.setFormat(prefix_start + 1, len(prefix), self.fmt_string_prefix)
 
                 # Find closing quote
                 j = i + 1
@@ -369,7 +371,14 @@ class PythonHighlighter(QSyntaxHighlighter):
                 if length <= 0:
                     i += 1
                     continue
+                
+                # Highlight the string (from start_idx which may include prefix)
                 self.setFormat(start_idx, length, self.fmt_string)
+                
+                # Highlight string prefix AFTER the string (so it doesn't get overwritten)
+                if valid_prefix and prefix:
+                    self.setFormat(prefix_start + 1, len(prefix), self.fmt_string_prefix)
+                
                 self._add_range(protected, start_idx, start_idx + length)
 
                 if is_f:
