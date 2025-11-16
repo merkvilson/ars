@@ -34,7 +34,8 @@ def execute_plugin(ars_window):
         ic.ICON_BACKGROUND: lambda: ars_window.viewport.bg.clear_image(),
     }
 
-    radial = open_context(
+    ctx = open_context(
         items=options_list,
         config=config
     )
+    ctx.symbol = ic.ICON_BACKGROUND

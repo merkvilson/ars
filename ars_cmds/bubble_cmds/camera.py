@@ -78,3 +78,4 @@ def execute_plugin(ars_window):
         items=options_list,
         config=config
     )
+    ctx.symbol = ic.ICON_CAMERA

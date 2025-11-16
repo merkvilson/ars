@@ -7,7 +7,7 @@ from ars_cmds.core_cmds.load_object import selected_object
 from PyQt6.QtCore import QPoint, QTimer
 
 
-def BBL_2(*args):
+def BBL_TEST2(*args):
     run_ext(__file__)
 
 
@@ -45,3 +45,4 @@ def execute_plugin(ars_window):
         items=options_list,
         config=config
     )
+    ctx.symbol = ic.ICON_TEST2
