@@ -73,6 +73,7 @@ def execute_plugin(ars_window):
     config.expand = "x"
     config.distribution_mode = "x"
     config.custom_height = ars_window.height() // 2
+    config.extra_distance = [0, 99999]
 
     current_code_file = os.path.join(user_script_dir, py_files[0])
     with open(current_code_file, 'r', encoding='utf-8') as f:
