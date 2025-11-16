@@ -95,10 +95,6 @@ def execute_plugin(ars_window):
             new_file = f.read()
         code_editor.editor.setPlainText(new_file)
 
-    
-    def save_script():
-        with open(current_code_file, 'w', encoding='utf-8') as f:
-            f.write(code_editor.editor.toPlainText())
 
 
     default_namespace_injection = {'ars_window': ars_window,
@@ -110,11 +106,13 @@ def execute_plugin(ars_window):
     code_editor.editor.project_file_path = current_code_file
 
 
-    config.callbackL = {ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
-                       ic.ICON_FOLDER_OPEN: lambda: open_file(os.path.join("ars_scripts", "user")),
-                        ic.ICON_CODE_PYTHON: lambda: code_editor.editor.run_code(default_namespace_injection),
-                        ic.ICON_SAVE: lambda: save_script(),
-                        ic.ICON_CODE_TERMINAL: lambda: open_file(current_code_file)
+    config.callbackL = {
+        ic.ICON_LIST:           lambda: scripts_ctx(ars_window, read_code_file),
+        ic.ICON_FOLDER_OPEN:    lambda: open_file(os.path.join("ars_scripts", "user")),
+
+        ic.ICON_CODE_PYTHON:    lambda: code_editor.editor.run_code(default_namespace_injection),
+        ic.ICON_SAVE:           lambda: code_editor.editor.save_script(),
+        ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.editor.project_file_path)
                         }
 
     ctx = open_context(
