@@ -49,4 +49,3 @@ def execute_plugin(self):
         items=options_list,
         config=config
     )
-    ctx.symbol = ic.ICON_TEST3

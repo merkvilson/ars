@@ -465,6 +465,12 @@ def calc_positions(config, center_pos, count):
 
 
 def open_context(parent = None, items = ["1", "2", "3"], position=None, config=None):
+    # Check if a menu with the same items is already open
+    for ctx in find_all_open_context_menus(parent):
+        if ctx.items == items:
+            ctx.close()
+            return None
+
     play_sound("hover2")
     if parent is None:
         if hasattr(QApplication.activeWindow(), "central_widget"): parent = QApplication.activeWindow().central_widget

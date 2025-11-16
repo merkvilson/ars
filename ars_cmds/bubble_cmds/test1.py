@@ -15,4 +15,3 @@ def execute_plugin(ars_window):
         items=["1", "2"],
         config=config
     )
-    ctx.symbol = ic.ICON_TEST

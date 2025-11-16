@@ -51,4 +51,3 @@ def execute_plugin(ars_window):
         items=ckpt_index_list,
         config=config
     )
-    ctx.symbol = ic.ICON_BRAIN

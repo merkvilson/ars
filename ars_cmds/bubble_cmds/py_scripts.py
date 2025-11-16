@@ -121,5 +121,4 @@ def execute_plugin(ars_window):
         items=options_list,
         config=config
     )
-    ctx.symbol = ic.ICON_CODE_TERMINAL
     return ctx, code_editor
