@@ -44,6 +44,7 @@ def r_dropdown(self, code_path = None):
         with open(path, 'r', encoding='utf-8') as f:
             code_file = f.read()
         code_editor.editor.setPlainText(code_file)
+        code_editor.editor.project_file_path = path
 
     config.callbackL = {
         ic.ICON_LOCK_state:  lambda: (

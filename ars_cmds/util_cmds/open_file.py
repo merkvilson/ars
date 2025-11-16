@@ -17,6 +17,5 @@ def open_file(path):
             subprocess.run(["open", path])
         else:  # Linux or other UNIX-like
             subprocess.run(["xdg-open", path])
-        print(f"Opened: {path}")
     except Exception as e:
         print(f"Failed to open file: {e}")
