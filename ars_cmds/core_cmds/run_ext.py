@@ -50,14 +50,8 @@ def run_ext(path, window = None, edit_func=None):
     except Exception:
         print("Failed to load/execute:")
         traceback.print_exc()
-"""
-window = ars_window()
 
-default_namespace_injection = {'ars_window': window,
-                              'sel': selected_object(),
-                              'msg': window.msg,
-                              'add_primitive': add_primitive}
-"""
+
 def run_string_code(code_string: str, namespace_injection: dict=None):
     """Execute raw Python code from a string.
     
