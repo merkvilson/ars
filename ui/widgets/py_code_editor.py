@@ -484,11 +484,11 @@ class CodeEditor(QPlainTextEdit):
 
 
         #TODO: CHECK LATER - add option to disable/enable line wrap
+        #TODO: Change f"background-color: rgba(0, 0, 0, {1.0 if STANDALONE else 0.15})
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
-            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.85});"
-            "color: #abb2bf;"
+            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.55});"            "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
             "selection-color: #ffffff;"
