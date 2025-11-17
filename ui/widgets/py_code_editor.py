@@ -584,8 +584,11 @@ class CodeEditor(QPlainTextEdit):
 
         if key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
             is_shift = bool(modifiers & Qt.KeyboardModifier.ShiftModifier) or key == Qt.Key.Key_Backtab
+            is_ctrl = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
             if is_shift:
                 self._adjust_selection_indent(decrease=True)
+            elif is_ctrl:
+                self._add_indent_at_line_start()
             else:
                 if self.textCursor().hasSelection():
                     self._adjust_selection_indent(decrease=False)
@@ -934,6 +937,52 @@ class CodeEditor(QPlainTextEdit):
         else:
             block = doc.findBlockByNumber(caret_block_number)
             new_column = max(0, caret_column - removed_on_caret_line)
+            new_pos = block.position() + new_column
+            new_cursor = QTextCursor(doc)
+            new_cursor.setPosition(new_pos)
+            self.setTextCursor(new_cursor)
+
+    def _add_indent_at_line_start(self):
+        """Add 4 spaces at the start of the current line or selected lines."""
+        cursor = self.textCursor()
+        doc = self.document()
+
+        has_selection = cursor.hasSelection()
+        sel_start = cursor.selectionStart() if has_selection else cursor.position()
+        sel_end = cursor.selectionEnd() if has_selection else cursor.position()
+
+        start_block = doc.findBlock(sel_start)
+        end_index = max(sel_start, sel_end - 1)
+        end_block = doc.findBlock(end_index)
+
+        caret_block_number = cursor.block().blockNumber()
+        caret_column = cursor.position() - cursor.block().position()
+
+        cursor.beginEditBlock()
+
+        block = start_block
+        while block.isValid():
+            block_cursor = QTextCursor(doc)
+            block_cursor.setPosition(block.position())
+            block_cursor.insertText(self.INDENT)
+
+            if block == end_block:
+                break
+            block = block.next()
+
+        cursor.endEditBlock()
+
+        if has_selection:
+            new_cursor = self.textCursor()
+            new_cursor.setPosition(start_block.position())
+            new_cursor.setPosition(
+                end_block.position() + end_block.length() - 1,
+                QTextCursor.MoveMode.KeepAnchor,
+            )
+            self.setTextCursor(new_cursor)
+        else:
+            block = doc.findBlockByNumber(caret_block_number)
+            new_column = caret_column + len(self.INDENT)
             new_pos = block.position() + new_column
             new_cursor = QTextCursor(doc)
             new_cursor.setPosition(new_pos)
