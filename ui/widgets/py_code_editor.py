@@ -1102,11 +1102,17 @@ class CodeEditor(QPlainTextEdit):
                 block_end = block_start + block.length()
                 is_selected = (block_start < selection_end and block_end > selection_start)
                 
-                # Use brighter color for selected lines
+                # Use brighter color and bold font for selected lines
                 if is_selected:
                     painter.setPen(QColor("#abb2bf"))  # Brighter color
+                    font = painter.font()
+                    font.setWeight(QFont.Weight.Bold)
+                    painter.setFont(font)
                 else:
                     painter.setPen(QColor("#5c6370"))  # Normal color
+                    font = painter.font()
+                    font.setWeight(QFont.Weight.Normal)
+                    painter.setFont(font)
                     
                 painter.drawText(0, int(top), self.line_number_area.width() - 12, self.fontMetrics().height(),
                                 Qt.AlignmentFlag.AlignRight, number)
