@@ -10,7 +10,7 @@ https://civitai.com/models/575474/textures-fluxsdxlpony
 https://www.facebook.com/reel/791143173656282
 https://www.facebook.com/reel/2631619090526695
 https://www.facebook.com/reel/809604318718913
-
+https://huggingface.co/dx8152/Qwen-Image-Edit-2509-Fusion
 
 ## High Priority
 - [ ] Add undo/redo functionality
