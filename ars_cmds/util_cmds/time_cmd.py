@@ -28,4 +28,6 @@ delay(doit)(5000) usage with after:
 
 # alternative usage: after(5000, doit)
 
+#delay(msg)(2000,"hello world") #use with arguments
+
 """
