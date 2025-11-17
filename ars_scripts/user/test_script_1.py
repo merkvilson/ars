@@ -1,8 +1,12 @@
+from PyQt6.QtCore import QTimer
+import random
 
-def f1():
-    msg("hello")
+def delay(f):
+    def wrapper(duration = 100):
+        QTimer.singleShot(duration, f)
+    return wrapper
 
-def f2(f):
-    f()
+def doit():
+    msg(random.randint(0,100))
 
-f2(f1)
+delay(lambda: doit())(1000)
