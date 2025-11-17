@@ -28,16 +28,16 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 
 ## Low Priority
 - [✓] Add primitive shapes
-- [ ] Implement plugin system
+- [20%] Implement plugin system
 - [ ] Add theme customization options
 - [ ] Open tutorial videos from right click dropdown.
 - [ ] Optimize memory usage in mesh loader.
-- [ ] 2D slider (shape extended) aka xy slider
+- [ ] 2D edit area b-button (shape extended) 
 
 ## Bug Fixes
 - [ ] Fix gizmo rotation
 - [ ] Resolve sprite rendering artifacts
-- [ ] Fix object manager deletion issues
+- [50%] Fix object manager deletion issues
 
 ## Future Features
 - [ ] Gaussian Splatting (3DGS)
