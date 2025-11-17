@@ -5,8 +5,8 @@ from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.util_cmds.open_file import open_file
 import os
-from util_functions.ars_window import ars_window
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
+from ars_cmds.util_cmds.time_cmd import after
 
 def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
@@ -102,7 +102,8 @@ def execute_plugin(ars_window):
     default_namespace_injection = {'ars_window': ars_window,
                                 'get_selected': selected_object,
                                 'msg': ars_window.msg,
-                                'add_primitive': add_primitive}
+                                'add_primitive': add_primitive,
+                                'after': after,}
     
     code_editor.custom_namespace = default_namespace_injection
     code_editor.project_file_path = current_code_file
