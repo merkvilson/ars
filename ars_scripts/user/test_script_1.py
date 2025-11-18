@@ -7,6 +7,6 @@ config.options = {
                 "2": "Option 2",
                 "3": "Option 3",
                 }
-config.callbackL("1": lambda: add_primitive("sphere") ) 
+config.callbackL("1": lambda: add_primitive("sphere") 
 
 open_context(config)
