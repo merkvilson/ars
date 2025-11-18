@@ -1063,9 +1063,25 @@ class CodeEditor(QPlainTextEdit):
         move_cursor = QTextCursor(doc)
         move_cursor.setPosition(prev_start)
         move_cursor.setPosition(prev_end, QTextCursor.MoveMode.KeepAnchor)
-        text = move_cursor.selectedText()
+        text = move_cursor.selectedText() # Includes newline if not last, but prev is never last
         
         move_cursor.removeSelectedText()
+        
+        # If end_block was the last block, it might not have a newline.
+        # We are appending 'text' (which ends in \n) to end_block.
+        # If end_block has no newline, we get "ContentPrev\n". We want "Content\nPrev".
+        # So we need to insert a newline before 'text', and remove the newline from 'text'?
+        
+        if end_block.blockNumber() == doc.blockCount() - 1:
+            # We are moving something to the end.
+            # 'text' is "Prev\n".
+            # We want to insert "\nPrev".
+            # So we strip the last char from text, and prepend \n.
+            if text.endswith("\u2029") or text.endswith("\n"):
+                 text = "\n" + text[:-1]
+            else:
+                 # Should not happen for prev_block unless it was somehow last, which it isn't
+                 text = "\n" + text
         
         insert_pos = end_block.position() + end_block.length()
         
@@ -1075,6 +1091,9 @@ class CodeEditor(QPlainTextEdit):
         cursor.endEditBlock()
         
         shift = len(text)
+        # If we changed the text structure (added \n at start), the shift logic might be tricky.
+        # But wait, we removed "Prev\n" (len L) and inserted "\nPrev" (len L). Length is same.
+        
         new_cursor = self.textCursor()
         new_cursor.setPosition(start_pos - shift)
         if end_pos > start_pos:
@@ -1107,28 +1126,53 @@ class CodeEditor(QPlainTextEdit):
         
         next_start = next_block.position()
         if next_block.next().isValid():
+            # Normal case: B is not last.
             next_end = next_block.next().position()
             move_cursor = QTextCursor(doc)
             move_cursor.setPosition(next_start)
             move_cursor.setPosition(next_end, QTextCursor.MoveMode.KeepAnchor)
             text = move_cursor.selectedText()
+            move_cursor.removeSelectedText()
+            
+            insert_pos = start_block.position()
+            move_cursor.setPosition(insert_pos)
+            move_cursor.insertText(text)
+            
+            shift = len(text)
         else:
+            # Special case: B is last.
+            # We move B (last) to before A. A becomes last.
             move_cursor = QTextCursor(doc)
             move_cursor.setPosition(next_start)
             move_cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
-            text = move_cursor.selectedText()
-            text += "\\n"
+            text = move_cursor.selectedText() # "ContentB" (no newline)
+            move_cursor.removeSelectedText()
             
-        move_cursor.removeSelectedText()
-        
-        insert_pos = start_block.position()
-        
-        move_cursor.setPosition(insert_pos)
-        move_cursor.insertText(text)
-        
+            # Now we must remove the newline after A (which is now at the end of doc)
+            # The newline is at end_block.position() + end_block.length()
+            # But since we removed B, the doc ends at that newline.
+            
+            # We need to be careful with positions since we just modified the doc.
+            # start_block and end_block are still valid objects but their positions might have updated?
+            # No, we removed text *after* them, so their positions are unchanged.
+            
+            # The newline to remove is at the end of the current selection range.
+            newline_pos = end_block.position() + end_block.length()
+            
+            delete_cursor = QTextCursor(doc)
+            delete_cursor.setPosition(newline_pos)
+            delete_cursor.deleteChar() # Remove \n
+            
+            # Insert "ContentB\n" before A
+            text = text + "\n"
+            insert_pos = start_block.position()
+            move_cursor.setPosition(insert_pos)
+            move_cursor.insertText(text)
+            
+            shift = len(text)
+
         cursor.endEditBlock()
         
-        shift = len(text)
         new_cursor = self.textCursor()
         new_cursor.setPosition(start_pos + shift)
         if end_pos > start_pos:
