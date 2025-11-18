@@ -40,9 +40,9 @@ class ScreenshotOverlay(QWidget):
         # Hide cursor using cursor modifier
         set_cursor("invisible")
         
-        # Initialize virtual cursor at center
-        screen_geo = self.screen().geometry()
-        self.virtual_cursor_pos = QPointF(screen_geo.width() / 2, screen_geo.height() / 2)
+        # Initialize virtual cursor at current cursor position
+        cursor_pos = QCursor.pos()
+        self.virtual_cursor_pos = QPointF(cursor_pos.x(), cursor_pos.y())
         
     def paintEvent(self, event):
         painter = QPainter(self)
