@@ -1,6 +1,6 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
-from PyQt6.QtGui import QCursor, QColor
+from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.key_check import key_check_continuous
 
 from ars_cmds.obj_ctx.obj_color_ctx import obj_color
@@ -37,13 +37,11 @@ def obj_att_mng(ars_window, ):
                         ic.ICON_GIZMO_SCALE_3D: lambda: (obj_scale(ars_window,mouse_pos, obj_att_mng),                ctx.close()),
                         ic.ICON_TRASH:          lambda: (delete_selected_obj(ars_window, None),                       ctx.close()),
                         ic.ICON_TEXT_INPUT:     lambda: (prompt_ctx(ars_window, mouse_pos, selected[0], obj_att_mng), ctx.close()),
-        ic.ICON_CLOSE_RADIAL:                   lambda: (ctx.close_animated(),ars_window.viewport.controller.set_handles(['t'])),
+                        ic.ICON_CLOSE_RADIAL:   lambda: (ctx.close_animated(),ars_window.viewport.controller.set_handles(['t'])),
     }
 
     def move_ctx():ctx.move(ars_window.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
-
-
 
 
     ctx = open_context(
