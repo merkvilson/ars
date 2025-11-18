@@ -1,8 +1,9 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
-from PyQt6.QtCore import Qt, QPointF, QTimer
+from PyQt6.QtCore import Qt, QPointF, QTimer, QEasingCurve
 from PyQt6.QtGui import QColor, QPainter, QTransform, QCursor
 from core.cursor_modifier import set_cursor
+import time
 
 
 class ScreenshotOverlay(QWidget):
@@ -26,10 +27,24 @@ class ScreenshotOverlay(QWidget):
         # Virtual cursor for smooth tracking
         self.virtual_cursor_pos = None
         
+        # Animation state
+        self.is_animating = False
+        self.animation_start_time = None
+        self.animation_duration = 0.3  # 0.3 seconds
+        self.animation_start_zoom = 1.0
+        self.animation_start_offset_x = 0.0
+        self.animation_start_offset_y = 0.0
+        self.animation_picked_color = None
+        
         # Timer for tracking raw mouse movement
         self.mouse_timer = QTimer()
         self.mouse_timer.timeout.connect(self.check_mouse_movement)
         self.mouse_timer.setInterval(16)  # ~60 FPS
+        
+        # Timer for animation
+        self.animation_timer = QTimer()
+        self.animation_timer.timeout.connect(self.update_animation)
+        self.animation_timer.setInterval(16)  # ~60 FPS
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowState(Qt.WindowState.WindowFullScreen)
@@ -40,9 +55,9 @@ class ScreenshotOverlay(QWidget):
         # Hide cursor using cursor modifier
         set_cursor("invisible")
         
-        # Initialize virtual cursor at center
-        screen_geo = self.screen().geometry()
-        self.virtual_cursor_pos = QPointF(screen_geo.width() / 2, screen_geo.height() / 2)
+        # Initialize virtual cursor at current cursor position
+        cursor_pos = QCursor.pos()
+        self.virtual_cursor_pos = QPointF(cursor_pos.x(), cursor_pos.y())
         
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -86,8 +101,49 @@ class ScreenshotOverlay(QWidget):
             self.virtual_cursor_pos = QPointF(event.pos())
         self.update()
     
+    def update_animation(self):
+        """Update zoom out animation"""
+        if not self.is_animating:
+            return
+        
+        current_time = time.time()
+        elapsed = current_time - self.animation_start_time
+        progress = min(elapsed / self.animation_duration, 1.0)
+        
+        # Use easing curve for smooth animation
+        easing = QEasingCurve(QEasingCurve.Type.OutCubic)
+        eased_progress = easing.valueForProgress(progress)
+        
+        # Animate zoom level from current to min_zoom (1.0)
+        self.zoom_level = self.animation_start_zoom + (self.min_zoom - self.animation_start_zoom) * eased_progress
+        
+        # Animate offsets back to 0
+        self.offset_x = self.animation_start_offset_x * (1.0 - eased_progress)
+        self.offset_y = self.animation_start_offset_y * (1.0 - eased_progress)
+        
+        self.update()
+        
+        # End animation
+        if progress >= 1.0:
+            self.is_animating = False
+            self.animation_timer.stop()
+            self.zoom_level = self.min_zoom
+            self.offset_x = 0.0
+            self.offset_y = 0.0
+            self.is_zoomed = False
+            
+            # Call parent callback and close
+            if self.animation_picked_color:
+                self.paretn_callback(self.animation_picked_color)
+            set_cursor("cursor")
+            self.close()
+    
     def check_mouse_movement(self):
         """Check actual global mouse position for continuous movement tracking"""
+        # Skip mouse tracking during animation
+        if self.is_animating:
+            return
+        
         current_global = QCursor.pos()
         
         if self.last_global_pos is not None:
@@ -200,9 +256,18 @@ class ScreenshotOverlay(QWidget):
             
             if 0 <= x < image.width() and 0 <= y < image.height():
                 color = QColor(image.pixel(x, y))
-                self.paretn_callback(color)
-                set_cursor("cursor")  # Restore cursor before closing
-                self.close()
+                
+                # Start zoom out animation
+                self.is_animating = True
+                self.animation_start_time = time.time()
+                self.animation_start_zoom = self.zoom_level
+                self.animation_start_offset_x = self.offset_x
+                self.animation_start_offset_y = self.offset_y
+                self.animation_picked_color = color
+                
+                # Stop mouse tracking and start animation
+                self.mouse_timer.stop()
+                self.animation_timer.start()
         elif event.button() == Qt.MouseButton.RightButton:
             set_cursor("cursor")  # Restore cursor before closing
             self.close()
@@ -214,7 +279,8 @@ class ScreenshotOverlay(QWidget):
             self.close()
     
     def closeEvent(self, event):
-        """Ensure timer is stopped and cursor is restored when window closes"""
+        """Ensure timers are stopped and cursor is restored when window closes"""
         self.mouse_timer.stop()
+        self.animation_timer.stop()
         set_cursor("cursor")  # Restore cursor visibility
         super().closeEvent(event)
