@@ -9,6 +9,8 @@ from ars_cmds.util_cmds.color_convert import hsv_to_rgb, rgb_to_hsv
 from core.sound_manager import play_sound
 from theme.fonts import font_icons as ic
 from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.screen_color_picker import ScreenshotOverlay
+from PyQt6.QtWidgets import QApplication
 
 class HSVSlider(QSlider):
     """
@@ -145,7 +147,7 @@ def obj_color(self, position, callback=None):
     config.close_on_outside = False
     config.auto_close = False
 #
-    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_CLOSE_RADIAL,]
+    options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_COLOR_PICKER, ic.ICON_CLOSE_RADIAL,]
 
     if not selected_object():
         return
@@ -228,8 +230,37 @@ def obj_color(self, position, callback=None):
 
     config.callbackL = {
         ic.ICON_IMAGE: lambda: load_image(None),
-        ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self))
+        ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
+        ic.ICON_COLOR_PICKER: lambda: start_picking(ctx),
     }
+
+    def display_color_callback(color):
+        rgb = color.getRgbF()[:3]
+        obj.set_color(rgb)  # set_color expects rgb tuple
+        
+        # Update color_state and sliders to reflect the new color
+        h, s, v, _ = rgb_to_hsv(rgb)
+        color_state["h"] = float(h)
+        color_state["s"] = float(s)
+        color_state["v"] = float(v)
+        
+        # Update slider values (0-100 range)
+        hue_slider.setValue(int(h * 100))
+        sat_slider.setValue(int(s * 100))
+        val_slider.setValue(int(v * 100))
+        
+        # Force repaint of all sliders to update their gradients
+        hue_slider.update()
+        sat_slider.update()
+        val_slider.update()
+        alpha_slider.update()
+
+    def start_picking(ctx):
+        # Capture entire screen
+        screen = QApplication.primaryScreen()
+        screenshot = screen.grabWindow(0)
+        ctx.overlay = ScreenshotOverlay(screenshot, paretn_callback=display_color_callback)
+
 
     def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
