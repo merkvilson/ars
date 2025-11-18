@@ -766,11 +766,11 @@ class CodeEditor(QPlainTextEdit):
         with open(self.project_file_path, 'w', encoding='utf-8') as f:
             f.write(self.toPlainText())
 
-
     def keyPressEvent(self, event):
         key = event.key()
         text = event.text()
         modifiers = event.modifiers()
+
         
         # Handle completion popup navigation - ONLY specific keys when popup is visible
         if self._completion_active and self.completion_popup.isVisible():
@@ -800,6 +800,16 @@ class CodeEditor(QPlainTextEdit):
                 event.accept()
                 return
             # For ALL other keys, let them pass through normally
+
+        if modifiers & Qt.KeyboardModifier.AltModifier:
+            if key == Qt.Key.Key_Up:
+                self._move_lines_up()
+                event.accept()
+                return
+            if key == Qt.Key.Key_Down:
+                self._move_lines_down()
+                event.accept()
+                return
 
         if self._handle_pair_chars(text, modifiers):
             event.accept()
@@ -1021,6 +1031,108 @@ class CodeEditor(QPlainTextEdit):
             end_block.position() + end_block.length() - 1,
             QTextCursor.MoveMode.KeepAnchor,
         )
+        self.setTextCursor(new_cursor)
+
+    def _move_lines_up(self):
+        cursor = self.textCursor()
+        doc = self.document()
+
+        if cursor.hasSelection():
+            start_pos = cursor.selectionStart()
+            end_pos = cursor.selectionEnd()
+        else:
+            start_pos = cursor.position()
+            end_pos = cursor.position()
+
+        start_block = doc.findBlock(start_pos)
+        end_block = doc.findBlock(end_pos)
+        
+        if end_pos > start_pos and end_block.position() == end_pos:
+            end_block = end_block.previous()
+
+        if start_block.blockNumber() == 0:
+            return
+
+        prev_block = start_block.previous()
+        
+        cursor.beginEditBlock()
+        
+        prev_start = prev_block.position()
+        prev_end = start_block.position()
+        
+        move_cursor = QTextCursor(doc)
+        move_cursor.setPosition(prev_start)
+        move_cursor.setPosition(prev_end, QTextCursor.MoveMode.KeepAnchor)
+        text = move_cursor.selectedText()
+        
+        move_cursor.removeSelectedText()
+        
+        insert_pos = end_block.position() + end_block.length()
+        
+        move_cursor.setPosition(insert_pos)
+        move_cursor.insertText(text)
+        
+        cursor.endEditBlock()
+        
+        shift = len(text)
+        new_cursor = self.textCursor()
+        new_cursor.setPosition(start_pos - shift)
+        if end_pos > start_pos:
+            new_cursor.setPosition(end_pos - shift, QTextCursor.MoveMode.KeepAnchor)
+        self.setTextCursor(new_cursor)
+
+    def _move_lines_down(self):
+        cursor = self.textCursor()
+        doc = self.document()
+
+        if cursor.hasSelection():
+            start_pos = cursor.selectionStart()
+            end_pos = cursor.selectionEnd()
+        else:
+            start_pos = cursor.position()
+            end_pos = cursor.position()
+
+        start_block = doc.findBlock(start_pos)
+        end_block = doc.findBlock(end_pos)
+        
+        if end_pos > start_pos and end_block.position() == end_pos:
+            end_block = end_block.previous()
+
+        if end_block.blockNumber() == doc.blockCount() - 1:
+            return
+
+        next_block = end_block.next()
+        
+        cursor.beginEditBlock()
+        
+        next_start = next_block.position()
+        if next_block.next().isValid():
+            next_end = next_block.next().position()
+            move_cursor = QTextCursor(doc)
+            move_cursor.setPosition(next_start)
+            move_cursor.setPosition(next_end, QTextCursor.MoveMode.KeepAnchor)
+            text = move_cursor.selectedText()
+        else:
+            move_cursor = QTextCursor(doc)
+            move_cursor.setPosition(next_start)
+            move_cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+            text = move_cursor.selectedText()
+            text += "\\n"
+            
+        move_cursor.removeSelectedText()
+        
+        insert_pos = start_block.position()
+        
+        move_cursor.setPosition(insert_pos)
+        move_cursor.insertText(text)
+        
+        cursor.endEditBlock()
+        
+        shift = len(text)
+        new_cursor = self.textCursor()
+        new_cursor.setPosition(start_pos + shift)
+        if end_pos > start_pos:
+            new_cursor.setPosition(end_pos + shift, QTextCursor.MoveMode.KeepAnchor)
         self.setTextCursor(new_cursor)
 
     def _duplicate_line(self):
