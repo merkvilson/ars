@@ -137,8 +137,8 @@ def add_point():
     window.viewport._view.camera.view_changed()
     return obj
 
-def add_primitive(**params, ):
-    obj = CPrimitive.create(**params)
+def add_primitive(primitive_type = "cube", **params, ):
+    obj = CPrimitive.create(primitive_type,**params)
     animated = params.get("animated")
     obj.set_position(0, 2 if animated else 0, 0)
     return add_mesh(file_path=obj, animated=animated)
