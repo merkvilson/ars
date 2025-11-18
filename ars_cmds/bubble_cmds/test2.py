@@ -33,4 +33,8 @@ def execute_plugin(ars_window):
     }
 
 
+<<<<<<< HEAD
     ctx = open_context(config)
+=======
+    ctx = open_context(config)
+>>>>>>> 82a8e21f2f7c15555cfbb5f355eae8670a62934b

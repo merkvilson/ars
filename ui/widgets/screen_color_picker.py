@@ -282,5 +282,5 @@ class ScreenshotOverlay(QWidget):
         """Ensure timers are stopped and cursor is restored when window closes"""
         self.mouse_timer.stop()
         self.animation_timer.stop()
-        set_cursor("cursor") 
+        set_cursor("cursor")  # Restore cursor visibility
         super().closeEvent(event)
