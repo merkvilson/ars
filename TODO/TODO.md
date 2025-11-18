@@ -20,6 +20,12 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Ctrl+Shift+A find all selected
 - [ ] Option to disable/enable line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
 - [ ] Custom Themes. f"background-color: rgba(0, 0, 0, {1.0 if STANDALONE else 0.15})
+- [ ] Auto Completion
+- [ ] Custom completion for icons. "ic." triggers icons list.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
 - [ ] 
 
 
@@ -62,7 +68,7 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 ## General Ideas
 - [ ] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
 
-- [ ] Save image steps inside final image as metadata
+- [70%] Save image steps inside final image as metadata
 
 - [ ] First step of animation generation can be a mix of first image and last image by applying generation steps from metadata.
 
