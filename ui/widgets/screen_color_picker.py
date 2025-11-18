@@ -46,7 +46,7 @@ class ScreenshotOverlay(QWidget):
         
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
         
         # Apply zoom and pan transformation
         painter.save()
