@@ -18,8 +18,8 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Ctrl+F Find / Search
 - [ ] Multi cursor placement
 - [ ] Ctrl+Shift+A find all selected
-- [ ] 
-- [ ] 
+- [ ] Option to disable/enable line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+- [ ] Custom Themes. f"background-color: rgba(0, 0, 0, {1.0 if STANDALONE else 0.15})
 - [ ] 
 
 

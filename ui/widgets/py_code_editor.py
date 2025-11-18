@@ -483,8 +483,6 @@ class CodeEditor(QPlainTextEdit):
         self.highlighter = PythonHighlighter(self.document())
 
 
-        #TODO: CHECK LATER - add option to disable/enable line wrap
-        #TODO: Change f"background-color: rgba(0, 0, 0, {1.0 if STANDALONE else 0.15})
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
