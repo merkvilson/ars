@@ -5,12 +5,12 @@ from PyQt6.QtGui import QColor, QPainter
 
 
 class ScreenshotOverlay(QWidget):
-    def __init__(self, screenshot, parent_picker):
+    def __init__(self, screenshot,  paretn_callback):
         super().__init__()
         self.screenshot = screenshot
-        self.parent_picker = parent_picker
         self.current_color = QColor(0, 0, 0)
         self.mouse_pos = None
+        self.paretn_callback = paretn_callback
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowState(Qt.WindowState.WindowFullScreen)
@@ -63,56 +63,11 @@ class ScreenshotOverlay(QWidget):
             y = int(pos.y() * ratio)
             
             color = QColor(image.pixel(x, y))
-            
-            self.parent_picker.picked_color = color
-            self.parent_picker.display_color(color)
+            self.paretn_callback(color)
             self.close()
-            self.parent_picker.show()
         elif event.button() == Qt.MouseButton.RightButton:
             self.close()
-            self.parent_picker.show()
             
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
             self.close()
-            self.parent_picker.show()
-
-
-class ScreenColorPicker(QWidget):
-    def __init__(self):
-        super().__init__()
-        
-        layout = QVBoxLayout()
-        
-        self.pick_btn = QPushButton("Color Picker")
-        self.pick_btn.clicked.connect(self.start_picking)
-        layout.addWidget(self.pick_btn)
-        
-        self.setLayout(layout)
-        self.picked_color = None
-        
-    def start_picking(self):
-        self.hide()
-        
-        # Capture entire screen
-        screen = QApplication.primaryScreen()
-        screenshot = screen.grabWindow(0)
-        self.overlay = ScreenshotOverlay(screenshot, self)
-        
-    def display_color(self, color):
-        
-        self.pick_btn.setStyleSheet(
-            f"background-color: {color.name()}; "
-            f"color: {'white' if color.lightness() < 128 else 'black'}; "
-        )
-        
-    def get_picked_color(self):
-        """Return the picked color (for integration with main app)"""
-        return self.picked_color
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    picker = ScreenColorPicker()
-    picker.show()
-    sys.exit(app.exec())
