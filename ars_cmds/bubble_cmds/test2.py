@@ -13,6 +13,8 @@ def BBL_TEST2(*args):
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
     config.show_value = True
+    config.auto_close = False
+    config.close_on_outside = False
 
     config.options = {
     "1": "Slider A",
