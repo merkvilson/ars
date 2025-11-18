@@ -14,6 +14,15 @@ https://huggingface.co/dx8152/Qwen-Image-Edit-2509-Fusion
 https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 
 
+## Code Editor
+- [ ] Ctrl+F Find / Search
+- [ ] Multi cursor placement
+- [ ] Ctrl+Shift+A find all selected
+- [ ] 
+- [ ] 
+- [ ] 
+
+
 
 ## High Priority
 - [ ] Add undo/redo functionality
