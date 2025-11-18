@@ -53,9 +53,7 @@ def scripts_ctx(ars_window, callback_ctx):
 
 
     ctx = open_context(
-        parent=ars_window.central_widget,
         items= [str(i) for i in range(len(py_files))],
-        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
         config=config
     )
 
