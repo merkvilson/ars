@@ -174,9 +174,14 @@ class ScreenshotOverlay(QWidget):
         # Mark as zoomed if not at base level
         self.is_zoomed = self.zoom_level > 1.01
         
-        # Adjust offset so the point under virtual cursor stays under cursor
-        self.offset_x = self.virtual_cursor_pos.x() - screen_x * self.zoom_level
-        self.offset_y = self.virtual_cursor_pos.y() - screen_y * self.zoom_level
+        # If zoomed back to 100%, reset offset to (0, 0) to center the screenshot
+        if not self.is_zoomed:
+            self.offset_x = 0.0
+            self.offset_y = 0.0
+        else:
+            # Adjust offset so the point under virtual cursor stays under cursor
+            self.offset_x = self.virtual_cursor_pos.x() - screen_x * self.zoom_level
+            self.offset_y = self.virtual_cursor_pos.y() - screen_y * self.zoom_level
         
         self.update()
     
