@@ -451,8 +451,13 @@ class JediCompleter:
     
     def __init__(self):
         self.enabled = JEDI_AVAILABLE
+        self.namespace = {}
     
-    def get_completions(self, source_code, line, column, file_path=None):
+    def set_namespace(self, namespace_dict):
+        """Set custom namespace for completions (e.g., injected variables)."""
+        self.namespace = namespace_dict or {}
+    
+    def get_completions(self, source_code, line, column, file_path=None, namespace=None):
         """
         Get completion suggestions at the given position.
         
@@ -461,6 +466,7 @@ class JediCompleter:
             line: 1-based line number
             column: 0-based column number
             file_path: Optional path for better context
+            namespace: Optional dict of runtime objects to include in completions
             
         Returns:
             List of tuples: (name, type, signature)
@@ -468,9 +474,17 @@ class JediCompleter:
         if not self.enabled:
             return []
         
+        # Use provided namespace or fall back to stored namespace
+        ns = namespace if namespace is not None else self.namespace
+        
         try:
-            script = jedi.Script(code=source_code, path=file_path)
-            completions = script.complete(line, column)
+            # Use Interpreter if we have a namespace, otherwise use Script
+            if ns:
+                interpreter = jedi.Interpreter(code=source_code, namespaces=[ns])
+                completions = interpreter.complete(line, column)
+            else:
+                script = jedi.Script(code=source_code, path=file_path)
+                completions = script.complete(line, column)
             
             results = []
             for c in completions:
@@ -1358,13 +1372,14 @@ class CodeEditor(QPlainTextEdit):
         
         current_word = text[word_start:pos_in_block]
         
-        # Get completions from Jedi
+        # Get completions from Jedi with namespace support
         source_code = self.toPlainText()
         line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
         column = pos_in_block
         
         completions = self.completer.get_completions(
-            source_code, line_num, column, self.project_file_path
+            source_code, line_num, column, self.project_file_path, 
+            namespace=self.custom_namespace
         )
         
         if not completions:
