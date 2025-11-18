@@ -62,4 +62,4 @@ desktop.ini
 *.tmp
 
 # --- User scripts ---
-ars_scripts/user/
+ars_scripts/temp_script.py
