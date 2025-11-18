@@ -756,7 +756,10 @@ class CodeEditor(QPlainTextEdit):
     def run_code(self, namespace_injection=None):
         if namespace_injection is None: namespace_injection = self.custom_namespace
         if not STANDALONE: run_string_code(self.toPlainText(), namespace_injection)
-        else: exec(self.toPlainText())
+        else: 
+            try: exec(self.toPlainText())
+            except Exception as e:
+                print(f"Error executing code: {e}")
 
 
     def save_script(self):
