@@ -3,7 +3,14 @@ import re
 import keyword
 import builtins
 
-from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF
+try:
+    import jedi
+    JEDI_AVAILABLE = True
+except ImportError:
+    JEDI_AVAILABLE = False
+    print("Warning: jedi not available. Autocompletion will be disabled.")
+
+from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal
 from PyQt6.QtGui import (
     QColor,
     QTextCharFormat,
@@ -439,6 +446,225 @@ class PythonHighlighter(QSyntaxHighlighter):
                 i += 1
 
 
+class JediCompleter:
+    """Wrapper around Jedi for Python autocompletion."""
+    
+    def __init__(self):
+        self.enabled = JEDI_AVAILABLE
+    
+    def get_completions(self, source_code, line, column, file_path=None):
+        """
+        Get completion suggestions at the given position.
+        
+        Args:
+            source_code: Full text of the document
+            line: 1-based line number
+            column: 0-based column number
+            file_path: Optional path for better context
+            
+        Returns:
+            List of tuples: (name, type, signature)
+        """
+        if not self.enabled:
+            return []
+        
+        try:
+            script = jedi.Script(code=source_code, path=file_path)
+            completions = script.complete(line, column)
+            
+            results = []
+            for c in completions:
+                # Get completion type (function, module, class, etc.)
+                comp_type = c.type
+                
+                # Get signature for functions/methods
+                signature = ""
+                if comp_type in ('function', 'method'):
+                    try:
+                        signatures = c.get_signatures()
+                        if signatures:
+                            sig = signatures[0]
+                            params = [p.name for p in sig.params if p.name not in ('self', 'cls')]
+                            signature = f"({', '.join(params)})"
+                    except:
+                        signature = "()"
+                
+                results.append((c.name, comp_type, signature))
+            
+            return results[:50]  # Limit to 50 suggestions
+        except Exception as e:
+            # Silently fail - don't interrupt typing
+            return []
+
+
+class CompletionPopup(QWidget):
+    """Popup widget displaying autocompletion suggestions."""
+    
+    completion_selected = pyqtSignal(str)  # Emitted when user selects a completion
+    
+    def __init__(self, parent=None):
+        from PyQt6.QtWidgets import QListWidget, QListWidgetItem
+        # Use ToolTip window type - it never steals focus!
+        super().__init__(parent, Qt.WindowType.ToolTip | Qt.WindowType.FramelessWindowHint)
+        
+        # Critical: Don't take focus from the editor!
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
+        
+        self.list_widget = QListWidget()
+        self.list_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.list_widget.itemClicked.connect(self._on_item_clicked)
+        
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.list_widget)
+        self.setLayout(layout)
+        
+        # Styling
+        self.setStyleSheet("""
+            CompletionPopup {
+                background-color: #1e2127;
+                border: 1px solid #4b5263;
+                border-radius: 4px;
+            }
+            QListWidget {
+                background-color: #1e2127;
+                color: #abb2bf;
+                border: none;
+                outline: none;
+            }
+            QListWidget::item {
+                padding: 4px 8px;
+                border: none;
+            }
+            QListWidget::item:selected {
+                background-color: #3e4451;
+                color: #ffffff;
+            }
+            QListWidget::item:hover {
+                background-color: #2c313c;
+            }
+        """)
+        
+        self.completions_data = []  # Store (name, type, signature) tuples
+        # Don't set fixed size - will resize dynamically
+    
+    def set_editor_font(self, font):
+        """Update the font to match the editor."""
+        self.list_widget.setFont(font)
+    
+    def set_completions(self, completions):
+        """
+        Set completion items.
+        
+        Args:
+            completions: List of tuples (name, type, signature)
+        """
+        from PyQt6.QtWidgets import QListWidgetItem
+        from PyQt6.QtGui import QIcon, QPixmap, QPainter
+        
+        self.list_widget.clear()
+        self.completions_data = completions
+        
+        # Type icons/colors
+        type_colors = {
+            'function': '#61afef',
+            'method': '#61afef',
+            'class': '#e5c07b',
+            'module': '#c678dd',
+            'instance': '#98c379',
+            'keyword': '#c678dd',
+            'statement': '#c678dd',
+            'param': '#d19a66',
+        }
+        
+        type_symbols = {
+            'function': 'ƒ',
+            'method': 'm',
+            'class': 'C',
+            'module': 'M',
+            'instance': 'v',
+            'keyword': 'K',
+            'statement': 'S',
+            'param': 'p',
+        }
+
+        for name, comp_type, signature in completions:
+            color = type_colors.get(comp_type, '#abb2bf')
+            symbol = type_symbols.get(comp_type, '•')
+            
+            # Format display text
+            display = f"  {symbol}  {name}{signature}"
+            
+            item = QListWidgetItem(display)
+            item.setData(Qt.ItemDataRole.UserRole, name)  # Store actual completion text
+            
+            # Color the type symbol
+            # (Note: QListWidget doesn't support rich text easily, so we use uniform coloring)
+            self.list_widget.addItem(item)
+        
+        if self.list_widget.count() > 0:
+            self.list_widget.setCurrentRow(0)
+        
+        # Resize to fit content
+        self._adjust_size()
+    
+    def _adjust_size(self):
+        """Resize the popup to fit the content."""
+        if self.list_widget.count() == 0:
+            return
+        
+        # Calculate required height based on number of items
+        item_count = self.list_widget.count()
+        max_visible_items = 10  # Show max 10 items before scrolling
+        visible_items = min(item_count, max_visible_items)
+        
+        # Get height of one item
+        item_height = self.list_widget.sizeHintForRow(0)
+        total_height = item_height * visible_items + 4  # +4 for borders
+        
+        # Calculate required width based on longest item
+        max_width = 0
+        for i in range(item_count):
+            item = self.list_widget.item(i)
+            if item:
+                text_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
+                max_width = max(max_width, text_width)
+        
+        # Add padding for icon, scrollbar, and margins
+        total_width = max_width + 40
+        total_width = max(200, min(600, total_width))  # Min 200, max 600
+        
+        self.resize(total_width, total_height)
+    
+    def current_completion(self):
+        """Get the currently selected completion text."""
+        item = self.list_widget.currentItem()
+        if item:
+            return item.data(Qt.ItemDataRole.UserRole)
+        return None
+    
+    def select_next(self):
+        """Move selection down."""
+        current = self.list_widget.currentRow()
+        if current < self.list_widget.count() - 1:
+            self.list_widget.setCurrentRow(current + 1)
+    
+    def select_previous(self):
+        """Move selection up."""
+        current = self.list_widget.currentRow()
+        if current > 0:
+            self.list_widget.setCurrentRow(current - 1)
+    
+    def _on_item_clicked(self, item):
+        """Handle item click."""
+        completion = item.data(Qt.ItemDataRole.UserRole)
+        if completion:
+            self.completion_selected.emit(completion)
+            self.hide()
+
+
 class LineNumberArea(QWidget):
     """Line number display widget for CodeEditor."""
 
@@ -473,11 +699,19 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.custom_namespace = {}
         self.project_file_path = None
+        
+        # Autocompletion setup
+        self.completer = JediCompleter()
+        self.completion_popup = CompletionPopup(self)
+        self.completion_popup.completion_selected.connect(self._insert_completion)
+        self.completion_popup.hide()
+        self._completion_active = False
 
         # Monospaced font - use Consolas (common on Windows) or Courier New
         fixed = QFont("Consolas", 14)
         fixed.setWeight(QFont.Weight.Medium)
         self.setFont(fixed)
+        self.completion_popup.set_editor_font(fixed)
 
         # Attach highlighter
         self.highlighter = PythonHighlighter(self.document())
@@ -497,11 +731,13 @@ class CodeEditor(QPlainTextEdit):
 
 
     def setFont(self, font):
-        """Override setFont to keep line number area in sync."""
+        """Override setFont to keep line number area and completion popup in sync."""
         super().setFont(font)
         if hasattr(self, 'line_number_area'):
             self.line_number_area.setFont(font)
             self.update_line_number_area_width(0)
+        if hasattr(self, 'completion_popup'):
+            self.completion_popup.set_editor_font(font)
 
     def run_code(self, namespace_injection=None):
         if namespace_injection is None: namespace_injection = self.custom_namespace
@@ -518,6 +754,35 @@ class CodeEditor(QPlainTextEdit):
         key = event.key()
         text = event.text()
         modifiers = event.modifiers()
+        
+        # Handle completion popup navigation - ONLY specific keys when popup is visible
+        if self._completion_active and self.completion_popup.isVisible():
+            # Up/Down arrow keys for navigation
+            if key == Qt.Key.Key_Down:
+                self.completion_popup.select_next()
+                event.accept()
+                return
+            elif key == Qt.Key.Key_Up:
+                self.completion_popup.select_previous()
+                event.accept()
+                return
+            # Escape to dismiss
+            elif key == Qt.Key.Key_Escape:
+                self.completion_popup.hide()
+                self._completion_active = False
+                event.accept()
+                return
+            # Tab to accept (only if no modifiers and no selection)
+            elif key == Qt.Key.Key_Tab and not modifiers and not self.textCursor().hasSelection():
+                self._accept_completion()
+                event.accept()
+                return
+            # Enter to accept (only if no modifiers)
+            elif key in (Qt.Key.Key_Return, Qt.Key.Key_Enter) and not modifiers:
+                self._accept_completion()
+                event.accept()
+                return
+            # For ALL other keys, let them pass through normally
 
         if self._handle_pair_chars(text, modifiers):
             event.accept()
@@ -571,12 +836,19 @@ class CodeEditor(QPlainTextEdit):
             return
 
         if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            # Hide completion popup on Enter
+            if self._completion_active:
+                self.completion_popup.hide()
+                self._completion_active = False
             self._handle_newline()
             event.accept()
             return
 
         if key == Qt.Key.Key_Backspace and not modifiers:
             if self._handle_smart_backspace():
+                # Update completions after backspace if popup was active
+                if self._completion_active:
+                    self._trigger_completion()
                 event.accept()
                 return
 
@@ -595,7 +867,17 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        # Call parent to handle the key first
         super().keyPressEvent(event)
+        
+        # After handling the key, manage completion popup
+        if text and (text.isalnum() or text in ('_', '.')):
+            # Continue showing/updating completions for valid identifier characters
+            self._trigger_completion()
+        elif text and self._completion_active:
+            # Hide completion for other printable characters
+            self.completion_popup.hide()
+            self._completion_active = False
 
     def wheelEvent(self, event):
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
@@ -612,7 +894,7 @@ class CodeEditor(QPlainTextEdit):
         blocked = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
         if modifiers & blocked:
             return False
-
+        
         # Expandable pairing map keeps behavior centralized
         pairs = {
             '"': '"',
@@ -1055,6 +1337,105 @@ class CodeEditor(QPlainTextEdit):
         self.line_number_area.setFont(font)
         self.update_line_number_area_width(0)
         self.line_number_area.update()
+    
+    def _trigger_completion(self):
+        """Trigger autocompletion at current cursor position."""
+        if not self.completer.enabled:
+            return
+        
+        cursor = self.textCursor()
+        
+        # Get word under cursor to filter completions
+        cursor_pos = cursor.position()
+        block = cursor.block()
+        text = block.text()
+        pos_in_block = cursor.positionInBlock()
+        
+        # Find start of current word
+        word_start = pos_in_block
+        while word_start > 0 and (text[word_start - 1].isalnum() or text[word_start - 1] == '_'):
+            word_start -= 1
+        
+        current_word = text[word_start:pos_in_block]
+        
+        # Get completions from Jedi
+        source_code = self.toPlainText()
+        line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
+        column = pos_in_block
+        
+        completions = self.completer.get_completions(
+            source_code, line_num, column, self.project_file_path
+        )
+        
+        if not completions:
+            self.completion_popup.hide()
+            self._completion_active = False
+            return
+        
+        # Filter completions by current word
+        if current_word:
+            filtered = [
+                c for c in completions 
+                if c[0].lower().startswith(current_word.lower())
+            ]
+            completions = filtered if filtered else completions
+        
+        if not completions:
+            self.completion_popup.hide()
+            self._completion_active = False
+            return
+        
+        # Show popup
+        self.completion_popup.set_completions(completions)
+        
+        # Position popup below cursor
+        cursor_rect = self.cursorRect()
+        popup_pos = self.mapToGlobal(cursor_rect.bottomLeft())
+        
+        # Adjust if popup would go off screen
+        screen_geom = self.screen().availableGeometry()
+        if popup_pos.y() + self.completion_popup.height() > screen_geom.bottom():
+            # Show above cursor instead
+            popup_pos = self.mapToGlobal(cursor_rect.topLeft())
+            popup_pos.setY(popup_pos.y() - self.completion_popup.height())
+        
+        self.completion_popup.move(popup_pos)
+        self.completion_popup.show()
+        self.completion_popup.raise_()
+        self._completion_active = True
+    
+    def _accept_completion(self):
+        """Accept the currently selected completion."""
+        completion = self.completion_popup.current_completion()
+        if completion:
+            self._insert_completion(completion)
+        self.completion_popup.hide()
+        self._completion_active = False
+    
+    def _insert_completion(self, completion_text):
+        """Insert the selected completion, replacing the partial word."""
+        cursor = self.textCursor()
+        
+        # Find and select the partial word to replace
+        block = cursor.block()
+        text = block.text()
+        pos_in_block = cursor.positionInBlock()
+        
+        # Find start of current word
+        word_start = pos_in_block
+        while word_start > 0 and (text[word_start - 1].isalnum() or text[word_start - 1] == '_'):
+            word_start -= 1
+        
+        # Select and replace the partial word
+        cursor.beginEditBlock()
+        cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
+        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, word_start)
+        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor, pos_in_block - word_start)
+        cursor.insertText(completion_text)
+        cursor.endEditBlock()
+        
+        self.setTextCursor(cursor)
+        self.setFocus()
 
     def line_number_area_width(self):
         digits = len(str(max(1, self.blockCount())))
