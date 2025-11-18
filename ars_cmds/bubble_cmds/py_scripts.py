@@ -69,7 +69,7 @@ def execute_plugin(ars_window):
     config.close_on_outside=False
     # config.expand = "x"
     config.distribution_mode = "x"
-    config.custom_height = int(ars_window.height() / 2.5)
+    config.custom_height = int(ars_window.height() / 1.2)
     config.custom_width = ars_window.width() 
     config.extra_distance = [0, 99999]
 
