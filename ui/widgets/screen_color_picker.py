@@ -275,7 +275,7 @@ class ScreenshotOverlay(QWidget):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
             self.mouse_timer.stop()
-            set_cursor("cursor") 
+            set_cursor("cursor")  # Restore cursor visibility
             self.close()
     
     def closeEvent(self, event):
