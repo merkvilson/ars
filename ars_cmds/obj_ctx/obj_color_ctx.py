@@ -234,6 +234,10 @@ def obj_color(self, position, callback=None):
         ic.ICON_COLOR_PICKER: lambda: start_picking(ctx),
     }
 
+    config.additional_texts = {
+        ic.ICON_IMAGE: "Load Image",
+        ic.ICON_COLOR_PICKER: "Color Picker", }
+
     def display_color_callback(color):
         rgb = color.getRgbF()[:3]
         obj.set_color(rgb)  # set_color expects rgb tuple
