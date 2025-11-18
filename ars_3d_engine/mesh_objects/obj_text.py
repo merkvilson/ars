@@ -13,10 +13,6 @@ from theme.fonts import font_icons as ic
 
 
 class CText3D(CGeometry):
-
-    print("testing custom font import")
-
-
     def __init__(self, visual, name="Text3D", text="text", depth=0.5, angle=30.0, font_name="Dosis"):
         super().__init__(visual, name)
         self._text = text

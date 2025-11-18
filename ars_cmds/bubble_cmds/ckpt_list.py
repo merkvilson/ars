@@ -19,7 +19,8 @@ try:
         ckpt_list=checkpoints
         
 except:
-    print("Could not fetch ckpt list from ARS backend.")
+    pass
+    #print("Could not fetch ckpt list from ARS backend.")
 
 
 BBL_CKPTLIST_CONFIG={"symbol": ic.ICON_BRAIN}
