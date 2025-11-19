@@ -388,6 +388,13 @@ class ContextButtonWindow(QWidget):
             if item.symbol == item_symbol:
                 item.set_updated_config(config_key, value)
                 break
+            
+    def set_alpha(self, alpha: float):
+        """Set the alpha (transparency) value. Alpha should be a value 0-1."""
+        r, g, b, _ = self.bg_color
+        new_alpha = int(max(0, min(1, alpha)) * 255)
+        self.bg_color = (r, g, b, new_alpha)
+        self.update()
 
     def close_animated(self, duration: int = 250, end_radius: int = 50):
         play_sound("back")
