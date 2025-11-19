@@ -2,9 +2,18 @@ import sys, math, numpy as np
 from vispy import scene
 from vispy.visuals.transforms import MatrixTransform
 from scipy.spatial.transform import Rotation as ScipyRotation 
-from core.sound_manager import play_sound
-from core.cursor_modifier import set_cursor
-from ars_cmds.core_cmds.key_check import key_check
+try:
+    from core.sound_manager import play_sound
+    from core.cursor_modifier import set_cursor
+    from ars_cmds.core_cmds.key_check import key_check
+except ImportError:
+    def play_sound(name):
+        pass
+    def set_cursor(name, hotspot='center'):
+        pass
+    def key_check(key_name):
+        return False
+
 def normalize(v):
     v = np.asarray(v, dtype=float)
     n = np.linalg.norm(v)
