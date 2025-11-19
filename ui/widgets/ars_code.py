@@ -744,6 +744,19 @@ class CodeEditor(QPlainTextEdit):
 
 
 
+    def set_alpha(self, alpha: float):
+        """Set the alpha (transparency) value. Alpha should be a value 0-1."""
+        self.setStyleSheet(
+            "QPlainTextEdit {"
+            f"background-color: rgba(40, 44, 52, {alpha});"
+            "color: #abb2bf;"
+            "border: none;"
+            "border-radius: 20px;"
+            "selection-color: #ffffff;"
+            "selection-background-color: #3e4451;"
+            "}"
+        )
+
     def setFont(self, font):
         """Override setFont to keep line number area and completion popup in sync."""
         super().setFont(font)

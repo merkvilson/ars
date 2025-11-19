@@ -77,7 +77,7 @@ def execute_plugin(ars_window):
     with open(current_code_file, 'r', encoding='utf-8') as f:
         current_code_text = f.read()
 
-    options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_PLAYER_PLAY, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",], ["   ","PythonEditorWidget","   ",]]
+    options_list = [["   ",ic.ICON_LIST,ic.ICON_FOLDER_OPEN, ic.ICON_PLAYER_PLAY, ic.ICON_SAVE, ic.ICON_CODE_TERMINAL,"   ",ic.ICON_SHADER_SMOOTH], ["   ","PythonEditorWidget","   ",]]
     code_editor = CodeEditor()
     code_editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height-int(44*1.5)))
     code_editor.setPlainText(current_code_text)
@@ -85,7 +85,8 @@ def execute_plugin(ars_window):
     config.additional_texts = {ic.ICON_LIST: "Scripts List",ic.ICON_FOLDER_OPEN: "Scripts Folder", ic.ICON_PLAYER_PLAY: "Run", ic.ICON_SAVE: "Save", ic.ICON_CODE_TERMINAL: "Open IDE" }
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
-
+    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,100,85)}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 1}
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -112,7 +113,8 @@ def execute_plugin(ars_window):
 
         ic.ICON_PLAYER_PLAY:    lambda: code_editor.run_code(default_namespace_injection),
         ic.ICON_SAVE:           lambda: code_editor.save_script(),
-        ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path)
+        ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path),
+        ic.ICON_SHADER_SMOOTH:  lambda value: code_editor.set_alpha(value/100.0),
                         }
 
     ctx = open_context(
