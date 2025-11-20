@@ -160,7 +160,7 @@ class BButtonConfig:
     progress_bar: bool = False
     image_path: Optional[str] = None
     clip_to_shape: bool = True
-    incremental_value: bool = False
+    incremental_value: bool | tuple = False
     inner_widget: Optional[QWidget] = None
 
 
@@ -187,7 +187,7 @@ class BButton(QGraphicsObject):
         self.show_symbol = config.show_symbol
         self.editable = config.editable
         self.progress_bar = config.progress_bar
-        self.incremental_value = config.incremental_value
+        self.incremental_value = config.incremental_value if isinstance(config.incremental_value, (int,bool)) else config.incremental_value[0] 
         
         # Timer for reverting symbol back after showing value
         self._original_symbol = self.symbol
@@ -335,11 +335,11 @@ class BButton(QGraphicsObject):
             if self.incremental_value: 
                 self._cursor_modifier = CursorModifier(
                     trigger_widget=self.slider_handle,
-                    axis="x",
+                    axis="x" if isinstance(self.incremental_value, int) else self.config.incremental_value[1],
                     target = None,
                     cursor_type=("invisible"),
                     anchor="center",
-                    teleport_back=self.incremental_value,
+                    teleport_back=True,
                     infinite_movement=True)
 
 
