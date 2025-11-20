@@ -93,7 +93,7 @@ def execute_plugin(ars_window):
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
     config.slider_values = {
     ic.ICON_SHADER_SMOOTH: (0,100,85), 
-    ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,500)
+    ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,int(ars_window.height() / 2.128))
     }
     config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-20,"y")}
 
