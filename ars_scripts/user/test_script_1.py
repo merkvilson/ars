@@ -1,1 +1,2 @@
-msg("Hello World")
+msg("Add Cube")
+cube = add_primitive("cube")
