@@ -92,6 +92,11 @@ class ContextButtonWindow(QWidget):
         self.config = config
         self.items = items
         self.symbol = symbol
+        
+        self.scroll_area = None
+        self._restore_scroll_timer = QTimer()
+        self._restore_scroll_timer.setSingleShot(True)
+        self._restore_scroll_timer.timeout.connect(self._restore_scrollbar)
 
         # ---- Window flags / transparency ----
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint)
@@ -339,17 +344,17 @@ class ContextButtonWindow(QWidget):
             if 'x' in expands and not has_h_spacer:
                 main_layout.addStretch(1)
             # ---- Scroll area (ensure transparency of viewport and contents) ----
-            scroll_area = QScrollArea()
-            scroll_area.setWidget(content_widget)
-            scroll_area.setWidgetResizable(True)
-            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-            scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-            scroll_area.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-            scroll_area.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-            scroll_area.setStyleSheet(StyleSheets.CONTEXT_WINDOW_STYLE)
-            scroll_area.viewport().setStyleSheet("background: transparent;")
-            window_layout.addWidget(scroll_area)
+            self.scroll_area = QScrollArea()
+            self.scroll_area.setWidget(content_widget)
+            self.scroll_area.setWidgetResizable(True)
+            self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+            self.scroll_area.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+            self.scroll_area.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+            self.scroll_area.setStyleSheet(StyleSheets.CONTEXT_WINDOW_STYLE)
+            self.scroll_area.viewport().setStyleSheet("background: transparent;")
+            window_layout.addWidget(self.scroll_area)
             content_size = content_widget.sizeHint()
             base_x = content_size.width()
             max_height = content_size.height()
@@ -396,7 +401,15 @@ class ContextButtonWindow(QWidget):
         self.bg_color = (r, g, b, new_alpha)
         self.update()
 
+    def _restore_scrollbar(self):
+        if self.scroll_area:
+            self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
     def resize_top(self, new_height: int):
+        if self.scroll_area:
+            self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            self._restore_scroll_timer.start(100)
+
         new_height = int(new_height)
         rect = self.geometry()
         # Calculate new Y position to keep the bottom fixed
