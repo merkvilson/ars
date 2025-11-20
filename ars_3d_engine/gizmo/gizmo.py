@@ -361,6 +361,8 @@ class GizmoController:
         self._drag_plane_normal = None
         self._initial_handle_pos = 0.0
         self._cumulative_angle = 0.0
+        
+        self._uniform_scale_mode = True
 
         # Object properties
         self._ring_center = np.array([0.0, 0.0, 0.0], dtype=float)
@@ -376,6 +378,9 @@ class GizmoController:
         self.set_handles(['all'])
         
         self.on_update = None
+
+    def uniform_scale(self, mode=True):
+        self._uniform_scale_mode = mode
 
     def set_handles(self, handles):
         self._enabled_handles.clear()
@@ -403,10 +408,10 @@ class GizmoController:
 
 
     def set_scale(self, scale, reset_originals=True):
-        self._object_scale = scale
+        self._object_scale = np.array(scale, dtype=float)
         if reset_originals:
-            self._original_scale = scale.copy()
-        self.renderer.update_handle_positions(scale)
+            self._original_scale = self._object_scale.copy()
+        self.renderer.update_handle_positions(self._object_scale)
 
     def _start_drag_rotate(self, data, origin, direction):
         if "axis" in data:
@@ -529,7 +534,9 @@ class GizmoController:
         scale_factor = max(0.01, scale_factor)
 
         new_scale = self._original_scale.copy()
-        if len(self._drag_axis) == 2: # Linear 'sx', 'sy', 'sz'
+        if self._uniform_scale_mode:
+            new_scale *= scale_factor
+        elif len(self._drag_axis) == 2: # Linear 'sx', 'sy', 'sz'
             axis_idx = {'x':0, 'y':1, 'z':2}[self._drag_axis[1]]
             new_scale[axis_idx] *= scale_factor
         else: # Planar 'sxy', 'syz', 'szx'
