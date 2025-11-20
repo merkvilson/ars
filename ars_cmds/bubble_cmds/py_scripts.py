@@ -16,15 +16,10 @@ def BBL_CODE_TERMINAL(*args):
 user_script_dir = os.path.join("ars_scripts", "user")
 
 def _list_user_scripts():
-    """Return current list of user python scripts (sorted for stability)."""
-    try:
-        return sorted(
-            f for f in os.listdir(user_script_dir)
-            if f.endswith('.py') and os.path.isfile(os.path.join(user_script_dir, f))
-        )
-    except FileNotFoundError:
-        return []
-
+    return sorted(
+        f for f in os.listdir(user_script_dir)
+        if f.endswith('.py') and os.path.isfile(os.path.join(user_script_dir, f))
+    )
 
 
 def scripts_ctx(ars_window, callback_ctx):
@@ -96,8 +91,11 @@ def execute_plugin(ars_window):
     code_editor.setPlainText(current_code_text)
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
-    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,100,85), ic.ICON_CIRCLE_UP: (300,2000,500)}
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-15,"y")}
+    config.slider_values = {
+    ic.ICON_SHADER_SMOOTH: (0,100,85), 
+    ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,500)
+    }
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-30,"y")}
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -126,7 +124,9 @@ def execute_plugin(ars_window):
         ic.ICON_SAVE:           lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path),
         ic.ICON_SHADER_SMOOTH:  lambda value: (code_editor.set_alpha(value/100.0),ctx.set_alpha(value/2550.0)),
-        ic.ICON_CIRCLE_UP:      lambda value: (ctx.resize_top(value), code_editor.setFixedHeight(int(value-int(44*1.5))))
+        ic.ICON_CIRCLE_UP:      lambda value: (
+                                            ctx.resize_top(value), 
+                                            code_editor.setFixedHeight(int(value-int(44*1.5))))
                         }
 
     ctx = open_context(
