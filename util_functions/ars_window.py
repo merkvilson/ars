@@ -106,3 +106,9 @@ def ars_window(strict: bool = True) -> Optional[MainWindow]:
 
 
 __all__ = ["ars_window"]
+
+
+
+#Alternative simpler implementation
+# from PyQt6.QtWidgets import QApplication
+# QApplication.instance().activeWindow() # This returns the main window instance
