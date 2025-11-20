@@ -85,8 +85,10 @@ def execute_plugin(ars_window):
     ic.ICON_SAVE, 
     ic.ICON_CODE_TERMINAL,
     "   ",
-    ic.ICON_SHADER_SMOOTH], 
-    ["   ","PythonEditorWidget","   ",]
+    ic.ICON_SHADER_SMOOTH,
+    ic.ICON_CIRCLE_UP], 
+    ["   ","PythonEditorWidget","   ",],
+    "   "
     ]
 
     code_editor = CodeEditor()
@@ -94,8 +96,8 @@ def execute_plugin(ars_window):
     code_editor.setPlainText(current_code_text)
     
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
-    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,100,85)}
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3}
+    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,100,85), ic.ICON_CIRCLE_UP: (300,2000,500)}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-15,"y")}
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -123,7 +125,8 @@ def execute_plugin(ars_window):
         ic.ICON_PLAYER_PLAY:    lambda: code_editor.run_code(default_namespace_injection),
         ic.ICON_SAVE:           lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path),
-        ic.ICON_SHADER_SMOOTH:  lambda value: (code_editor.set_alpha(value/100.0),ctx.set_alpha(value/2550.0))
+        ic.ICON_SHADER_SMOOTH:  lambda value: (code_editor.set_alpha(value/100.0),ctx.set_alpha(value/2550.0)),
+        ic.ICON_CIRCLE_UP:      lambda value: (ctx.resize_top(value), code_editor.setFixedHeight(int(value-int(44*1.5))))
                         }
 
     ctx = open_context(
