@@ -1,8 +1,10 @@
-from PyQt6.QtCore import Qt, QPointF
+from PyQt6.QtCore import Qt, QPointF, QTimer
 import inspect
 
 def hotkey_press(window, event):
-    if event.key() == Qt.Key.Key_Escape:  window.close_menu()
+    if event.key() == Qt.Key.Key_Escape:  
+        # Close the menu on Escape key press after a short delay
+        QTimer.singleShot(300, lambda: window.close_animated(150, 50))
     else:
         # Handle hotkey presses
         key = event.text().lower()
