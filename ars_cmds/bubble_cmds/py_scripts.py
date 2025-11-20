@@ -95,7 +95,7 @@ def execute_plugin(ars_window):
     ic.ICON_SHADER_SMOOTH: (0,100,85), 
     ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,500)
     }
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-30,"y")}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-20,"y")}
 
     def read_code_file(new_file):
         nonlocal current_code_file
