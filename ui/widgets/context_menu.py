@@ -443,6 +443,13 @@ class ContextButtonWindow(QWidget):
             QApplication.instance().removeEventFilter(self)
         super().closeEvent(event)
 
+    def resizeEvent(self, event):
+        path = QPainterPath()
+        path.addRoundedRect(0, 0, self.width(), self.height(), self.corner_radius, self.corner_radius)
+        region = QRegion(path.toFillPolygon().toPolygon())
+        self.setMask(region)
+        super().resizeEvent(event)
+
 
 def calc_positions(config, center_pos, count):
     if count == 0: return []
