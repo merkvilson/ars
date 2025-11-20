@@ -14,6 +14,6 @@ def update_geometry(value):
     ctx.setFixedSize(ars_window.width(), new_height)
 
 config.callbackL={"1": update_geometry}
-config.incremental_values={"1": 3}
+config.incremental_values={"1": (3,"y")}
 
 ctx = open_context(config)
