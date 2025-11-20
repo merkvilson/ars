@@ -26,15 +26,15 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Transparency Slider for revialing scene behind editor.
 - [ ] 
 - [ ] 
-- [ ] 
-
-
 
 ## High Priority
 - [✓] Uniform scale
 - [ ] Add undo/redo functionality
 - [ ] Optimize render pipeline performance
 - [ ] Save one extra image to prevent early image load
+- [ ] Middle click revert to default 
+
+
 
 ## Medium Priority
 - [ ] Add material system for mesh objects
