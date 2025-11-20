@@ -3,7 +3,7 @@ from ui.widgets.context_menu import open_context, ContextMenuConfig
 config = ContextMenuConfig()
 config.custom_width = ars_window.width() 
 config.options = {"1": "Slider 1",}
-config.slider_values = {"1": (10,500,50)}
+config.slider_values = {"1": (50,500,50)}
 
 def update_geometry(value):    
     new_height = int(value)
@@ -14,6 +14,6 @@ def update_geometry(value):
     ctx.setFixedSize(ars_window.width(), new_height)
 
 config.callbackL={"1": update_geometry}
-config.incremental_values={"1": (3,"y")}
+config.incremental_values={"1": (-10,"y")}
 
 ctx = open_context(config)
