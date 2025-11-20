@@ -396,6 +396,14 @@ class ContextButtonWindow(QWidget):
         self.bg_color = (r, g, b, new_alpha)
         self.update()
 
+    def resize_top(self, new_height: int):
+        new_height = int(new_height)
+        rect = self.geometry()
+        # Calculate new Y position to keep the bottom fixed
+        new_y = rect.y() + (rect.height() - new_height)
+        self.move(rect.x(), new_y)
+        self.setFixedSize(QApplication.instance().activeWindow().width(), new_height)
+
     def close_animated(self, duration: int = 250, end_radius: int = 50):
         play_sound("back")
         animated_effects.close_effect(self, duration, end_radius)
