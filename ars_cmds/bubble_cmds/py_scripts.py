@@ -6,6 +6,8 @@ from ars_cmds.util_cmds.open_file import open_file
 import os
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 from ars_cmds.util_cmds.time_cmd import after
+from PyQt6.QtGui import QColor
+#
 
 def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
@@ -96,6 +98,7 @@ def execute_plugin(ars_window):
     ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,int(ars_window.height() / 2.128))
     }
     config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-20,"y")}
+    config.slider_color = {ic.ICON_CIRCLE_UP: QColor(0,0,0,0)}
 
     def read_code_file(new_file):
         nonlocal current_code_file
