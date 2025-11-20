@@ -108,7 +108,22 @@ def ars_window(strict: bool = True) -> Optional[MainWindow]:
 __all__ = ["ars_window"]
 
 
-
-#Alternative simpler implementation
+"""
+#Alternative (1) simpler implementation
 # from PyQt6.QtWidgets import QApplication
 # QApplication.instance().activeWindow() # This returns the main window instance
+
+#alternative (2) simpler implementation
+
+def get_main_window():
+    app = QApplication.instance()
+    for widget in app.topLevelWidgets():
+        if type(widget).__name__ == 'MainWindow':
+            return widget
+    return None
+
+# This should print True
+print(get_main_window() == ars_window())
+
+
+"""
