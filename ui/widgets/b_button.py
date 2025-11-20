@@ -335,7 +335,7 @@ class BButton(QGraphicsObject):
             if self.incremental_value: 
                 self._cursor_modifier = CursorModifier(
                     trigger_widget=self.slider_handle,
-                    axis="x" if isinstance(self.incremental_value, int) else self.config.incremental_value[1],
+                    axis="x" if isinstance(self.config.incremental_value, (int, bool)) else self.config.incremental_value[1],
                     target = None,
                     cursor_type=("invisible"),
                     anchor="center",
@@ -681,7 +681,14 @@ class BButton(QGraphicsObject):
         min_val, max_val, _ = self.slider_values
         if self.incremental_value: # Calculate new value using cursor offset
             current_offset = self._cursor_modifier.get_accumulated_offset()
-            distance = current_offset.x()
+            
+            # Determine which axis to use based on modifier configuration
+            axis = self._cursor_modifier.axis
+            if axis == 'y':
+                distance = current_offset.y()
+            else:
+                distance = current_offset.x()
+
             delta = distance * (self.incremental_value / 100)
             new_value = self._initial_slider_value + delta
 
@@ -691,7 +698,12 @@ class BButton(QGraphicsObject):
                 factor = (self.incremental_value / 100)
                 if factor != 0:
                     new_distance = (clamped_val - self._initial_slider_value) / factor
-                    current_offset.setX(int(new_distance))
+                    
+                    if axis == 'y':
+                        current_offset.setY(int(new_distance))
+                    else:
+                        current_offset.setX(int(new_distance))
+                        
                     self._cursor_modifier.set_accumulated_offset(current_offset)
                 new_value = clamped_val
         else: # Calculate new value based on position ratio
