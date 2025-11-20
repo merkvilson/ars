@@ -680,9 +680,20 @@ class BButton(QGraphicsObject):
             return
         min_val, max_val, _ = self.slider_values
         if self.incremental_value: # Calculate new value using cursor offset
-            distance = self._cursor_modifier.get_accumulated_offset().x()
+            current_offset = self._cursor_modifier.get_accumulated_offset()
+            distance = current_offset.x()
             delta = distance * (self.incremental_value / 100)
             new_value = self._initial_slider_value + delta
+
+            # Clamp the internal cursor modifier value to prevent drift
+            if new_value < min_val or new_value > max_val:
+                clamped_val = max(min_val, min(max_val, new_value))
+                factor = (self.incremental_value / 100)
+                if factor != 0:
+                    new_distance = (clamped_val - self._initial_slider_value) / factor
+                    current_offset.setX(int(new_distance))
+                    self._cursor_modifier.set_accumulated_offset(current_offset)
+                new_value = clamped_val
         else: # Calculate new value based on position ratio
             relative_x = pos.x() - self._bounding.left()
             progress_ratio = relative_x / self._bounding.width()

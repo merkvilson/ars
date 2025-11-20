@@ -191,6 +191,11 @@ class CursorModifier(QObject):
         """Returns the accumulated offset when infinite_movement is enabled."""
         return QPoint(self._accumulated_offset) if self.infinite_movement else QPoint(0, 0)
     
+    def set_accumulated_offset(self, offset: QPoint):
+        """Sets the accumulated offset."""
+        if self.infinite_movement:
+            self._accumulated_offset = QPoint(offset)
+
     def reset_accumulated_offset(self):
         """Resets the accumulated offset to zero."""
         self._accumulated_offset = QPoint(0, 0)
