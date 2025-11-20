@@ -407,9 +407,6 @@ class ContextButtonWindow(QWidget):
         else:
             animated_effects.open_effect(self, 0, start_radius)
 
-    def close_menu(self, time = 300):
-        QTimer.singleShot(time, lambda: self.close_animated(150, 50))
-
     def keyPressEvent(self, event):
         hotkey_press(self, event)
         super().keyPressEvent(event)
