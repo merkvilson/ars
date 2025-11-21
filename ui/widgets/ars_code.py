@@ -645,7 +645,7 @@ class CompletionDelegate(QStyledItemDelegate):
 class CompletionPopup(QWidget):
     """Popup widget displaying autocompletion suggestions."""
     
-    completion_selected = pyqtSignal(str)  # Emitted when user selects a completion
+    completion_selected = pyqtSignal(str, str)  # Emitted when user selects a completion
     
     def __init__(self, parent=None):
         from PyQt6.QtWidgets import QListWidget, QListWidgetItem
@@ -770,6 +770,13 @@ class CompletionPopup(QWidget):
         if item:
             return item.data(Qt.ItemDataRole.UserRole)
         return None
+
+    def current_completion_type(self):
+        """Get the currently selected completion type."""
+        item = self.list_widget.currentItem()
+        if item:
+            return item.data(Qt.ItemDataRole.UserRole + 1)
+        return None
     
     def select_next(self):
         """Move selection down."""
@@ -786,8 +793,9 @@ class CompletionPopup(QWidget):
     def _on_item_clicked(self, item):
         """Handle item click."""
         completion = item.data(Qt.ItemDataRole.UserRole)
+        comp_type = item.data(Qt.ItemDataRole.UserRole + 1)
         if completion:
-            self.completion_selected.emit(completion)
+            self.completion_selected.emit(completion, comp_type)
             self.hide()
 
 
@@ -1842,12 +1850,13 @@ class CodeEditor(QPlainTextEdit):
     def _accept_completion(self):
         """Accept the currently selected completion."""
         completion = self.completion_popup.current_completion()
+        comp_type = self.completion_popup.current_completion_type()
         if completion:
-            self._insert_completion(completion)
+            self._insert_completion(completion, comp_type)
         self.completion_popup.hide()
         self._completion_active = False
     
-    def _insert_completion(self, completion_text):
+    def _insert_completion(self, completion_text, comp_type=None):
         """Insert the selected completion, replacing the partial word."""
         # Check if it's an icon name and replace with char
         if completion_text in self.NAME_TO_ICON:
@@ -1882,6 +1891,13 @@ class CodeEditor(QPlainTextEdit):
             cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, word_start)
             cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor, pos_in_block - word_start)
             cursor.insertText(completion_text)
+        
+        # Add parentheses for functions/methods if not in import
+        if comp_type in ('function', 'method'):
+            block_text = cursor.block().text().lstrip()
+            if not (block_text.startswith('import ') or block_text.startswith('from ')):
+                cursor.insertText("()")
+                cursor.movePosition(QTextCursor.MoveOperation.Left)
             
         cursor.endEditBlock()
         
