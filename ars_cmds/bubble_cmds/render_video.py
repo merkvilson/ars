@@ -9,6 +9,8 @@ import os
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check_continuous
+from PIL import Image
+from collections import Counter
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
@@ -21,6 +23,72 @@ def execute_plugin(ars_window):
         ars_window._loop_timer = None
     if not hasattr(ars_window, '_loop_index'):
         ars_window._loop_index = 0
+
+    def get_valid_layers(tiff_path):
+        try:
+            img = Image.open(tiff_path)
+        except:
+            return []
+        valid_layers = []
+        sizes = []
+        n_frames = getattr(img, 'n_frames', 1)
+        for i in range(n_frames):
+            img.seek(i)
+            sizes.append(img.size)
+        
+        if not sizes: return []
+        # Find most common size
+        most_common_size = Counter(sizes).most_common(1)[0][0]
+        
+        for i in range(n_frames):
+            if sizes[i] == most_common_size:
+                valid_layers.append(i)
+                
+        return valid_layers
+
+    def get_cached_sequence():
+        # Check for files first
+        v_frames = get_path("video_frames")
+        frames = get_path("frames")
+        
+        if (os.path.exists(v_frames) and os.listdir(v_frames)) or (os.path.exists(frames) and os.listdir(frames)):
+            return None # Use file mode
+            
+        # Check for TIFFs
+        input_path = get_path("input")
+        tiff1 = os.path.join(input_path, "1.tiff")
+        tiff2 = os.path.join(input_path, "2.tiff")
+        
+        if not (os.path.exists(tiff1) and os.path.exists(tiff2)):
+            return None
+
+        # Check mtimes
+        mtime1 = os.path.getmtime(tiff1)
+        mtime2 = os.path.getmtime(tiff2)
+        
+        if (hasattr(ars_window, '_tiff_cache') and 
+            ars_window._tiff_cache['mtime1'] == mtime1 and 
+            ars_window._tiff_cache['mtime2'] == mtime2):
+            return ars_window._tiff_cache['sequence']
+            
+        # Recompute
+        layers1 = get_valid_layers(tiff1)
+        layers2 = get_valid_layers(tiff2)
+        
+        if layers1 and layers2:
+            # 1.tiff: last(small) -> first
+            seq1 = [(tiff1, l) for l in reversed(layers1)]
+            # 2.tiff: first -> last(small)
+            seq2 = [(tiff2, l) for l in layers2]
+            sequence = seq1 + seq2
+            ars_window._tiff_cache = {
+                'mtime1': mtime1,
+                'mtime2': mtime2,
+                'sequence': sequence
+            }
+            return sequence
+            
+        return None
 
 
     config = ContextMenuConfig()
@@ -82,6 +150,16 @@ def execute_plugin(ars_window):
         pause_video()
         
         val = int(val)
+
+        sequence = get_cached_sequence()
+        if sequence:
+            max_index = len(sequence) - 1
+            image_index = int((val / 100) * max_index)
+            path, layer = sequence[image_index]
+            ars_window.img.open_image(path, layer=layer, auto_fit=False)
+            ars_window._loop_index = image_index
+            return
+
         images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
         images_list = os.listdir(images_path)
         if not images_list:
@@ -110,6 +188,23 @@ def execute_plugin(ars_window):
         
         
         def frame_next():
+            sequence = get_cached_sequence()
+            
+            if sequence:
+                # Wrap index if list size changed
+                ars_window._loop_index = ars_window._loop_index % len(sequence)
+                
+                path, layer = sequence[ars_window._loop_index]
+                ars_window.img.open_image(path, layer=layer, auto_fit=False)
+                ctx.update_item("timeline", "progress", (ars_window._loop_index / len(sequence)) * 100 )
+                
+                ars_window._loop_index = (ars_window._loop_index + 1) % len(sequence)
+                
+                current_fps = ctx.get_value(ic.ICON_SPEED_UP)
+                new_interval = int(1000 / current_fps)
+                if ars_window._loop_timer and ars_window._loop_timer.interval() != new_interval:
+                    ars_window._loop_timer.setInterval(new_interval)
+                return
 
             images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
 
@@ -146,8 +241,13 @@ def execute_plugin(ars_window):
         ars_window._loop_timer.timeout.connect(frame_next)
         
         # Initial interval calculation
-        initial_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
-        initial_fps = fps if initial_path != get_path("frames") else fps / 4
+        sequence = get_cached_sequence()
+        if sequence:
+            initial_fps = fps
+        else:
+            initial_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
+            initial_fps = fps if initial_path != get_path("frames") else fps / 4
+        
         interval = int(1000 / initial_fps)
         
         ars_window._loop_timer.start(interval)
