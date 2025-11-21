@@ -113,7 +113,9 @@ def execute_plugin(ars_window):
                                 'get_selected': selected_object,
                                 'msg': ars_window.msg,
                                 'add_primitive': add_primitive,
-                                'after': after,}
+                                'after': after,
+                                'ic': ic,}
+    
     
     code_editor.custom_namespace = default_namespace_injection
     code_editor.project_file_path = current_code_file

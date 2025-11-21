@@ -19,6 +19,7 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Ctrl+F Find / Search
 - [ ] Multi cursor placement
 - [ ] Tab key adds ( ) signs when auto completing functions. 
+- [ ] Auto Complete def something with ( ): after opening first bracket 
 - [ ] Ctrl+Shift+A find all selected
 - [ ] Toggle line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
 - [ ] Custom Themes. f"background-color: rgba(0,0,0,{1.0 if STANDALONE else 0.15})
