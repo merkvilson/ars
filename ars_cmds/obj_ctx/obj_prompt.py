@@ -24,8 +24,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             pass        
         callback = close_callback 
 
-    print("Opening prompt context menu")
-
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
@@ -36,6 +34,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.custom_width = 450
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
+    # config.incremental_values = {ic.ICON_STEPS: 1, ic.ICON_GIZMO_SCALE: 1}
 
 
 
@@ -59,8 +58,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_GIZMO_SCALE: (25, 1024, 512),
 
     }
-
-    # config.incremental_values = {ic.ICON_STEPS: 1, ic.ICON_GIZMO_SCALE: 1}
 
 
     def start_render(seed_step = 0):
