@@ -167,7 +167,10 @@
         "94",
         0
       ],
-      "end_at_step": 10000,
+      "end_at_step": [
+        "93",
+        0
+      ],
       "return_with_leftover_noise": "disable",
       "model": [
         "55",
@@ -303,7 +306,7 @@
   "97": {
     "inputs": {
       "ud_name": "frames",
-      "output": 40
+      "output": 81
     },
     "class_type": "Airen_Int",
     "_meta": {
