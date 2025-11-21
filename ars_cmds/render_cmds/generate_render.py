@@ -18,29 +18,72 @@ def generate_render(self, ctx, max_steps, default_object):
     final_attempts = {'count': 0}
     
     def apply_latest_texture():
-        current_files = os.listdir(get_path("steps"))
-        current_step = len(current_files)
+        steps_path = get_path("steps")
+        if not os.path.exists(steps_path):
+            return
+
+        all_files = os.listdir(steps_path)
+        valid_exts = ('.png', '.jpg', '.jpeg', '.tiff')
+        image_files = [f for f in all_files if f.lower().endswith(valid_exts)]
+        
+        if not image_files:
+            return
+
+        full_paths = [os.path.join(steps_path, f) for f in image_files]
+        full_paths.sort(key=os.path.getmtime)
+        
+        current_step = len(full_paths)
+        last_file = full_paths[-1]
+        
+        file_to_apply = None
+        stop_rendering = False
+
+        if last_file.lower().endswith('.tiff'):
+            valid_candidates = [p for p in full_paths if p.lower().endswith(('.png', '.jpg', '.jpeg'))]
+            if valid_candidates:
+                file_to_apply = valid_candidates[-1]
+            stop_rendering = True
+        else:
+            if len(full_paths) >= 2:
+                file_to_apply = full_paths[-2]
+        
+        if file_to_apply and not file_to_apply.lower().endswith(('.png', '.jpg', '.jpeg')):
+            file_to_apply = None
 
         if type(default_object).__name__ == "CSprite":
             try:
-                latest_file = get_path("last_step")
-                if latest_file:
-                    default_object.set_texture(latest_file)
+                if file_to_apply:
+                    default_object.set_texture(file_to_apply)
                     
                     # Calculate alpha based on current step (0.1 to 0.99)
                     alpha = 0.1 + (0.89 * (current_step / (max_steps + 1)))
-                    default_object.set_alpha( alpha)
+                    default_object.set_alpha(alpha)
                     
-                    # Check if we've reached max_steps + 1
-                    if current_step >= max_steps + 1:
-                        default_object.cutout()
-                        #print("finish")
-                        update_timer.stop()
+                if stop_rendering or current_step >= max_steps + 1:
+                    default_object.cutout()
+                    #print("finish")
+                    update_timer.stop()
 
             except Exception as e:
                 print(f"Error applying texture: {e}")
             
         else:
+            if file_to_apply and os.path.exists(file_to_apply):
+                try:
+                    pixmap = QPixmap(file_to_apply)
+                    if not pixmap.isNull():
+                        if type(default_object).__name__ == "CPoint":
+                            self.viewport.bg.set_image(file_to_apply)
+                        else:
+                            ctx.update_item(ic.ICON_IMAGE, "image_path", file_to_apply)
+                        if not self.viewport.isVisible() and hasattr(self, 'img') and self.img:
+                            self.img.open_image(file_to_apply)
+                except:
+                    pass
+
+            if stop_rendering:
+                update_timer.stop()
+                return
 
             if current_step >= max_steps + 2:
                 final_attempts['count'] += 1
@@ -48,21 +91,6 @@ def generate_render(self, ctx, max_steps, default_object):
                     #print("finish")
                     update_timer.stop()
                     return
-            
-            latest_file = get_path("last_step")
-            if latest_file and os.path.exists(latest_file):
-                try:
-                    pixmap = QPixmap(latest_file)
-                    if not pixmap.isNull():
-                        if type(default_object).__name__ == "CPoint":
-                            self.viewport.bg.set_image(latest_file)
-                        else:
-                            ctx.update_item(ic.ICON_IMAGE, "image_path", latest_file)
-                        if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
-                            self.img.open_image(get_path('last_step'))
-
-                except:
-                    pass
         
     # Start the timer
     update_timer.timeout.connect(apply_latest_texture)
