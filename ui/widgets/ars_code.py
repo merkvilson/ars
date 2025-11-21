@@ -864,6 +864,8 @@ class CodeEditor(QPlainTextEdit):
         # Attach highlighter
         self.highlighter = PythonHighlighter(self.document())
 
+        # Ensure trailing newline on change
+        self.textChanged.connect(self._ensure_trailing_newline)
 
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
@@ -1503,6 +1505,37 @@ class CodeEditor(QPlainTextEdit):
         
         return True
 
+
+    def _ensure_trailing_newline(self):
+        """Ensure the document always ends with an empty line."""
+        doc = self.document()
+        if doc.isEmpty():
+            return
+            
+        last_block = doc.lastBlock()
+        # If the last block contains text, we need to append a new block.
+        if len(last_block.text()) > 0:
+            # Save current cursor state
+            current_cursor = self.textCursor()
+            original_position = current_cursor.position()
+            original_anchor = current_cursor.anchor()
+            
+            # Block signals to prevent recursion
+            was_blocked = self.blockSignals(True)
+            
+            try:
+                cursor = QTextCursor(doc)
+                cursor.movePosition(QTextCursor.MoveOperation.End)
+                cursor.insertBlock()
+                
+                # Restore cursor position explicitly
+                restored_cursor = self.textCursor()
+                restored_cursor.setPosition(original_anchor)
+                restored_cursor.setPosition(original_position, QTextCursor.MoveMode.KeepAnchor)
+                self.setTextCursor(restored_cursor)
+                
+            finally:
+                self.blockSignals(was_blocked)
 
     def _handle_newline(self):
         cursor = self.textCursor()
