@@ -25,6 +25,8 @@ from PyQt6.QtWidgets import (
     QWidget,
     QPlainTextEdit,
     QVBoxLayout,
+    QStyledItemDelegate,
+    QStyle,
 )    
 try: 
     from ars_cmds.core_cmds.run_ext import run_string_code
@@ -511,6 +513,95 @@ class JediCompleter:
             return []
 
 
+class CompletionDelegate(QStyledItemDelegate):
+    """Delegate for rendering completion items with color-coded icons."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.type_colors = {
+            'function': '#61afef',
+            'method': '#61afef',
+            'class': '#e5c07b',
+            'module': '#c678dd',
+            'instance': '#98c379',
+            'keyword': '#c678dd',
+            'statement': '#c678dd',
+            'param': '#d19a66',
+        }
+        self.type_symbols = {
+            'function': 'ƒ',
+            'method': 'm',
+            'class': 'C',
+            'module': 'M',
+            'instance': 'v',
+            'keyword': 'K',
+            'statement': 'S',
+            'param': 'p',
+        }
+        self.padding = 5
+
+    def paint(self, painter, option, index):
+        painter.save()
+        
+        # Draw background
+        if option.state & QStyle.StateFlag.State_Selected:
+            painter.fillRect(option.rect, QColor("#3e4451"))
+        else:
+            painter.fillRect(option.rect, QColor("#1e2127"))
+
+        # Get data
+        name = index.data(Qt.ItemDataRole.UserRole)
+        comp_type = index.data(Qt.ItemDataRole.UserRole + 1)
+        signature = index.data(Qt.ItemDataRole.UserRole + 2)
+        
+        if not name:
+            painter.restore()
+            return
+
+        rect = option.rect
+        
+        # Draw Symbol
+        symbol = self.type_symbols.get(comp_type, '•')
+        color = QColor(self.type_colors.get(comp_type, '#abb2bf'))
+        
+        painter.setPen(color)
+        
+        # Increase font size for symbol
+        original_font = painter.font()
+        symbol_font = QFont(original_font)
+        symbol_font.setPointSize(max(10, original_font.pointSize() + 4))
+        symbol_font.setBold(True)
+        painter.setFont(symbol_font)
+        
+        # Draw symbol on the left
+        symbol_rect = QRect(rect.left() + self.padding, rect.top(), 20, rect.height())
+        painter.drawText(symbol_rect, Qt.AlignmentFlag.AlignCenter, symbol)
+        
+        # Restore font for name
+        painter.setFont(original_font)
+        
+        # Draw Name
+        text_rect = QRect(rect.left() + 30, rect.top(), rect.width() - 30, rect.height())
+        painter.setPen(QColor("#abb2bf"))
+        
+        # Calculate name width to position signature
+        font_metrics = painter.fontMetrics()
+        name_width = font_metrics.horizontalAdvance(name)
+        
+        painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, name)
+        
+        # Draw Signature (if fits)
+        if signature:
+            painter.setPen(QColor("#5c6370")) # Dimmer color for signature
+            sig_rect = QRect(text_rect.left() + name_width, text_rect.top(), text_rect.width() - name_width, text_rect.height())
+            painter.drawText(sig_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, signature)
+
+        painter.restore()
+        
+    def sizeHint(self, option, index):
+        return QSize(200, 25)
+
+
 class CompletionPopup(QWidget):
     """Popup widget displaying autocompletion suggestions."""
     
@@ -529,6 +620,7 @@ class CompletionPopup(QWidget):
         self.list_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list_widget.itemClicked.connect(self._on_item_clicked)
+        self.list_widget.setItemDelegate(CompletionDelegate(self.list_widget))
         
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -576,46 +668,15 @@ class CompletionPopup(QWidget):
             completions: List of tuples (name, type, signature)
         """
         from PyQt6.QtWidgets import QListWidgetItem
-        from PyQt6.QtGui import QIcon, QPixmap, QPainter
         
         self.list_widget.clear()
         self.completions_data = completions
         
-        # Type icons/colors
-        type_colors = {
-            'function': '#61afef',
-            'method': '#61afef',
-            'class': '#e5c07b',
-            'module': '#c678dd',
-            'instance': '#98c379',
-            'keyword': '#c678dd',
-            'statement': '#c678dd',
-            'param': '#d19a66',
-        }
-        
-        type_symbols = {
-            'function': 'ƒ',
-            'method': 'm',
-            'class': 'C',
-            'module': 'M',
-            'instance': 'v',
-            'keyword': 'K',
-            'statement': 'S',
-            'param': 'p',
-        }
-
         for name, comp_type, signature in completions:
-            color = type_colors.get(comp_type, '#abb2bf')
-            symbol = type_symbols.get(comp_type, '•')
-            
-            # Format display text
-            display = f"  {symbol}  {name}{signature}"
-            
-            item = QListWidgetItem(display)
-            item.setData(Qt.ItemDataRole.UserRole, name)  # Store actual completion text
-            
-            # Color the type symbol
-            # (Note: QListWidget doesn't support rich text easily, so we use uniform coloring)
+            item = QListWidgetItem()
+            item.setData(Qt.ItemDataRole.UserRole, name)
+            item.setData(Qt.ItemDataRole.UserRole + 1, comp_type)
+            item.setData(Qt.ItemDataRole.UserRole + 2, signature)
             self.list_widget.addItem(item)
         
         if self.list_widget.count() > 0:
@@ -635,19 +696,23 @@ class CompletionPopup(QWidget):
         visible_items = min(item_count, max_visible_items)
         
         # Get height of one item
-        item_height = self.list_widget.sizeHintForRow(0)
+        item_height = 25 # Fixed height from delegate sizeHint
         total_height = item_height * visible_items + 4  # +4 for borders
         
         # Calculate required width based on longest item
         max_width = 0
+        font_metrics = self.list_widget.fontMetrics()
         for i in range(item_count):
             item = self.list_widget.item(i)
             if item:
-                text_width = self.list_widget.fontMetrics().horizontalAdvance(item.text())
+                name = item.data(Qt.ItemDataRole.UserRole) or ""
+                signature = item.data(Qt.ItemDataRole.UserRole + 2) or ""
+                # Approximate width: padding + symbol + padding + name + signature
+                text_width = font_metrics.horizontalAdvance(name + signature)
                 max_width = max(max_width, text_width)
         
-        # Add padding for icon, scrollbar, and margins
-        total_width = max_width + 40
+        # Add padding for icon (30px), margins and scrollbar
+        total_width = max_width + 60
         total_width = max(200, min(600, total_width))  # Min 200, max 600
         
         self.resize(total_width, total_height)
