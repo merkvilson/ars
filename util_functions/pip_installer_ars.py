@@ -9,7 +9,7 @@ base_dir = (os.path.split(__file__)[0])
 
 # Option 1: Install from requirements.txt
 # Set this to the path of your requirements.txt file, or None to use package list
-requirements_file = r"C:\Airen_Engine\AIREN_MODELS\custom_nodes\ComfyUI_FlashVSR-main\requirements.txt"
+requirements_file = r"extensions\comfyui\custom_nodes\rembg\requirements.txt"
 
 
 
