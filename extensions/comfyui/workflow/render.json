@@ -136,6 +136,7 @@
     "inputs": {
       "ud_name": "",
       "category": "steps",
+      "save_layers": false,
       "images": [
         "16",
         0
@@ -245,6 +246,7 @@
     "inputs": {
       "ud_name": "",
       "category": "steps",
+      "save_layers": true,
       "images": [
         "38",
         0

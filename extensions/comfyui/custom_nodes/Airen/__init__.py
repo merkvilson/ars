@@ -127,6 +127,7 @@ class Airen_SaveImage:
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "images": ("IMAGE", ),
                 "category": (["keyframes", "3d", "bg", "dome", "mesh", "sprite", "steps", "texture"], ),
+                "save_layers": ("BOOLEAN", {"default": True}),
             }
         }
 
@@ -135,7 +136,7 @@ class Airen_SaveImage:
     OUTPUT_NODE = True
     CATEGORY = "Airen_Studio/Image Processing"
 
-    def save_images(self, ud_name, images, category):
+    def save_images(self, ud_name, images, category, save_layers):
         if category in ["keyframes", "3d", "bg", "dome", "sprite", "steps", "texture"]:
             output_dir = folder_paths.get_output_directory()
             filename_prefix = f"{category}/0"
@@ -153,7 +154,7 @@ class Airen_SaveImage:
                 results.append({"filename": file, "subfolder": subfolder, "type": "output"})
             
             # After saving the last image in "steps" category, create layered TIFF
-            if category == "steps" and saved_files:
+            if category == "steps" and saved_files and save_layers:
                 try:
                     last_image_path = saved_files[-1]
                     steps_folder = full_output_folder
