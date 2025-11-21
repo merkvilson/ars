@@ -7,16 +7,28 @@ from os.path import join as opj
 
 json_file = Path(os.path.join("prefs", "paths.json"))
 
+
+
+
+#TODO: Implement prefs manager and config classes
+
+
+class CprefsManager:
+    def __init__(self):
+        pass
+
+
+class CprefsConfig:
+    def __init__(self):
+        self.dev_mode = False
+
+
 def read_pref(key = "cui_root"):
     with open(json_file, "r", encoding="utf-8") as file:
         data = json.load(file)
         res = data.get(key)
         if res:
             return res
-
-
-
-
 
 
 def get_path(key = "image"):
