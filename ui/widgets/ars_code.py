@@ -10,7 +10,7 @@ except ImportError:
     JEDI_AVAILABLE = False
     print("Warning: jedi not available. Autocompletion will be disabled.")
 
-from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal
+from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal, QPoint
 from PyQt6.QtGui import (
     QColor,
     QTextCharFormat,
@@ -154,6 +154,13 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         # TODO/FIXME patterns inside comments
         self.re_todo = QRegularExpression(r"\b(?:TODO|FIXME|NOTE|BUG|HACK)\b")
+        
+        # ICON_ prefix for custom icons
+        self.re_icon_prefix = QRegularExpression(r"\bICON_(?=[A-Z0-9_])")
+        self.fmt_hidden = QTextCharFormat()
+        self.fmt_hidden.setForeground(Qt.GlobalColor.transparent)
+        # We can also make it smaller to fit the icon better if needed, 
+        # but keeping it standard size ensures selection works normally.
 
     # Utility: check overlap with protected ranges
     @staticmethod
@@ -295,6 +302,9 @@ class PythonHighlighter(QSyntaxHighlighter):
         # 7) Function calls and class instantiation
         self._apply_regex_group(self.re_class_instantiation, 1, self.fmt_class_instantiation, text, protected)
         self._apply_regex_group(self.re_function_call, 1, self.fmt_function_call, text, protected)
+        
+        # 8) Hide ICON_ prefix to show icon instead
+        self._apply_regex(self.re_icon_prefix, self.fmt_hidden, text, protected)
 
     def _apply_regex(self, regex: QRegularExpression, fmt: QTextCharFormat, text: str, protected):
         it = regex.globalMatch(text)
@@ -774,12 +784,16 @@ class LineNumberArea(QWidget):
         super().__init__(editor)
         self.editor = editor
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def sizeHint(self):
         return QSize(self.editor.line_number_area_width(), 0)
 
     def paintEvent(self, event):
         self.editor.line_number_area_paint_event(event)
+        
+    def mousePressEvent(self, event):
+        self.editor.line_number_area_mouse_press_event(event)
 
 
 class CodeEditor(QPlainTextEdit):
@@ -1765,6 +1779,14 @@ class CodeEditor(QPlainTextEdit):
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
+        
+        # Try to load font/icons for painting
+        try:
+            from theme.fonts import font_icons, new_fonts
+            icon_font = new_fonts.get_font(14, "icomoon.ttf")
+            has_icons = True
+        except ImportError:
+            has_icons = False
 
         # Get current selection range
         cursor = self.textCursor()
@@ -1797,13 +1819,124 @@ class CodeEditor(QPlainTextEdit):
                     font.setWeight(QFont.Weight.Normal)
                     painter.setFont(font)
                     
-                painter.drawText(0, int(top), self.line_number_area.width() - 12, self.fontMetrics().height(),
+                # Draw line number
+                painter.drawText(0, int(top), self.line_number_area.width() - 5, self.fontMetrics().height(),
                                 Qt.AlignmentFlag.AlignRight, number)
 
             block = block.next()
             top = bottom
             bottom = top + self.blockBoundingRect(block).height()
             block_number += 1
+
+    def line_number_area_mouse_press_event(self, event):
+        pass
+
+    def _show_icon_picker(self):
+        completions = self._get_icon_completions("")
+        if not completions:
+            return
+            
+        self.completion_popup.set_completions(completions)
+        
+        # Position popup
+        cursor_rect = self.cursorRect()
+        popup_pos = self.mapToGlobal(cursor_rect.bottomLeft())
+        
+        screen_geom = self.screen().availableGeometry()
+        if popup_pos.y() + self.completion_popup.height() > screen_geom.bottom():
+            popup_pos = self.mapToGlobal(cursor_rect.topLeft())
+            popup_pos.setY(popup_pos.y() - self.completion_popup.height())
+        
+        self.completion_popup.move(popup_pos)
+        self.completion_popup.show()
+        self.completion_popup.raise_()
+        self._completion_active = True
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        
+        # Try to load font/icons for painting
+        try:
+            from theme.fonts import font_icons, new_fonts
+            # Use a slightly larger font for the icon
+            icon_font = new_fonts.get_font(self.font().pointSize() + 2, "icomoon.ttf")
+        except ImportError:
+            return
+
+        painter = QPainter(self.viewport())
+        painter.setFont(icon_font)
+        painter.setPen(QColor("#98c379")) # Greenish color for icons
+
+        # Iterate visible blocks to find ICON_ tokens
+        block = self.firstVisibleBlock()
+        while block.isValid():
+            if not block.isVisible():
+                block = block.next()
+                continue
+                
+            # Optimization: check if block is within viewport
+            block_geom = self.blockBoundingGeometry(block).translated(self.contentOffset())
+            if block_geom.top() > event.rect().bottom():
+                break
+                
+            text = block.text()
+            # Find all ICON_ prefixes
+            for match in re.finditer(r"\bICON_(?=[A-Z0-9_])", text):
+                start_in_block = match.start()
+                # Get the icon name to decide what to draw
+                full_match = re.match(r"ICON_[A-Z0-9_]+", text[start_in_block:])
+                if full_match:
+                    full_name = full_match.group(0)
+                    if hasattr(font_icons, full_name):
+                        icon_char = getattr(font_icons, full_name)
+                        if isinstance(icon_char, str):
+                            # Calculate position
+                            cursor = QTextCursor(block)
+                            cursor.setPosition(block.position() + start_in_block)
+                            
+                            # Get rect for the start
+                            rect_start = self.cursorRect(cursor)
+                            
+                            # Move to end of "ICON_" (length 5)
+                            cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, 5)
+                            rect_end = self.cursorRect(cursor)
+                            
+                            # The rect for "ICON_"
+                            draw_rect = QRect(rect_start.topLeft(), rect_end.bottomLeft())
+                            draw_rect.setWidth(rect_end.x() - rect_start.x())
+                            draw_rect.setHeight(rect_start.height())
+                            
+                            # Draw the icon centered in this rect
+                            painter.drawText(draw_rect, Qt.AlignmentFlag.AlignCenter, icon_char)
+            
+            block = block.next()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            cursor = self.cursorForPosition(event.pos())
+            block = cursor.block()
+            text = block.text()
+            pos_in_block = cursor.positionInBlock()
+            
+            # Check if we clicked on "ICON_"
+            for match in re.finditer(r"\bICON_(?=[A-Z0-9_])", text):
+                if match.start() <= pos_in_block < match.end():
+                    # Clicked on the icon!
+                    # Select the full variable
+                    full_match = re.match(r"ICON_[A-Z0-9_]+", text[match.start():])
+                    if full_match:
+                        start = block.position() + match.start()
+                        end = block.position() + match.start() + len(full_match.group(0))
+                        
+                        selection_cursor = self.textCursor()
+                        selection_cursor.setPosition(start)
+                        selection_cursor.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
+                        self.setTextCursor(selection_cursor)
+                        
+                        self._show_icon_picker()
+                        return
+
+        super().mousePressEvent(event)
 
 
 if __name__ == "__main__":
