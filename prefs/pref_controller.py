@@ -13,14 +13,14 @@ json_file = Path(os.path.join("prefs", "paths.json"))
 #TODO: Implement prefs manager and config classes
 
 
-class CprefsManager:
+class prefsManager:
     def __init__(self):
         pass
 
 
-class CprefsConfig:
+class prefsConfig:
     def __init__(self):
-        self.dev_mode = False
+        self.dev_mode = True 
 
 
 def read_pref(key = "cui_root"):
