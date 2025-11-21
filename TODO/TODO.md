@@ -37,7 +37,8 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Optimize render pipeline performance
 - [ ] Save one extra image to prevent early image load
 - [ ] Middle click revert to default 
-
+- [ ] Implement prefs manager and config classes
+- [ ] 
 
 
 ## Medium Priority
