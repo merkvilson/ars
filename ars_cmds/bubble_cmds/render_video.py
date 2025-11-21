@@ -23,6 +23,14 @@ def execute_plugin(ars_window):
         ars_window._loop_timer = None
     if not hasattr(ars_window, '_loop_index'):
         ars_window._loop_index = 0
+    if not hasattr(ars_window, '_last_source_type'):
+        ars_window._last_source_type = None
+
+    def check_source_changed(new_type):
+        if ars_window._last_source_type != new_type:
+            ars_window._last_source_type = new_type
+            return True
+        return False
 
     def get_valid_layers(tiff_path):
         try:
@@ -153,14 +161,16 @@ def execute_plugin(ars_window):
 
         sequence = get_cached_sequence()
         if sequence:
+            should_fit = check_source_changed("tiff_sequence")
             max_index = len(sequence) - 1
             image_index = int((val / 100) * max_index)
             path, layer = sequence[image_index]
-            ars_window.img.open_image(path, layer=layer, auto_fit=False)
+            ars_window.img.open_image(path, layer=layer, auto_fit=should_fit)
             ars_window._loop_index = image_index
             return
 
         images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
+        should_fit = check_source_changed(images_path)
         images_list = os.listdir(images_path)
         if not images_list:
             return
@@ -170,7 +180,7 @@ def execute_plugin(ars_window):
         image_index = int((val / 100) * max_index)
         selected_image = images_list[image_index]
         image_path = os.path.join(images_path, selected_image)
-        ars_window.img.open_image(image_path, auto_fit=False)
+        ars_window.img.open_image(image_path, auto_fit=should_fit)
 
         ars_window._loop_index = image_index
 
@@ -191,11 +201,12 @@ def execute_plugin(ars_window):
             sequence = get_cached_sequence()
             
             if sequence:
+                should_fit = check_source_changed("tiff_sequence")
                 # Wrap index if list size changed
                 ars_window._loop_index = ars_window._loop_index % len(sequence)
                 
                 path, layer = sequence[ars_window._loop_index]
-                ars_window.img.open_image(path, layer=layer, auto_fit=False)
+                ars_window.img.open_image(path, layer=layer, auto_fit=should_fit)
                 ctx.update_item("timeline", "progress", (ars_window._loop_index / len(sequence)) * 100 )
                 
                 ars_window._loop_index = (ars_window._loop_index + 1) % len(sequence)
@@ -207,6 +218,7 @@ def execute_plugin(ars_window):
                 return
 
             images_path = get_path("video_frames") if os.listdir( get_path("video_frames") ) else get_path("frames")
+            should_fit = check_source_changed(images_path)
 
             # Refresh image list every frame to detect changes
             images_list = sorted([f for f in os.listdir(images_path) 
@@ -220,7 +232,7 @@ def execute_plugin(ars_window):
             
             # Load current frame
             image_path = os.path.join(images_path, images_list[ars_window._loop_index])
-            ars_window.img.open_image(image_path, auto_fit=False)
+            ars_window.img.open_image(image_path, auto_fit=should_fit)
             ctx.update_item("timeline", "progress", (ars_window._loop_index / len(images_list)) * 100 )
             
             # Move to next frame
