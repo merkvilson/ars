@@ -272,6 +272,8 @@ def execute_plugin(ars_window):
 
     
     def start_render():
+        ars_window.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+
         
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
