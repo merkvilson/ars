@@ -15,15 +15,19 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 
 
 ## Code Editor
+- [✓] Auto Completion
 - [ ] Ctrl+F Find / Search
 - [ ] Multi cursor placement
+- [ ] Tab key adds ( ) signs when auto completing functions. 
 - [ ] Ctrl+Shift+A find all selected
-- [ ] Option to disable/enable line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
-- [ ] Custom Themes. f"background-color: rgba(0, 0, 0, {1.0 if STANDALONE else 0.15})
-- [✓] Auto Completion
-- [ ] Custom completion for icons. "ic." triggers icons list.
+- [ ] Toggle line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+- [ ] Custom Themes. f"background-color: rgba(0,0,0,{1.0 if STANDALONE else 0.15})
+- [✓] Custom completion for icons. "ic." triggers icons list (autocomplete).
+- [✓] display ic.ICON_NAME texts as actual icons.
+- [✓] ctrl+i opens icons list (autocomplete).
 - [✓] Move selected lines up/down using arrow keys.
-- [ ] Transparency Slider for revialing scene behind editor.
+- [✓] Transparency Slider for revialing scene behind editor.
+- [ ] 
 - [ ] 
 - [ ] 
 
