@@ -155,12 +155,25 @@ class PythonHighlighter(QSyntaxHighlighter):
         # TODO/FIXME patterns inside comments
         self.re_todo = QRegularExpression(r"\b(?:TODO|FIXME|NOTE|BUG|HACK)\b")
         
-        # ICON_ prefix for custom icons
-        self.re_icon_prefix = QRegularExpression(r"\bICON_(?=[A-Z0-9_])")
-        self.fmt_hidden = QTextCharFormat()
-        self.fmt_hidden.setForeground(Qt.GlobalColor.transparent)
-        # We can also make it smaller to fit the icon better if needed, 
-        # but keeping it standard size ensures selection works normally.
+        # Icon characters
+        self.re_icon_char = QRegularExpression("(?!)")
+        try:
+            from theme.fonts import font_icons, new_fonts
+            # Ensure font is loaded to get family name
+            f = new_fonts.get_font(10, "icomoon.ttf")
+            self.icon_font_family = f.family()
+            
+            if hasattr(font_icons, "ICON_FULL_LIST"):
+                # Build regex for all icon characters
+                # Escape them just in case, though they are likely safe
+                chars = "".join(re.escape(c) for c in font_icons.ICON_FULL_LIST)
+                self.re_icon_char = QRegularExpression(f"[{chars}]")
+                
+            self.fmt_icon_char = QTextCharFormat()
+            self.fmt_icon_char.setFontFamily(self.icon_font_family)
+            self.fmt_icon_char.setForeground(QColor("#98c379")) 
+        except ImportError:
+            pass
 
     # Utility: check overlap with protected ranges
     @staticmethod
@@ -303,8 +316,9 @@ class PythonHighlighter(QSyntaxHighlighter):
         self._apply_regex_group(self.re_class_instantiation, 1, self.fmt_class_instantiation, text, protected)
         self._apply_regex_group(self.re_function_call, 1, self.fmt_function_call, text, protected)
         
-        # 8) Hide ICON_ prefix to show icon instead
-        self._apply_regex(self.re_icon_prefix, self.fmt_hidden, text, protected)
+        # 8) Icon characters
+        if hasattr(self, 're_icon_char'):
+            self._apply_regex(self.re_icon_char, self.fmt_icon_char, text, protected)
 
     def _apply_regex(self, regex: QRegularExpression, fmt: QTextCharFormat, text: str, protected):
         it = regex.globalMatch(text)
@@ -816,6 +830,24 @@ class CodeEditor(QPlainTextEdit):
         self.custom_namespace = {}
         self.project_file_path = None
         
+        # Initialize icon mappings
+        self.ICON_TO_NAME = {}
+        self.NAME_TO_ICON = {}
+        self._is_replacing = False
+        try:
+            from theme.fonts import font_icons
+            for name in dir(font_icons):
+                if name.startswith("ICON_") and name != "ICON_FULL_LIST":
+                    val = getattr(font_icons, name)
+                    if isinstance(val, str):
+                        # Map both with and without 'ic.' prefix
+                        self.NAME_TO_ICON[name] = val
+                        self.NAME_TO_ICON["ic." + name] = val
+                        # Reverse map prefers 'ic.' prefix
+                        self.ICON_TO_NAME[val] = "ic." + name
+        except ImportError:
+            pass
+
         # Autocompletion setup
         self.completer = JediCompleter()
         self.completion_popup = CompletionPopup(self)
@@ -868,18 +900,61 @@ class CodeEditor(QPlainTextEdit):
         if hasattr(self, 'completion_popup'):
             self.completion_popup.set_editor_font(font)
 
+    def text_to_icons(self, text):
+        """Convert text representation of icons to actual characters."""
+        if not self.NAME_TO_ICON:
+            return text
+            
+        pattern = r"\b(?:ic\.)?ICON_[A-Z0-9_]+\b"
+        
+        def replace_match(match):
+            word = match.group(0)
+            return self.NAME_TO_ICON.get(word, word)
+            
+        return re.sub(pattern, replace_match, text)
+
+    def icons_to_text(self, text):
+        """Convert icon characters back to text representation."""
+        if not self.ICON_TO_NAME:
+            return text
+            
+        chars = "".join(re.escape(c) for c in self.ICON_TO_NAME.keys())
+        if not chars:
+            return text
+            
+        pattern = f"[{chars}]"
+        
+        def replace_match(match):
+            char = match.group(0)
+            return self.ICON_TO_NAME.get(char, char)
+            
+        return re.sub(pattern, replace_match, text)
+
+    def setPlainText(self, text):
+        """Override to convert text to icons on load."""
+        converted = self.text_to_icons(text)
+        super().setPlainText(converted)
+        
+    def get_clean_code(self):
+        """Get code with icons converted back to text."""
+        text = self.toPlainText()
+        return self.icons_to_text(text)
+
     def run_code(self, namespace_injection=None):
         if namespace_injection is None: namespace_injection = self.custom_namespace
-        if not STANDALONE: run_string_code(self.toPlainText(), namespace_injection)
+        # Use get_clean_code() instead of toPlainText()
+        code = self.get_clean_code()
+        if not STANDALONE: run_string_code(code, namespace_injection)
         else: 
-            try: exec(self.toPlainText())
+            try: exec(code)
             except Exception as e:
                 print(f"Error executing code: {e}")
 
 
     def save_script(self):
+        # Use get_clean_code() instead of toPlainText()
         with open(self.project_file_path, 'w', encoding='utf-8') as f:
-            f.write(self.toPlainText())
+            f.write(self.get_clean_code())
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -951,6 +1026,11 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
+        if key == Qt.Key.Key_I and modifiers & Qt.KeyboardModifier.ControlModifier:
+            self._show_icon_picker()
+            event.accept()
+            return
+
         if modifiers & Qt.KeyboardModifier.ControlModifier:
             if key in (
                 Qt.Key.Key_Plus,
@@ -1011,6 +1091,10 @@ class CodeEditor(QPlainTextEdit):
 
         # Call parent to handle the key first
         super().keyPressEvent(event)
+        
+        # Check for icon replacement
+        if text and not self._is_replacing:
+             self._check_icon_replacement()
         
         # After handling the key, manage completion popup
         if text and (text.isalnum() or text in ('_', '.')):
@@ -1198,22 +1282,22 @@ class CodeEditor(QPlainTextEdit):
                  # Should not happen for prev_block unless it was somehow last, which it isn't
                  text = "\n" + text
         
-        insert_pos = end_block.position() + end_block.length()
+        insert_pos = end_block.position() + end_block.length();
         
-        move_cursor.setPosition(insert_pos)
-        move_cursor.insertText(text)
+        move_cursor.setPosition(insert_pos);
+        move_cursor.insertText(text);
         
-        cursor.endEditBlock()
+        cursor.endEditBlock();
         
-        shift = len(text)
+        shift = len(text);
         # If we changed the text structure (added \n at start), the shift logic might be tricky.
         # But wait, we removed "Prev\n" (len L) and inserted "\nPrev" (len L). Length is same.
         
-        new_cursor = self.textCursor()
-        new_cursor.setPosition(start_pos - shift)
+        new_cursor = self.textCursor();
+        new_cursor.setPosition(start_pos - shift);
         if end_pos > start_pos:
-            new_cursor.setPosition(end_pos - shift, QTextCursor.MoveMode.KeepAnchor)
-        self.setTextCursor(new_cursor)
+            new_cursor.setPosition(end_pos - shift, QTextCursor.MoveMode.KeepAnchor);
+        self.setTextCursor(new_cursor);
 
     def _move_lines_down(self):
         cursor = self.textCursor()
@@ -1732,28 +1816,65 @@ class CodeEditor(QPlainTextEdit):
     
     def _insert_completion(self, completion_text):
         """Insert the selected completion, replacing the partial word."""
+        # Check if it's an icon name and replace with char
+        if completion_text in self.NAME_TO_ICON:
+            completion_text = self.NAME_TO_ICON[completion_text]
+        elif "ic." + completion_text in self.NAME_TO_ICON:
+             completion_text = self.NAME_TO_ICON["ic." + completion_text]
+
         cursor = self.textCursor()
-        
-        # Find and select the partial word to replace
-        block = cursor.block()
-        text = block.text()
-        pos_in_block = cursor.positionInBlock()
-        
-        # Find start of current word
-        word_start = pos_in_block
-        while word_start > 0 and (text[word_start - 1].isalnum() or text[word_start - 1] == '_'):
-            word_start -= 1
-        
-        # Select and replace the partial word
         cursor.beginEditBlock()
-        cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
-        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, word_start)
-        cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor, pos_in_block - word_start)
-        cursor.insertText(completion_text)
+        
+        if cursor.hasSelection():
+            cursor.insertText(completion_text)
+        else:
+            # Find and select the partial word to replace
+            block = cursor.block()
+            text = block.text()
+            pos_in_block = cursor.positionInBlock()
+            
+            # Find start of current word
+            word_start = pos_in_block
+            while word_start > 0 and (text[word_start - 1].isalnum() or text[word_start - 1] == '_'):
+                word_start -= 1
+                
+            # Check if preceded by "ic." or "font_icons." and include it in replacement
+            if word_start >= 3 and text[word_start-3:word_start] == "ic.":
+                word_start -= 3
+            elif word_start >= 11 and text[word_start-11:word_start] == "font_icons.":
+                word_start -= 11
+            
+            # Select and replace the partial word
+            cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
+            cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, word_start)
+            cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor, pos_in_block - word_start)
+            cursor.insertText(completion_text)
+            
         cursor.endEditBlock()
         
         self.setTextCursor(cursor)
         self.setFocus()
+
+    def _check_icon_replacement(self):
+        cursor = self.textCursor()
+        block = cursor.block()
+        text = block.text()
+        pos = cursor.positionInBlock()
+        
+        # Look for pattern ending at cursor
+        text_before = text[:pos]
+        # Match (ic.)?ICON_...
+        match = re.search(r"(?:ic\.)?ICON_[A-Z0-9_]+$", text_before)
+        if match:
+            word = match.group(0)
+            if word in self.NAME_TO_ICON:
+                self._is_replacing = True
+                cursor.beginEditBlock()
+                cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor, len(word))
+                cursor.insertText(self.NAME_TO_ICON[word])
+                cursor.endEditBlock()
+                self.setTextCursor(cursor)
+                self._is_replacing = False
 
     def line_number_area_width(self):
         digits = len(str(max(1, self.blockCount())))
@@ -1854,88 +1975,8 @@ class CodeEditor(QPlainTextEdit):
 
     def paintEvent(self, event):
         super().paintEvent(event)
-        
-        # Try to load font/icons for painting
-        try:
-            from theme.fonts import font_icons, new_fonts
-            # Use a slightly larger font for the icon
-            icon_font = new_fonts.get_font(self.font().pointSize() + 2, "icomoon.ttf")
-        except ImportError:
-            return
-
-        painter = QPainter(self.viewport())
-        painter.setFont(icon_font)
-        painter.setPen(QColor("#98c379")) # Greenish color for icons
-
-        # Iterate visible blocks to find ICON_ tokens
-        block = self.firstVisibleBlock()
-        while block.isValid():
-            if not block.isVisible():
-                block = block.next()
-                continue
-                
-            # Optimization: check if block is within viewport
-            block_geom = self.blockBoundingGeometry(block).translated(self.contentOffset())
-            if block_geom.top() > event.rect().bottom():
-                break
-                
-            text = block.text()
-            # Find all ICON_ prefixes
-            for match in re.finditer(r"\bICON_(?=[A-Z0-9_])", text):
-                start_in_block = match.start()
-                # Get the icon name to decide what to draw
-                full_match = re.match(r"ICON_[A-Z0-9_]+", text[start_in_block:])
-                if full_match:
-                    full_name = full_match.group(0)
-                    if hasattr(font_icons, full_name):
-                        icon_char = getattr(font_icons, full_name)
-                        if isinstance(icon_char, str):
-                            # Calculate position
-                            cursor = QTextCursor(block)
-                            cursor.setPosition(block.position() + start_in_block)
-                            
-                            # Get rect for the start
-                            rect_start = self.cursorRect(cursor)
-                            
-                            # Move to end of "ICON_" (length 5)
-                            cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, 5)
-                            rect_end = self.cursorRect(cursor)
-                            
-                            # The rect for "ICON_"
-                            draw_rect = QRect(rect_start.topLeft(), rect_end.bottomLeft())
-                            draw_rect.setWidth(rect_end.x() - rect_start.x())
-                            draw_rect.setHeight(rect_start.height())
-                            
-                            # Draw the icon centered in this rect
-                            painter.drawText(draw_rect, Qt.AlignmentFlag.AlignCenter, icon_char)
-            
-            block = block.next()
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            cursor = self.cursorForPosition(event.pos())
-            block = cursor.block()
-            text = block.text()
-            pos_in_block = cursor.positionInBlock()
-            
-            # Check if we clicked on "ICON_"
-            for match in re.finditer(r"\bICON_(?=[A-Z0-9_])", text):
-                if match.start() <= pos_in_block < match.end():
-                    # Clicked on the icon!
-                    # Select the full variable
-                    full_match = re.match(r"ICON_[A-Z0-9_]+", text[match.start():])
-                    if full_match:
-                        start = block.position() + match.start()
-                        end = block.position() + match.start() + len(full_match.group(0))
-                        
-                        selection_cursor = self.textCursor()
-                        selection_cursor.setPosition(start)
-                        selection_cursor.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
-                        self.setTextCursor(selection_cursor)
-                        
-                        self._show_icon_picker()
-                        return
-
         super().mousePressEvent(event)
 
 
