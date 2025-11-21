@@ -252,6 +252,53 @@ class Airen_RenderPass:
         return (render_tensor, depth_tensor)
 
 
+class Airen_LoadKeyframe:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ud_name": ("STRING", {"default": "", "multiline": False}),
+                "frame_number": ("INT", {"default": 1, "min": 1, "max": 10, "step": 1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image",)
+    FUNCTION = "load_keyframe"
+    CATEGORY = "Airen_Studio/Image Processing"
+
+    @classmethod
+    def IS_CHANGED(cls, ud_name, frame_number):
+        """ This forces ComfyUI to treat the node as non-deterministic 
+        and re-execute it every time the workflow runs, ensuring that 
+        the latest version of the TIFF file is always loaded, even if 
+        the filename hasn't changed."""
+        return float("NaN")
+
+    def load_keyframe(self, ud_name, frame_number):
+        input_dir = folder_paths.get_input_directory()
+        image_path = os.path.join(input_dir, f"{frame_number}.tiff")
+        
+        if not os.path.exists(image_path):
+            # Return empty black image if not found
+            return (torch.zeros((1, 64, 64, 3), dtype=torch.float32),)
+            
+        img = Image.open(image_path)
+        
+        # Get the latest layer (last frame of TIFF)
+        try:
+            if hasattr(img, 'n_frames') and img.n_frames > 1:
+                img.seek(img.n_frames - 1)
+        except Exception as e:
+            print(f"Error seeking TIFF frame: {e}")
+            pass
+            
+        img = img.convert("RGB")
+        image_tensor = torch.from_numpy(np.array(img).astype(np.float32) / 255.0)[None,]
+        
+        return (image_tensor,)
+
+
 NODE_CLASS_MAPPINGS = {
     "Airen_Str": Airen_Str,
     "Airen_Int": Airen_Int,
@@ -262,4 +309,5 @@ NODE_CLASS_MAPPINGS = {
     "Airen_SaveImage": Airen_SaveImage,
     "Airen_Progress_Reader": Airen_Progress_Reader,
     "Airen_RenderPass": Airen_RenderPass,
+    "Airen_LoadKeyframe": Airen_LoadKeyframe,
 }

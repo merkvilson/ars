@@ -191,15 +191,6 @@
       "title": "KSampler (Advanced)"
     }
   },
-  "62": {
-    "inputs": {
-      "image": "1.png"
-    },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Image"
-    }
-  },
   "67": {
     "inputs": {
       "width": [
@@ -228,26 +219,17 @@
         0
       ],
       "start_image": [
-        "62",
+        "101",
         0
       ],
       "end_image": [
-        "68",
+        "102",
         0
       ]
     },
     "class_type": "WanFirstLastFrameToVideo",
     "_meta": {
       "title": "WanFirstLastFrameToVideo"
-    }
-  },
-  "68": {
-    "inputs": {
-      "image": "2.png"
-    },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Image"
     }
   },
   "91": {
@@ -349,6 +331,26 @@
     "class_type": "Airen_Str",
     "_meta": {
       "title": "Airen Text"
+    }
+  },
+  "101": {
+    "inputs": {
+      "ud_name": "",
+      "frame_number": 1
+    },
+    "class_type": "Airen_LoadKeyframe",
+    "_meta": {
+      "title": "Airen_LoadKeyframe"
+    }
+  },
+  "102": {
+    "inputs": {
+      "ud_name": "",
+      "frame_number": 2
+    },
+    "class_type": "Airen_LoadKeyframe",
+    "_meta": {
+      "title": "Airen_LoadKeyframe"
     }
   }
 }
