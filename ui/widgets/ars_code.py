@@ -1026,7 +1026,7 @@ class CodeEditor(QPlainTextEdit):
             event.accept()
             return
 
-        if key == Qt.Key.Key_I and modifiers & Qt.KeyboardModifier.ControlModifier:
+        if key == Qt.Key.Key_I and modifiers & Qt.KeyboardModifier.AltModifier:
             self._show_icon_picker()
             event.accept()
             return
