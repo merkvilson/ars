@@ -553,6 +553,7 @@ class CompletionDelegate(QStyledItemDelegate):
         name = index.data(Qt.ItemDataRole.UserRole)
         comp_type = index.data(Qt.ItemDataRole.UserRole + 1)
         signature = index.data(Qt.ItemDataRole.UserRole + 2)
+        icon_char = index.data(Qt.ItemDataRole.UserRole + 3)
         
         if not name:
             painter.restore()
@@ -561,27 +562,42 @@ class CompletionDelegate(QStyledItemDelegate):
         rect = option.rect
         
         # Draw Symbol
-        symbol = self.type_symbols.get(comp_type, '•')
-        color = QColor(self.type_colors.get(comp_type, '#abb2bf'))
+        original_font = painter.font()
+        
+        if icon_char:
+            try:
+                from theme.fonts import new_fonts
+                # Make icon larger than text
+                icon_size = max(16, original_font.pointSize() + 6)
+                font = new_fonts.get_font(icon_size, "icomoon.ttf")
+                painter.setFont(font)
+                symbol = icon_char
+                color = QColor("#e0e0e0")
+            except ImportError:
+                symbol = '?'
+                color = QColor("#abb2bf")
+                painter.setFont(original_font)
+        else:
+            symbol = self.type_symbols.get(comp_type, '•')
+            color = QColor(self.type_colors.get(comp_type, '#abb2bf'))
+            
+            symbol_font = QFont(original_font)
+            symbol_font.setPointSize(max(10, original_font.pointSize() + 4))
+            symbol_font.setBold(True)
+            painter.setFont(symbol_font)
         
         painter.setPen(color)
-        
-        # Increase font size for symbol
-        original_font = painter.font()
-        symbol_font = QFont(original_font)
-        symbol_font.setPointSize(max(10, original_font.pointSize() + 4))
-        symbol_font.setBold(True)
-        painter.setFont(symbol_font)
-        
         # Draw symbol on the left
-        symbol_rect = QRect(rect.left() + self.padding, rect.top(), 20, rect.height())
+        symbol_width = 30
+        symbol_rect = QRect(rect.left() + self.padding, rect.top(), symbol_width, rect.height())
         painter.drawText(symbol_rect, Qt.AlignmentFlag.AlignCenter, symbol)
         
         # Restore font for name
         painter.setFont(original_font)
         
         # Draw Name
-        text_rect = QRect(rect.left() + 30, rect.top(), rect.width() - 30, rect.height())
+        text_offset = symbol_width + self.padding + 5
+        text_rect = QRect(rect.left() + text_offset, rect.top(), rect.width() - text_offset, rect.height())
         painter.setPen(QColor("#abb2bf"))
         
         # Calculate name width to position signature
@@ -599,7 +615,7 @@ class CompletionDelegate(QStyledItemDelegate):
         painter.restore()
         
     def sizeHint(self, option, index):
-        return QSize(200, 25)
+        return QSize(200, 30)
 
 
 class CompletionPopup(QWidget):
@@ -665,18 +681,25 @@ class CompletionPopup(QWidget):
         Set completion items.
         
         Args:
-            completions: List of tuples (name, type, signature)
+            completions: List of tuples (name, type, signature, [icon_char])
         """
         from PyQt6.QtWidgets import QListWidgetItem
         
         self.list_widget.clear()
         self.completions_data = completions
         
-        for name, comp_type, signature in completions:
+        for item_data in completions:
+            name = item_data[0]
+            comp_type = item_data[1]
+            signature = item_data[2]
+            icon_char = item_data[3] if len(item_data) > 3 else None
+            
             item = QListWidgetItem()
             item.setData(Qt.ItemDataRole.UserRole, name)
             item.setData(Qt.ItemDataRole.UserRole + 1, comp_type)
             item.setData(Qt.ItemDataRole.UserRole + 2, signature)
+            if icon_char:
+                item.setData(Qt.ItemDataRole.UserRole + 3, icon_char)
             self.list_widget.addItem(item)
         
         if self.list_widget.count() > 0:
@@ -696,7 +719,7 @@ class CompletionPopup(QWidget):
         visible_items = min(item_count, max_visible_items)
         
         # Get height of one item
-        item_height = 25 # Fixed height from delegate sizeHint
+        item_height = 30 # Fixed height from delegate sizeHint
         total_height = item_height * visible_items + 4  # +4 for borders
         
         # Calculate required width based on longest item
@@ -711,8 +734,8 @@ class CompletionPopup(QWidget):
                 text_width = font_metrics.horizontalAdvance(name + signature)
                 max_width = max(max_width, text_width)
         
-        # Add padding for icon (30px), margins and scrollbar
-        total_width = max_width + 60
+        # Add padding for icon (40px), margins and scrollbar
+        total_width = max_width + 70
         total_width = max(200, min(600, total_width))  # Min 200, max 600
         
         self.resize(total_width, total_height)
@@ -1589,6 +1612,25 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.line_number_area.update()
     
+    def _get_icon_completions(self, filter_text):
+        try:
+            from theme.fonts import font_icons
+        except ImportError:
+            return []
+            
+        results = []
+        for name in dir(font_icons):
+            if name.startswith("ICON_") and name != "ICON_FULL_LIST":
+                if filter_text and not name.lower().startswith(filter_text.lower()):
+                    continue
+                
+                val = getattr(font_icons, name)
+                if isinstance(val, str):
+                    # (name, type, signature, icon_char)
+                    results.append((name, 'icon', '', val))
+        
+        return sorted(results, key=lambda x: x[0])
+
     def _trigger_completion(self):
         """Trigger autocompletion at current cursor position."""
         if not self.completer.enabled:
@@ -1609,28 +1651,38 @@ class CodeEditor(QPlainTextEdit):
         
         current_word = text[word_start:pos_in_block]
         
-        # Get completions from Jedi with namespace support
-        source_code = self.toPlainText()
-        line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
-        column = pos_in_block
+        # Check for custom triggers
+        # Look at text before word_start
+        prefix_text = text[:word_start].rstrip()
         
-        completions = self.completer.get_completions(
-            source_code, line_num, column, self.project_file_path, 
-            namespace=self.custom_namespace
-        )
+        completions = []
+        
+        if prefix_text.endswith("ic.") or prefix_text.endswith("font_icons."):
+            completions = self._get_icon_completions(current_word)
         
         if not completions:
-            self.completion_popup.hide()
-            self._completion_active = False
-            return
-        
-        # Filter completions by current word
-        if current_word:
-            filtered = [
-                c for c in completions 
-                if c[0].lower().startswith(current_word.lower())
-            ]
-            completions = filtered if filtered else completions
+            # Get completions from Jedi with namespace support
+            source_code = self.toPlainText()
+            line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
+            column = pos_in_block
+            
+            completions = self.completer.get_completions(
+                source_code, line_num, column, self.project_file_path, 
+                namespace=self.custom_namespace
+            )
+            
+            if not completions:
+                self.completion_popup.hide()
+                self._completion_active = False
+                return
+            
+            # Filter completions by current word
+            if current_word:
+                filtered = [
+                    c for c in completions 
+                    if c[0].lower().startswith(current_word.lower())
+                ]
+                completions = filtered if filtered else completions
         
         if not completions:
             self.completion_popup.hide()
