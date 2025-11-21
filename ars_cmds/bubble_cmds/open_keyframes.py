@@ -61,9 +61,7 @@ def execute_plugin(ars_window):
         config2.callbackL = imgs_dict
 
         ctx2=open_context(
-            parent=ars_window.central_widget,
             items=items,
-            position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
             config=config2
         )
 
