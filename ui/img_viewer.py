@@ -70,7 +70,29 @@ class ImageViewer(QGraphicsView):
         factor = self.zoom_factor if event.angleDelta().y() > 0 else 1 / self.zoom_factor
         current_zoom = self.transform().m11()
         new_zoom = current_zoom * factor
+        
+        update_zoom = False
+        
         if self.min_zoom <= new_zoom <= self.max_zoom:
+            update_zoom = True
+        else:
+            # new_zoom is out of bounds
+            if current_zoom > self.max_zoom and factor < 1:
+                # Allow zooming out if we are above max zoom
+                update_zoom = True
+            elif current_zoom < self.min_zoom and factor > 1:
+                # Allow zooming in if we are below min zoom
+                update_zoom = True
+            elif self.min_zoom <= current_zoom <= self.max_zoom:
+                # If we were in range, but going out, clamp to the limit
+                if new_zoom > self.max_zoom:
+                    factor = self.max_zoom / current_zoom
+                    update_zoom = True
+                elif new_zoom < self.min_zoom:
+                    factor = self.min_zoom / current_zoom
+                    update_zoom = True
+
+        if update_zoom:
             self._user_interacted = True  # Mark as interacted
             cursor_pos = event.position()
             scene_pos = self.mapToScene(cursor_pos.toPoint())
