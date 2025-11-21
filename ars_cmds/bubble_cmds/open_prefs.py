@@ -16,13 +16,14 @@ def execute_plugin(ars_window):
 
     config.options = {
     "1": "ComfyUI Path",
-    "2": "Option 2",
+    "2": "Dev Mode",
     "3": "Option 3",
     }
+    config.toggle_values = { "2": (0,1,ars_window.prefs.dev_mode) }
 
     config.callbackL = {
     "1": edit_pref,
-    "2": read_pref,
+    "2": lambda value: setattr(ars_window.prefs, 'dev_mode', value),
     }
 
     ctx = open_context(config)

@@ -61,6 +61,7 @@ def r_dropdown(self, code_path = None):
         ic.ICON_CODE_TERMINAL: lambda: open_file(code_path),
     }
         
+    config.editable_items = {ic.ICON_CODE_TERMINAL: self.prefs.dev_mode}
 
 
     config.additional_texts = {

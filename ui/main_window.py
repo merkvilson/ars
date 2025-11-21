@@ -13,7 +13,7 @@ from hotkeys.hotkey_manager import HotkeyManager
 from ui.widgets.bubble_layout import FloatingBubblesManager
 from ui.widgets.cursor_follower import CursorFollowerWidget
 from ui.img_viewer import ImageViewerWidget
-
+from prefs.pref_controller import CprefsConfig
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,6 +29,8 @@ class MainWindow(QMainWindow):
 
         self._setup_ui()
         set_default_cursor("cursor")
+
+        self.prefs = CprefsConfig()
 
 
         #render data
