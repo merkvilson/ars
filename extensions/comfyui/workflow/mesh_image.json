@@ -108,6 +108,7 @@
     "inputs": {
       "ud_name": "",
       "category": "mesh",
+      "save_layers": false,
       "images": [
         "45",
         0
@@ -203,6 +204,7 @@
     "inputs": {
       "ud_name": "",
       "category": "steps",
+      "save_layers": false,
       "images": [
         "45",
         2
