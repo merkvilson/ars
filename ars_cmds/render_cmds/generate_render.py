@@ -15,7 +15,7 @@ def generate_render(self, ctx, max_steps, default_object):
     
     # Create a timer to apply the latest file every 100ms
     update_timer = QTimer()
-    final_attempts = {'count': 0}
+    final_attempts = {'count': 0, 'last_step': 0}
     
     def apply_latest_texture():
         steps_path = get_path("steps")
@@ -35,14 +35,30 @@ def generate_render(self, ctx, max_steps, default_object):
         current_step = len(full_paths)
         last_file = full_paths[-1]
         
-        file_to_apply = None
+        # Reset counter if new files appear
+        if current_step > final_attempts['last_step']:
+            final_attempts['last_step'] = current_step
+            final_attempts['count'] = 0
+
         stop_rendering = False
 
         if last_file.lower().endswith('.tiff'):
+            stop_rendering = True
+        elif type(default_object).__name__ == "CSprite":
+            if current_step >= max_steps + 1:
+                stop_rendering = True
+        else:
+            # Image Render: Wait for stability after reaching max steps
+            if current_step >= max_steps + 1:
+                final_attempts['count'] += 1
+                if final_attempts['count'] >= 20: # Wait ~2 seconds of silence
+                    stop_rendering = True
+
+        file_to_apply = None
+        if stop_rendering:
             valid_candidates = [p for p in full_paths if p.lower().endswith(('.png', '.jpg', '.jpeg'))]
             if valid_candidates:
                 file_to_apply = valid_candidates[-1]
-            stop_rendering = True
         else:
             if len(full_paths) >= 2:
                 file_to_apply = full_paths[-2]
@@ -57,9 +73,9 @@ def generate_render(self, ctx, max_steps, default_object):
                     
                     # Calculate alpha based on current step (0.1 to 0.99)
                     alpha = 0.1 + (0.89 * (current_step / (max_steps + 1)))
-                    default_object.set_alpha(alpha)
+                    default_object.set_alpha(min(alpha, 1.0))
                     
-                if stop_rendering or current_step >= max_steps + 1:
+                if stop_rendering:
                     default_object.cutout()
                     #print("finish")
                     update_timer.stop()
@@ -84,13 +100,6 @@ def generate_render(self, ctx, max_steps, default_object):
             if stop_rendering:
                 update_timer.stop()
                 return
-
-            if current_step >= max_steps + 2:
-                final_attempts['count'] += 1
-                if final_attempts['count'] >= 10:
-                    #print("finish")
-                    update_timer.stop()
-                    return
         
     # Start the timer
     update_timer.timeout.connect(apply_latest_texture)
