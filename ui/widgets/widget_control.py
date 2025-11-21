@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QColor, QBrush, QPen, QPixmap
+from PyQt6.QtGui import QColor, QBrush, QPen, QPixmap, QImageReader
 from PyQt6.QtWidgets import QGraphicsTextItem, QGraphicsItem
 from PyQt6.QtCore import Qt, QRectF
 
@@ -286,7 +286,18 @@ def set_updated_config(widget, key: str, value):
             widget.image_path = value
             widget.pixmap = None
             if value:
-                widget.pixmap = QPixmap(value)
+                if value.lower().endswith(('.tif', '.tiff')):
+                    reader = QImageReader(value)
+                    count = reader.imageCount()
+                    if count > 0:
+                        reader.jumpToImage(count - 1)
+                        image = reader.read()
+                        if not image.isNull():
+                            widget.pixmap = QPixmap.fromImage(image)
+
+                if widget.pixmap is None:
+                    widget.pixmap = QPixmap(value)
+
                 if widget.pixmap.isNull():
                     widget.pixmap = None
                     print(f"Warning: Failed to load image from {value}")

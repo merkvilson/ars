@@ -13,7 +13,8 @@ from PyQt6.QtGui import (
     QBrush,
     QFont,
     QPainterPath,
-    QPixmap,)
+    QPixmap,
+    QImageReader,)
 
 from PyQt6.QtCore import (
     Qt,
@@ -198,7 +199,18 @@ class BButton(QGraphicsObject):
         self.image_path = config.image_path  
         self.pixmap = None 
         if self.image_path:
-            self.pixmap = QPixmap(self.image_path) 
+            if self.image_path.lower().endswith(('.tif', '.tiff')):
+                reader = QImageReader(self.image_path)
+                count = reader.imageCount()
+                if count > 0:
+                    reader.jumpToImage(count - 1)
+                    image = reader.read()
+                    if not image.isNull():
+                        self.pixmap = QPixmap.fromImage(image)
+
+            if self.pixmap is None:
+                self.pixmap = QPixmap(self.image_path) 
+
             if self.pixmap.isNull():
                 self.pixmap = None
                 print(f"Warning: Failed to load image from '{self.image_path}'") 
