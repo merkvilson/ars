@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QStyledItemDelegate,
     QStyle,
+    QApplication,
 )    
 from ars_cmds.core_cmds.run_ext import run_string_code
     
@@ -1074,8 +1075,9 @@ class CodeEditor(QPlainTextEdit):
             is_delete = key == Qt.Key.Key_Delete
             is_enter = key in (Qt.Key.Key_Return, Qt.Key.Key_Enter)
             is_arrow = key in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down)
+            is_paste = (key == Qt.Key.Key_V and modifiers & Qt.KeyboardModifier.ControlModifier)
             
-            if is_typing or is_backspace or is_delete or is_enter or is_arrow:
+            if is_typing or is_backspace or is_delete or is_enter or is_arrow or is_paste:
                 # Collect all cursors
                 cursors = [self.textCursor()] + self.multi_cursors
                 # Sort descending
@@ -1085,6 +1087,11 @@ class CodeEditor(QPlainTextEdit):
                 
                 new_cursors = []
                 
+                # Pre-fetch clipboard text for paste
+                paste_text = ""
+                if is_paste:
+                    paste_text = QApplication.clipboard().text()
+
                 for c in cursors:
                     self.setTextCursor(c)
                     
@@ -1108,6 +1115,10 @@ class CodeEditor(QPlainTextEdit):
                         
                     elif is_enter:
                         self._handle_newline()
+                    
+                    elif is_paste:
+                        if paste_text:
+                            self.insertPlainText(paste_text)
                         
                     elif is_typing:
                         # Handle pair chars
