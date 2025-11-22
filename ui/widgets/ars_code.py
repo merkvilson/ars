@@ -1110,6 +1110,12 @@ class CodeEditor(QPlainTextEdit):
         if text and (text.isalnum() or text in ('_', '.')):
             # Continue showing/updating completions for valid identifier characters
             self._trigger_completion()
+        elif text == ' ':
+             # Trigger on space to support "from x " -> "import" and "import " -> members
+             self._trigger_completion()
+        elif text == ',':
+             # Trigger on comma to support "import x," -> members
+             self._trigger_completion()
         elif text and self._completion_active:
             # Hide completion for other printable characters
             self.completion_popup.hide()
@@ -1800,15 +1806,29 @@ class CodeEditor(QPlainTextEdit):
             completions = self._get_icon_completions(current_word)
         
         if not completions:
-            # Get completions from Jedi with namespace support
-            source_code = self.toPlainText()
-            line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
-            column = pos_in_block
+            # Optimization: If current_word is empty (e.g. after space/comma),
+            # only trigger Jedi in specific contexts to avoid performance hit on every space
+            should_trigger = True
+            if not current_word:
+                line_text = text[:pos_in_block]
+                # Check for "from ... " (expecting import)
+                # Check for "from ... import ... " (expecting members)
+                # Check for "import ... " (expecting modules)
+                # Check for comma in import statement
+                is_import_ctx = re.match(r"^\s*(from|import)\b", line_text)
+                if not is_import_ctx:
+                    should_trigger = False
             
-            completions = self.completer.get_completions(
-                source_code, line_num, column, self.project_file_path, 
-                namespace=self.custom_namespace
-            )
+            if should_trigger:
+                # Get completions from Jedi with namespace support
+                source_code = self.toPlainText()
+                line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
+                column = pos_in_block
+                
+                completions = self.completer.get_completions(
+                    source_code, line_num, column, self.project_file_path, 
+                    namespace=self.custom_namespace
+                )
             
             if not completions:
                 self.completion_popup.hide()
@@ -1890,6 +1910,11 @@ class CodeEditor(QPlainTextEdit):
             cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
             cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, word_start)
             cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.KeepAnchor, pos_in_block - word_start)
+            
+            # Add space if inserting directly after comma
+            if word_start > 0 and text[word_start - 1] == ',':
+                completion_text = " " + completion_text
+                
             cursor.insertText(completion_text)
         
         # Add parentheses for functions/methods if not in import
