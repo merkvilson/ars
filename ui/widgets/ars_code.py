@@ -3,7 +3,7 @@ import keyword
 import builtins
 import jedi
 
-from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal, QPoint
+from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal, QPoint, QEvent, QTimer
 from PyQt6.QtGui import (
     QColor,
     QTextCharFormat,
@@ -11,6 +11,7 @@ from PyQt6.QtGui import (
     QFont,
     QTextCursor,
     QPainter,
+    QPen,
 )
 from PyQt6.QtWidgets import (
     QWidget,
@@ -823,6 +824,7 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.custom_namespace = {}
         self.project_file_path = None
+        self.multi_cursors = []
         
         # Initialize icon mappings
         self.ICON_TO_NAME = {}
@@ -872,8 +874,78 @@ class CodeEditor(QPlainTextEdit):
             "selection-background-color: #3e4451;"
             "}"
         )
+        
+        # Install event filter on viewport to catch mouse events reliably
+        self.viewport().installEventFilter(self)
+        
+        # Multi-cursor blinking
+        self._cursor_blink_timer = QTimer(self)
+        self._cursor_blink_timer.setInterval(500)
+        self._cursor_blink_timer.timeout.connect(self._toggle_cursor_blink)
+        self._cursor_visible = True
 
+    def _toggle_cursor_blink(self):
+        self._cursor_visible = not self._cursor_visible
+        self.viewport().update()
 
+    def _update_multi_cursor_state(self):
+        if hasattr(self, 'multi_cursors') and self.multi_cursors:
+            if not self._cursor_blink_timer.isActive():
+                self._cursor_blink_timer.start()
+                self._cursor_visible = True
+                self.setCursorWidth(0) # Hide system cursor
+        else:
+            if self._cursor_blink_timer.isActive():
+                self._cursor_blink_timer.stop()
+            self.setCursorWidth(1) # Restore system cursor
+            self._cursor_visible = True # Ensure visible when reverting
+            self.viewport().update()
+
+    def eventFilter(self, obj, event):
+        if obj == self.viewport() and event.type() == QEvent.Type.MouseButtonPress:
+            print(f"DEBUG: eventFilter caught MouseButtonPress. Button: {event.button()}, Modifiers: {event.modifiers()}")
+            
+            if (event.modifiers() & Qt.KeyboardModifier.AltModifier and event.button() == Qt.MouseButton.LeftButton) or \
+               (event.button() == Qt.MouseButton.MiddleButton):
+                
+                print(f"DEBUG: Multi-cursor condition met in eventFilter at {event.pos()}")
+                self.setFocus()
+                
+                # Map viewport pos to cursor
+                cursor = self.cursorForPosition(event.pos())
+                main_cursor = self.textCursor()
+                
+                if not hasattr(self, 'multi_cursors'):
+                    self.multi_cursors = []
+                
+                if cursor.position() != main_cursor.position():
+                    found_idx = -1
+                    for i, c in enumerate(self.multi_cursors):
+                        if c.position() == cursor.position():
+                            found_idx = i
+                            break
+                    
+                    if found_idx != -1:
+                        print(f"DEBUG: Removing cursor at {found_idx}")
+                        self.multi_cursors.pop(found_idx)
+                    else:
+                        print(f"DEBUG: Adding cursor at {cursor.position()}")
+                        self.multi_cursors.append(cursor)
+                    
+                    self._update_multi_cursor_state()
+                    self.viewport().update()
+                
+                return True # Consume event
+            
+            if event.button() == Qt.MouseButton.LeftButton:
+                if hasattr(self, 'multi_cursors') and self.multi_cursors:
+                    print("DEBUG: Clearing multi cursors in eventFilter")
+                    self.multi_cursors.clear()
+                    self._update_multi_cursor_state()
+                    self.viewport().update()
+                    # Don't return True, let default handler process the click (move cursor)
+        
+        return super().eventFilter(obj, event)
 
     def set_alpha(self, alpha: float):
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
@@ -950,10 +1022,125 @@ class CodeEditor(QPlainTextEdit):
         with open(self.project_file_path, 'w', encoding='utf-8') as f:
             f.write(self.get_clean_code())
 
+    def mousePressEvent(self, event):
+        # Default handler is sufficient if eventFilter catches the special cases
+        # But we keep this for debugging or fallback
+        # print(f"DEBUG: mousePressEvent called. Button: {event.button()}")
+        super().mousePressEvent(event)
+
+    def viewportEvent(self, event):
+        result = super().viewportEvent(event)
+        if event.type() == QEvent.Type.Paint:
+            self._paint_multi_cursors()
+        return result
+
+    def _paint_multi_cursors(self):
+        if hasattr(self, 'multi_cursors') and self.multi_cursors:
+            if not self._cursor_visible:
+                return
+
+            painter = QPainter(self.viewport())
+            painter.setPen(QPen(QColor("#ffffff"), 2))
+            
+            offset = self.contentOffset()
+            offset_point = QPoint(int(offset.x()), int(offset.y()))
+            
+            # Draw extra cursors AND main cursor
+            cursors_to_draw = self.multi_cursors + [self.textCursor()]
+            
+            for c in cursors_to_draw:
+                rect = self.cursorRect(c)
+                # cursorRect returns content coordinates.
+                # We must translate by contentOffset to get viewport coordinates.
+                rect.translate(offset_point)
+                
+                # Ensure visible width
+                rect.setWidth(2)
+                
+                painter.drawLine(rect.topLeft(), rect.bottomLeft())
+            painter.end()
+
     def keyPressEvent(self, event):
+        # Reset blink timer on key press
+        if hasattr(self, 'multi_cursors') and self.multi_cursors:
+            self._cursor_visible = True
+            self._cursor_blink_timer.start()
+            self.viewport().update()
+
         key = event.key()
         text = event.text()
         modifiers = event.modifiers()
+
+        # Handle multi-cursor typing/deletion/navigation
+        if hasattr(self, 'multi_cursors') and self.multi_cursors:
+            # Check for supported keys
+            is_typing = text and (text.isprintable() or text == '\t') and not (modifiers & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier))
+            is_backspace = key == Qt.Key.Key_Backspace
+            is_delete = key == Qt.Key.Key_Delete
+            is_enter = key in (Qt.Key.Key_Return, Qt.Key.Key_Enter)
+            is_arrow = key in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down)
+            
+            if is_typing or is_backspace or is_delete or is_enter or is_arrow:
+                # Collect all cursors
+                cursors = [self.textCursor()] + self.multi_cursors
+                # Sort descending
+                cursors.sort(key=lambda c: c.position(), reverse=True)
+                
+                self.textCursor().beginEditBlock()
+                
+                new_cursors = []
+                
+                for c in cursors:
+                    self.setTextCursor(c)
+                    
+                    # Perform action
+                    if is_arrow:
+                        mode = QTextCursor.MoveMode.KeepAnchor if (modifiers & Qt.KeyboardModifier.ShiftModifier) else QTextCursor.MoveMode.MoveAnchor
+                        op = QTextCursor.MoveOperation.NoMove
+                        if key == Qt.Key.Key_Left: op = QTextCursor.MoveOperation.Left
+                        elif key == Qt.Key.Key_Right: op = QTextCursor.MoveOperation.Right
+                        elif key == Qt.Key.Key_Up: op = QTextCursor.MoveOperation.Up
+                        elif key == Qt.Key.Key_Down: op = QTextCursor.MoveOperation.Down
+                        
+                        self.moveCursor(op, mode)
+                        
+                    elif is_backspace:
+                        if not self._handle_smart_backspace():
+                            self.textCursor().deletePreviousChar()
+                            
+                    elif is_delete:
+                        self.textCursor().deleteChar()
+                        
+                    elif is_enter:
+                        self._handle_newline()
+                        
+                    elif is_typing:
+                        # Handle pair chars
+                        if not self._handle_pair_chars(text, modifiers):
+                            self.insertPlainText(text)
+                            
+                    new_cursors.append(self.textCursor())
+                
+                self.textCursor().endEditBlock()
+                
+                # Restore cursors
+                # new_cursors is sorted descending (bottom to top).
+                # So new_cursors[-1] is the top-most.
+                
+                self.setTextCursor(new_cursors[-1])
+                self.multi_cursors = new_cursors[:-1]
+                
+                self.viewport().update()
+                event.accept()
+                return
+            
+            # If unsupported key, clear multi cursors?
+            if key == Qt.Key.Key_Escape:
+                self.multi_cursors.clear()
+                self._update_multi_cursor_state()
+                self.viewport().update()
+                event.accept()
+                return
 
         
         # Handle completion popup navigation - ONLY specific keys when popup is visible
@@ -1796,7 +1983,7 @@ class CodeEditor(QPlainTextEdit):
             if not current_word:
                 line_text = text[:pos_in_block]
                 # Check for "from ... " (expecting import)
-                # Check for "from ... import ... " (expecting members)
+                # Check for "from ...import ... " (expecting members)
                 # Check for "import ... " (expecting modules)
                 # Check for comma in import statement
                 is_import_ctx = re.match(r"^\s*(from|import)\b", line_text)
@@ -1810,6 +1997,7 @@ class CodeEditor(QPlainTextEdit):
                 column = pos_in_block
                 
                 completions = self.completer.get_completions(
+
                     source_code, line_num, column, self.project_file_path, 
                     namespace=self.custom_namespace
                 )
@@ -1982,6 +2170,7 @@ class CodeEditor(QPlainTextEdit):
                 number = str(block_number + 1)
                 
                 # Check if this line is part of the selection
+               
                 block_start = block.position()
                 block_end = block_start + block.length()
                 is_selected = (block_start < selection_end and block_end > selection_start)
@@ -2035,4 +2224,33 @@ class CodeEditor(QPlainTextEdit):
         super().paintEvent(event)
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        if (event.modifiers() & Qt.KeyboardModifier.AltModifier and event.button() == Qt.MouseButton.LeftButton) or \
+           (event.button() == Qt.MouseButton.MiddleButton):
+            
+            new_cursor = self.cursorForPosition(event.pos())
+            main_cursor = self.textCursor()
+            
+            if new_cursor.position() != main_cursor.position():
+                # Check for overlap with existing extra cursors
+                found_idx = -1
+                for i, c in enumerate(self.multi_cursors):
+                    if c.position() == new_cursor.position():
+                        found_idx = i
+                        break
+                
+                if found_idx != -1:
+                    self.multi_cursors.pop(found_idx)
+                else:
+                    self.multi_cursors.append(new_cursor)
+                
+                self.viewport().update()
+            
+            event.accept()
+            return
+
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.multi_cursors.clear()
+            self.viewport().update()
+            
         super().mousePressEvent(event)
