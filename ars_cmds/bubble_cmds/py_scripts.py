@@ -83,7 +83,7 @@ def execute_plugin(ars_window):
     ic.ICON_CODE_TERMINAL,
     "   ",
     ic.ICON_SHADER_SMOOTH,
-    ic.ICON_CIRCLE_UP], 
+    ic.ICON_ARROW_BARS_V], 
     ["   ","PythonEditorWidget","   ",],
     "   "
     ]
@@ -95,10 +95,10 @@ def execute_plugin(ars_window):
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
     config.slider_values = {
     ic.ICON_SHADER_SMOOTH: (0,100,85), 
-    ic.ICON_CIRCLE_UP: (int(44*1.5),ars_window.height()-int(44*1.5)-20,int(ars_window.height() / 2.128))
+    ic.ICON_ARROW_BARS_V: (int(44*1.5),ars_window.height()-int(44*1.5)-20,int(ars_window.height() / 2.128))
     }
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_CIRCLE_UP: (-20,"y")}
-    config.slider_color = {ic.ICON_CIRCLE_UP: QColor(0,0,0,0)}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_ARROW_BARS_V: (-20,"y")}
+    config.slider_color = {ic.ICON_ARROW_BARS_V: QColor(0,0,0,0)}
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -126,10 +126,10 @@ def execute_plugin(ars_window):
         ic.ICON_FOLDER_OPEN:    lambda: open_file(os.path.join("ars_scripts", "user")),
 
         ic.ICON_PLAYER_PLAY:    lambda: code_editor.run_code(default_namespace_injection),
-        ic.ICON_SAVE:           lambda: code_editor.save_script(),
+        ic.ICON_SAVE:  lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL:  lambda: open_file(code_editor.project_file_path),
         ic.ICON_SHADER_SMOOTH:  lambda value: (code_editor.set_alpha(value/100.0),ctx.set_alpha(value/2550.0)),
-        ic.ICON_CIRCLE_UP:      lambda value: (
+        ic.ICON_ARROW_BARS_V:  lambda value: (
                                             ctx.resize_top(value), 
                                             code_editor.setFixedHeight(int(value-int(44*1.5))))
                         }
