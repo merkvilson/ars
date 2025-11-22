@@ -903,12 +903,10 @@ class CodeEditor(QPlainTextEdit):
 
     def eventFilter(self, obj, event):
         if obj == self.viewport() and event.type() == QEvent.Type.MouseButtonPress:
-            print(f"DEBUG: eventFilter caught MouseButtonPress. Button: {event.button()}, Modifiers: {event.modifiers()}")
             
             if (event.modifiers() & Qt.KeyboardModifier.AltModifier and event.button() == Qt.MouseButton.LeftButton) or \
                (event.button() == Qt.MouseButton.MiddleButton):
                 
-                print(f"DEBUG: Multi-cursor condition met in eventFilter at {event.pos()}")
                 self.setFocus()
                 
                 # Map viewport pos to cursor
@@ -926,10 +924,8 @@ class CodeEditor(QPlainTextEdit):
                             break
                     
                     if found_idx != -1:
-                        print(f"DEBUG: Removing cursor at {found_idx}")
                         self.multi_cursors.pop(found_idx)
                     else:
-                        print(f"DEBUG: Adding cursor at {cursor.position()}")
                         self.multi_cursors.append(cursor)
                     
                     self._update_multi_cursor_state()
@@ -939,7 +935,6 @@ class CodeEditor(QPlainTextEdit):
             
             if event.button() == Qt.MouseButton.LeftButton:
                 if hasattr(self, 'multi_cursors') and self.multi_cursors:
-                    print("DEBUG: Clearing multi cursors in eventFilter")
                     self.multi_cursors.clear()
                     self._update_multi_cursor_state()
                     self.viewport().update()
