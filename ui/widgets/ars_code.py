@@ -1,14 +1,7 @@
-import sys
 import re
 import keyword
 import builtins
-
-try:
-    import jedi
-    JEDI_AVAILABLE = True
-except ImportError:
-    JEDI_AVAILABLE = False
-    print("Warning: jedi not available. Autocompletion will be disabled.")
+import jedi
 
 from PyQt6.QtCore import QRegularExpression, Qt, QRect, QSize, QRectF, pyqtSignal, QPoint
 from PyQt6.QtGui import (
@@ -18,22 +11,15 @@ from PyQt6.QtGui import (
     QFont,
     QTextCursor,
     QPainter,
-    QPainterPath,
 )
 from PyQt6.QtWidgets import (
-    QApplication,
     QWidget,
     QPlainTextEdit,
     QVBoxLayout,
     QStyledItemDelegate,
     QStyle,
 )    
-try: 
-    from ars_cmds.core_cmds.run_ext import run_string_code
-    STANDALONE = False
-except ImportError:
-    print("executing py_code_editor.py in __main__ mode")
-    STANDALONE = True
+from ars_cmds.core_cmds.run_ext import run_string_code
     
 class PythonHighlighter(QSyntaxHighlighter):
     """
@@ -476,7 +462,7 @@ class JediCompleter:
     """Wrapper around Jedi for Python autocompletion."""
     
     def __init__(self):
-        self.enabled = JEDI_AVAILABLE
+        self.enabled = True
         self.namespace = {}
     
     def set_namespace(self, namespace_dict):
@@ -878,7 +864,8 @@ class CodeEditor(QPlainTextEdit):
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
-            f"background-color: rgba(40, 44, 52, {1.0 if STANDALONE else 0.55});"            "color: #abb2bf;"
+            f"background-color: rgba(40, 44, 52, 0.85);"
+            "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
             "selection-color: #ffffff;"
@@ -954,11 +941,8 @@ class CodeEditor(QPlainTextEdit):
         if namespace_injection is None: namespace_injection = self.custom_namespace
         # Use get_clean_code() instead of toPlainText()
         code = self.get_clean_code()
-        if not STANDALONE: run_string_code(code, namespace_injection)
-        else: 
-            try: exec(code)
-            except Exception as e:
-                print(f"Error executing code: {e}")
+        run_string_code(code, namespace_injection)
+
 
 
     def save_script(self):
@@ -2052,16 +2036,3 @@ class CodeEditor(QPlainTextEdit):
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
-
-
-if __name__ == "__main__":
-    import os
-    app = QApplication(sys.argv)
-    widget = CodeEditor()
-
-    with open(os.path.join("tests", "sample_editor_script.py"), 'r', encoding='utf-8') as f:
-        new_file = f.read()
-    widget.setPlainText(new_file)
-    widget.resize(1280, 720)
-    widget.show()
-    sys.exit(app.exec())
