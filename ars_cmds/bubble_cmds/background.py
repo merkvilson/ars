@@ -5,14 +5,21 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 
 
-def load_bg_image(ars_window, image_path = None):
-    if image_path == None:
-        image_path, _ = QFileDialog.getOpenFileName(None, "Select Background Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+def load_bg_image(ars_window, image_path=None):
+    if image_path is None:
+        image_path, _ = QFileDialog.getOpenFileName(
+            None,
+            "Select Background Image",
+            "",
+            "Image Files (*.png *.jpg *.jpeg *.bmp)",
+        )
     if image_path:
         ars_window.viewport.bg.set_image(image_path)
 
 
 BBL_RENDER_CONFIG = {"symbol": ic.ICON_BACKGROUND}
+
+
 def BBL_RENDER(*args):
     run_ext(__file__)
 
@@ -22,10 +29,8 @@ def execute_plugin(ars_window):
 
     config.options = {
         ic.ICON_IMAGE: "Change BG",
-        ic.ICON_BACKGROUND: "Remove BG",    
-        }
-
-
+        ic.ICON_BACKGROUND: "Remove BG",
+    }
 
     config.callbackL = {
         ic.ICON_IMAGE: lambda: load_bg_image(ars_window),
