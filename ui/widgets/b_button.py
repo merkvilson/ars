@@ -28,7 +28,7 @@ from PyQt6.QtCore import (
 
 
 from dataclasses import dataclass, field
-from typing import Optional, Callable, Tuple, Any
+from typing import Optional, Callable, Tuple, Any, Union, List
 
 
 import inspect
@@ -148,7 +148,7 @@ class BButtonConfig:
     hotkey_text: Optional[str] = None
     use_extended_shape: bool = False
     auto_close: bool = False
-    slider_values: Optional[Tuple[int, int, int]] = None
+    slider_values: Optional[Union[Tuple[int, int, int], List[int]]] = None
     slider_color: QColor = field(default_factory=lambda: colors.slider_color)
     toggle_values: Optional[Any] = None
     toggle_color: QColor = field(default_factory=lambda: colors.toggle_color)
@@ -227,7 +227,7 @@ class BButton(QGraphicsObject):
         self.radio_group = None
         
         # Handle slider_values with safety check
-        if isinstance(config.slider_values, tuple) and len(config.slider_values) >= 3:
+        if isinstance(config.slider_values, (tuple, list)) and len(config.slider_values) >= 3:
             self.slider_values = config.slider_values[:3]
             self._slider_value = config.slider_values[2]
         else:
