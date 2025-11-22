@@ -104,4 +104,14 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] Semi radial side menus ![alt text](image-1.png) ![alt text](image.png)
 
+- [ ] config.options should accept tuple of different types. str for name, list for slider values, lambda function for callbackL. (bool for enable/disable maybe?)
+
+- [ ] 
+
+- [ ] 
+
+- [ ] 
+
+- [ ] 
+
 - [ ] 
