@@ -103,8 +103,9 @@ def execute_plugin(ars_window):
         nonlocal current_code_file
         current_code_file = new_file
         with open(new_file, 'r', encoding='utf-8') as f:
-            new_file = f.read()
-        code_editor.setPlainText(new_file)
+            content = f.read()
+        code_editor.setPlainText(content)
+        code_editor.project_file_path = current_code_file
 
     default_namespace_injection = {
         'ars_window': ars_window,
