@@ -1022,6 +1022,9 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.line_number_area.update()
 
+    def get_font_size(self) -> int:
+        return self.font().pointSize()
+
     def save_script(self):
         # Use get_clean_code() instead of toPlainText()
         with open(self.project_file_path, 'w', encoding='utf-8') as f:
