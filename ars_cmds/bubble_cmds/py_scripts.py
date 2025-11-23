@@ -1,5 +1,5 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from ui.widgets.ars_code import CodeEditor
+from ui.ars_code.ars_code import CodeEditor
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.util_cmds.open_file import open_file
