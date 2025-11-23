@@ -103,10 +103,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     def swap_imge(self):
-        image_path = os.path.join(get_path('input'), "vp_screenshot.png")       
         if self.viewport.isVisible():
             def post_screenshot():
-                ctx.update_item(ic.ICON_IMAGE, "image_path", image_path)
+                ctx.update_item(ic.ICON_IMAGE, "image_path", os.path.join(get_path('input'), "vp_screenshot.png") )
                 files = os.listdir(get_path('steps')) 
                 full_paths = [os.path.join(get_path('steps'), f) for f in files]
                 if full_paths:
@@ -118,8 +117,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             make_screenshot(self, callback=post_screenshot, x=200, y=200, name="vp_screenshot.png")
         else:
             self.swap_widgets()
-            #if not self.viewport.isVisible() and hasattr(self, 'img') and self.img and get_path('last_step'):
-               # self.img.open_image(get_path('last_step'))
+            if get_path('last_step'):
+                ctx.update_item(ic.ICON_IMAGE, "image_path",get_path('last_step') )
 
 
 
