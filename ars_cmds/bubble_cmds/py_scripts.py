@@ -80,6 +80,7 @@ def execute_plugin(ars_window):
             ic.ICON_SAVE,
             ic.ICON_CODE_TERMINAL,
             "   ",
+            ic.ICON_TXT_SIZE,
             ic.ICON_SHADER_SMOOTH,
             ic.ICON_ARROW_BARS_V,
         ],
@@ -95,8 +96,9 @@ def execute_plugin(ars_window):
     config.slider_values = {
         ic.ICON_SHADER_SMOOTH: (0, 100, 85),
         ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, int(ars_window.height() / 2.128)),
+        ic.ICON_TXT_SIZE: (14,48,14),
     }
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_ARROW_BARS_V: (-20, "y")}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_ARROW_BARS_V: (-20, "y"),ic.ICON_TXT_SIZE: 1, }
     config.slider_color = {ic.ICON_ARROW_BARS_V: QColor(0, 0, 0, 0)}
 
     def read_code_file(new_file):
@@ -125,6 +127,7 @@ def execute_plugin(ars_window):
         ic.ICON_PLAYER_PLAY: lambda: code_editor.run_code(default_namespace_injection),
         ic.ICON_SAVE: lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL: lambda: open_file(code_editor.project_file_path),
+        ic.ICON_TXT_SIZE: lambda value: code_editor.set_font_size(value),
         ic.ICON_SHADER_SMOOTH: lambda value: (code_editor.set_alpha(value / 100.0), ctx.set_alpha(value / 2550.0)),
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
