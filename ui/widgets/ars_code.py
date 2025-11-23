@@ -1011,7 +1011,16 @@ class CodeEditor(QPlainTextEdit):
         code = self.get_clean_code()
         run_string_code(code, namespace_injection)
 
-
+    def set_font_size(self, size: int):
+        size = int(size)
+        font = self.font()
+        new_size = max(self.MIN_FONT_SIZE, min(self.MAX_FONT_SIZE, size))
+        font.setPointSize(new_size)
+        self.setFont(font)
+        self.document().setDefaultFont(font)
+        self.line_number_area.setFont(font)
+        self.update_line_number_area_width(0)
+        self.line_number_area.update()
 
     def save_script(self):
         # Use get_clean_code() instead of toPlainText()
