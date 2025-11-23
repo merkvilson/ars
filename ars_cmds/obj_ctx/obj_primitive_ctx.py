@@ -28,7 +28,7 @@ def obj_primitive_ctx(self, position, callback):
     size_x_objs = ["cube", "plane", ]
     size_y_objs = ["cube", "cylinder", "cone", ]
     size_z_objs = ["cube", "plane", ]
-    radius_objs = ["cylinder", "cone", "sphere", 'torus']
+    radius_objs = ["disc", "cylinder", "cone", "sphere", 'torus']
     radius_inner_objs = ["disc", 'torus', 'cylinder',]
     lod_objs = ["sphere", "cylinder", "cone", "disc", "torus"]
     angle_objs = ["sphere", ]
