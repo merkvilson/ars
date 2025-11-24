@@ -18,6 +18,7 @@ class Airen_Str:
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "output": ("STRING", {"multiline": True, "default": ""}),
+                "gui_expose": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -26,7 +27,7 @@ class Airen_Str:
     CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
-    def execute(self, ud_name, output):
+    def execute(self, ud_name, output, gui_expose):
         return (output,)
 
 class Airen_Int:
@@ -36,6 +37,7 @@ class Airen_Int:
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "output": ("INT", {"default": 0, "min": -999999, "max": 999999, "step": 1}),
+                "gui_expose": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -44,7 +46,7 @@ class Airen_Int:
     CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
-    def execute(self, ud_name, output):
+    def execute(self, ud_name, output, gui_expose):
         return (output,)
 
 class Airen_Float:
@@ -54,6 +56,7 @@ class Airen_Float:
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "output": ("FLOAT", {"default": 0, "min": -999999, "max": 999999, "step": 0.1}),
+                "gui_expose": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -62,7 +65,7 @@ class Airen_Float:
     CATEGORY = "Airen_Studio/User Data"
     OUTPUT_NODE = True
 
-    def execute(self, ud_name, output):
+    def execute(self, ud_name, output, gui_expose):
         return (output,)
     
 class Airen_Checkpoint:

@@ -100,7 +100,8 @@
   "25": {
     "inputs": {
       "ud_name": "steps",
-      "output": 20
+      "output": 20,
+      "gui_expose": false
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -111,7 +112,7 @@
     "inputs": {
       "ud_name": "",
       "category": "steps",
-      "save_layers": true,
+      "save_layers": false,
       "images": [
         "16",
         0
@@ -125,7 +126,8 @@
   "30": {
     "inputs": {
       "ud_name": "positive",
-      "output": ""
+      "output": "",
+      "gui_expose": false
     },
     "class_type": "Airen_Str",
     "_meta": {
@@ -135,7 +137,8 @@
   "33": {
     "inputs": {
       "ud_name": "seed",
-      "output": 5
+      "output": 5,
+      "gui_expose": false
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -209,7 +212,8 @@
   "43": {
     "inputs": {
       "ud_name": "denoise",
-      "output": 0.8
+      "output": 0.8,
+      "gui_expose": false
     },
     "class_type": "Airen_Float",
     "_meta": {
@@ -236,7 +240,8 @@
   "45": {
     "inputs": {
       "ud_name": "size",
-      "output": 512
+      "output": 512,
+      "gui_expose": false
     },
     "class_type": "Airen_Int",
     "_meta": {
