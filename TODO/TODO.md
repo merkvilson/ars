@@ -14,7 +14,7 @@ https://huggingface.co/dx8152/Qwen-Image-Edit-2509-Fusion
 https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 
 ## Easy TO DO
-- [x] set_workflow should be able to get only workflow name as well as full path
+- [✓] set_workflow should be able to get only workflow name as well as full path
 - [ ]
 - [ ] 
 
@@ -45,7 +45,7 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Save one extra image to prevent early image load
 - [ ] Middle click revert to default 
 - [ ] Implement prefs manager and config classes
-- [ ] 
+- [ ] BG image should generate upscaled image and set it to bg
 - [ ] 
 ## Medium Priority
 - [ ] Add material system for mesh objects
