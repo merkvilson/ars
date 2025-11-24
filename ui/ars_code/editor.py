@@ -583,6 +583,18 @@ class CodeEditor(QPlainTextEdit):
             self.setTextCursor(cursor)
             return True
 
+        # Special handling for 'def func(' -> 'def func():'
+        if text == "(":
+            block_text = cursor.block().text()
+            pos_in_block = cursor.positionInBlock()
+            text_before = block_text[:pos_in_block]
+            # Check if we are defining a function: "def something"
+            if re.search(r"\bdef\s+[a-zA-Z_][a-zA-Z0-9_]*\s*$", text_before):
+                cursor.insertText("():")
+                cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.MoveAnchor, 2)
+                self.setTextCursor(cursor)
+                return True
+
         cursor.insertText(f"{open_char}{close_char}")
         cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter)
         self.setTextCursor(cursor)
