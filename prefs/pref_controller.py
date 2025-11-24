@@ -36,39 +36,6 @@ class prefsConfig:
         self.timeline_prompt = "a beautiful landscape, high detail, 8k"
 
 
-        # Viewport
-        self.viewport_bgcolor = [39/255, 41/255, 45/255, 1] # stored as list for json compatibility
-
-        # Grid
-        self.grid_minor_step = 1.0
-        self.grid_subdivisions = 10
-        self.grid_visible_distance = 100.0
-        self.grid_fade_exponent = 0.4
-        self.grid_show_y_axis = True
-        self.grid_y_axis_length = 100.0
-
-        # Camera
-        self.camera_fov = 60
-        self.camera_scale_factor = 10.0
-        self.camera_center = [6, 3, 6]
-
-        # Render Defaults
-        self.default_steps = 25
-        self.default_seed = 0
-        self.default_prompt = "marble texture, high detail, 8k"
-
-        # Render Limits
-        self.render_min_steps = 1
-        self.render_max_steps = 50
-        self.render_resolution_min = 25
-        self.render_resolution_max = 1024
-        self.render_resolution_default = 512
-        self.screenshot_resolution = [200, 200]
-
-        # Paths & Resources
-        self.default_layout_path = os.path.join("saved_layouts", "bubble_layout.arsl")
-        self.default_workflow_path = os.path.join("extensions","comfyui","workflow", "render.json")
-        self.startup_sound = "startup3"
 
     def load(self):
         config_path = os.path.join("prefs", "config.json")
