@@ -1,5 +1,6 @@
 import re
-from PyQt6.QtCore import Qt, QSize, QPoint, QEvent, QTimer, QRect
+import os
+from PyQt6.QtCore import Qt, QSize, QPoint, QEvent, QTimer, QRect, pyqtSignal
 from PyQt6.QtGui import (
     QColor,
     QFont,
@@ -39,6 +40,8 @@ class CodeEditor(QPlainTextEdit):
     MIN_FONT_SIZE = 10
     MAX_FONT_SIZE = 48
     DEFAULT_FONT_SIZE = 14
+    
+    request_goto_definition = pyqtSignal(str, int, int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -131,6 +134,10 @@ class CodeEditor(QPlainTextEdit):
     def eventFilter(self, obj, event):
         if obj == self.viewport() and event.type() == QEvent.Type.MouseButtonPress:
             
+            if (event.modifiers() & Qt.KeyboardModifier.ControlModifier and event.button() == Qt.MouseButton.LeftButton):
+                self.goto_definition(event.pos())
+                return True
+
             if (event.modifiers() & Qt.KeyboardModifier.AltModifier and event.button() == Qt.MouseButton.LeftButton) or \
                (event.button() == Qt.MouseButton.MiddleButton):
                 
@@ -1503,3 +1510,37 @@ class CodeEditor(QPlainTextEdit):
             self.viewport().update()
             
         super().mousePressEvent(event)
+
+    def goto_definition(self, pos):
+        """Handle Go to Definition request."""
+        cursor = self.cursorForPosition(pos)
+        line = cursor.blockNumber() + 1
+        col = cursor.positionInBlock()
+        
+        def_info = self.completer.get_definition(
+            self.toPlainText(),
+            line,
+            col,
+            self.project_file_path
+        )
+        
+        if def_info and def_info['path']:
+            path = str(def_info['path'])
+            line = def_info['line']
+            col = def_info['column']
+            
+            # Check if it's the current file
+            is_current_file = False
+            if self.project_file_path:
+                try:
+                    is_current_file = os.path.abspath(path) == os.path.abspath(self.project_file_path)
+                except Exception:
+                    pass
+            
+            if is_current_file:
+                new_cursor = QTextCursor(self.document().findBlockByNumber(line - 1))
+                new_cursor.movePosition(QTextCursor.MoveOperation.Right, QTextCursor.MoveMode.MoveAnchor, col)
+                self.setTextCursor(new_cursor)
+                self.centerCursor()
+            else:
+                self.request_goto_definition.emit(path, line, col)

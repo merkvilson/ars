@@ -73,6 +73,30 @@ class JediCompleter:
         except Exception as e:
             # Silently fail - don't interrupt typing
             return []
+    
+    def get_definition(self, source_code, line, column, file_path=None):
+        """
+        Find the definition of the symbol at the given position.
+        """
+        if not self.enabled:
+            return None
+        
+        try:
+            script = jedi.Script(code=source_code, path=file_path)
+            definitions = script.goto(line=line, column=column)
+            
+            if not definitions:
+                return None
+            
+            # Return the first definition
+            d = definitions[0]
+            return {
+                'path': d.module_path,
+                'line': d.line,
+                'column': d.column
+            }
+        except Exception:
+            return None
 
 
 class CompletionDelegate(QStyledItemDelegate):
