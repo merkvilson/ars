@@ -1448,25 +1448,14 @@ class CodeEditor(QPlainTextEdit):
         pass
 
     def _show_icon_picker(self):
-        completions = self._get_icon_completions("")
-        if not completions:
-            return
-            
-        self.completion_popup.set_completions(completions)
+        """Insert 'ic.ICON_' and trigger completion."""
+        cursor = self.textCursor()
+        cursor.beginEditBlock()
+        cursor.insertText("ic.ICON_")
+        cursor.endEditBlock()
+        self.setTextCursor(cursor)
         
-        # Position popup
-        cursor_rect = self.cursorRect()
-        popup_pos = self.mapToGlobal(cursor_rect.bottomLeft())
-        
-        screen_geom = self.screen().availableGeometry()
-        if popup_pos.y() + self.completion_popup.height() > screen_geom.bottom():
-            popup_pos = self.mapToGlobal(cursor_rect.topLeft())
-            popup_pos.setY(popup_pos.y() - self.completion_popup.height())
-        
-        self.completion_popup.move(popup_pos)
-        self.completion_popup.show()
-        self.completion_popup.raise_()
-        self._completion_active = True
+        self._trigger_completion()
 
     def paintEvent(self, event):
         super().paintEvent(event)
