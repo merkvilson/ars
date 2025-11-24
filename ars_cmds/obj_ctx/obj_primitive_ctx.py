@@ -26,9 +26,9 @@ def obj_primitive_ctx(self, position, callback):
     objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus', ]
 
     size_x_objs = ["cube", "plane", ]
-    size_y_objs = ["cube", "cylinder", "cone", ]
-    size_z_objs = ["cube", "plane", ]
-    radius_objs = ["disc", "cylinder", "cone", "sphere", 'torus']
+    size_y_objs = ["cube", "plane", "cylinder", "cone", 'pyramid']
+    size_z_objs = ["cube", ]
+    radius_objs = ["disc", "cylinder", "cone", "sphere", 'torus', 'pyramid']
     radius_inner_objs = ["disc", 'torus', 'cylinder',]
     lod_objs = ["sphere", "cylinder", "cone", "disc", "torus"]
     angle_objs = ["sphere", ]
@@ -61,16 +61,16 @@ def obj_primitive_ctx(self, position, callback):
     }
 
     config.slider_values = {
-        ic.ICON_AXIS_X: (0.001,10,1),
-        ic.ICON_AXIS_Y: (0.001,10,1),
-        ic.ICON_AXIS_Z: (0.001,10,1),
-        ic.ICON_RADIUS: (0.001,10,1),
+        ic.ICON_AXIS_X: (0.001,999,2),
+        ic.ICON_AXIS_Y: (0.001,999,2),
+        ic.ICON_AXIS_Z: (0.001,999,2),
+        ic.ICON_RADIUS: (0.001,999,2),
         ic.ICON_RADIUS_INNER: (0.001,10,0),
         ic.ICON_LOD3: (1,50,30),
         ic.ICON_ANGLE: (0,360,360),
         }
     
-    config.incremental_value = True
+    config.incremental_value = 1
 
     # config.incremental_values = {
     # ic.ICON_AXIS_X:1,
