@@ -108,6 +108,8 @@ class CompletionDelegate(QStyledItemDelegate):
         # Draw background
         if option.state & QStyle.StateFlag.State_Selected:
             painter.fillRect(option.rect, QColor("#3e4451"))
+        elif option.state & QStyle.StateFlag.State_MouseOver:
+            painter.fillRect(option.rect, QColor("#2c313c"))
         else:
             painter.fillRect(option.rect, QColor("#1e2127"))
 
@@ -194,6 +196,7 @@ class CompletionPopup(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         
         self.list_widget = QListWidget()
+        self.list_widget.setMouseTracking(True)
         self.list_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list_widget.itemClicked.connect(self._on_item_clicked)
@@ -235,7 +238,9 @@ class CompletionPopup(QWidget):
     
     def set_editor_font(self, font):
         """Update the font to match the editor."""
-        self.list_widget.setFont(font)
+        fixed_font = QFont(font)
+        fixed_font.setPointSize(14)
+        self.list_widget.setFont(fixed_font)
     
     def set_completions(self, completions):
         """
