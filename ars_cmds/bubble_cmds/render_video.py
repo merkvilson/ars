@@ -294,11 +294,11 @@ def execute_plugin(ars_window):
 
     config.callbackL = {
         "timeline": lambda val: set_img_by_index(val),
-        ic.ICON_RENDER: lambda: start_render(),
-
+        ic.ICON_RENDER: lambda: (
+        ars_window.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+        start_render()),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
-
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
         }
 
