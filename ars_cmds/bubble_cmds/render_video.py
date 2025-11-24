@@ -108,6 +108,8 @@ def execute_plugin(ars_window):
     config.extra_distance = [0,99999]
     config.distribution_mode = "x"
     config.custom_height = 110
+    config.incremental_value = True
+    config.incremental_values = {"timeline": False,}
     #config.custom_width = 450
 
 
@@ -116,6 +118,7 @@ def execute_plugin(ars_window):
         [
         "   ", 
         ic.ICON_RENDER, 
+        ic.ICON_GIZMO_SCALE,
         "   ",
         #ic.ICON_PLAYER_TRACK_BACK,
         ic.ICON_PLAYER_SKIP_BACK, 
@@ -131,11 +134,9 @@ def execute_plugin(ars_window):
     
 
     config.slider_values = {
-        "timeline": (0, 100, 50),
-        ic.ICON_SPEED_UP: (1, 60, 30),
-    }
-    config.incremental_values = {
-        ic.ICON_SPEED_UP: 1,
+        "timeline": (0, 100, ars_window.prefs.timeline_frame),
+        ic.ICON_GIZMO_SCALE: (25, 1024, ars_window.prefs.timeline_resolution),
+        ic.ICON_SPEED_UP: (1, 60, ars_window.prefs.timeline_fps),
     }
     config.per_item_radius = { "timeline": 20,}
 
@@ -293,13 +294,18 @@ def execute_plugin(ars_window):
         ctx.update_item("timeline", "progress", frame - 1)
 
     config.callbackL = {
-        "timeline": lambda val: set_img_by_index(val),
+        "timeline": lambda val:( 
+            set_img_by_index(val), 
+            setattr(ars_window.prefs, 'timeline_frame', int(val)),
+            ),
         ic.ICON_RENDER: lambda: (
-        ars_window.render_manager.set_workflow("video"),
-        start_render()),
+            ars_window.render_manager.set_workflow("video"),
+            start_render()),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
+        ic.ICON_SPEED_UP: lambda val: setattr(ars_window.prefs, 'timeline_fps', int(val)),
+        ic.ICON_GIZMO_SCALE: lambda val: setattr(ars_window.prefs, 'timeline_resolution', int(val)),
         }
 
 

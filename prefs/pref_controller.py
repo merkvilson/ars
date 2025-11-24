@@ -27,6 +27,11 @@ class prefsConfig:
         self.code_editor_height = 300
         self.code_editor_font_size = 14
 
+        # Timeline
+        self.timeline_frame = 10
+        self.timeline_fps = 30
+        self.timeline_resolution = 512
+
         # Viewport
         self.viewport_bgcolor = [39/255, 41/255, 45/255, 1] # stored as list for json compatibility
 
