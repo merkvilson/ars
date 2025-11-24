@@ -5,7 +5,8 @@ from ars_3d_engine.mesh_objects.scene_objects import CGeometry
 
 class CPoint(CGeometry):
 
-    def __init__(self):
+    def __init__(self, visual, name="Point"):
+        super().__init__(visual, name)
         self.symbol = '•'  # Default symbol for point
 
     @classmethod
