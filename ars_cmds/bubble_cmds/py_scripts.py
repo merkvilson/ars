@@ -63,7 +63,11 @@ def execute_plugin(ars_window):
     config.close_on_outside = False
     # config.expand = "x"
     config.distribution_mode = "x"
-    config.custom_height = int(ars_window.height() / 2.128)
+    if hasattr(ars_window, '_code_editor_height'):
+        config.custom_height = ars_window._code_editor_height
+    else:
+        config.custom_height = int(ars_window.height() / 2.128)
+        ars_window._code_editor_height = config.custom_height
     config.custom_width = ars_window.width()
     config.extra_distance = [0, 99999]
 
@@ -132,6 +136,7 @@ def execute_plugin(ars_window):
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
             code_editor.setFixedHeight(int(value - int(44 * 1.5))),
+            setattr(ars_window, '_code_editor_height', int(value))
         ),
     }
 
