@@ -13,6 +13,10 @@ https://www.facebook.com/reel/809604318718913
 https://huggingface.co/dx8152/Qwen-Image-Edit-2509-Fusion
 https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 
+## Easy TO DO
+- [x] set_workflow should be able to get only workflow name as well as full path
+- [ ]
+- [ ] 
 
 ## Code Editor
 - [✓] Auto Completion
@@ -33,6 +37,8 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] 
 
 ## High Priority
+- [ ] CUI workflow to CTX
+- [ ] 
 - [✓] Uniform scale
 - [ ] Add undo/redo functionality
 - [ ] Optimize render pipeline performance
@@ -40,8 +46,7 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 - [ ] Middle click revert to default 
 - [ ] Implement prefs manager and config classes
 - [ ] 
-
-
+- [ ] 
 ## Medium Priority
 - [ ] Add material system for mesh objects
 - [ ] Implement scene save/load functionality
