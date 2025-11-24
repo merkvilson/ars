@@ -1231,7 +1231,11 @@ class CodeEditor(QPlainTextEdit):
                 # Check for "import ... " (expecting modules)
                 # Check for comma in import statement
                 is_import_ctx = re.match(r"^\s*(from|import)\b", line_text)
-                if not is_import_ctx:
+                
+                # Also trigger if the last character is a dot (member access)
+                is_dot_trigger = line_text.rstrip().endswith('.')
+                
+                if not is_import_ctx and not is_dot_trigger:
                     should_trigger = False
             
             if should_trigger:
