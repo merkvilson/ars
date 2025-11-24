@@ -272,7 +272,7 @@ def execute_plugin(ars_window):
 
     
     def start_render():
-        ars_window.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+        ars_window.render_manager.set_workflow("video"),
 
         
         delete_all_files_in_folder( get_path('frames') )
@@ -295,7 +295,7 @@ def execute_plugin(ars_window):
     config.callbackL = {
         "timeline": lambda val: set_img_by_index(val),
         ic.ICON_RENDER: lambda: (
-        ars_window.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+        ars_window.render_manager.set_workflow("video"),
         start_render()),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),

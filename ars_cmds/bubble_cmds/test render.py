@@ -24,11 +24,11 @@ def execute_plugin(self):
 
     config.callbackL = {
                         "0": lambda: print(self.render_manager.workflow_name),
-                        "1": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh.json")),
-                        "2": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
-                        "3": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "mesh_image.json")),
-                        "4": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
-                        "5": lambda: self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "video.json")),
+                        "1": lambda: self.render_manager.set_workflow("mesh"),
+                        "2": lambda: self.render_manager.set_workflow("render"),
+                        "3": lambda: self.render_manager.set_workflow("mesh_image"),
+                        "4": lambda: self.render_manager.set_workflow("sprite"),
+                        "5": lambda: self.render_manager.set_workflow("video"),
                         "6": lambda: self.render_manager.send_render(),
                         }
 

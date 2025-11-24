@@ -18,10 +18,15 @@ class RenderDataManager(QObject):
             with open(default_workflow_path, 'r', encoding='utf-8') as f:
                 self.workflow_template = json.load(f)
 
-    def set_workflow(self, workflow_json):
-        with open(workflow_json, 'r', encoding='utf-8') as f:
+    def set_workflow(self, workflow):
+        if not os.path.exists(workflow):
+            workflow = os.path.join("extensions", "comfyui", "workflow", f"{workflow}.json")
+        if not os.path.exists(workflow):
+            print(f"Workflow file '{workflow}' not found.")
+            return
+        with open(workflow, 'r', encoding='utf-8') as f:
             self.workflow_template = json.load(f)
-            self.workflow_name = os.path.splitext(os.path.basename(workflow_json))[0]
+            self.workflow_name = os.path.splitext(os.path.basename(workflow))[0]
  
     def set_userdata(self, key, value):
         for _, node in self.workflow_template.items():

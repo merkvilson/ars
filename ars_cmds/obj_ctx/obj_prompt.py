@@ -71,15 +71,15 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
         if type(default_object).__name__ == "CSprite":
             default_object.revert_cutout()
-            self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "sprite.json")),
+            self.render_manager.set_workflow("sprite"),
         
         elif type(default_object).__name__ == "CPoint":
-            self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "bg.json")),
+            self.render_manager.set_workflow("bg"),
             
         else:
             save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
             save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-            self.render_manager.set_workflow(os.path.join("extensions","comfyui","workflow", "render.json")),
+            self.render_manager.set_workflow("render"),
 
         self.render_manager.set_userdata("seed", default_object.seed)
         self.render_manager.set_userdata("steps", int(ctx.get_value(ic.ICON_STEPS))),
