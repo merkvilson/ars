@@ -27,7 +27,13 @@ class prefsConfig:
         self.code_editor_height = 300
         self.code_editor_font_size = 14
 
-        # Timeline
+        # Render Image
+        self.render_resolution = 512
+        self.render_steps = 20
+        self.render_seed = 12345
+        self.render_prompt = "a beautiful landscape, high detail, 8k"
+
+        # Timeline / Render Video
         self.timeline_frame = 10
         self.timeline_fps = 30
         self.timeline_resolution = 512
