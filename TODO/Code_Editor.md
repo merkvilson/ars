@@ -2,7 +2,7 @@
 
 - [✓] Auto Completion
 - [ ] Ctrl+F Find / Search
-- [ ] Multi cursor placement
+- [80%] Multi cursor placement
 - [✓] Tab key adds ( ) signs when auto completing functions. 
 - [ ] Auto Complete def something with ( ): after opening first bracket 
 - [ ] Ctrl+Shift+A find all selected

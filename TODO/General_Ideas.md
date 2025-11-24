@@ -42,8 +42,3 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 - [ ] 
 
 - [ ] 
-
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
