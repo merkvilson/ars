@@ -8,13 +8,8 @@ def BBL_TEST(*arg):
 
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
-    config.auto_close = False
-    config.close_on_outside = False
     config.options = {
         ic.ICON_TEST: "Option A",
         ic.ICON_TEST2: "Option B",
         ic.ICON_TEST3: "Option C",}
-    
-
-
     ctx = open_context(config)
