@@ -22,9 +22,14 @@ class prefsConfig:
     def __init__(self):
         self.dev_mode = True 
 
+        # Code Editor
+        self.code_editor_alpha = 85
+        self.code_editor_height = 300
+        self.code_editor_font_size = 14
+
         # Viewport
         self.viewport_bgcolor = [39/255, 41/255, 45/255, 1] # stored as list for json compatibility
-        
+
         # Grid
         self.grid_minor_step = 1.0
         self.grid_subdivisions = 10

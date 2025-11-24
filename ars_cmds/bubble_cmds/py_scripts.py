@@ -63,11 +63,7 @@ def execute_plugin(ars_window):
     config.close_on_outside = False
     # config.expand = "x"
     config.distribution_mode = "x"
-    if hasattr(ars_window, '_code_editor_height'):
-        config.custom_height = ars_window._code_editor_height
-    else:
-        config.custom_height = int(ars_window.height() / 2.128)
-        ars_window._code_editor_height = config.custom_height
+    config.custom_height = ars_window.prefs.code_editor_height
     config.custom_width = ars_window.width()
     config.extra_distance = [0, 99999]
 
@@ -98,9 +94,9 @@ def execute_plugin(ars_window):
 
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
     config.slider_values = {
-        ic.ICON_SHADER_SMOOTH: (0, 100, 85),
-        ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, config.custom_height),
-        ic.ICON_TXT_SIZE: (10,48,code_editor.get_font_size()),
+        ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha),
+        ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, ars_window.prefs.code_editor_height),
+        ic.ICON_TXT_SIZE: (10,48,ars_window.prefs.code_editor_font_size),
     }
     config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_ARROW_BARS_V: (-20, "y"),ic.ICON_TXT_SIZE: 1, }
     config.slider_color = {ic.ICON_ARROW_BARS_V: QColor(0, 0, 0, 0)}
@@ -124,6 +120,8 @@ def execute_plugin(ars_window):
 
     code_editor.custom_namespace = default_namespace_injection
     code_editor.project_file_path = current_code_file
+    code_editor.set_font_size(ars_window.prefs.code_editor_font_size)
+    code_editor.set_alpha(ars_window.prefs.code_editor_alpha)
 
     config.callbackL = {
         ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
@@ -131,13 +129,20 @@ def execute_plugin(ars_window):
         ic.ICON_PLAYER_PLAY: lambda: code_editor.run_code(default_namespace_injection),
         ic.ICON_SAVE: lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL: lambda: open_file(code_editor.project_file_path),
-        ic.ICON_TXT_SIZE: lambda value: code_editor.set_font_size(value),
-        ic.ICON_SHADER_SMOOTH: lambda value: (code_editor.set_alpha(value / 100.0), ctx.set_alpha(value / 2550.0)),
+        ic.ICON_TXT_SIZE: lambda value: (
+            code_editor.set_font_size(value) ,
+            setattr(ars_window.prefs, 'code_editor_font_size', value),
+            ),
+        ic.ICON_SHADER_SMOOTH: lambda value: (
+            ctx.set_alpha(value / 2550.0),
+            code_editor.set_alpha(value / 100.0), 
+            setattr(ars_window.prefs, 'code_editor_alpha', value),
+            ),
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
             code_editor.setFixedHeight(int(value - int(44 * 1.5))),
-            setattr(ars_window, '_code_editor_height', int(value))
-        ),
+            setattr(ars_window.prefs, 'code_editor_height', int(value)),
+            ),
     }
 
     ctx = open_context(
