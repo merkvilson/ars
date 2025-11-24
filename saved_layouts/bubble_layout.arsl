@@ -2,12 +2,17 @@
     "bubbles": [
         {
             "symbol": "\ue94f",
-            "grid_x": 23,
+            "grid_x": 18,
             "grid_y": 0
         },
         {
             "symbol": "\ue976",
             "grid_x": 11,
+            "grid_y": 0
+        },
+        {
+            "symbol": "\ue9bb",
+            "grid_x": 23,
             "grid_y": 0
         },
         {
