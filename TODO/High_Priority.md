@@ -1,7 +1,7 @@
 # High Priority
 
 - [ ] CUI workflow to CTX
-- [ ] 
+- [ ] CUI Workflof: Checkbox to expose value in gui
 - [✓] Uniform scale
 - [ ] Add undo/redo functionality
 - [ ] Optimize render pipeline performance
