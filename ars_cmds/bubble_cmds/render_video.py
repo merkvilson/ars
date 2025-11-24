@@ -118,6 +118,7 @@ def execute_plugin(ars_window):
         [
         "   ", 
         ic.ICON_RENDER, 
+        ic.ICON_STEPS,
         ic.ICON_GIZMO_SCALE,
         "   ",
         #ic.ICON_PLAYER_TRACK_BACK,
@@ -137,6 +138,7 @@ def execute_plugin(ars_window):
         "timeline": (0, 100, ars_window.prefs.timeline_frame),
         ic.ICON_GIZMO_SCALE: (25, 1024, ars_window.prefs.timeline_resolution),
         ic.ICON_SPEED_UP: (1, 60, ars_window.prefs.timeline_fps),
+        ic.ICON_STEPS: (1, 50, ars_window.prefs.timeline_steps),
     }
     config.per_item_radius = { "timeline": 20,}
 
@@ -273,8 +275,10 @@ def execute_plugin(ars_window):
 
     
     def start_render():
-        ars_window.render_manager.set_workflow("video"),
-
+        ars_window.render_manager.set_workflow("video")
+        ars_window.render_manager.set_userdata('steps', ctx.get_value(ic.ICON_STEPS))
+        ars_window.render_manager.set_userdata('start-stop', int(ctx.get_value(ic.ICON_STEPS)/2))
+        ars_window.render_manager.set_userdata('size', ctx.get_value(ic.ICON_GIZMO_SCALE))
         
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
@@ -299,13 +303,14 @@ def execute_plugin(ars_window):
             setattr(ars_window.prefs, 'timeline_frame', int(val)),
             ),
         ic.ICON_RENDER: lambda: (
-            ars_window.render_manager.set_workflow("video"),
+
             start_render()),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
         ic.ICON_SPEED_UP: lambda val: setattr(ars_window.prefs, 'timeline_fps', int(val)),
         ic.ICON_GIZMO_SCALE: lambda val: setattr(ars_window.prefs, 'timeline_resolution', int(val)),
+        ic.ICON_STEPS: lambda val: setattr(ars_window.prefs, 'timeline_steps', int(val)),
         }
 
 

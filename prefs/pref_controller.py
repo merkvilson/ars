@@ -31,6 +31,10 @@ class prefsConfig:
         self.timeline_frame = 10
         self.timeline_fps = 30
         self.timeline_resolution = 512
+        self.timeline_steps = 4
+        self.timeline_seed = 0
+        self.timeline_prompt = "a beautiful landscape, high detail, 8k"
+
 
         # Viewport
         self.viewport_bgcolor = [39/255, 41/255, 45/255, 1] # stored as list for json compatibility
