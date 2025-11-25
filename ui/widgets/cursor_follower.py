@@ -9,7 +9,8 @@ class CursorFollowerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
         # Layout with only QGraphicsView
         from PyQt6.QtWidgets import QVBoxLayout
         self.layout = QVBoxLayout(self)
