@@ -1,3 +1,6 @@
+"""
+This module provides a screen color picker widget.
+"""
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt, QPointF, QTimer, QEasingCurve
@@ -7,6 +10,15 @@ import time
 
 
 class ScreenshotOverlay(QWidget):
+    """
+    A full-screen overlay widget for picking colors from a screenshot.
+    
+    Features:
+    - Zooming and panning.
+    - Virtual cursor for precise selection.
+    - Color preview.
+    - Animated zoom out on selection.
+    """
     def __init__(self, screenshot,  paretn_callback):
         super().__init__()
         self.screenshot = screenshot
@@ -60,6 +72,9 @@ class ScreenshotOverlay(QWidget):
         self.virtual_cursor_pos = QPointF(cursor_pos.x(), cursor_pos.y())
         
     def paintEvent(self, event):
+        """
+        Paint event handler. Draws the screenshot, virtual cursor, and color indicator.
+        """
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
         
@@ -96,13 +111,20 @@ class ScreenshotOverlay(QWidget):
             painter.drawEllipse(int(circle_x), int(circle_y), circle_size, circle_size)
     
     def mouseMoveEvent(self, event):
+        """
+        Handles mouse move events to initialize the virtual cursor position.
+        """
         # Update virtual cursor position based on mouse movement
         if self.virtual_cursor_pos is None:
             self.virtual_cursor_pos = QPointF(event.pos())
         self.update()
     
     def update_animation(self):
-        """Update zoom out animation"""
+        """
+        Updates the zoom-out animation state.
+        
+        Called by the animation timer. Closes the widget when animation finishes.
+        """
         if not self.is_animating:
             return
         
@@ -139,7 +161,12 @@ class ScreenshotOverlay(QWidget):
             self.close()
     
     def check_mouse_movement(self):
-        """Check actual global mouse position for continuous movement tracking"""
+        """
+        Checks the actual global mouse position for continuous movement tracking.
+        
+        Updates the virtual cursor position, handles panning when zoomed,
+        and recenters the real cursor if it hits the screen edges.
+        """
         # Skip mouse tracking during animation
         if self.is_animating:
             return
@@ -212,7 +239,9 @@ class ScreenshotOverlay(QWidget):
             self.last_global_pos = current_global
         
     def wheelEvent(self, event):
-        """Handle mouse wheel for zooming at virtual cursor position"""
+        """
+        Handles mouse wheel events to zoom in/out at the virtual cursor position.
+        """
         if not self.virtual_cursor_pos:
             return
             
@@ -242,6 +271,12 @@ class ScreenshotOverlay(QWidget):
         self.update()
     
     def mousePressEvent(self, event):
+        """
+        Handles mouse press events.
+        
+        Left click: Picks the color and starts the finish animation.
+        Right click: Cancels and closes the picker.
+        """
         if event.button() == Qt.MouseButton.LeftButton:
             # Transform virtual cursor position to image coordinates
             screen_x = (self.virtual_cursor_pos.x() - self.offset_x) / self.zoom_level
@@ -273,13 +308,18 @@ class ScreenshotOverlay(QWidget):
             self.close()
             
     def keyPressEvent(self, event):
+        """
+        Handles key press events. Escape key closes the picker.
+        """
         if event.key() == Qt.Key.Key_Escape:
             self.mouse_timer.stop()
             set_cursor("cursor")  # Restore cursor visibility
             self.close()
     
     def closeEvent(self, event):
-        """Ensure timers are stopped and cursor is restored when window closes"""
+        """
+        Handles the close event. Ensures timers are stopped and cursor is restored.
+        """
         self.mouse_timer.stop()
         self.animation_timer.stop()
         set_cursor("cursor")  # Restore cursor visibility

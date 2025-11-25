@@ -1,3 +1,6 @@
+"""
+This module provides functionality for rendering and playing back video sequences.
+"""
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -14,9 +17,22 @@ from collections import Counter
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
+    """
+    Entry point for the video bubble command.
+    Runs the current file as an extension.
+    """
     run_ext(__file__)
 
 def execute_plugin(ars_window):
+    """
+    Executes the video player/renderer plugin.
+    
+    Sets up the context menu for video control, including timeline, playback controls,
+    and rendering options. Handles image sequence loading and caching.
+    
+    Args:
+        ars_window: The main application window instance.
+    """
     
     # Timer and state for play_video
     if not hasattr(ars_window, '_loop_timer'):
@@ -27,12 +43,32 @@ def execute_plugin(ars_window):
         ars_window._last_source_type = None
 
     def check_source_changed(new_type):
+        """
+        Checks if the video source type has changed.
+        
+        Args:
+            new_type: The new source type identifier.
+            
+        Returns:
+            bool: True if the source type changed, False otherwise.
+        """
         if ars_window._last_source_type != new_type:
             ars_window._last_source_type = new_type
             return True
         return False
 
     def get_valid_layers(tiff_path):
+        """
+        Extracts valid layer indices from a multi-page TIFF file.
+        
+        Identifies layers with the most common size to ensure consistency.
+        
+        Args:
+            tiff_path (str): Path to the TIFF file.
+            
+        Returns:
+            list: A list of valid layer indices.
+        """
         try:
             img = Image.open(tiff_path)
         except:
@@ -55,6 +91,15 @@ def execute_plugin(ars_window):
         return valid_layers
 
     def get_cached_sequence():
+        """
+        Retrieves the cached image sequence or generates a new one.
+        
+        Prioritizes file-based sequences (video_frames/frames) over TIFF sequences.
+        Caches TIFF sequences based on file modification times.
+        
+        Returns:
+            list or None: A list of (path, layer) tuples for the sequence, or None if using file mode.
+        """
         # Check for files first
         v_frames = get_path("video_frames")
         frames = get_path("frames")
@@ -144,6 +189,14 @@ def execute_plugin(ars_window):
 
 
     def pause_video():
+        """
+        Pauses video playback.
+        
+        Stops the loop timer and updates the play/pause icon.
+        
+        Returns:
+            bool: True if video was paused, False otherwise.
+        """
         # Stop existing timer if running
         if ars_window._loop_timer is not None:
             ars_window._loop_timer.stop()
@@ -157,6 +210,14 @@ def execute_plugin(ars_window):
 
 
     def set_img_by_index(val):
+        """
+        Sets the current image based on a timeline value (0-100).
+        
+        Pauses playback and updates the displayed image.
+        
+        Args:
+            val (float): The timeline value (0-100).
+        """
         # Stop existing timer if running
         pause_video()
         
@@ -192,6 +253,11 @@ def execute_plugin(ars_window):
     ars_window._loop_index = 0
 
     def play_video():
+        """
+        Toggles video playback.
+        
+        Starts or stops the playback timer. Handles frame updates and FPS adjustments.
+        """
 
         if pause_video(): return
 
@@ -201,6 +267,11 @@ def execute_plugin(ars_window):
         
         
         def frame_next():
+            """
+            Advances to the next frame in the sequence.
+            
+            Updates the displayed image and timeline progress.
+            """
             sequence = get_cached_sequence()
             
             if sequence:
@@ -275,6 +346,12 @@ def execute_plugin(ars_window):
 
     
     def start_render():
+        """
+        Initiates the video rendering process.
+        
+        Sets up the render manager, clears old frames, sends the render request,
+        and starts playback.
+        """
         ars_window.render_manager.set_workflow("video")
         ars_window.render_manager.set_userdata('steps', ctx.get_value(ic.ICON_STEPS))
         ars_window.render_manager.set_userdata('start-stop', int(ctx.get_value(ic.ICON_STEPS)/2))
@@ -288,11 +365,13 @@ def execute_plugin(ars_window):
         play_video()
 
     def frame_next():
+        """Advances the timeline by one frame."""
         frame = ctx.get_value("timeline")
         set_img_by_index(frame + 1)
         ctx.update_item("timeline", "progress", frame + 1)
 
     def frame_back():
+        """Moves the timeline back by one frame."""
         frame = ctx.get_value("timeline")
         set_img_by_index(frame - 1)
         ctx.update_item("timeline", "progress", frame - 1)

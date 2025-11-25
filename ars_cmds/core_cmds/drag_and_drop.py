@@ -1,3 +1,9 @@
+"""
+Handles drag and drop functionality for the application.
+
+This module defines functions to handle drag enter/move events and drop events,
+processing various file types such as images, 3D objects, layouts, and scripts.
+"""
 import os
 from theme.fonts import font_icons as ic
 from ars_cmds import bubble_cmds as Bcmd
@@ -9,6 +15,15 @@ ars = (".arsp", ".arss",)
 from .run_ext import run_ext
 
 def dd_drag(self, event):
+    """
+    Handles the drag enter and drag move events.
+
+    Updates the UI feedback (cursor/tooltip) based on the type of files being dragged.
+
+    Args:
+        self: The instance of the class calling this method (likely a window or widget).
+        event: The drag event object containing mime data and URLs.
+    """
 
     files = [u.toLocalFile() for u in event.mimeData().urls()]
     
@@ -42,6 +57,19 @@ def dd_drag(self, event):
 
 
 def dd_drop(self, event):
+    """
+    Handles the drop event.
+
+    Processes the dropped files based on their extensions:
+    - 3D Objects (.obj, .stl, etc.): Adds the mesh to the scene.
+    - Images (.png, .jpg, etc.): Loads as background image.
+    - Layouts (.arsl): Loads the UI layout.
+    - Scripts (.py, .arsp): Runs the script.
+
+    Args:
+        self: The instance of the class calling this method.
+        event: The drop event object containing mime data and URLs.
+    """
     files = [u.toLocalFile() for u in event.mimeData().urls()]
     for f in files:
 

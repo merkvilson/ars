@@ -1,3 +1,6 @@
+"""
+This module provides gizmo control functionality (move, rotate, scale) via a context menu.
+"""
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object
@@ -9,10 +12,23 @@ BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
 
 
 def BBL_GIZMO_MOVE(*args):
+    """
+    Entry point for the gizmo bubble command.
+    Runs the current file as an extension.
+    """
     run_ext(__file__)
 
 
 def execute_plugin(ars_window):
+    """
+    Executes the gizmo plugin.
+    
+    Opens a context menu allowing the user to switch between different gizmo modes
+    (Move, Rotate, Scale, Drag) for the currently selected object.
+    
+    Args:
+        ars_window: The main application window instance.
+    """
     if not selected_object():
         return
 

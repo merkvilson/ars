@@ -1,3 +1,6 @@
+"""
+This module provides a widget that follows the cursor and displays information.
+"""
 from PyQt6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene
 from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QPoint
 from PyQt6.QtGui import QCursor, QColor, QFont
@@ -6,6 +9,12 @@ import theme.fonts.new_fonts as RRRFONT
 from theme.fonts import font_icons as ic
 
 class CursorFollowerWidget(QWidget):
+    """
+    A widget that follows the mouse cursor and displays information using a BButton.
+    
+    This widget is frameless, transparent to mouse events, and stays on top.
+    It updates its position to follow the cursor while staying within the parent's bounds.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
@@ -57,7 +66,16 @@ class CursorFollowerWidget(QWidget):
         self.hide()  # Start hidden
 
     def UP(self, key = "additional_text", value = "0.0",  symbol = ic.ICON_MSG, auto_close = 1000, alpha = 60):
-        """Update BButton's additional text using set_updated_config."""
+        """
+        Update BButton's configuration and show the widget.
+
+        Args:
+            key (str): The configuration key to update (default: "additional_text").
+            value (str): The value to set for the key.
+            symbol (str): The icon symbol to display.
+            auto_close (int): Time in milliseconds to auto-hide the widget (0 to disable).
+            alpha (int): The alpha transparency of the button color.
+        """
 
         if not self.isVisible(): self.animated_show()        
 
@@ -71,6 +89,11 @@ class CursorFollowerWidget(QWidget):
         if auto_close: self.hide_timer.start(auto_close) 
 
     def update_position(self):
+        """
+        Updates the widget's position to follow the global cursor position.
+        
+        Ensures the widget stays within the boundaries of its parent widget.
+        """
         if self.isVisible():
             parent = self.parent()
             if parent:
@@ -90,7 +113,11 @@ class CursorFollowerWidget(QWidget):
                 self.raise_()
 
     def animated_show(self):
-        """Show widget with scale and opacity animation."""
+        """
+        Shows the widget with a scale and opacity animation.
+        
+        Starts the timer to follow the cursor.
+        """
         self.b_button.setScale(0.0)
         self.b_button.setOpacity(0.0)
         self.show()
@@ -116,7 +143,9 @@ class CursorFollowerWidget(QWidget):
         anim_group.start()
 
     def animated_hide(self):
-        """Hide widget with scale and opacity animation."""
+        """
+        Hides the widget with a scale and opacity animation.
+        """
         from PyQt6.QtCore import QParallelAnimationGroup
         anim_group = QParallelAnimationGroup(self)
         
