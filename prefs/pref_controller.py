@@ -23,7 +23,7 @@ class prefsConfig:
         self.dev_mode = True 
 
         # Code Editor
-        self.code_editor_alpha = 85
+        self.code_editor_alpha = 0.85
         self.code_editor_height = 300
         self.code_editor_font_size = 14
 

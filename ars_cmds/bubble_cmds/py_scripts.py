@@ -94,7 +94,7 @@ def execute_plugin(ars_window):
 
     config.custom_widget_items = {"PythonEditorWidget": code_editor}
     config.slider_values = {
-        ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha),
+        ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha*100),
         ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, ars_window.prefs.code_editor_height),
         ic.ICON_TXT_SIZE: (10,48,ars_window.prefs.code_editor_font_size),
     }
@@ -136,7 +136,7 @@ def execute_plugin(ars_window):
         ic.ICON_SHADER_SMOOTH: lambda value: (
             ctx.set_alpha(value / 2550.0),
             code_editor.set_alpha(value / 100.0), 
-            setattr(ars_window.prefs, 'code_editor_alpha', value),
+            setattr(ars_window.prefs, 'code_editor_alpha', value / 100.0),
             ),
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
