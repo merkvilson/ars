@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QPoint
 from PyQt6.QtGui import QCursor, QColor, QFont
 from .b_button import BButton, BButtonConfig
 import theme.fonts.new_fonts as RRRFONT
@@ -8,6 +8,7 @@ from theme.fonts import font_icons as ic
 class CursorFollowerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
@@ -55,7 +56,7 @@ class CursorFollowerWidget(QWidget):
         self.resize(250, 80)  # Match view size
         self.hide()  # Start hidden
 
-    def UP(self, key = "additional_text", value = "0.0",  symbol = ic.ICON_MSG, auto_close = 1000):
+    def UP(self, key = "additional_text", value = "0.0",  symbol = ic.ICON_MSG, auto_close = 1000, alpha = 60):
         """Update BButton's additional text using set_updated_config."""
 
         if not self.isVisible(): self.animated_show()        
@@ -65,7 +66,7 @@ class CursorFollowerWidget(QWidget):
        
         self.b_button.set_updated_config(key, value)
         self.b_button.set_updated_config("symbol", symbol)        
-        self.b_button.set_updated_config("color", QColor(200, 200, 200, 60))
+        self.b_button.set_updated_config("color", QColor(100, 100, 100, alpha))
         
         if auto_close: self.hide_timer.start(auto_close) 
 
@@ -74,11 +75,19 @@ class CursorFollowerWidget(QWidget):
             parent = self.parent()
             if parent:
                 global_cursor = QCursor.pos()
-                local_pos = parent.mapFromGlobal(global_cursor)
-                local_pos.setX(max(0, min(local_pos.x(), parent.width() - self.width())))
-                local_pos.setY(max(0, min(local_pos.y(), parent.height() - self.height())))
-                self.move(local_pos)
-                self.raise_()  # Ensure it's on top of other siblings
+                
+                # Calculate constraints in global coordinates
+                parent_tl = parent.mapToGlobal(QPoint(0, 0))
+                min_x = parent_tl.x()
+                min_y = parent_tl.y()
+                max_x = min_x + parent.width() - self.width()
+                max_y = min_y + parent.height() - self.height()
+
+                x = max(min_x, min(global_cursor.x(), max_x))
+                y = max(min_y, min(global_cursor.y(), max_y))
+                
+                self.move(x, y)
+                self.raise_()
 
     def animated_show(self):
         """Show widget with scale and opacity animation."""

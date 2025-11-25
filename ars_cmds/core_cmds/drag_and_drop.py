@@ -35,7 +35,7 @@ def dd_drag(self, event):
     else: ttip,sym = "Files", ic.ICON_FILES
 
 
-    self.CF.UP("additional_text", ttip,  sym, False)
+    self.CF.UP("additional_text", ttip,  sym, False, 255)
 
     if event.mimeData().hasUrls(): event.accept()
     else: event.ignore()
