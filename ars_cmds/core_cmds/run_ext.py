@@ -6,7 +6,7 @@ from util_functions.ars_window import ars_window
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 
 #finds and runs execute_plugin in the given file
-def run_ext(path, window = None, edit_func=None):
+def run_ext(path, edit_func=None):
     """Load & execute a Python source file at `path` (works with any extension).
     
     Args:
