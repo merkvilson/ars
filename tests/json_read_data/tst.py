@@ -1,4 +1,3 @@
-from ui.widgets.context_menu import open_context, ContextMenuConfig
 import os
 import json
 
@@ -9,21 +8,14 @@ with open(default_workflow_path, 'r', encoding='utf-8') as f: workflow_template 
 airen_class_types = ["Airen_Int"]
 
 test_dict = {}
-def get_userdata():
-    start_id = 0
+def get_gui_data():
     for _, node in workflow_template.items():
         if node.get("class_type") in airen_class_types:
             inputs = node.get("inputs", {})
             if inputs.get("gui_expose") == True:
                 print(f"Exposed Input: {inputs}")
-                test_dict[str(start_id)] = inputs["ud_name"]
-                start_id += 1
+                test_dict[inputs["ud_name"]] = inputs["ud_name"]
 
-get_userdata()
+get_gui_data()
+print(" ")
 print(test_dict)
-
-
-config=ContextMenuConfig()
-config.options = test_dict
-
-open_context(config)
