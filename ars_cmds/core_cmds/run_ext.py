@@ -11,7 +11,6 @@ def run_ext(path, edit_func=None):
     
     Args:
         path: File path to the Python script.
-        ars_window: Object passed to the plugin's entrypoint.
         edit_func: Optional callable that takes raw file content (str) and returns edited content (str).
                    If None, no edits are applied.
     """
