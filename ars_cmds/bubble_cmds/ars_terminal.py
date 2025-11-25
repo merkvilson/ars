@@ -8,11 +8,11 @@ def BBL_CODE(*arg):
 
 def execute_plugin(ars_window):
     config = ContextMenuConfig()
-    config.expand = 'x'
+    config.custom_width = ars_window.width()
     config.custom_height = 300
     config.auto_close = False
     config.close_on_outside = False
-    items = ["terminal"]
+    items = ["   ", "terminal", "   "]
     terminal = TerminalWidget()
     terminal.setFixedSize(int(ars_window.width() - 10), int(config.custom_height - int(44 * 1.5)))
     config.custom_widget_items = {'terminal': terminal}
