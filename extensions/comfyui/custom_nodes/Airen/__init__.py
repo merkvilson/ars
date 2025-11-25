@@ -10,7 +10,6 @@ import torch
 import hashlib
 from .convert_layer import save_images_as_layers
 
-
 class Airen_Str:
     @classmethod
     def INPUT_TYPES(cls):
@@ -302,6 +301,29 @@ class Airen_LoadKeyframe:
         return (image_tensor,)
 
 
+class Airen_Gui_Data:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "symbol": ("STRING", {"default": "", "multiline": False}),
+                "additional_text": ("STRING", {"default": "", "multiline": False}),
+                "slider_values": ("STRING", {"default": "", "multiline": False}),
+
+                "custom_data": ("STRING", {"multiline": True, "default": ""}),
+            }
+        }
+
+    RETURN_TYPES = ("BOOLEAN",)
+    FUNCTION = "execute"
+    CATEGORY = "Airen_Studio/User Data"
+    OUTPUT_NODE = True
+
+    def execute(self, symbol, additional_text, slider_values, custom_data, ):
+        return (True)
+   
+
+
 NODE_CLASS_MAPPINGS = {
     "Airen_Str": Airen_Str,
     "Airen_Int": Airen_Int,
@@ -313,4 +335,5 @@ NODE_CLASS_MAPPINGS = {
     "Airen_Progress_Reader": Airen_Progress_Reader,
     "Airen_RenderPass": Airen_RenderPass,
     "Airen_LoadKeyframe": Airen_LoadKeyframe,
+    "Airen_Gui_Data": Airen_Gui_Data,
 }
