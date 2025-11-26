@@ -25,12 +25,12 @@ def load_json_file(ars_window, file_path=None):
 def execute_cmd(ars_window):
 
     if not ars_window.prefs.json_ud_path:
-        default_workflow_path = r"C:\Users\gmerk\Downloads\ARS\tests\json_read_data\tst2.json" #Temporal default path
+        default_workflow_path = r"C:\Users\gmerk\Downloads\ARS\tests\json_read_data\test2.json" #Temporal default path
         load_json_file(ars_window, default_workflow_path)
 
     with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
 
-    airen_class_types = ["Airen_Int"]
+    airen_class_types = ["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
 
     test_dict = {}
     def get_gui_data(config):

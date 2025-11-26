@@ -167,7 +167,7 @@
   },
   "14": {
     "inputs": {
-      "symbol": "ICON_OBJ_CUBE",
+      "symbol": "ICON_OBJ_BOX",
       "additional_text": "CFG",
       "slider_values": "0,100,8",
       "custom_data": ""
@@ -189,6 +189,32 @@
     "class_type": "Airen_Float",
     "_meta": {
       "title": "Airen_Float"
+    }
+  },
+  "16": {
+    "inputs": {
+      "ud_name": "cfg",
+      "output": 8,
+      "gui_expose": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "Airen_Float",
+    "_meta": {
+      "title": "Airen_Float"
+    }
+  },
+  "17": {
+    "inputs": {
+      "symbol": "ICON_OBJ_PLANE",
+      "additional_text": "Test",
+      "slider_values": "0,100,8",
+      "custom_data": ""
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
     }
   }
 }
