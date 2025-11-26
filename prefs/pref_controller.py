@@ -42,6 +42,10 @@ class prefsConfig:
         self.timeline_prompt = "a beautiful landscape, high detail, 8k"
 
 
+        # Json User Data
+        self.json_ud_path = ""
+
+
 
     def load(self):
         config_path = os.path.join("prefs", "config.json")
