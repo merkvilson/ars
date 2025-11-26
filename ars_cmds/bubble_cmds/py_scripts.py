@@ -52,7 +52,7 @@ def scripts_ctx(ars_window, callback_ctx):
 
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     py_files = _list_user_scripts()
     if not py_files:
         print("No python scripts found in ars_scripts/user")

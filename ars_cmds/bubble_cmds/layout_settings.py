@@ -27,7 +27,7 @@ def BBL_MENU(*args):
 
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
 
     config.options = {

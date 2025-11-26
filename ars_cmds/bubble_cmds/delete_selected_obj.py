@@ -12,7 +12,7 @@ def BBL_TRASH(*args):
     run_ext(__file__)
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     if ars_window.viewport.is_not_empty():
         om = ars_window.viewport._objectManager
         index = om._active_idx

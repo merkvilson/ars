@@ -10,7 +10,7 @@ import os
 def plugin_1(ars_window):
     ars_window.msg("Test Plugin Activated")
 
-def execute_plugin(window):
+def execute_cmd(window):
 
     config = BubbleConfig()
     config.symbol = ic.ICON_TEST3

@@ -7,7 +7,7 @@ def BBL_TEST3(*args):
     run_ext(__file__)
 
 
-def execute_plugin(self):
+def execute_cmd(self):
     config = ContextMenuConfig()
     
     config.options = {

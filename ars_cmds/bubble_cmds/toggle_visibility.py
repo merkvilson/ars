@@ -8,7 +8,7 @@ def BBL_EYE(*arg):
     run_ext(__file__)
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
 
     # Compute visibility states
     grid = ars_window.viewport.grid

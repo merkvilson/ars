@@ -6,7 +6,7 @@ from ui.ars_code import TerminalWidget
 def BBL_CODE(*arg):
     run_ext(__file__)
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.custom_width = ars_window.width()
     config.custom_height = 300

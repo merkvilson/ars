@@ -6,7 +6,7 @@ from theme.fonts import font_icons as ic
 def BBL_TEST(*arg):
     run_ext(__file__)
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.options = {
         ic.ICON_TEST: "Option A",

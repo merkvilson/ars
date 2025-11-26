@@ -12,5 +12,5 @@ def BBL_PROMPT(*args):
     run_ext(__file__)
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     prompt_ctx(ars_window, ars_window.central_widget.mapFromGlobal(QCursor.pos()), default_object= ars_window)

@@ -11,7 +11,7 @@ BBL_KEYFRAMES_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
 def BBL_KEYFRAMES(*args):
     run_ext(__file__)
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False

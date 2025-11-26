@@ -13,7 +13,7 @@ def BBL_LIST(*args):
     run_ext(__file__)
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.expand = "y"
     config.auto_close = False

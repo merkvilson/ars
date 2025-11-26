@@ -218,7 +218,7 @@ BBL_GAME_CONFIG = {"symbol": ic.ICON_SPEED_SNAIL}
 def BBL_GAME(*args):
     run_ext(__file__)
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     print("start")
     # Create and start the snake game overlay
     if not hasattr(ars_window, 'snake_game'):

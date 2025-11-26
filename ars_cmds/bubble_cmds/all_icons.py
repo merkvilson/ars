@@ -20,7 +20,7 @@ def BBL_ICONS(*args):
     run_ext(__file__)
 
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.item_radius = 25
     config.font = get_font(25)

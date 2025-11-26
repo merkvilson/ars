@@ -5,7 +5,7 @@ import importlib.util
 from util_functions.ars_window import ars_window
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 
-#finds and runs execute_plugin in the given file
+#finds and runs execute_cmd in the given file
 def run_ext(path, edit_func=None):
     """Load & execute a Python source file at `path` (works with any extension).
     
@@ -38,10 +38,10 @@ def run_ext(path, edit_func=None):
         exec(code_obj, module.__dict__)
 
         # Call the plugin entrypoint if it exists
-        if hasattr(module, "execute_plugin"):
-            module.execute_plugin(ars_window())
+        if hasattr(module, "execute_cmd"):
+            module.execute_cmd(ars_window())
         else:
-            print("execute_plugin() not found in", path)
+            print("execute_cmd() not found in", path)
 
     except SyntaxError as e:
         print(f"Syntax error in {path} (after edits): {e}")

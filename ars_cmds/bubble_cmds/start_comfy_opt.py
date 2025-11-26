@@ -11,7 +11,7 @@ def BBL_C(*args):
 
     
 
-def execute_plugin(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
 

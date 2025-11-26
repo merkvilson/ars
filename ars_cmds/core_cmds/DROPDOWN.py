@@ -41,7 +41,7 @@ def r_dropdown(self, code_path = None):
             if "PythonEditorWidget" in str(ctx_menu.items):
                 ctx_menu.close()
                 print("Closed existing Python Editor context menu.")
-        py_ctx_menu, code_editor = py_scripts.execute_plugin(self)
+        py_ctx_menu, code_editor = py_scripts.execute_cmd(self)
         with open(path, 'r', encoding='utf-8') as f:
             code_file = f.read()
         code_editor.setPlainText(code_file)
