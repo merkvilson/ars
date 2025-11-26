@@ -2,27 +2,33 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import json
+from PyQt6.QtWidgets import QFileDialog
 
 def BBL_J(*args):
     run_ext(__file__)
 
 
 
-
-
-
-
-
-
+def load_json_file(ars_window, file_path=None):
+    if file_path is None:
+        file_path, _ = QFileDialog.getOpenFileName(
+            None,
+            "Select Json File",
+            "",
+            "Json Files (*.json)",
+        )
+    if file_path:
+        ars_window.prefs.json_ud_path = file_path
 
 
 
 def execute_cmd(ars_window):
 
     if not ars_window.prefs.json_ud_path:
-        default_workflow_path = r"C:\Users\gmerk\Downloads\ARS\tests\json_read_data\tst.json"
+        default_workflow_path = r"C:\Users\gmerk\Downloads\ARS\tests\json_read_data\tst2.json" #Temporal default path
+        load_json_file(ars_window, default_workflow_path)
 
-    with open(default_workflow_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
+    with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
 
     airen_class_types = ["Airen_Int"]
 

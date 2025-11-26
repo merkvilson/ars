@@ -1,0 +1,194 @@
+{
+  "3": {
+    "inputs": {
+      "seed": [
+        "11",
+        0
+      ],
+      "steps": [
+        "12",
+        0
+      ],
+      "cfg": [
+        "15",
+        0
+      ],
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "v1-5-pruned-emaonly-fp16.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "5": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "text, watermark",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "9": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "10": {
+    "inputs": {
+      "symbol": "ICON_OBJ_CONE",
+      "additional_text": "Seed",
+      "slider_values": "0,9999,100",
+      "custom_data": ""
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "11": {
+    "inputs": {
+      "ud_name": "seed",
+      "output": 12345,
+      "gui_expose": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen_Int"
+    }
+  },
+  "12": {
+    "inputs": {
+      "ud_name": "steps",
+      "output": 25,
+      "gui_expose": [
+        "13",
+        0
+      ]
+    },
+    "class_type": "Airen_Int",
+    "_meta": {
+      "title": "Airen_Int"
+    }
+  },
+  "13": {
+    "inputs": {
+      "symbol": "ICON_OBJ_SPHERE",
+      "additional_text": "Steps",
+      "slider_values": "0,9999,25",
+      "custom_data": ""
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "14": {
+    "inputs": {
+      "symbol": "ICON_OBJ_CUBE",
+      "additional_text": "CFG",
+      "slider_values": "0,100,8",
+      "custom_data": ""
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "15": {
+    "inputs": {
+      "ud_name": "cfg",
+      "output": 8,
+      "gui_expose": [
+        "14",
+        0
+      ]
+    },
+    "class_type": "Airen_Float",
+    "_meta": {
+      "title": "Airen_Float"
+    }
+  }
+}
