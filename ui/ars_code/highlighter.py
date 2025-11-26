@@ -64,6 +64,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         self.fmt_parameter = mkfmt("#d19a66")  # function parameters
         self.fmt_lambda = mkfmt("#c678dd", italic=True)  # lambda keyword
         self.fmt_fplaceholder = mkfmt("#e5c07b", bold=True)  # f-string expressions
+        self.fmt_unused = mkfmt("#4b5263", italic=True)  # Unused variables/imports (darker grey, italic)
 
     def _init_regex(self):
         # Keywords (excluding True, False, None which we'll handle separately)
@@ -162,6 +163,18 @@ class PythonHighlighter(QSyntaxHighlighter):
     def _add_range(ranges, start, end):
         if start < end:
             ranges.append((start, end))
+
+    def set_unused_ranges(self, ranges):
+        """
+        Set the list of unused variable/import ranges.
+        ranges: list of (line_idx, start_col, length)
+        """
+        self.unused_ranges = {}
+        for line, start, length in ranges:
+            if line not in self.unused_ranges:
+                self.unused_ranges[line] = []
+            self.unused_ranges[line].append((start, length))
+        self.rehighlight()
 
     def highlightBlock(self, text: str) -> None:
         self.setCurrentBlockState(0)
@@ -293,6 +306,13 @@ class PythonHighlighter(QSyntaxHighlighter):
         # 8) Icon characters
         if hasattr(self, 're_icon_char'):
             self._apply_regex(self.re_icon_char, self.fmt_icon_char, text, protected)
+
+        # 9) Unused variables/imports
+        block_num = self.currentBlock().blockNumber()
+        if hasattr(self, 'unused_ranges') and block_num in self.unused_ranges:
+             for start, length in self.unused_ranges[block_num]:
+                 if not self._overlaps(protected, start, length):
+                     self.setFormat(start, length, self.fmt_unused)
 
     def _apply_regex(self, regex: QRegularExpression, fmt: QTextCharFormat, text: str, protected):
         it = regex.globalMatch(text)

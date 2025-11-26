@@ -13,6 +13,7 @@ from ars_cmds.core_cmds.run_ext import run_string_code
 
 from .highlighter import PythonHighlighter
 from .completer import JediCompleter, CompletionPopup
+from .linter import UnusedLinter
 
 class LineNumberArea(QWidget):
     """Line number display widget for CodeEditor."""
@@ -90,8 +91,16 @@ class CodeEditor(QPlainTextEdit):
         # Attach highlighter
         self.highlighter = PythonHighlighter(self.document())
 
+        # Linter setup
+        self.linter = UnusedLinter()
+        self._linter_timer = QTimer(self)
+        self._linter_timer.setSingleShot(True)
+        self._linter_timer.setInterval(1000) # 1 second delay
+        self._linter_timer.timeout.connect(self._run_linter)
+
         # Ensure trailing newline on change
         self.textChanged.connect(self._ensure_trailing_newline)
+        self.textChanged.connect(self._on_text_changed_linter)
 
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
@@ -953,6 +962,14 @@ class CodeEditor(QPlainTextEdit):
         
         return True
 
+
+    def _on_text_changed_linter(self):
+        self._linter_timer.start()
+
+    def _run_linter(self):
+        code = self.get_clean_code()
+        ranges = self.linter.get_unused_ranges(code)
+        self.highlighter.set_unused_ranges(ranges)
 
     def _ensure_trailing_newline(self):
         """Ensure the document always ends with an empty line."""
