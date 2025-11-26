@@ -306,20 +306,29 @@ class Airen_Gui_Data:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "data_type": (["Integer", "Float", "Boolean"], ),
+                "ud_name": ("STRING", {"default": "", "multiline": False}),
+                "data_type": (["Integer", "Float", "Boolean", "String"], ),
+                "output": ("STRING", {"multiline": False, "default": ""}),
+
                 "symbol": ("STRING", {"default": "", "multiline": False}),
                 "additional_text": ("STRING", {"default": "", "multiline": False}),
                 "slider_values": ("STRING", {"default": "", "multiline": False}),
             }
         }
 
-    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_TYPES = ("*",)
     FUNCTION = "execute"
     CATEGORY = "Airen_Studio/Custom GUI"
     OUTPUT_NODE = True
 
-    def execute(self,data_type, symbol, additional_text, slider_values,):
-        return (True)
+    def execute(self, ud_name, data_type, output, symbol, additional_text, slider_values):
+        if data_type == "Integer":
+            return (int(output),)
+        elif data_type == "Float":
+            return (float(output),)
+        elif data_type == "String":
+            return (output,)
+        return (None,)
    
 
 
