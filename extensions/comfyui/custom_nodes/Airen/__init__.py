@@ -316,7 +316,7 @@ class Airen_Gui_Data:
             }
         }
 
-    RETURN_TYPES = ("*",)
+    RETURN_TYPES = ("Output",)
     FUNCTION = "execute"
     CATEGORY = "Airen_Studio/Custom GUI"
     OUTPUT_NODE = True
@@ -332,6 +332,32 @@ class Airen_Gui_Data:
    
 
 
+class Airen_UserData:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ud_name": ("STRING", {"default": "", "multiline": False}),
+                "data_type": (["Integer", "Float", "Boolean", "String"], ),
+                "output": ("STRING", {"multiline": False, "default": ""}),
+            }
+        }
+
+    RETURN_TYPES = ("Output",)
+    FUNCTION = "execute"
+    CATEGORY = "Airen_Studio/Custom GUI"
+    OUTPUT_NODE = True
+
+    def execute(self, ud_name, data_type, output, symbol, additional_text, slider_values):
+        if data_type == "Integer":
+            return (int(output),)
+        elif data_type == "Float":
+            return (float(output),)
+        elif data_type == "String":
+            return (output,)
+        return (None,)
+   
+
 NODE_CLASS_MAPPINGS = {
     "Airen_Str": Airen_Str,
     "Airen_Int": Airen_Int,
@@ -344,4 +370,5 @@ NODE_CLASS_MAPPINGS = {
     "Airen_RenderPass": Airen_RenderPass,
     "Airen_LoadKeyframe": Airen_LoadKeyframe,
     "Airen_Gui_Data": Airen_Gui_Data,
+    "Airen_UserData": Airen_UserData,
 }
