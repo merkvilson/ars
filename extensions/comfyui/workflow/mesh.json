@@ -148,8 +148,7 @@
   "19": {
     "inputs": {
       "ud_name": "steps",
-      "output": 20,
-      "gui_expose": false
+      "output": 20
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -173,8 +172,7 @@
   "24": {
     "inputs": {
       "ud_name": "seed",
-      "output": 5,
-      "gui_expose": false
+      "output": 5
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -184,8 +182,7 @@
   "26": {
     "inputs": {
       "ud_name": "resolution",
-      "output": 256,
-      "gui_expose": false
+      "output": 256
     },
     "class_type": "Airen_Int",
     "_meta": {

@@ -125,8 +125,7 @@
   "25": {
     "inputs": {
       "ud_name": "steps",
-      "output": 20,
-      "gui_expose": false
+      "output": 20
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -151,8 +150,7 @@
   "30": {
     "inputs": {
       "ud_name": "positive",
-      "output": "",
-      "gui_expose": false
+      "output": ""
     },
     "class_type": "Airen_Str",
     "_meta": {
@@ -193,8 +191,7 @@
   "33": {
     "inputs": {
       "ud_name": "seed",
-      "output": 5,
-      "gui_expose": false
+      "output": 5
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -277,8 +274,7 @@
   "43": {
     "inputs": {
       "ud_name": "denoise",
-      "output": 0.8,
-      "gui_expose": false
+      "output": 0.8
     },
     "class_type": "Airen_Float",
     "_meta": {

@@ -97,8 +97,7 @@
   "25": {
     "inputs": {
       "ud_name": "steps",
-      "output": 20,
-      "gui_expose": false
+      "output": 20
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -123,8 +122,7 @@
   "30": {
     "inputs": {
       "ud_name": "positive",
-      "output": "cat",
-      "gui_expose": false
+      "output": "cat"
     },
     "class_type": "Airen_Str",
     "_meta": {
@@ -134,8 +132,7 @@
   "33": {
     "inputs": {
       "ud_name": "seed",
-      "output": 0,
-      "gui_expose": false
+      "output": 0
     },
     "class_type": "Airen_Int",
     "_meta": {

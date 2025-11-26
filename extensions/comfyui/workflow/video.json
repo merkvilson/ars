@@ -266,8 +266,7 @@
   "93": {
     "inputs": {
       "ud_name": "steps",
-      "output": 4,
-      "gui_expose": false
+      "output": 4
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -277,8 +276,7 @@
   "94": {
     "inputs": {
       "ud_name": "start-stop",
-      "output": 2,
-      "gui_expose": false
+      "output": 2
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -288,8 +286,7 @@
   "95": {
     "inputs": {
       "ud_name": "seed",
-      "output": 12345,
-      "gui_expose": false
+      "output": 12345
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -299,8 +296,7 @@
   "96": {
     "inputs": {
       "ud_name": "size",
-      "output": 512,
-      "gui_expose": false
+      "output": 512
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -310,8 +306,7 @@
   "97": {
     "inputs": {
       "ud_name": "frames",
-      "output": 81,
-      "gui_expose": false
+      "output": 81
     },
     "class_type": "Airen_Int",
     "_meta": {
@@ -334,8 +329,7 @@
   "100": {
     "inputs": {
       "ud_name": "positive",
-      "output": "",
-      "gui_expose": false
+      "output": ""
     },
     "class_type": "Airen_Str",
     "_meta": {
