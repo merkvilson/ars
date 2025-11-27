@@ -311,9 +311,9 @@ class Airen_Gui_Data:
                 "data_type": (["Integer", "Float", "Boolean", "String"], ),
                 "output": ("STRING", {"multiline": False, "default": "1"}),
 
-                "symbol": ("STRING", {"default": "", "multiline": False}),
-                "additional_text": ("STRING", {"default": "", "multiline": False}),
-                "slider_values": ("STRING", {"default": "", "multiline": False}),
+                "symbol": ("STRING", {"default": "ICON_AIREN", "multiline": False}),
+                "additional_text": ("STRING", {"default": "test", "multiline": False}),
+                "slider_values": ("STRING", {"default": "0,100,50", "multiline": False}),
             }
         }
 
