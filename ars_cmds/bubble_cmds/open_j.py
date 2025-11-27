@@ -29,7 +29,7 @@ def execute_cmd(ars_window):
         for _, node in workflow_template.items():
             if node.get("class_type") in airen_class_types:
                 inputs = node.get("inputs", {})
-                if 'slider_values' in inputs:
+                if 'symbol' in inputs:
                     gui_node_inputs = inputs
 
                     symbol = getattr(ic, gui_node_inputs["symbol"])
@@ -41,10 +41,20 @@ def execute_cmd(ars_window):
 
 
 
+    def set_default_values(config):
+        for _, node in workflow_template.items():
+            inputs = node.get("inputs", {})
+            if inputs.get("ud_name") == "Default_Values":
+                config.close_on_outside = inputs.get("close_on_outside", True)
+                config.auto_close = inputs.get("auto_close", False)
+                config.incremental_value = inputs.get("incremental_value", True)
+                config.show_value = inputs.get("show_value", True)
+
 
 
     config=ContextMenuConfig()
     config.options = {}
     get_gui_data(config)
+    set_default_values(config)
 
     open_context(config)
