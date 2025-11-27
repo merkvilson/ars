@@ -3,6 +3,7 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import json
 from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtGui import QColor
 
 def BBL_J(*args):
     run_ext(__file__)
@@ -18,6 +19,8 @@ def execute_cmd(ars_window):
     if not ars_window.prefs.json_ud_path:
         default_workflow_path = r"C:\Users\DESKTOP.GE\Downloads\default.json" #Temporal default path
         load_json_file(ars_window, default_workflow_path)
+
+    ars_window.render_manager.set_workflow(ars_window.prefs.json_ud_path)
 
     with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
 
@@ -54,6 +57,11 @@ def execute_cmd(ars_window):
 
     config=ContextMenuConfig()
     config.options = {}
+
+    config.options[ic.ICON_PLAYER_PLAY] = "Run"
+    config.color = {ic.ICON_PLAYER_PLAY: QColor.fromRgbF(0.304, 0.471937, 0.8, 1.0)}
+    config.hover_color = {ic.ICON_PLAYER_PLAY: QColor.fromRgbF(0.3822,  0.657188, 0.98,  1.0)}
+    # config.hotkey_items = {ic.ICON_PLAYER_PLAY: 'Ctrl R'}
     get_gui_data(config)
     set_default_values(config)
 
