@@ -16,7 +16,7 @@ def load_json_file(ars_window, file_path=None):
 def execute_cmd(ars_window):
 
     if not ars_window.prefs.json_ud_path:
-        default_workflow_path = r"C:\Users\gmerk\Downloads\ARS\tests\json_read_data\test2.json" #Temporal default path
+        default_workflow_path = r"C:\Users\DESKTOP.GE\Downloads\default.json" #Temporal default path
         load_json_file(ars_window, default_workflow_path)
 
     with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
@@ -34,7 +34,7 @@ def execute_cmd(ars_window):
 
                     symbol = getattr(ic, gui_node_inputs["symbol"])
                     additional_text = gui_node_inputs.get("additional_text", "")
-                    slider_values = gui_node_inputs.get("slider_values", "")
+                    slider_values = gui_node_inputs.get("slider_values", "0,100,1")
                     config.options[symbol] = additional_text
                     config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
 
