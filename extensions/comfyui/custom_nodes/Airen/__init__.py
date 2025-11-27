@@ -309,7 +309,7 @@ class Airen_Gui_Data:
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "data_type": (["Integer", "Float", "Boolean", "String"], ),
-                "output": ("STRING", {"multiline": False, "default": "1"}),
+                "output": ("FLOAT", {"default": 0, "min": -999999, "max": 999999, "step": 0.1}),
 
                 "symbol": ("STRING", {"default": "ICON_AIREN", "multiline": False}),
                 "additional_text": ("STRING", {"default": "test", "multiline": False}),
@@ -343,12 +343,12 @@ class Airen_Gui_Defaults:
         return {
             "required": {
                 "ud_name": ("STRING", {"default": "Default_Values", "multiline": False}),
-                "data_type": (["Integer", "Float", "Boolean", "String"], ),
-                "output": ("STRING", {"multiline": False, "default": "1"}),
 
-                "symbol": ("STRING", {"default": "", "multiline": False}),
-                "additional_text": ("STRING", {"default": "", "multiline": False}),
-                "slider_values": ("STRING", {"default": "", "multiline": False}),
+                "close_on_outside": ("BOOLEAN", {"default": True}),
+                "auto_close": ("BOOLEAN", {"default": False}),
+                "incremental_value": ("BOOLEAN", {"default": False}),
+                "show_value": ("BOOLEAN", {"default": True}),
+
             }
         }
 
