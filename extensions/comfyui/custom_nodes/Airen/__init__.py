@@ -373,5 +373,5 @@ NODE_CLASS_MAPPINGS = {
     "Airen_LoadKeyframe": Airen_LoadKeyframe,
     "Airen_Gui_Data": Airen_Gui_Data,
     "Airen_Gui_Defaults": Airen_Gui_Defaults,
-    "Airen_UserData": Airen_UserData,
+    # "Airen_UserData": Airen_UserData,
 }
