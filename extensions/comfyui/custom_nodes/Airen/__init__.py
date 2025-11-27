@@ -10,6 +10,10 @@ import torch
 import hashlib
 from .convert_layer import save_images_as_layers
 
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
 class Airen_Str:
     @classmethod
     def INPUT_TYPES(cls):
@@ -313,7 +317,7 @@ class Airen_Gui_Data:
             }
         }
 
-    RETURN_TYPES = ("Output",)
+    RETURN_TYPES = (AnyType("*"),)
     FUNCTION = "execute"
     CATEGORY = "Airen_Studio/Custom GUI"
     OUTPUT_NODE = True
@@ -323,9 +327,11 @@ class Airen_Gui_Data:
             return (int(output),)
         elif data_type == "Float":
             return (float(output),)
-        elif data_type == "String":
-            return (output,)
-        return (None,)
+        elif data_type == "Boolean":
+            if str(output).lower() == "true":
+                return (True,)
+            return (False,)
+        return (output,)
    
 
 
@@ -350,35 +356,7 @@ class Airen_Gui_Defaults:
     CATEGORY = "Airen_Studio/Custom GUI"
 
 
-
-
-
-class Airen_UserData:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "ud_name": ("STRING", {"default": "", "multiline": False}),
-                "data_type": (["Integer", "Float", "Boolean", "String"], ),
-                "output": ("STRING", {"multiline": False, "default": "1"}),
-            }
-        }
-
-    RETURN_TYPES = ("Output",)
-    FUNCTION = "execute"
-    CATEGORY = "Airen_Studio/Custom GUI"
-    OUTPUT_NODE = True
-
-    def execute(self, ud_name, data_type, output, symbol, additional_text, slider_values):
-        if data_type == "Integer":
-            return (int(output),)
-        elif data_type == "Float":
-            return (float(output),)
-        elif data_type == "String":
-            return (output,)
-        return (None,)
-
-
+#TODO: Add UserData node based on Airen_Gui_Data
 
 
 
