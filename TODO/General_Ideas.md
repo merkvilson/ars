@@ -1,3 +1,31 @@
+# Medium Priority
+
+- [ ] Color coded prompt editor
+- [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
+- [30%] CUI workflow to CTX
+- [✓] CUI Workflof: Checkbox to expose value in gui
+- [✓] Uniform scale
+- [ ] Add undo/redo functionality
+- [ ] Optimize render pipeline performance
+- [✓] Save one extra image to prevent early image load
+- [ ] Middle click revert to default 
+- [30%] Implement prefs manager and config classes
+- [✓] BG image should generate upscaled image and set it to bg
+- [✓] set_workflow should be able to get only workflow name as well as full path
+- [✓] Add primitive shapes
+- [20%] Implement plugin system
+- [ ] Add theme customization options
+- [ ] Open tutorial videos from right click dropdown.
+- [ ] Optimize memory usage in mesh loader.
+- [ ] 2D edit area b-button (shape extended) 
+- [ ] Add material system for mesh objects
+- [ ] Implement scene save/load functionality
+- [ ] Create user documentation
+- [ ] Improve object selection feedback
+- [50%] Store values inside ars_window.prefs
+- [ ] 
+- [ ] 
+
 # General Ideas
 
 - [ ] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
