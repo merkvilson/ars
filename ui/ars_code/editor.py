@@ -105,7 +105,7 @@ class BaseCodeEditor(QPlainTextEdit):
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
-            f"background-color: rgba(40, 44, 52, 0.85);"
+            f"background-color: rgba(40, 40, 40, 0.60);"
             "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
@@ -189,7 +189,7 @@ class BaseCodeEditor(QPlainTextEdit):
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
         self.setStyleSheet(
             "QPlainTextEdit {"
-            f"background-color: rgba(40, 44, 52, {alpha});"
+            f"background-color: rgba(20, 20, 20, {alpha});"
             "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
