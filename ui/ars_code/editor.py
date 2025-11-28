@@ -34,8 +34,8 @@ class LineNumberArea(QWidget):
         self.editor.line_number_area_mouse_press_event(event)
 
 
-class CodeEditor(QPlainTextEdit):
-    """Lightweight conveniences for typing Python."""
+class BaseCodeEditor(QPlainTextEdit):
+    """Lightweight conveniences for typing code. Base class for specific language editors."""
 
     INDENT = " " * 4
     MIN_FONT_SIZE = 10
@@ -76,7 +76,7 @@ class CodeEditor(QPlainTextEdit):
             pass
 
         # Autocompletion setup
-        self.completer = JediCompleter()
+        self.completer = None
         self.completion_popup = CompletionPopup(self)
         self.completion_popup.completion_selected.connect(self._insert_completion)
         self.completion_popup.hide()
@@ -89,10 +89,10 @@ class CodeEditor(QPlainTextEdit):
         self.completion_popup.set_editor_font(fixed)
 
         # Attach highlighter
-        self.highlighter = PythonHighlighter(self.document())
+        self.highlighter = None
 
         # Linter setup
-        self.linter = UnusedLinter()
+        self.linter = None
         self._linter_timer = QTimer(self)
         self._linter_timer.setSingleShot(True)
         self._linter_timer.setInterval(1000) # 1 second delay
@@ -248,10 +248,7 @@ class CodeEditor(QPlainTextEdit):
         return self.icons_to_text(text)
 
     def run_code(self, namespace_injection=None):
-        if namespace_injection is None: namespace_injection = self.custom_namespace
-        # Use get_clean_code() instead of toPlainText()
-        code = self.get_clean_code()
-        run_string_code(code, namespace_injection)
+        pass
 
     def set_font_size(self, size: int):
         size = int(size)
@@ -967,6 +964,8 @@ class CodeEditor(QPlainTextEdit):
         self._linter_timer.start()
 
     def _run_linter(self):
+        if not self.linter or not self.highlighter:
+            return
         code = self.get_clean_code()
         ranges = self.linter.get_unused_ranges(code)
         self.highlighter.set_unused_ranges(ranges)
@@ -1229,7 +1228,7 @@ class CodeEditor(QPlainTextEdit):
 
     def _trigger_completion(self):
         """Trigger autocompletion at current cursor position."""
-        if not self.completer.enabled:
+        if not self.completer or not self.completer.enabled:
             return
         
         cursor = self.textCursor()
@@ -1247,57 +1246,7 @@ class CodeEditor(QPlainTextEdit):
         
         current_word = text[word_start:pos_in_block]
         
-        # Check for custom triggers
-        # Look at text before word_start
-        prefix_text = text[:word_start].rstrip()
-        
-        completions = []
-        
-        if prefix_text.endswith("ic.") or prefix_text.endswith("font_icons."):
-            completions = self._get_icon_completions(current_word)
-        
-        if not completions:
-            # Optimization: If current_word is empty (e.g. after space/comma),
-            # only trigger Jedi in specific contexts to avoid performance hit on every space
-            should_trigger = True
-            if not current_word:
-                line_text = text[:pos_in_block]
-                # Check for "from ... " (expecting import)
-                # Check for "from ...import ... " (expecting members)
-                # Check for "import ... " (expecting modules)
-                # Check for comma in import statement
-                is_import_ctx = re.match(r"^\s*(from|import)\b", line_text)
-                
-                # Also trigger if the last character is a dot (member access)
-                is_dot_trigger = line_text.rstrip().endswith('.')
-                
-                if not is_import_ctx and not is_dot_trigger:
-                    should_trigger = False
-            
-            if should_trigger:
-                # Get completions from Jedi with namespace support
-                source_code = self.toPlainText()
-                line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
-                column = pos_in_block
-                
-                completions = self.completer.get_completions(
-
-                    source_code, line_num, column, self.project_file_path, 
-                    namespace=self.custom_namespace
-                )
-            
-            if not completions:
-                self.completion_popup.hide()
-                self._completion_active = False
-                return
-            
-            # Filter completions by current word
-            if current_word:
-                filtered = [
-                    c for c in completions 
-                    if c[0].lower().startswith(current_word.lower())
-                ]
-                completions = filtered if filtered else completions
+        completions = self._get_completions(text, pos_in_block, current_word)
         
         if not completions:
             self.completion_popup.hide()
@@ -1322,6 +1271,14 @@ class CodeEditor(QPlainTextEdit):
         self.completion_popup.show()
         self.completion_popup.raise_()
         self._completion_active = True
+
+    def _get_completions(self, text, pos_in_block, current_word):
+        """Get completions for the current context. Override in subclasses."""
+        # Base implementation handles icon completions
+        prefix_text = text[:pos_in_block - len(current_word)].rstrip()
+        if prefix_text.endswith("ic.") or prefix_text.endswith("font_icons."):
+            return self._get_icon_completions(current_word)
+        return []
     
     def _accept_completion(self):
         """Accept the currently selected completion."""
@@ -1561,3 +1518,71 @@ class CodeEditor(QPlainTextEdit):
                 self.centerCursor()
             else:
                 self.request_goto_definition.emit(path, line, col)
+
+class CodeEditor(BaseCodeEditor):
+    """Python specific editor implementation."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # Autocompletion setup
+        self.completer = JediCompleter()
+        
+        # Attach highlighter
+        self.highlighter = PythonHighlighter(self.document())
+
+        # Linter setup
+        self.linter = UnusedLinter()
+
+    def run_code(self, namespace_injection=None):
+        if namespace_injection is None: namespace_injection = self.custom_namespace
+        # Use get_clean_code() instead of toPlainText()
+        code = self.get_clean_code()
+        run_string_code(code, namespace_injection)
+
+    def _get_completions(self, text, pos_in_block, current_word):
+        # First check base completions (icons)
+        completions = super()._get_completions(text, pos_in_block, current_word)
+        if completions:
+            return completions
+            
+        # Optimization: If current_word is empty (e.g. after space/comma),
+        # only trigger Jedi in specific contexts to avoid performance hit on every space
+        should_trigger = True
+        if not current_word:
+            line_text = text[:pos_in_block]
+            # Check for "from ... " (expecting import)
+            # Check for "from ...import ... " (expecting members)
+            # Check for "import ... " (expecting modules)
+            # Check for comma in import statement
+            is_import_ctx = re.match(r"^\s*(from|import)\b", line_text)
+            
+            # Also trigger if the last character is a dot (member access)
+            is_dot_trigger = line_text.rstrip().endswith('.')
+            
+            if not is_import_ctx and not is_dot_trigger:
+                should_trigger = False
+        
+        if should_trigger:
+            # Get completions from Jedi with namespace support
+            source_code = self.toPlainText()
+            cursor = self.textCursor()
+            block = cursor.block()
+            line_num = block.blockNumber() + 1  # Jedi uses 1-based line numbers
+            column = pos_in_block
+            
+            jedi_completions = self.completer.get_completions(
+                source_code, line_num, column, self.project_file_path, 
+                namespace=self.custom_namespace
+            )
+            
+            # Filter completions by current word
+            if current_word and jedi_completions:
+                filtered = [
+                    c for c in jedi_completions 
+                    if c[0].lower().startswith(current_word.lower())
+                ]
+                return filtered if filtered else jedi_completions
+            
+            return jedi_completions
+            
+        return []
