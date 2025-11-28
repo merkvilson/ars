@@ -1,5 +1,6 @@
 # Medium Priority
 
+- [ ] implement whisperthunder and pollinations as extensions/plugins
 - [ ] Color coded prompt editor
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
 - [30%] CUI workflow to CTX
@@ -61,7 +62,6 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] config.options should accept tuple of different types. str for name, list for slider values, lambda function for callbackL. (bool for enable/disable maybe?)
 
-- [ ] 
 
 - [ ] 
 
