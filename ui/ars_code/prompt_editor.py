@@ -1,5 +1,7 @@
 from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeyEvent
-from PyQt6.QtCore import QRegularExpression, Qt
+from PyQt6.QtCore import QRegularExpression, Qt 
+from PyQt6.QtWidgets import QPlainTextEdit
+
 from .editor import BaseCodeEditor
 import webcolors
 import re
@@ -72,6 +74,8 @@ class PromptEditor(BaseCodeEditor):
         
         # Hide line numbers by default for prompt editor
         self.set_line_numbers_visible(False)
+
+        self.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
         
         # Set a default font that might be more suitable for prompts (optional)
         # For now, we stick to the base class font (Consolas/Monospace)
