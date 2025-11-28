@@ -118,12 +118,12 @@
   },
   "26": {
     "inputs": {
-      "ud_name": "steps",
+      "ud_name": "Steps",
       "data_type": "Integer",
       "output": 20,
       "symbol": "ICON_STEPS",
       "additional_text": "Steps",
-      "slider_values": "0,99,20"
+      "slider_values": "1,99,20"
     },
     "class_type": "Airen_Gui_Data",
     "_meta": {
@@ -132,7 +132,7 @@
   },
   "27": {
     "inputs": {
-      "ud_name": "seed",
+      "ud_name": "Seed",
       "data_type": "Integer",
       "output": 1,
       "symbol": "ICON_SEED_0",
@@ -146,12 +146,12 @@
   },
   "28": {
     "inputs": {
-      "ud_name": "size",
+      "ud_name": "Size",
       "data_type": "Integer",
       "output": 512,
       "symbol": "ICON_GIZMO_SCALE",
       "additional_text": "Size",
-      "slider_values": "0,1024,512"
+      "slider_values": "48,1024,512"
     },
     "class_type": "Airen_Gui_Data",
     "_meta": {
