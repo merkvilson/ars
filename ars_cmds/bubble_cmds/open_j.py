@@ -5,7 +5,7 @@ import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 
-def BBL_J(*args):
+def BBL_WORKFLOW(*args):
     run_ext(__file__)
 
 def load_json_file(ars_window, file_path=None):
@@ -28,34 +28,29 @@ def execute_cmd(ars_window):
 
 
 
-    def get_gui_data(config):
-        for _, node in workflow_template.items():
-            if node.get("class_type") in airen_class_types:
-                inputs = node.get("inputs", {})
-                if 'symbol' in inputs:
-                    gui_node_inputs = inputs
-
-                    symbol = getattr(ic, gui_node_inputs["symbol"])
-                    additional_text = gui_node_inputs.get("additional_text", "")
-                    slider_values = gui_node_inputs.get("slider_values", "0,100,1")
-                    config.options[symbol] = additional_text
-                    config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
-                    
-    def set_default_values(config):
-        for _, node in workflow_template.items():
-            inputs = node.get("inputs", {})
-            if inputs.get("ud_name") == "Default_Values":
-                config.close_on_outside = inputs.get("close_on_outside", True)
-                config.auto_close = inputs.get("auto_close", False)
-                config.incremental_value = inputs.get("incremental_value", True)
-                config.show_value = inputs.get("show_value", True)
-
-
 
     config=ContextMenuConfig()
     config.options = {}
-    get_gui_data(config)
-    set_default_values(config)
+
+    for _, node in workflow_template.items():
+        if node.get("class_type") in airen_class_types:
+            inputs = node.get("inputs", {})
+            if 'symbol' in inputs:
+                gui_node_inputs = inputs
+
+                symbol = getattr(ic, gui_node_inputs["symbol"])
+                additional_text = gui_node_inputs.get("additional_text", "")
+                slider_values = gui_node_inputs.get("slider_values", "0,100,1")
+                config.options[symbol] = additional_text
+                config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
+                
+    for _, node in workflow_template.items():
+        inputs = node.get("inputs", {})
+        if inputs.get("ud_name") == "Default_Values":
+            config.close_on_outside = inputs.get("close_on_outside", True)
+            config.auto_close = inputs.get("auto_close", False)
+            config.incremental_value = inputs.get("incremental_value", True)
+            config.show_value = inputs.get("show_value", True)
 
     def start_render():
         for _, node in workflow_template.items():
