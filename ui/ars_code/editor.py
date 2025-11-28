@@ -1363,13 +1363,20 @@ class BaseCodeEditor(QPlainTextEdit):
                 self.setTextCursor(cursor)
                 self._is_replacing = False
 
+    def set_line_numbers_visible(self, visible: bool):
+        """Show or hide the line number area."""
+        self.line_number_area.setVisible(visible)
+        self.update_line_number_area_width(0)
+
     def line_number_area_width(self):
+        if not self.line_number_area.isVisible():
+            return 0
         digits = len(str(max(1, self.blockCount())))
         space = 30 + self.fontMetrics().horizontalAdvance('9') * digits
         return space
 
     def update_line_number_area_width(self, _):
-        self.setViewportMargins(self.line_number_area_width() + 5, 0, 0, 0)
+        self.setViewportMargins(self.line_number_area_width() + 5 if self.line_number_area.isVisible() else 0, 0, 0, 0)
 
     def update_line_number_area(self, rect, dy):
         if dy:

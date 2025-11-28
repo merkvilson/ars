@@ -15,7 +15,7 @@ from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from prefs.pref_controller import get_path
 from theme.fonts import font_icons as ic
 from ui.widgets.context_menu import ContextMenuConfig, open_context
-from ui.widgets.multi_line_input import MultiLineInputWidget
+from ui.ars_code import PromptEditor
 
 def prompt_ctx(self, position, default_object = None, callback = None):
 
@@ -39,7 +39,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     options_list = [
-    ["   ","prompt_widget","   ",],
+    ["   ", "PromptEditorWidget", "   ",],
 
     [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
     ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", 
@@ -138,17 +138,14 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     def set_text_from_prompt():
-        default_object.prompt = prompt_widget.text_edit.toPlainText()
+        default_object.prompt = editor.toPlainText()
 
-    prompt_widget = MultiLineInputWidget()
-    prompt_widget.text_edit.setPlainText(default_object.prompt)
-    prompt_widget.text_edit.textChanged.connect(set_text_from_prompt)
+    editor = PromptEditor()
+    editor.setFixedSize(440, 140)
+    editor.setPlainText(default_object.prompt)
+    editor.textChanged.connect(set_text_from_prompt)
 
-    prompt_widget.setFixedSize(440, 140)
-
-    config.custom_widget_items = {"prompt_widget": prompt_widget}
-
-
+    config.custom_widget_items = {"PromptEditorWidget": editor}
 
     ctx = open_context(
         parent=self.central_widget,

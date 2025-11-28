@@ -70,6 +70,9 @@ class PromptEditor(BaseCodeEditor):
         super().__init__(parent)
         self.highlighter = PromptHighlighter(self.document())
         
+        # Hide line numbers by default for prompt editor
+        self.set_line_numbers_visible(False)
+        
         # Set a default font that might be more suitable for prompts (optional)
         # For now, we stick to the base class font (Consolas/Monospace)
         
