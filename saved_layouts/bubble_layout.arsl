@@ -57,7 +57,7 @@
         },
         {
             "symbol": "\ue91d",
-            "grid_x": 25,
+            "grid_x": 16,
             "grid_y": 0
         },
         {
@@ -68,6 +68,11 @@
         {
             "symbol": "\ue948",
             "grid_x": 1,
+            "grid_y": 0
+        },
+        {
+            "symbol": "P",
+            "grid_x": 25,
             "grid_y": 0
         },
         {
