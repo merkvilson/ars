@@ -23,7 +23,9 @@
 - [ ] Implement scene save/load functionality
 - [ ] Create user documentation
 - [ ] Improve object selection feedback
-- [50%] Store values inside ars_window.prefs
+- [80%] Store values inside ars_window.prefs
+- [80%] Read values from ars_window.prefs
+- [ ] 
 - [ ] 
 - [ ] 
 
