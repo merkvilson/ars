@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeyEvent
+from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeyEvent, QTextCursor
 from PyQt6.QtCore import QRegularExpression, Qt 
 from PyQt6.QtWidgets import QPlainTextEdit
 
@@ -87,7 +87,12 @@ class PromptEditor(BaseCodeEditor):
             return
             
         # Get current format
-        fmt = cursor.charFormat()
+        # Use the start of the selection to ensure we get the format of the selected text,
+        # not the character before the selection (which happens if selecting backwards)
+        check_cursor = QTextCursor(self.document())
+        check_cursor.setPosition(cursor.selectionStart() + 1)
+        fmt = check_cursor.charFormat()
+        
         current_size = fmt.fontPointSize()
         
         # If point size is not set (0), use the default font size
@@ -96,8 +101,9 @@ class PromptEditor(BaseCodeEditor):
             
         new_size = max(6, current_size + delta)
         
-        fmt.setFontPointSize(new_size)
-        cursor.mergeCharFormat(fmt)
+        new_fmt = QTextCharFormat()
+        new_fmt.setFontPointSize(new_size)
+        cursor.mergeCharFormat(new_fmt)
         self.setTextCursor(cursor)
 
     def keyPressEvent(self, event: QKeyEvent):
