@@ -16,6 +16,9 @@ def load_json_file(ars_window, file_path=None):
 
 def execute_cmd(ars_window):
 
+    config=ContextMenuConfig()
+    config.options = {}
+
     if not ars_window.prefs.json_ud_path:
         default_workflow_path = r"extensions\comfyui\test.json" #Temporal default path
         load_json_file(ars_window, default_workflow_path)
@@ -26,12 +29,7 @@ def execute_cmd(ars_window):
 
     airen_class_types = ["Airen_Gui_Data"]#["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
 
-
-
-
-    config=ContextMenuConfig()
-    config.options = {}
-
+    # First, gather all GUI data nodes
     for _, node in workflow_template.items():
         if node.get("class_type") in airen_class_types:
             inputs = node.get("inputs", {})
@@ -44,6 +42,7 @@ def execute_cmd(ars_window):
                 config.options[symbol] = additional_text
                 config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
                 
+    # Set default values from "Default_Values" node
     for _, node in workflow_template.items():
         inputs = node.get("inputs", {})
         if inputs.get("ud_name") == "Default_Values":
