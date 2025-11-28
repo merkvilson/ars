@@ -17,7 +17,7 @@ def load_json_file(ars_window, file_path=None):
 def execute_cmd(ars_window):
 
     if not ars_window.prefs.json_ud_path:
-        default_workflow_path = r"C:\Users\DESKTOP.GE\Downloads\default.json" #Temporal default path
+        default_workflow_path = r"extensions\comfyui\test.json" #Temporal default path
         load_json_file(ars_window, default_workflow_path)
 
     ars_window.render_manager.set_workflow(ars_window.prefs.json_ud_path)
@@ -58,6 +58,16 @@ def execute_cmd(ars_window):
     set_default_values(config)
 
     def start_render():
+        for _, node in workflow_template.items():
+            if node.get("class_type") in airen_class_types:
+                inputs = node.get("inputs", {})
+                if 'symbol' in inputs and 'ud_name' in inputs:
+                    symbol_name = inputs["symbol"]
+                    if hasattr(ic, symbol_name):
+                        symbol = getattr(ic, symbol_name)
+                        value = ctx.get_value(symbol)
+                        if value is not None:
+                            ars_window.render_manager.set_userdata(inputs["ud_name"], value)
         
         ars_window.render_manager.send_render()
 
