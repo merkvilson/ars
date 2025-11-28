@@ -18,6 +18,8 @@ def execute_cmd(ars_window):
 
     config=ContextMenuConfig()
     config.options = {}
+    config.extra_distance = [99999,0]
+
 
     if not ars_window.prefs.json_ud_path:
         default_workflow_path = r"extensions\comfyui\test.json" #Temporal default path
