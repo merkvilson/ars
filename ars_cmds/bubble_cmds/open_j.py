@@ -40,10 +40,7 @@ def execute_cmd(ars_window):
                     slider_values = gui_node_inputs.get("slider_values", "0,100,1")
                     config.options[symbol] = additional_text
                     config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
-
-
-
-
+                    
     def set_default_values(config):
         for _, node in workflow_template.items():
             inputs = node.get("inputs", {})
@@ -57,12 +54,21 @@ def execute_cmd(ars_window):
 
     config=ContextMenuConfig()
     config.options = {}
-
-    config.options[ic.ICON_PLAYER_PLAY] = "Run"
-    config.color = {ic.ICON_PLAYER_PLAY: QColor.fromRgbF(0.304, 0.471937, 0.8, 1.0)}
-    config.hover_color = {ic.ICON_PLAYER_PLAY: QColor.fromRgbF(0.3822,  0.657188, 0.98,  1.0)}
-    # config.hotkey_items = {ic.ICON_PLAYER_PLAY: 'Ctrl R'}
     get_gui_data(config)
     set_default_values(config)
 
-    open_context(config)
+    def start_render():
+        
+        ars_window.render_manager.send_render()
+
+
+
+    config.options[ic.ICON_PLAYER_PLAY] = "Run"
+    config.color[ic.ICON_PLAYER_PLAY] = QColor.fromRgbF(0.304, 0.471937, 0.8, 1.0)
+    config.hover_color[ic.ICON_PLAYER_PLAY] = QColor.fromRgbF(0.3822,  0.657188, 0.98,  1.0)
+    
+
+    
+    config.callbackL[ic.ICON_PLAYER_PLAY] = start_render
+    
+    ctx = open_context(config)

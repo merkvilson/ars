@@ -1,0 +1,174 @@
+{
+  "3": {
+    "inputs": {
+      "seed": [
+        "27",
+        0
+      ],
+      "steps": [
+        "26",
+        0
+      ],
+      "cfg": 8,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "dreamshaper_8.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "5": {
+    "inputs": {
+      "width": [
+        "28",
+        0
+      ],
+      "height": [
+        "28",
+        0
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "beautiful scenery nature glass bottle landscape, purple galaxy bottle,",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "text, watermark",
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "9": {
+    "inputs": {
+      "filename_prefix": "SD1.5",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "26": {
+    "inputs": {
+      "ud_name": "steps",
+      "data_type": "Integer",
+      "output": 20,
+      "symbol": "ICON_STEPS",
+      "additional_text": "Steps",
+      "slider_values": "0,99,20"
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "27": {
+    "inputs": {
+      "ud_name": "seed",
+      "data_type": "Integer",
+      "output": 1,
+      "symbol": "ICON_SEED_0",
+      "additional_text": "Seed",
+      "slider_values": "0,99999,1"
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "28": {
+    "inputs": {
+      "ud_name": "size",
+      "data_type": "Integer",
+      "output": 512,
+      "symbol": "ICON_GIZMO_SCALE",
+      "additional_text": "Size",
+      "slider_values": "0,1024,512"
+    },
+    "class_type": "Airen_Gui_Data",
+    "_meta": {
+      "title": "Airen_Gui_Data"
+    }
+  },
+  "31": {
+    "inputs": {
+      "ud_name": "Default_Values",
+      "close_on_outside": false,
+      "auto_close": false,
+      "incremental_value": true,
+      "show_value": true
+    },
+    "class_type": "Airen_Gui_Defaults",
+    "_meta": {
+      "title": "Airen_Gui_Defaults"
+    }
+  }
+}
