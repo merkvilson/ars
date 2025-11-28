@@ -70,9 +70,6 @@ def execute_cmd(ars_window):
     config.options = {ic.ICON_PLAYER_PLAY: "Run", **config.options}
     config.color[ic.ICON_PLAYER_PLAY] = QColor.fromRgbF(0.304, 0.471937, 0.8, 1.0)
     config.hover_color[ic.ICON_PLAYER_PLAY] = QColor.fromRgbF(0.3822,  0.657188, 0.98,  1.0)
-    
-
-    
     config.callbackL[ic.ICON_PLAYER_PLAY] = start_render
     
     ctx = open_context(config)
