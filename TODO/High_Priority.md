@@ -1,6 +1,6 @@
 # High Priority
 
-
+- [ ] Color coded prompt editor
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
 - [30%] CUI workflow to CTX
 - [✓] CUI Workflof: Checkbox to expose value in gui
