@@ -2,7 +2,7 @@
     "bubbles": [
         {
             "symbol": "\ue94f",
-            "grid_x": 18,
+            "grid_x": 19,
             "grid_y": 0
         },
         {
@@ -12,7 +12,7 @@
         },
         {
             "symbol": "\ue9bb",
-            "grid_x": 23,
+            "grid_x": 18,
             "grid_y": 0
         },
         {
@@ -37,7 +37,7 @@
         },
         {
             "symbol": "\ue905",
-            "grid_x": 14,
+            "grid_x": 10,
             "grid_y": 0
         },
         {
@@ -57,7 +57,7 @@
         },
         {
             "symbol": "\ue91d",
-            "grid_x": 8,
+            "grid_x": 25,
             "grid_y": 0
         },
         {
@@ -72,7 +72,7 @@
         },
         {
             "symbol": "\ue9b0",
-            "grid_x": 24,
+            "grid_x": 17,
             "grid_y": 0
         },
         {
@@ -82,32 +82,32 @@
         },
         {
             "symbol": "\ue93a",
-            "grid_x": 25,
+            "grid_x": 24,
             "grid_y": 0
         },
         {
             "symbol": "C",
-            "grid_x": 22,
+            "grid_x": 23,
             "grid_y": 0
         },
         {
             "symbol": "\ue9a8",
-            "grid_x": 21,
+            "grid_x": 22,
             "grid_y": 0
         },
         {
             "symbol": "\ue90e",
-            "grid_x": 19,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue9a7",
             "grid_x": 20,
             "grid_y": 0
         },
         {
+            "symbol": "\ue9a7",
+            "grid_x": 21,
+            "grid_y": 0
+        },
+        {
             "symbol": "\ue99b",
-            "grid_x": 15,
+            "grid_x": 9,
             "grid_y": 0
         }
     ]
