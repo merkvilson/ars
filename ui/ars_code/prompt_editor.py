@@ -1,6 +1,8 @@
 from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeyEvent
 from PyQt6.QtCore import QRegularExpression, Qt
 from .editor import BaseCodeEditor
+import webcolors
+import re
 
 class PromptHighlighter(QSyntaxHighlighter):
     def __init__(self, document):
@@ -9,12 +11,29 @@ class PromptHighlighter(QSyntaxHighlighter):
         # Hex codes pattern
         self.hex_pattern = QRegularExpression(r"#(?:[0-9a-fA-F]{3}){1,2}\b")
         
-        # Color names
-        self.color_names = QColor.colorNames()
+        # Color names from webcolors (CSS3)
+        # Use public API to get names and build map
+        try:
+            # webcolors >= 1.11 uses names() function
+            names = webcolors.names("css3")
+            self.color_map = {name: webcolors.name_to_hex(name) for name in names}
+        except (AttributeError, TypeError):
+            # Fallback for older versions or if names() is not available/different
+            try:
+                self.color_map = webcolors.CSS3_NAMES_TO_HEX
+            except AttributeError:
+                # Fallback to basic QColor names if webcolors fails completely
+                self.color_map = {name: name for name in QColor.colorNames()}
+
+        self.color_names = list(self.color_map.keys())
+        
         # Regex for color names (word boundary)
         # Sort by length descending to match longest names first (e.g. "darkblue" before "blue")
         sorted_colors = sorted(self.color_names, key=len, reverse=True)
-        self.color_pattern = QRegularExpression(r"\b(" + "|".join(sorted_colors) + r")\b")
+        
+        # Build regex pattern
+        pattern = r"\b(" + "|".join(re.escape(c) for c in sorted_colors) + r")\b"
+        self.color_pattern = QRegularExpression(pattern)
         self.color_pattern.setPatternOptions(QRegularExpression.PatternOption.CaseInsensitiveOption)
 
     def highlightBlock(self, text):
@@ -35,14 +54,15 @@ class PromptHighlighter(QSyntaxHighlighter):
         match_iter = self.color_pattern.globalMatch(text)
         while match_iter.hasNext():
             match = match_iter.next()
-            color_name = match.captured(1)
+            color_name = match.captured(1).lower()
             
-            fmt = QTextCharFormat()
-            # QColor understands SVG color names
-            fmt.setForeground(QColor(color_name))
-            fmt.setFontWeight(QFont.Weight.Bold)
-            
-            self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+            if color_name in self.color_map:
+                hex_value = self.color_map[color_name]
+                fmt = QTextCharFormat()
+                fmt.setForeground(QColor(hex_value))
+                fmt.setFontWeight(QFont.Weight.Bold)
+                
+                self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
 
 
 class PromptEditor(BaseCodeEditor):
