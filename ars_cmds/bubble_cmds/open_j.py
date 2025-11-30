@@ -32,7 +32,13 @@ def execute_cmd(ars_window):
 
     airen_class_types = ["Airen_Gui_Data", "Airen_Gui_Prompt"]#["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
 
-    # First, gather all GUI data nodes
+    # Check Workflow Type (Image/Video/3D/etc)
+    for _, node in workflow_template.items():
+        if node.get("class_type") == "Airen_Workflow_Type":
+            inputs = node.get("inputs", {})
+            ars_window.prefs.workflow_type = inputs.get("workflow_type", "Image")
+
+    # Gather all GUI data nodes
     for _, node in workflow_template.items():
         if node.get("class_type") in airen_class_types:
             inputs = node.get("inputs", {})
@@ -62,6 +68,11 @@ def execute_cmd(ars_window):
             config.auto_close = inputs.get("auto_close", False)
             config.incremental_value = inputs.get("incremental_value", True)
             config.show_value = inputs.get("show_value", True)
+
+            workflow_type = inputs.get("workflow_type", "Image")
+            if workflow_type in ["Image", "Video", "Sprite"]:
+                ars_window.viewport.hide()
+                ars_window.img.show()
 
     def start_render():
         for _, node in workflow_template.items():
