@@ -715,6 +715,14 @@ class BButton(QGraphicsObject):
                 else:
                     self.callbackL()
             
+            if not self.use_extended_shape:
+                value_txt = str(int(round(self._slider_value)))
+                self.main_symbol_item.setPlainText(value_txt)
+                self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
+                bounding = self.main_symbol_item.boundingRect()
+                self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+                self._start_revert_timer()
+
             self.update()
             event.accept()
         else:
@@ -803,7 +811,7 @@ class BButton(QGraphicsObject):
 
     def _start_revert_timer(self):
         """Start the timer to revert symbol after button release."""
-        if self.incremental_value and not self.use_extended_shape:
+        if not self.use_extended_shape:
             if self._revert_timer:
                 self._revert_timer.stop()
             self._revert_timer = QTimer()
