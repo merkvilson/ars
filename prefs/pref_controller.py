@@ -44,6 +44,9 @@ class prefsConfig:
 
         # Json User Data
         self.json_ud_path = ""
+        self.json_positive = ""
+        self.json_negative = ""
+        
 
 
 
