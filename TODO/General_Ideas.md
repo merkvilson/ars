@@ -35,7 +35,7 @@
 
 - [70%] Save image steps inside final image as metadata
 
-- [ ] First step of animation generation can be a mix of first image and last image by applying generation steps from metadata.
+- [✓] First step of animation generation can be a mix of first image and last image by applying generation steps from metadata.
 
 - [✓] b_button: Hover enter callback, Hover leave callback
 
