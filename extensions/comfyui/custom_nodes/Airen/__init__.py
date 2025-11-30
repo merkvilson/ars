@@ -33,25 +33,6 @@ class Airen_Str:
         return (output,)
 
 
-class Airen_Prompt:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "ud_name": ("STRING", {"default": "prompt", "multiline": False}),
-                "positive": ("STRING", {"default": "", "multiline": False}),
-                "negative": ("STRING", {"default": "", "multiline": False}),
-
-            }
-        }
-
-    RETURN_TYPES = ("STRING","STRING")
-    FUNCTION = "execute"
-    CATEGORY = "Airen_Studio/User Data"
-    OUTPUT_NODE = True
-
-    def execute(self, ud_name, positive, negative):
-        return (positive, negative)
 
 
 class Airen_Int:
@@ -357,6 +338,27 @@ class Airen_Gui_Data:
    
 
 
+class Airen_Gui_Prompt:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ud_name": ("STRING", {"default": "prompt", "multiline": False}),
+                "positive": ("STRING", {"default": "", "multiline": False}),
+                "negative": ("STRING", {"default": "", "multiline": False}),
+
+            }
+        }
+
+    RETURN_TYPES = ("STRING","STRING")
+    FUNCTION = "execute"
+    CATEGORY = "Airen_Studio/User Data"
+    OUTPUT_NODE = True
+
+    def execute(self, ud_name, positive, negative):
+        return (positive, negative)
+
+
 
 
 class Airen_Gui_Defaults:
@@ -384,7 +386,7 @@ class Airen_Gui_Defaults:
 
 NODE_CLASS_MAPPINGS = {
     "Airen_Str": Airen_Str,
-    "Airen_Prompt": Airen_Prompt,
+    "Airen_Gui_Prompt": Airen_Gui_Prompt,
     "Airen_Int": Airen_Int,
     "Airen_Float": Airen_Float,
     "Airen_Checkpoint": Airen_Checkpoint,

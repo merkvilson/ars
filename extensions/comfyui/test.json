@@ -63,7 +63,10 @@
   },
   "6": {
     "inputs": {
-      "text": "beautiful scenery nature glass bottle landscape, purple galaxy bottle,",
+      "text": [
+        "36",
+        0
+      ],
       "clip": [
         "4",
         1
@@ -76,7 +79,10 @@
   },
   "7": {
     "inputs": {
-      "text": "text, watermark",
+      "text": [
+        "36",
+        1
+      ],
       "clip": [
         "4",
         1
@@ -171,6 +177,17 @@
     "class_type": "Airen_SaveImage",
     "_meta": {
       "title": "Airen_SaveImage"
+    }
+  },
+  "36": {
+    "inputs": {
+      "ud_name": "prompt",
+      "positive": "",
+      "negative": ""
+    },
+    "class_type": "Airen_Gui_Prompt",
+    "_meta": {
+      "title": "Airen_Gui_Prompt"
     }
   }
 }
