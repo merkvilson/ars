@@ -4,6 +4,7 @@ from ars_cmds.core_cmds.run_ext import run_ext
 import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
+from ars_cmds.render_cmds.generate_render import generate_render
 
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
@@ -65,7 +66,9 @@ def execute_cmd(ars_window):
                         if value is not None:
                             ars_window.render_manager.set_userdata(inputs["ud_name"], value)
         
-        ars_window.render_manager.send_render()
+        #ars_window.render_manager.send_render()
+            generate_render(ars_window, ctx, int(ctx.get_value(ic.ICON_STEPS)), None)
+
 
 
 
