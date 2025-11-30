@@ -26,7 +26,7 @@ def execute_cmd(self):
                         "0": lambda: print(self.render_manager.workflow_name),
                         "1": lambda: self.render_manager.set_workflow("mesh"),
                         "2": lambda: self.render_manager.set_workflow("render"),
-                        "3": lambda: self.render_manager.set_workflow("mesh_image"),
+                        # "3": lambda: self.render_manager.set_workflow("mesh_image"),
                         "4": lambda: self.render_manager.set_workflow("sprite"),
                         "5": lambda: self.render_manager.set_workflow("video"),
                         "6": lambda: self.render_manager.send_render(),
