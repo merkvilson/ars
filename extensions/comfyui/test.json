@@ -154,6 +154,7 @@
   "31": {
     "inputs": {
       "ud_name": "Default_Values",
+      "workflow_type": "Image",
       "close_on_outside": false,
       "auto_close": false,
       "incremental_value": true,

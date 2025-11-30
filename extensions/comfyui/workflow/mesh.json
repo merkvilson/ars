@@ -146,13 +146,10 @@
     }
   },
   "19": {
-    "inputs": {
-      "ud_name": "steps",
-      "output": 20
-    },
-    "class_type": "Airen_Int",
+    "inputs": {},
+    "class_type": "Airen_UD",
     "_meta": {
-      "title": "Airen Integer"
+      "title": "steps"
     }
   },
   "20": {
@@ -170,23 +167,17 @@
     }
   },
   "24": {
-    "inputs": {
-      "ud_name": "seed",
-      "output": 5
-    },
-    "class_type": "Airen_Int",
+    "inputs": {},
+    "class_type": "Airen_UD",
     "_meta": {
-      "title": "Airen Integer"
+      "title": "seed"
     }
   },
   "26": {
-    "inputs": {
-      "ud_name": "resolution",
-      "output": 256
-    },
-    "class_type": "Airen_Int",
+    "inputs": {},
+    "class_type": "Airen_UD",
     "_meta": {
-      "title": "Airen_Int"
+      "title": "resolution"
     }
   },
   "29": {

@@ -55,10 +55,7 @@
       "cfg": 8,
       "sampler_name": "euler",
       "scheduler": "exponential",
-      "denoise": [
-        "43",
-        0
-      ],
+      "denoise": 1,
       "model": [
         "4",
         0
@@ -174,16 +171,6 @@
     "class_type": "Airen_Progress_Reader",
     "_meta": {
       "title": "Airen_Progress_Reader"
-    }
-  },
-  "43": {
-    "inputs": {
-      "ud_name": "denoise",
-      "output": 0.8
-    },
-    "class_type": "Airen_Float",
-    "_meta": {
-      "title": "Airen_Float"
     }
   },
   "44": {
