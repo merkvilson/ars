@@ -14,9 +14,11 @@ class RenderDataManager(QObject):
 
         # Load default workflow JSON if provided (like your default.json)
         self.workflow_template = None
+        self.base_workflow = None
         if default_workflow_path and os.path.exists(default_workflow_path):
             with open(default_workflow_path, 'r', encoding='utf-8') as f:
                 self.workflow_template = json.load(f)
+                self.base_workflow = json.loads(json.dumps(self.workflow_template))
 
     def set_workflow(self, workflow):
         if not os.path.exists(workflow):
@@ -26,6 +28,7 @@ class RenderDataManager(QObject):
             return
         with open(workflow, 'r', encoding='utf-8') as f:
             self.workflow_template = json.load(f)
+            self.base_workflow = json.loads(json.dumps(self.workflow_template))
             self.workflow_name = os.path.splitext(os.path.basename(workflow))[0]
  
     def set_userdata(self, key, value):
@@ -45,6 +48,25 @@ class RenderDataManager(QObject):
                 return inputs["output"]
 
         print(f"Userdata node with ud_name '{key}' not found.")
+
+    def set_ud(self, key, value):
+        if not self.base_workflow: return
+
+        target_node_id = None
+        for node_id, node in self.base_workflow.items():
+            if node.get("class_type") == "Airen_UD" and node.get("_meta", {}).get("title") == key:
+                target_node_id = node_id
+                break
+        
+        if not target_node_id:
+            print(f"Airen_UD node with title '{key}' not found.")
+            return
+
+        for node_id, node in self.base_workflow.items():
+            inputs = node.get("inputs", {})
+            for input_key, input_val in inputs.items():
+                if isinstance(input_val, list) and len(input_val) == 2 and str(input_val[0]) == str(target_node_id):
+                    self.workflow_template[node_id]["inputs"][input_key] = value
 
     
     def get_weights(self):
