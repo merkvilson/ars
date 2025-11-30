@@ -14,62 +14,6 @@ class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
 
-class Airen_Str:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "ud_name": ("STRING", {"default": "", "multiline": False}),
-                "output": ("STRING", {"default": "", "multiline": False}),
-            }
-        }
-
-    RETURN_TYPES = ("STRING",)
-    FUNCTION = "execute"
-    CATEGORY = "Airen_Studio/User Data"
-    OUTPUT_NODE = True
-
-    def execute(self, ud_name, output):
-        return (output,)
-
-
-
-
-class Airen_Int:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "ud_name": ("STRING", {"default": "", "multiline": False}),
-                "output": ("INT", {"default": 0, "min": -999999, "max": 999999, "step": 1}),
-            }
-        }
-
-    RETURN_TYPES = ("INT",)
-    FUNCTION = "execute"
-    CATEGORY = "Airen_Studio/User Data"
-    OUTPUT_NODE = True
-
-    def execute(self, ud_name, output):
-        return (output,)
-
-class Airen_Float:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "ud_name": ("STRING", {"default": "", "multiline": False}),
-                "output": ("FLOAT", {"default": 0, "min": -999999, "max": 999999, "step": 0.1}),
-            }
-        }
-
-    RETURN_TYPES = ("FLOAT",)
-    FUNCTION = "execute"
-    CATEGORY = "Airen_Studio/User Data"
-    OUTPUT_NODE = True
-
-    def execute(self, ud_name, output):
-        return (output,)
     
 class Airen_Checkpoint:
     @classmethod
@@ -361,12 +305,14 @@ class Airen_Gui_Prompt:
 
 
 
-class Airen_Gui_Defaults:
+class Airen_Gui_Defaults: #TODO: Rename to global values or similar
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "ud_name": ("STRING", {"default": "Default_Values", "multiline": False}),
+
+                "workflow_type": (["Image", "Video", "3D", "Sprite", "Custom"], ),
 
                 "close_on_outside": ("BOOLEAN", {"default": True}),
                 "auto_close": ("BOOLEAN", {"default": False}),
@@ -407,10 +353,7 @@ class Airen_UD:
 
 NODE_CLASS_MAPPINGS = {
     "Airen_UD": Airen_UD,
-    "Airen_Str": Airen_Str,
     "Airen_Gui_Prompt": Airen_Gui_Prompt,
-    "Airen_Int": Airen_Int,
-    "Airen_Float": Airen_Float,
     "Airen_Checkpoint": Airen_Checkpoint,
     "Airen_VAE": Airen_VAE,
     "Airen_Lora": Airen_Lora,
