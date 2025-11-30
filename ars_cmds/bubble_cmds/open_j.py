@@ -30,7 +30,7 @@ def execute_cmd(ars_window):
 
     with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
 
-    airen_class_types = ["Airen_Gui_Data"]#["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
+    airen_class_types = ["Airen_Gui_Data", "Airen_Gui_Prompt"]#["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
 
     # First, gather all GUI data nodes
     for _, node in workflow_template.items():
@@ -44,7 +44,16 @@ def execute_cmd(ars_window):
                 slider_values = gui_node_inputs.get("slider_values", "0,100,1")
                 config.options[symbol] = additional_text
                 config.slider_values[symbol] = [float(x) for x in slider_values.split(",")]
-                
+
+
+    # Get Prompt Node values (There can be only one prompt node with two outputs - positive and negative)
+    for _, node in workflow_template.items():
+        if node.get("class_type") == "Airen_Gui_Prompt":
+            inputs = node.get("inputs", {})
+            ars_window.prefs.json_positive = inputs.get("positive", "")
+            ars_window.prefs.json_negative = inputs.get("negative", "")
+
+
     # Set default values from "Default_Values" node
     for _, node in workflow_template.items():
         inputs = node.get("inputs", {})
@@ -66,9 +75,15 @@ def execute_cmd(ars_window):
                         if value is not None:
                             ars_window.render_manager.set_userdata(inputs["ud_name"], value)
         
-        #ars_window.render_manager.send_render()
-            generate_render(ars_window, ctx, int(ctx.get_value(ic.ICON_STEPS)), None)
 
+        for _, node in workflow_template.items():
+            if node.get("class_type") in airen_class_types:
+                inputs = node.get("inputs", {})
+                if inputs.get("ud_name") == 'prompt':
+                    inputs["positive"] = ars_window.prefs.json_positive
+                    inputs["negative"] = ars_window.prefs.json_negative
+
+        generate_render(ars_window, ctx, int(ctx.get_value(ic.ICON_STEPS)), None)
 
 
 
