@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainter, QBrush, QImage
 from PyQt6.QtCore import Qt, QRectF, QPointF
 from PIL import Image, ImageSequence
+from PyQt6.QtWidgets import QApplication
 
 class ImageViewer(QGraphicsView):
     def __init__(self, scene, parent=None):
@@ -111,6 +112,14 @@ class ImageViewer(QGraphicsView):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         super().mouseReleaseEvent(event)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            ars_window = QApplication.instance().activeWindow() # This returns the main window instance
+            ars_window.img.hide()
+            ars_window.viewport.show()
+
+        super().keyPressEvent(event)
 
 class ImageViewerWidget(QWidget):
     def __init__(self, parent=None):
