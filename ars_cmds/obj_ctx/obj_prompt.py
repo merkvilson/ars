@@ -83,6 +83,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         self.render_manager.set_ud("seed", default_object.seed)
         self.render_manager.set_ud("steps", int(ctx.get_value(ic.ICON_STEPS)))
         self.render_manager.set_ud("positive", default_object.prompt)
+        self.render_manager.set_ud("negative", "Low quality, blurry, deformed, bad anatomy") #TODO: make editable
 
         generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
 
