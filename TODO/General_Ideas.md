@@ -25,7 +25,7 @@
 - [ ] Improve object selection feedback
 - [80%] Store values inside ars_window.prefs
 - [80%] Read values from ars_window.prefs
-- [ ] 
+- [ ] A|B compare
 - [ ] 
 - [ ] 
 
