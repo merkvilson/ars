@@ -103,19 +103,6 @@
       "title": "VAE Decode"
     }
   },
-  "9": {
-    "inputs": {
-      "filename_prefix": "SD1.5",
-      "images": [
-        "8",
-        0
-      ]
-    },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Image"
-    }
-  },
   "26": {
     "inputs": {
       "ud_name": "Steps",
@@ -169,6 +156,21 @@
     "class_type": "Airen_Gui_Defaults",
     "_meta": {
       "title": "Airen_Gui_Defaults"
+    }
+  },
+  "32": {
+    "inputs": {
+      "ud_name": "",
+      "category": "steps",
+      "save_layers": true,
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "Airen_SaveImage",
+    "_meta": {
+      "title": "Airen_SaveImage"
     }
   }
 }
