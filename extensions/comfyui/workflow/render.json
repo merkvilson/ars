@@ -14,7 +14,7 @@
   "6": {
     "inputs": {
       "text": [
-        "30",
+        "46",
         0
       ],
       "clip": [
@@ -31,8 +31,8 @@
     "inputs": {
       "text": "text, watermark",
       "clip": [
-        "4",
-        1
+        "47",
+        0
       ]
     },
     "class_type": "CLIPTextEncode",
@@ -43,22 +43,19 @@
   "15": {
     "inputs": {
       "seed": [
-        "33",
+        "45",
         0
       ],
       "tileX": 0,
       "tileY": 0,
       "steps": [
-        "25",
+        "44",
         0
       ],
       "cfg": 8,
       "sampler_name": "euler",
       "scheduler": "exponential",
-      "denoise": [
-        "43",
-        0
-      ],
+      "denoise": 1,
       "model": [
         "4",
         0
@@ -122,16 +119,6 @@
       "title": "VAE Encode"
     }
   },
-  "25": {
-    "inputs": {
-      "ud_name": "steps",
-      "output": 20
-    },
-    "class_type": "Airen_Int",
-    "_meta": {
-      "title": "Airen Integer"
-    }
-  },
   "27": {
     "inputs": {
       "ud_name": "",
@@ -145,16 +132,6 @@
     "class_type": "Airen_SaveImage",
     "_meta": {
       "title": "Airen Save Image"
-    }
-  },
-  "30": {
-    "inputs": {
-      "ud_name": "positive",
-      "output": ""
-    },
-    "class_type": "Airen_Str",
-    "_meta": {
-      "title": "Airen Text"
     }
   },
   "31": {
@@ -186,16 +163,6 @@
     "class_type": "ControlNetApplyAdvanced",
     "_meta": {
       "title": "Apply ControlNet"
-    }
-  },
-  "33": {
-    "inputs": {
-      "ud_name": "seed",
-      "output": 5
-    },
-    "class_type": "Airen_Int",
-    "_meta": {
-      "title": "Airen Integer"
     }
   },
   "34": {
@@ -271,14 +238,32 @@
       "title": "Airen_Progress_Reader"
     }
   },
-  "43": {
-    "inputs": {
-      "ud_name": "denoise",
-      "output": 0.8
-    },
-    "class_type": "Airen_Float",
+  "44": {
+    "inputs": {},
+    "class_type": "Airen_UD",
     "_meta": {
-      "title": "Airen_Float"
+      "title": "steps"
+    }
+  },
+  "45": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "seed"
+    }
+  },
+  "46": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "positive"
+    }
+  },
+  "47": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "negative"
     }
   }
 }

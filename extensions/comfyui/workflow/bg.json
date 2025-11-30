@@ -14,7 +14,7 @@
   "6": {
     "inputs": {
       "text": [
-        "30",
+        "46",
         0
       ],
       "clip": [
@@ -43,13 +43,13 @@
   "15": {
     "inputs": {
       "seed": [
-        "33",
+        "48",
         0
       ],
       "tileX": 0,
       "tileY": 0,
       "steps": [
-        "25",
+        "47",
         0
       ],
       "cfg": 8,
@@ -97,16 +97,6 @@
       "title": "VAE Decode"
     }
   },
-  "25": {
-    "inputs": {
-      "ud_name": "steps",
-      "output": 20
-    },
-    "class_type": "Airen_Int",
-    "_meta": {
-      "title": "Airen Integer"
-    }
-  },
   "27": {
     "inputs": {
       "ud_name": "",
@@ -120,26 +110,6 @@
     "class_type": "Airen_SaveImage",
     "_meta": {
       "title": "Airen Save Image"
-    }
-  },
-  "30": {
-    "inputs": {
-      "ud_name": "positive",
-      "output": ""
-    },
-    "class_type": "Airen_Str",
-    "_meta": {
-      "title": "Airen Text"
-    }
-  },
-  "33": {
-    "inputs": {
-      "ud_name": "seed",
-      "output": 5
-    },
-    "class_type": "Airen_Int",
-    "_meta": {
-      "title": "Airen Integer"
     }
   },
   "34": {
@@ -219,11 +189,11 @@
   "44": {
     "inputs": {
       "width": [
-        "45",
+        "49",
         0
       ],
       "height": [
-        "45",
+        "49",
         0
       ],
       "batch_size": 1
@@ -233,14 +203,32 @@
       "title": "Empty Latent Image"
     }
   },
-  "45": {
-    "inputs": {
-      "ud_name": "size",
-      "output": 512
-    },
-    "class_type": "Airen_Int",
+  "46": {
+    "inputs": {},
+    "class_type": "Airen_UD",
     "_meta": {
-      "title": "Airen Integer"
+      "title": "positive"
+    }
+  },
+  "47": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "steps"
+    }
+  },
+  "48": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "seed"
+    }
+  },
+  "49": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "size"
     }
   }
 }
