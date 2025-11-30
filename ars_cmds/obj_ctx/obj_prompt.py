@@ -11,7 +11,6 @@ from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
 from ars_cmds.render_cmds.render_pass import save_depth, save_render
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
-from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 from prefs.pref_controller import get_path
 from theme.fonts import font_icons as ic
 from ui.widgets.context_menu import ContextMenuConfig, open_context
@@ -84,8 +83,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         self.render_manager.set_userdata("seed", default_object.seed)
         self.render_manager.set_userdata("steps", int(ctx.get_value(ic.ICON_STEPS))),
         self.render_manager.set_userdata("positive", default_object.prompt)
-
-        delete_all_files_in_folder( get_path('steps') )
 
         generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
 
