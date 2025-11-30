@@ -20,7 +20,7 @@ class Airen_Str:
         return {
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
-                "output": ("STRING", {"multiline": True, "default": ""}),
+                "output": ("STRING", {"default": "", "multiline": False}),
             }
         }
 
