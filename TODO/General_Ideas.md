@@ -58,7 +58,7 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [✓] Floating window should open at the position of selected bubble. Fb messenger style
 
-- [ ] 
+- [ ] "tabler.io" and "lucide.dev" wrapper/converter. 
 
 - [ ] Semi radial side menus ![alt text](image-1.png) ![alt text](image.png)
 
