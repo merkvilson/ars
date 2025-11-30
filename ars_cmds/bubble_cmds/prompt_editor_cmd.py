@@ -34,9 +34,16 @@ def execute_cmd(ars_window):
         "   ",
     ]
 
+
+    def set_text_from_prompt():
+        ars_window.prefs.json_positive = editor.toPlainText()
+
+
     editor = PromptEditor()
     editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height - int(44 * 1.5)))
-    editor.setPlainText("# Prompt Editor\n# Type colors like red, blue, or #FF00AA to see them highlighted.\n# Use Alt + +/- to change font size of selected text.")
+    editor.setPlainText(ars_window.prefs.json_positive)
+    editor.textChanged.connect(set_text_from_prompt)
+
     
     editor.set_font_size(font_size)
     editor.set_alpha(alpha)
