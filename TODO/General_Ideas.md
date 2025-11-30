@@ -31,7 +31,6 @@
 - [ ] 
 - [ ] 
 - [ ] 
-- [ ] 
 
 
 # General Ideas
@@ -69,6 +68,7 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] config.options should accept tuple of different types. str for name, list for slider values, lambda function for callbackL. (bool for enable/disable maybe?)
 
+- [ ] Adaptive drag and drop area. When dropping image, it should show huge area for setting background and several small areas (h-list) of other options
 
 - [ ] 
 
