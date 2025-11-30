@@ -687,6 +687,39 @@ class BButton(QGraphicsObject):
             self.update()
         super().mouseReleaseEvent(event)
 
+    def wheelEvent(self, event):
+        if self.editable and self.slider_values:
+            step = self.incremental_value if self.incremental_value else 1
+            
+            delta = 0
+            if hasattr(event, 'delta'):
+                delta = event.delta()
+            elif hasattr(event, 'angleDelta'):
+                delta = event.angleDelta().y()
+            
+            if delta == 0:
+                return
+
+            if delta < 0:
+                step = -step
+            
+            min_val, max_val, _ = self.slider_values
+            new_value = self._slider_value + step
+            self._slider_value = max(min_val, min(max_val, new_value))
+            
+            self._update_additional_text()
+            
+            if self.callbackL:
+                if len(inspect.signature(self.callbackL).parameters) > 0:
+                    self.callbackL(self._slider_value)
+                else:
+                    self.callbackL()
+            
+            self.update()
+            event.accept()
+        else:
+            super().wheelEvent(event)
+
     def _update_slider_value(self, pos):
         if not (self.editable and self.slider_values):
             return
