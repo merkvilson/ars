@@ -141,7 +141,7 @@
     "inputs": {
       "ud_name": "Size",
       "data_type": "Integer",
-      "output": 512,
+      "output": "512",
       "symbol": "ICON_GIZMO_SCALE",
       "additional_text": "Size",
       "slider_values": "48,1024,512"
