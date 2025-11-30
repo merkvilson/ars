@@ -28,6 +28,11 @@
 - [ ] A|B compare
 - [ ] 
 - [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+
 
 # General Ideas
 
