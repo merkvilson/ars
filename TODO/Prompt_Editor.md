@@ -2,7 +2,7 @@
 
 - [✓] Color coded prompt editor
 - [✓] Text weight
-- [ ] Auto Completion
+- [10%] Auto Completion
 - [ ] Ctrl+F Find / Search
 - [✓] Multi cursor placement
 - [ ] Ctrl+Shift+A find all selected
