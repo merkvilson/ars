@@ -76,7 +76,9 @@ def execute_cmd(ars_window):
                             ars_window.render_manager.set_userdata(inputs["ud_name"], value)
         
 
-        for _, node in workflow_template.items():
+        # We must update the render_manager's workflow_template directly because that is what generate_render uses.
+        # The local 'workflow_template' variable is independent and changes to it won't affect the render.
+        for _, node in ars_window.render_manager.workflow_template.items():
             if node.get("class_type") in airen_class_types:
                 inputs = node.get("inputs", {})
                 if inputs.get("ud_name") == 'prompt':
