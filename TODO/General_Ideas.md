@@ -18,6 +18,7 @@
 - [ ] Open tutorial videos from right click dropdown.
 - [ ] Optimize memory usage in mesh loader.
 - [ ] 2D edit area b-button (shape extended) 
+- [ ] Text edit area for b-button
 - [ ] Add material system for mesh objects
 - [ ] Implement scene save/load functionality
 - [ ] Create user documentation
