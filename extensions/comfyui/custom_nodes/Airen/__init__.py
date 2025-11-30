@@ -380,11 +380,33 @@ class Airen_Gui_Defaults:
     CATEGORY = "Airen_Studio/Custom GUI"
 
 
+
+class Airen_UD:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {}}
+
+    RETURN_TYPES = (AnyType("*"),)
+    FUNCTION = "execute"
+    CATEGORY = "Airen_Studio"
+
+    def execute(self):
+        return (None,)
+
+
+
+
+
+
+
+
+
 #TODO: Add UserData node based on Airen_Gui_Data
 
 
 
 NODE_CLASS_MAPPINGS = {
+    "Airen_UD": Airen_UD,
     "Airen_Str": Airen_Str,
     "Airen_Gui_Prompt": Airen_Gui_Prompt,
     "Airen_Int": Airen_Int,
