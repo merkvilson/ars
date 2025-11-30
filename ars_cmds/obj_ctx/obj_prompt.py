@@ -80,9 +80,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
             self.render_manager.set_workflow("render"),
 
-        self.render_manager.set_userdata("seed", default_object.seed)
-        self.render_manager.set_userdata("steps", int(ctx.get_value(ic.ICON_STEPS))),
-        self.render_manager.set_userdata("positive", default_object.prompt)
+        self.render_manager.set_ud("seed", default_object.seed)
+        self.render_manager.set_ud("steps", int(ctx.get_value(ic.ICON_STEPS)))
+        self.render_manager.set_ud("positive", default_object.prompt)
 
         generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
 
@@ -93,10 +93,10 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     def save_output(name = self.render_manager.workflow_name):
-        if name == "mesh_image":
-            copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
-        elif name == "render":
+        if name == "render":
             copy_file_to_dir(get_path('last_step'), get_path('keyframes'), "frame", True)
+        # elif name == "mesh_image":
+        #     copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
 
 
     def swap_imge(self):
