@@ -3,8 +3,11 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QPixmap
 import os
 from prefs.pref_controller import get_path
+from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
 
 def generate_render(self, ctx, max_steps, default_object):
+    delete_all_files_in_folder( get_path('steps') )
+
 
     self.render_manager.send_render()
     
