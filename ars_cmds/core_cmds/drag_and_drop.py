@@ -11,6 +11,7 @@ from ars_cmds import bubble_cmds as Bcmd
 imgs = (".png", ".jpg", ".jpeg", ".bmp")
 objs = ('.obj','.stl','.ply','.off','.dae','.glb','.gltf','.3mf')
 ars = (".arsp", ".arss",)
+jsons = (".json",) #TODO; implement
 
 from .run_ext import run_ext
 
