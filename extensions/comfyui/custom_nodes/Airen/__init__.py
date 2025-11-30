@@ -312,7 +312,7 @@ class Airen_Gui_Data:
             "required": {
                 "ud_name": ("STRING", {"default": "", "multiline": False}),
                 "data_type": (["Integer", "Float", "Boolean", "String"], ),
-                "output": ("FLOAT", {"default": 0, "min": -999999, "max": 999999, "step": 0.1}),
+                "output": ("STRING", {"default": "", "multiline": False}),
 
                 "symbol": ("STRING", {"default": "ICON_AIREN", "multiline": False}),
                 "additional_text": ("STRING", {"default": "test", "multiline": False}),
@@ -327,7 +327,7 @@ class Airen_Gui_Data:
 
     def execute(self, ud_name, data_type, output, symbol, additional_text, slider_values):
         if data_type == "Integer":
-            return (int(output),)
+            return (int(float(output)),)
         elif data_type == "Float":
             return (float(output),)
         elif data_type == "Boolean":
