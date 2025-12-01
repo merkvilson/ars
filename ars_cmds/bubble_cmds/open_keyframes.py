@@ -23,14 +23,15 @@ def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
-    config.expand = "x"
     config.distribution_mode = "x"
-    config.extra_distance = [0,-220]
+    config.extra_distance = [0,-180]
+    config.use_extended_shape_items = {"1": (2, 2), "2": (2, 2),}
 
-    options_list = ["1","   ", "keyframes_widget","   ","2"]
+
+    options_list = ["   ","1", "keyframes_widget","2","   ",]
 
     keyframes_widget = KeyframesWidget()
-    keyframes_widget.setFixedSize( ars_window.width() - 360 , 140)
+    keyframes_widget.setFixedSize(360 , 80)
 
     config.custom_widget_items = {"keyframes_widget": keyframes_widget,}
 
@@ -39,7 +40,7 @@ def execute_cmd(ars_window):
     "2": r" ",
     }
 
-    def img_list(keyframe,distance):
+    def img_list(keyframe):
         if not os.path.exists(get_path("keyframes")):
             return
         config2 = ContextMenuConfig()
@@ -47,7 +48,6 @@ def execute_cmd(ars_window):
         config2.show_symbol = False
         config2.close_on_outside = True
         config2.auto_close = True
-        config2.extra_distance = distance
 
         items = [os.path.join(get_path("keyframes"),img) for img in os.listdir(get_path("keyframes"))]
 
@@ -76,8 +76,8 @@ def execute_cmd(ars_window):
         )
 
     config.callbackL = {
-        "1": lambda: img_list("1", [-9999,0]),
-        "2": lambda: img_list("2", [9999,0]),
+        "1": lambda: img_list("1"),
+        "2": lambda: img_list("2"),
         }
 
     ctx = open_context(
