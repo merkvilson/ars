@@ -24,7 +24,9 @@ def execute_cmd(ars_window):
     config.auto_close = False
     config.close_on_outside = False
     config.distribution_mode = "x"
-    config.extra_distance = [0,-180]
+    config.anchor = "+y"
+
+    config.extra_distance = [0,-30]
     config.use_extended_shape_items = {"1": (2, 2), "2": (2, 2),}
 
 

@@ -13,15 +13,16 @@ def execute_cmd(ars_window):
     config.auto_close = False
     config.close_on_outside = False
     config.distribution_mode = "x"
+    config.anchor = "+y"
+    config.extra_distance = [0,-30]
     
     # Use existing preferences or defaults
-    height = getattr(ars_window.prefs, 'code_editor_height', 500)
+    height = getattr(ars_window.prefs, 'code_editor_height', 100)
     font_size = getattr(ars_window.prefs, 'code_editor_font_size', 14)
     alpha = getattr(ars_window.prefs, 'code_editor_alpha', 0.85)
 
-    config.custom_height = height
-    config.custom_width = ars_window.width()
-    config.extra_distance = [0, 99999]
+    config.custom_width = 400
+    config.custom_height = 150
 
     options_list = [
         [
@@ -32,7 +33,9 @@ def execute_cmd(ars_window):
         ],
         ["   ", "PromptEditorWidget", "   "],
         "   ",
-    ]
+    ] # Override
+
+    options_list = ["   ", "PromptEditorWidget", "   "]
 
 
     def set_text_from_prompt():
@@ -42,7 +45,7 @@ def execute_cmd(ars_window):
 
 
     editor = PromptEditor()
-    editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height - int(44 * 1.5)))
+    editor.setFixedSize(config.custom_width - 10, config.custom_height - 10)
     editor.setPlainText(ars_window.prefs.json_positive)
     editor.textChanged.connect(set_text_from_prompt)
 
