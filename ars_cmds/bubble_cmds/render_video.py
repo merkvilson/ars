@@ -369,7 +369,9 @@ def execute_cmd(ars_window):
         ars_window.render_manager.set_ud('size', ctx.get_value(ic.ICON_GIZMO_SCALE))
         ars_window.render_manager.set_ud('seed', 1)
         ars_window.render_manager.set_ud('length', 81)
-        ars_window.render_manager.set_ud('positive', "")
+        ars_window.render_manager.set_ud('positive', ars_window.prefs.render_prompt)
+
+        #TODO: delete Airen_LoadKeyframe node if the second image does not exist
 
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
@@ -395,9 +397,7 @@ def execute_cmd(ars_window):
             set_img_by_index(val), 
             setattr(ars_window.prefs, 'timeline_frame', int(val)),
             ),
-        ic.ICON_RENDER: lambda: (
-
-            start_render()),
+        ic.ICON_RENDER: lambda: (start_render()),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
