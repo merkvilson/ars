@@ -72,9 +72,9 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
             return self.base_previewer.decode_latent_to_preview_image(preview_format, x0)
         
         # Multi-image (animated sequence) - handle frame saving
-        return self._handle_animated_sequence(x0)
+        return self._handle_animated_sequence(x0, preview_format)
     
-    def _handle_animated_sequence(self, x0):
+    def _handle_animated_sequence(self, x0, preview_format="JPEG"):
         """Process and save animated frame sequence"""
         # Reshape 5D tensor to 4D if needed
         if x0.ndim == 5:
@@ -82,6 +82,11 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
             x0 = x0.reshape((-1,) + x0.shape[-3:])
         
         num_frames = x0.size(0)
+
+        # If it's just a single frame (e.g. 5D tensor with 1 frame), treat as step preview
+        if num_frames == 1:
+            return self.base_previewer.decode_latent_to_preview_image(preview_format, x0)
+        
         current_time = time.time()
         num_previews = int((current_time - self.last_time) * self.frame_rate)
         self.last_time = self.last_time + num_previews / self.frame_rate

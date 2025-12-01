@@ -353,10 +353,13 @@ def execute_cmd(ars_window):
         and starts playback.
         """
         ars_window.render_manager.set_workflow("video")
-        ars_window.render_manager.set_userdata('steps', ctx.get_value(ic.ICON_STEPS))
-        ars_window.render_manager.set_userdata('start-stop', int(ctx.get_value(ic.ICON_STEPS)/2))
-        ars_window.render_manager.set_userdata('size', ctx.get_value(ic.ICON_GIZMO_SCALE))
-        
+        ars_window.render_manager.set_ud('steps', ctx.get_value(ic.ICON_STEPS))
+        ars_window.render_manager.set_ud('steps_noise', int(ctx.get_value(ic.ICON_STEPS)/2))
+        ars_window.render_manager.set_ud('size', ctx.get_value(ic.ICON_GIZMO_SCALE))
+        ars_window.render_manager.set_ud('seed', 1)
+        ars_window.render_manager.set_ud('length', 81)
+        ars_window.render_manager.set_ud('positive', "")
+
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
 
