@@ -86,5 +86,8 @@ class RenderDataManager(QObject):
         if self.workflow_template is None: return
 
         data = json.dumps({"prompt": self.workflow_template}).encode('utf-8')
-        req = request.Request("http://127.0.0.1:8188/prompt", data=data)
-        request.urlopen(req)
+        try:
+            req = request.Request("http://127.0.0.1:8188/prompt", data=data)
+            request.urlopen(req)
+        except Exception as e:
+            print(f"Error sending render data: {e}")
