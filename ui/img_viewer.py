@@ -209,7 +209,7 @@ class ImageViewerWidget(QWidget):
         self.anim = QVariantAnimation(self)
         self.anim.setStartValue(1.0)
         self.anim.setEndValue(0.0)
-        self.anim.setDuration(1)
+        self.anim.setDuration(200)  # Duration in milliseconds
         self.anim.valueChanged.connect(self._update_opacity)
         self.anim.finished.connect(self._finalize_clear)
         self.anim.start()
