@@ -15,6 +15,7 @@ from ars_cmds.core_cmds.key_check import key_check_continuous
 from PIL import Image
 from collections import Counter
 from ars_cmds.bubble_cmds.open_keyframes import BBL_KEYFRAMES as open_keyframes
+from ars_cmds.bubble_cmds.prompt_editor_cmd import BBL_P as open_prompt_editor
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
@@ -35,14 +36,10 @@ def execute_cmd(ars_window):
         ars_window: The main application window instance.
     """
 
-
     #Prepare GUI
     ars_window.viewport.hide()
     ars_window.img.show()
 
-
-
-    
     # Timer and state for play_video
     if not hasattr(ars_window, '_loop_timer'):
         ars_window._loop_timer = None
@@ -173,6 +170,7 @@ def execute_cmd(ars_window):
         ic.ICON_RENDER, 
         ic.ICON_STEPS,
         ic.ICON_GIZMO_SCALE,
+        ic.ICON_TXT_FONT,
         "   ",
         #ic.ICON_PLAYER_TRACK_BACK,
         ic.ICON_PLAYER_SKIP_BACK, 
@@ -370,7 +368,7 @@ def execute_cmd(ars_window):
         ars_window.render_manager.set_ud('seed', 1)
         ars_window.render_manager.set_ud('length', 81)
         ars_window.render_manager.set_ud('positive', ars_window.prefs.render_prompt)
-
+        ars_window.render_manager.set_ud('fps', ctx.get_value(ic.ICON_SPEED_UP))
         # Check if second image exists and disconnect if missing
         input_path = get_path("input")
         tiff2 = os.path.join(input_path, "2.tiff")
@@ -416,6 +414,7 @@ def execute_cmd(ars_window):
         ic.ICON_STEPS: lambda val: setattr(ars_window.prefs, 'timeline_steps', int(val)),
         ic.ICON_SIZE: lambda: open_keyframes(ars_window),
         ic.ICON_WINDOW_FULLSCREEN: lambda: ars_window.img.fit_image(),
+        ic.ICON_TXT_FONT: lambda: open_prompt_editor(ars_window),
         }
 
 
