@@ -4,7 +4,7 @@ import os
 from urllib import request
 from PyQt6.QtCore import QObject
 
-from core.render_data_converter import convert_KSampler, replace_SaveImage
+from core.render_data_converter import convert_KSampler, replace_SaveImage, add_Airen_Gui_Defaults, convert_Prompts
 
 class RenderDataManager(QObject):
     """Manages render data settings, storage, and sending to backend."""
@@ -35,9 +35,11 @@ class RenderDataManager(QObject):
 
 
     def propagate_custom_nodes(self):
-        convert_KSampler()
-        replace_SaveImage()
-        #TODO: Implement
+        if self.workflow_template:
+            convert_KSampler(self.workflow_template)
+            convert_Prompts(self.workflow_template)
+            replace_SaveImage(self.workflow_template)
+            add_Airen_Gui_Defaults(self.workflow_template)
 
  
     def set_userdata(self, key, value):
