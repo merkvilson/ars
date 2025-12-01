@@ -337,5 +337,43 @@
     "_meta": {
       "title": "Airen_LoadKeyframe"
     }
+  },
+  "103": {
+    "inputs": {
+      "fps": [
+        "105",
+        0
+      ],
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "CreateVideo",
+    "_meta": {
+      "title": "Create Video"
+    }
+  },
+  "104": {
+    "inputs": {
+      "filename_prefix": "animation/0",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "103",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "Save Video"
+    }
+  },
+  "105": {
+    "inputs": {},
+    "class_type": "Airen_UD",
+    "_meta": {
+      "title": "fps"
+    }
   }
 }
