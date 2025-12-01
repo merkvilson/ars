@@ -6,6 +6,8 @@ from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.bubble_cmds.prompt_editor_cmd import execute_cmd as open_prompt_editor
+
+
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
 
