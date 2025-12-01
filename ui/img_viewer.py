@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, QWidget, QFileDialog
 )
 from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainter, QBrush, QImage
-from PyQt6.QtCore import Qt, QRectF, QPointF
+from PyQt6.QtCore import Qt, QRectF, QPointF, QVariantAnimation
 from PIL import Image, ImageSequence
 from PyQt6.QtWidgets import QApplication
 
@@ -125,6 +125,7 @@ class ImageViewer(QGraphicsView):
 class ImageViewerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.current_image_path = ""
         self.scene = QGraphicsScene()
         self.view = ImageViewer(self.scene, self)
         self.layout = QVBoxLayout(self)
@@ -136,9 +137,13 @@ class ImageViewerWidget(QWidget):
             self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
 
     def open_image(self, file_path=None, layer = -1, auto_fit=True):
+        if hasattr(self, 'anim') and self.anim.state() == QVariantAnimation.State.Running:
+            self.anim.stop()
+        
         if not file_path:
             file_path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff)")
         if file_path:
+            self.current_image_path = file_path
             pixmap = None
             
             # Check if it's a multi-layer image (TIFF)
@@ -195,6 +200,32 @@ class ImageViewerWidget(QWidget):
             if auto_fit:
                 self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
             self.view._user_interacted = False  # Reset flag on new load
+
+    def clear_image(self):
+        if not self.scene.items():
+            self._finalize_clear()
+            return
+
+        self.anim = QVariantAnimation(self)
+        self.anim.setStartValue(1.0)
+        self.anim.setEndValue(0.0)
+        self.anim.setDuration(1)
+        self.anim.valueChanged.connect(self._update_opacity)
+        self.anim.finished.connect(self._finalize_clear)
+        self.anim.start()
+
+    def _update_opacity(self, value):
+        for item in self.scene.items():
+            item.setOpacity(value)
+
+    def _finalize_clear(self):
+        self.scene.clear()
+        self.view.image_rect = None
+        self.current_image_path = ""
+        self.view._user_interacted = False
+
+    def get_current_image_path(self):
+        return self.current_image_path
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
