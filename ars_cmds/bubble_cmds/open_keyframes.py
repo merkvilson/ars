@@ -17,12 +17,12 @@ def execute_cmd(ars_window):
     config.close_on_outside = False
     config.expand = "x"
     config.distribution_mode = "x"
-    config.extra_distance = [0,99999]
+    config.extra_distance = [0,ars_window.height() - 350]
 
     options_list = ["1","   ", "A","   ","2"]
 
     keyframes_widget = KeyframesWidget()
-    keyframes_widget.setFixedSize(600, 140)
+    keyframes_widget.setFixedSize( ars_window.width() - 360 , 140)
 
     config.custom_widget_items = {"A": keyframes_widget,}
 
@@ -60,7 +60,8 @@ def execute_cmd(ars_window):
 
         config2.callbackL = imgs_dict
 
-        ctx2=open_context(
+        if config2.image_items:
+            open_context(
             items=items,
             config=config2
         )

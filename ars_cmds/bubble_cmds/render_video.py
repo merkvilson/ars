@@ -33,6 +33,14 @@ def execute_cmd(ars_window):
     Args:
         ars_window: The main application window instance.
     """
+
+
+    #Prepare GUI
+    ars_window.viewport.hide()
+    ars_window.img.show()
+
+
+
     
     # Timer and state for play_video
     if not hasattr(ars_window, '_loop_timer'):
@@ -159,7 +167,6 @@ def execute_cmd(ars_window):
 
 
     options_list=    [
-        ["   ", "timeline", "   ",],
         [
         "   ", 
         ic.ICON_RENDER, 
@@ -174,7 +181,8 @@ def execute_cmd(ars_window):
         "   ",
         ic.ICON_SPEED_UP,
         "   ",
-        ]
+        ],
+        ["   ", "timeline", "   ",],
         ]
     config.expand = "x"
     
