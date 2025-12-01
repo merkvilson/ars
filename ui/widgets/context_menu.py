@@ -615,4 +615,4 @@ def close_all_open_context_menus(widget=None):
     """
     open_menus = find_all_open_context_menus(widget)
     for menu in open_menus:
-        menu.close()
+        menu.close_animated()
