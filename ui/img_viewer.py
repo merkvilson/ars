@@ -131,7 +131,8 @@ class ImageViewerWidget(QWidget):
         self.layout.addWidget(self.view)
 
     def fit_image(self):
-        self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
+        if self.view.image_rect is not None:
+            self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
 
     def open_image(self, file_path=None, layer = -1, auto_fit=True):
         if not file_path:

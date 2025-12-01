@@ -14,6 +14,7 @@ from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from PIL import Image
 from collections import Counter
+from ars_cmds.bubble_cmds.open_keyframes import BBL_KEYFRAMES as open_keyframes
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
@@ -180,6 +181,8 @@ def execute_cmd(ars_window):
         #ic.ICON_PLAYER_TRACK_NEXT,
         "   ",
         ic.ICON_SPEED_UP,
+        ic.ICON_SIZE,
+        ic.ICON_WINDOW_FULLSCREEN,
         "   ",
         ],
         ["   ", "timeline", "   ",],
@@ -401,6 +404,8 @@ def execute_cmd(ars_window):
         ic.ICON_SPEED_UP: lambda val: setattr(ars_window.prefs, 'timeline_fps', int(val)),
         ic.ICON_GIZMO_SCALE: lambda val: setattr(ars_window.prefs, 'timeline_resolution', int(val)),
         ic.ICON_STEPS: lambda val: setattr(ars_window.prefs, 'timeline_steps', int(val)),
+        ic.ICON_SIZE: lambda: open_keyframes(ars_window),
+        ic.ICON_WINDOW_FULLSCREEN: lambda: ars_window.img.fit_image(),
         }
 
 
