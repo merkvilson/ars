@@ -5,7 +5,7 @@ import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
-
+from ars_cmds.bubble_cmds.render_video import BBL_VIDEO as open_render_video
 
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
@@ -23,6 +23,7 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     
     for ctx_menu in find_all_open_context_menus():
         ctx_menu.close()
+    open_render_video(ars_window)
 
 
     config=ContextMenuConfig()
