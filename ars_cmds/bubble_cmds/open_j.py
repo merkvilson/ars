@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import ContextMenuConfig, open_context, find_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import json
@@ -16,6 +16,13 @@ def load_json_file(ars_window, file_path=None):
         ars_window.prefs.json_ud_path = file_path
 
 def execute_cmd(ars_window):
+
+
+    for ctx_menu in find_all_open_context_menus():
+        if "PromptEditorWidget" in str(ctx_menu.items):
+            ctx_menu.close()
+            print("Closed existing Editor context menu.")
+
 
     open_prompt_editor(ars_window)
 
