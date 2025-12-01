@@ -29,7 +29,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.use_extended_shape = False
     config.distribution_mode = "x"
     config.anchor = "+y"
-    config.custom_height = 260 + (300 if default_object == self else 0)
+    config.custom_height = 260 + (300 if default_object == self and self.viewport.isVisible() else 0)
     config.custom_width = 450
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
@@ -47,7 +47,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     ["   ",ic.ICON_CLOSE_RADIAL,"   "],
     ]
 
-    if default_object == self: options_list.insert(0, [ic.ICON_IMAGE])
+    if default_object == self and self.viewport.isVisible():
+            options_list.insert(0, [ic.ICON_IMAGE])
     config.image_items = {ic.ICON_IMAGE: r" "}
     config.use_extended_shape_items = {ic.ICON_IMAGE: (9.5, 6)}
     config.per_item_radius = { ic.ICON_IMAGE: 23,}
