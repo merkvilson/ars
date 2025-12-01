@@ -32,7 +32,7 @@ class ImageViewer(QGraphicsView):
             zoom = 1.0
 
         minor_spacing = 50
-        major_spacing = 250
+        major_spacing = 500
         minor_pen = QPen(QColor(80, 80, 80, 50), 1.5 / zoom)
         major_pen = QPen(QColor(120, 120, 120, 50), 2 / zoom)
 
@@ -58,14 +58,15 @@ class ImageViewer(QGraphicsView):
             y += minor_spacing
 
         if rect.top() <= 0 <= rect.bottom():
-            x_axis_pen = QPen(QColor.fromRgbF(0.9, 0.3, 0.3, 0.3), 2 / zoom)
+            x_axis_pen = QPen(QColor.fromRgbF(0.9, 0.3, 0.3, 0.4), 1.8 / zoom)
             painter.setPen(x_axis_pen)
             painter.drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0))
 
         if rect.left() <= 0 <= rect.right():
-            y_axis_pen = QPen(QColor.fromRgbF(0.3, 0.3, 0.9, 0.3), 2 / zoom)
+            y_axis_pen = QPen(QColor.fromRgbF(0.3, 0.3, 0.9, 0.4), 1.8 / zoom)
             painter.setPen(y_axis_pen)
             painter.drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()))
+        
 
     def wheelEvent(self, event: QWheelEvent):
         factor = self.zoom_factor if event.angleDelta().y() > 0 else 1 / self.zoom_factor
