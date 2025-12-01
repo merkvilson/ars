@@ -371,7 +371,17 @@ def execute_cmd(ars_window):
         ars_window.render_manager.set_ud('length', 81)
         ars_window.render_manager.set_ud('positive', ars_window.prefs.render_prompt)
 
-        #TODO: delete Airen_LoadKeyframe node if the second image does not exist
+        # Check if second image exists and disconnect if missing
+        input_path = get_path("input")
+        tiff2 = os.path.join(input_path, "2.tiff")
+        
+        if not os.path.exists(tiff2):
+            workflow = ars_window.render_manager.workflow_template
+            for node_id, node in workflow.items():
+                if node.get("class_type") == "WanFirstLastFrameToVideo":
+                    if "end_image" in node["inputs"]:
+                        del node["inputs"]["end_image"]
+                    break
 
         delete_all_files_in_folder( get_path('frames') )
         delete_all_files_in_folder( get_path('video_frames') )
