@@ -405,7 +405,7 @@ def execute_cmd(ars_window):
             set_img_by_index(val), 
             setattr(ars_window.prefs, 'timeline_frame', int(val)),
             ),
-        ic.ICON_RENDER: lambda: (start_render()),
+        ic.ICON_RENDER: lambda: start_render(),
         ic.ICON_PLAYER_SKIP_BACK: lambda: key_check_continuous(callback=frame_back,),
         ic.ICON_PLAYER_SKIP_FORWARD: lambda: key_check_continuous(callback=frame_next,),
         ic.ICON_PLAYER_PLAY: lambda: play_video(),
