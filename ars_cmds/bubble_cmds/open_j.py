@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context, find_all_open_context_menus
+from ui.widgets.context_menu import ContextMenuConfig, open_context, close_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import json
@@ -21,8 +21,7 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     ars_window.prefs.json_ud_path = file_path if file_path else ars_window.prefs.json_ud_path
     load_json_file(ars_window, ars_window.prefs.json_ud_path)
     
-    for ctx_menu in find_all_open_context_menus():
-        ctx_menu.close()
+    close_all_open_context_menus()
     open_render_video(ars_window)
 
 

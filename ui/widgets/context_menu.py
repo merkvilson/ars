@@ -597,3 +597,22 @@ def find_all_open_context_menus(widget=None):
     
     # Filter to only return visible (open) menus
     return [menu for menu in all_menus if menu.isVisible()]
+
+def close_all_open_context_menus(widget=None):
+    """
+    Close all open context menus (ContextButtonWindow instances) in the application.
+    
+    Args:
+        widget: Optional widget to search from. If None, searches from QApplication.
+                Can be the main window, central widget, or any parent widget.
+    
+    Example:
+        # Close all open context menus from main window
+        close_all_open_context_menus(main_window)
+        
+        # Close all open context menus globally
+        close_all_open_context_menus()
+    """
+    open_menus = find_all_open_context_menus(widget)
+    for menu in open_menus:
+        menu.close()
