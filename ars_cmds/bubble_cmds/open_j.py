@@ -15,8 +15,8 @@ def load_json_file(ars_window, file_path=None):
     if file_path:
         ars_window.prefs.json_ud_path = file_path
 
-def execute_cmd(ars_window):
 
+def open_workflow_prompt_editor(ars_window):
 
     for ctx_menu in find_all_open_context_menus():
         if "PromptEditorWidget" in str(ctx_menu.items):
@@ -115,3 +115,7 @@ def execute_cmd(ars_window):
     config.callbackL[ic.ICON_PLAYER_PLAY] = start_render
     
     ctx = open_context(config)
+
+
+def execute_cmd(ars_window):
+    open_workflow_prompt_editor(ars_window)
