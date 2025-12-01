@@ -1,6 +1,6 @@
 from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeyEvent, QTextCursor
-from PyQt6.QtCore import QRegularExpression, Qt 
-from PyQt6.QtWidgets import QPlainTextEdit
+from PyQt6.QtCore import QRegularExpression, Qt, QEvent
+from PyQt6.QtWidgets import QPlainTextEdit, QApplication
 
 from .editor import BaseCodeEditor
 import webcolors
@@ -206,6 +206,25 @@ class PromptEditor(BaseCodeEditor):
         new_fmt.setFontPointSize(new_size)
         cursor.mergeCharFormat(new_fmt)
         self.setTextCursor(cursor)
+
+    def wheelEvent(self, event):
+        modifiers = QApplication.keyboardModifiers()
+        
+        if modifiers & Qt.KeyboardModifier.AltModifier:
+            # Check both vertical and horizontal deltas, and pixel deltas
+            # Some drivers/OSs map Alt+Scroll to horizontal scroll or other axes
+            delta = event.angleDelta().y()
+            if delta == 0: delta = event.angleDelta().x()
+            if delta == 0: delta = event.pixelDelta().y()
+            if delta == 0: delta = event.pixelDelta().x()
+                
+            if delta > 0: self.change_selection_font_size(1)
+            elif delta < 0: self.change_selection_font_size(-1)
+            
+            event.accept()
+            return
+            
+        super().wheelEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent):
         modifiers = event.modifiers()
