@@ -37,6 +37,7 @@ def execute_cmd(ars_window):
 
     def set_text_from_prompt():
         ars_window.prefs.json_positive = editor.toPlainText()
+        ars_window.prefs.render_prompt = editor.toPlainText()
 
 
     editor = PromptEditor()
