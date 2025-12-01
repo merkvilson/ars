@@ -11,13 +11,13 @@ BBL_KEYFRAMES_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
 def BBL_KEYFRAMES(*args):
     run_ext(__file__)
 
-def open_keyframes(ars_window):
+def execute_cmd(ars_window):
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
     config.expand = "x"
     config.distribution_mode = "x"
-    config.extra_distance = [0,ars_window.height() - 350]
+    config.extra_distance = [0,-220]
 
     options_list = ["1","   ", "A","   ","2"]
 
@@ -76,6 +76,3 @@ def open_keyframes(ars_window):
         items=options_list,
         config=config
     )
-
-def execute_cmd(ars_window):
-    open_keyframes(ars_window)
