@@ -5,7 +5,7 @@ import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
-
+from ars_cmds.bubble_cmds.prompt_editor_cmd import execute_cmd as open_prompt_editor
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
 
@@ -16,6 +16,8 @@ def load_json_file(ars_window, file_path=None):
         ars_window.prefs.json_ud_path = file_path
 
 def execute_cmd(ars_window):
+
+    open_prompt_editor(ars_window)
 
     config=ContextMenuConfig()
     config.options = {}
