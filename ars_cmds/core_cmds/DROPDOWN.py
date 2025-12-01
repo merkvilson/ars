@@ -5,11 +5,11 @@ from theme.fonts import font_icons as ic
 import theme.fonts.new_fonts as RRRFONT
 from ars_cmds.util_cmds.open_file import open_file
 from ars_cmds.bubble_cmds import py_scripts
+
+
 def unlock_function(self):
     new_state = Qt.CheckState.Unchecked if self.bubbles_overlay.locked else Qt.CheckState.Checked
     self.bubbles_overlay.toggle_lock(new_state.value)
-
-
 
 
 def r_dropdown(self, code_path = None):
@@ -22,7 +22,6 @@ def r_dropdown(self, code_path = None):
 
     ic.ICON_LOCK_state = ic.ICON_LOCK if self.bubbles_overlay.locked else ic.ICON_LOCK_OPEN
 
-    
     options_list = [
         ic.ICON_LOCK_state,
         "?",
@@ -48,7 +47,7 @@ def r_dropdown(self, code_path = None):
         code_editor.project_file_path = path
 
     config.callbackL = {
-        ic.ICON_LOCK_state:  lambda: (
+        ic.ICON_LOCK_state: lambda: (
                                unlock_function(self),
                                ctx.update_item(ic.ICON_LOCK_state, "symbol", ic.ICON_LOCK if self.bubbles_overlay.locked else ic.ICON_LOCK_OPEN),
             ),
@@ -72,7 +71,6 @@ def r_dropdown(self, code_path = None):
         ic.ICON_CODE_TERMINAL: "Edit Code",
         ic.ICON_POWER: "Exit",
     }
-
 
 
     ctx = open_context(
