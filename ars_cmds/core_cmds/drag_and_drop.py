@@ -107,7 +107,7 @@ def dd_drop(self, event):
         elif f.endswith(".json"):
             ttip, sym = "Load Json File", ic.ICON_CODE_PYTHON #TODO; implement
             from ars_cmds.bubble_cmds.open_j import open_workflow_prompt_editor
-            open_workflow_prompt_editor(self)
+            open_workflow_prompt_editor(self, f)
 
 
 
