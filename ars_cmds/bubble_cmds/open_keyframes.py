@@ -1,5 +1,5 @@
 import os
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import ContextMenuConfig, open_context, find_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ui.widgets.keyframes import KeyframesWidget
 from prefs.pref_controller import get_path
@@ -14,7 +14,11 @@ def BBL_KEYFRAMES(*args):
 
 def execute_cmd(ars_window):
 
-    delete_all_files_in_folder( get_path("input") )
+    keyframes_open = False
+    for ctx_menu in find_all_open_context_menus():
+        if "keyframes_widget" in str(ctx_menu.items): 
+            keyframes_open = True
+    if not keyframes_open: delete_all_files_in_folder( get_path("input") )
 
     config = ContextMenuConfig()
     config.auto_close = False
@@ -23,12 +27,12 @@ def execute_cmd(ars_window):
     config.distribution_mode = "x"
     config.extra_distance = [0,-220]
 
-    options_list = ["1","   ", "A","   ","2"]
+    options_list = ["1","   ", "keyframes_widget","   ","2"]
 
     keyframes_widget = KeyframesWidget()
     keyframes_widget.setFixedSize( ars_window.width() - 360 , 140)
 
-    config.custom_widget_items = {"A": keyframes_widget,}
+    config.custom_widget_items = {"keyframes_widget": keyframes_widget,}
 
     config.image_items = {
     "1": r" ",
