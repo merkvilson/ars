@@ -5,7 +5,6 @@ import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
-from ars_cmds.bubble_cmds.prompt_editor_cmd import execute_cmd as open_prompt_editor
 
 
 def BBL_WORKFLOW(*args):
@@ -23,12 +22,8 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     load_json_file(ars_window, ars_window.prefs.json_ud_path)
     
     for ctx_menu in find_all_open_context_menus():
-        if "PromptEditorWidget" in str(ctx_menu.items):
-            ctx_menu.close()
-            print("Closed existing Editor context menu.")
+        ctx_menu.close()
 
-
-    open_prompt_editor(ars_window)
 
     config=ContextMenuConfig()
     config.options = {}
@@ -83,6 +78,13 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
             if workflow_type in ["Image", "Video", "Sprite"]:
                 ars_window.viewport.hide()
                 ars_window.img.show()
+        else:
+            config.close_on_outside = False
+            config.auto_close = False
+            config.incremental_value = True
+            config.show_value = True
+            ars_window.viewport.hide()
+            ars_window.img.show()
 
     def start_render():
         for _, node in workflow_template.items():
