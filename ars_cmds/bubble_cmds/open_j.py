@@ -16,8 +16,10 @@ def load_json_file(ars_window, file_path=None):
         ars_window.prefs.json_ud_path = file_path
 
 
-def open_workflow_prompt_editor(ars_window):
-
+def open_workflow_prompt_editor(ars_window, file_path=None):
+    ars_window.prefs.json_ud_path = file_path if file_path else ars_window.prefs.json_ud_path
+    load_json_file(ars_window, ars_window.prefs.json_ud_path)
+    
     for ctx_menu in find_all_open_context_menus():
         if "PromptEditorWidget" in str(ctx_menu.items):
             ctx_menu.close()
@@ -31,9 +33,6 @@ def open_workflow_prompt_editor(ars_window):
     config.extra_distance = [99999,0]
 
 
-    if not ars_window.prefs.json_ud_path:
-        default_workflow_path = r"extensions\comfyui\test.json" #Temporal default path
-        load_json_file(ars_window, default_workflow_path)
 
     ars_window.render_manager.set_workflow(ars_window.prefs.json_ud_path)
 
