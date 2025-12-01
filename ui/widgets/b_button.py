@@ -817,7 +817,7 @@ class BButton(QGraphicsObject):
             self._revert_timer = QTimer()
             self._revert_timer.setSingleShot(True)
             self._revert_timer.timeout.connect(self._revert_symbol)
-            self._revert_timer.start(500)
+            self._revert_timer.start(1000)
 
 
     def _update_additional_text(self):
