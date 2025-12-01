@@ -10,9 +10,14 @@ class PromptHighlighter(QSyntaxHighlighter):
     def __init__(self, document):
         super().__init__(document)
         
+        self._init_formats()
+
         # Hex codes pattern
         self.hex_pattern = QRegularExpression(r"#(?:[0-9a-fA-F]{3}){1,2}\b")
         
+        # Number pattern
+        self.number_pattern = QRegularExpression(r"\b\d+(?:\.\d+)?\b")
+
         # Color names from webcolors (CSS3)
         # Use public API to get names and build map
         try:
@@ -38,11 +43,74 @@ class PromptHighlighter(QSyntaxHighlighter):
         self.color_pattern = QRegularExpression(pattern)
         self.color_pattern.setPatternOptions(QRegularExpression.PatternOption.CaseInsensitiveOption)
 
+    def _init_formats(self):
+        def mkfmt(color_hex, bold=False, italic=False):
+            fmt = QTextCharFormat()
+            fmt.setForeground(QColor(color_hex))
+            if bold:
+                fmt.setFontWeight(QFont.Weight.Bold)
+            if italic:
+                fmt.setFontItalic(True)
+            return fmt
+
+        self.fmt_comment = mkfmt("#5c6370", italic=True)
+        self.fmt_string = mkfmt("#98c379")
+        self.fmt_number = mkfmt("#d16666")
+
+    def _overlaps(self, ranges, start, length):
+        end = start + length
+        for s, e in ranges:
+            if start < e and end > s:
+                return True
+        return False
+
+    def _add_range(self, ranges, start, end):
+        if start < end:
+            ranges.append((start, end))
+
     def highlightBlock(self, text):
-        # 1. Highlight Hex Codes
+        protected = []
+
+        # 1. Strings ("")
+        idx = 0
+        while idx < len(text):
+            start_quote = text.find('"', idx)
+            if start_quote == -1:
+                break
+            
+            # Check if escaped (simple check)
+            if start_quote > 0 and text[start_quote-1] == '\\':
+                idx = start_quote + 1
+                continue
+
+            end_quote = -1
+            j = start_quote + 1
+            while j < len(text):
+                if text[j] == '"' and text[j-1] != '\\':
+                    end_quote = j
+                    break
+                j += 1
+            
+            if end_quote != -1:
+                length = end_quote - start_quote + 1
+                self.setFormat(start_quote, length, self.fmt_string)
+                self._add_range(protected, start_quote, end_quote + 1)
+                idx = end_quote + 1
+            else:
+                self.setFormat(start_quote, len(text) - start_quote, self.fmt_string)
+                self._add_range(protected, start_quote, len(text))
+                break
+
+        # 2. Highlight Hex Codes
         match_iter = self.hex_pattern.globalMatch(text)
         while match_iter.hasNext():
             match = match_iter.next()
+            start = match.capturedStart()
+            length = match.capturedLength()
+            
+            if self._overlaps(protected, start, length):
+                continue
+
             color_str = match.captured(0)
             
             fmt = QTextCharFormat()
@@ -50,12 +118,19 @@ class PromptHighlighter(QSyntaxHighlighter):
                 fmt.setForeground(QColor(color_str))
             fmt.setFontWeight(QFont.Weight.Bold)
             
-            self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+            self.setFormat(start, length, fmt)
+            self._add_range(protected, start, start + length)
 
-        # 2. Highlight Color Names
+        # 3. Highlight Color Names
         match_iter = self.color_pattern.globalMatch(text)
         while match_iter.hasNext():
             match = match_iter.next()
+            start = match.capturedStart()
+            length = match.capturedLength()
+            
+            if self._overlaps(protected, start, length):
+                continue
+
             color_name = match.captured(1).lower()
             
             if color_name in self.color_map:
@@ -64,7 +139,33 @@ class PromptHighlighter(QSyntaxHighlighter):
                 fmt.setForeground(QColor(hex_value))
                 fmt.setFontWeight(QFont.Weight.Bold)
                 
-                self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+                self.setFormat(start, length, fmt)
+                self._add_range(protected, start, start + length)
+
+        # 4. Comments (#)
+        idx = 0
+        while idx < len(text):
+            pos = text.find("#", idx)
+            if pos == -1:
+                break
+            
+            if self._overlaps(protected, pos, 1):
+                idx = pos + 1
+                continue
+                
+            self.setFormat(pos, len(text) - pos, self.fmt_comment)
+            self._add_range(protected, pos, len(text))
+            break
+
+        # 5. Numbers
+        match_iter = self.number_pattern.globalMatch(text)
+        while match_iter.hasNext():
+            match = match_iter.next()
+            start = match.capturedStart()
+            length = match.capturedLength()
+            
+            if not self._overlaps(protected, start, length):
+                self.setFormat(start, length, self.fmt_number)
 
 
 class PromptEditor(BaseCodeEditor):
