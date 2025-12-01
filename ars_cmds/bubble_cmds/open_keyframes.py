@@ -6,12 +6,16 @@ from prefs.pref_controller import get_path
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
+from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder, delete_single_file
 
 BBL_KEYFRAMES_CONFIG = {"symbol": ic.ICON_SIZE, "hotkey": "T" }
 def BBL_KEYFRAMES(*args):
     run_ext(__file__)
 
 def execute_cmd(ars_window):
+
+    delete_all_files_in_folder( get_path("input") )
+
     config = ContextMenuConfig()
     config.auto_close = False
     config.close_on_outside = False
