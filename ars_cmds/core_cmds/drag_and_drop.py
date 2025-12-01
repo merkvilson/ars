@@ -48,6 +48,14 @@ def dd_drag(self, event):
         sym = ic.ICON_LAYOUT
         ttip = first_file if one else f"{count} Layouts"
 
+    elif all(s.endswith(ars) for s in files):
+        sym = ic.ICON_CODE_PYTHON
+        ttip = first_file if one else f"{count} Scripts"
+
+    elif all(s.endswith(jsons) for s in files):
+        sym = ic.ICON_CODE_PYTHON #TODO; change icon
+        ttip = first_file if one else f"{count} JSON Files"
+
     else: ttip,sym = "Files", ic.ICON_FILES
 
 
@@ -94,6 +102,12 @@ def dd_drop(self, event):
         elif f.endswith(".arsp"):
             run_ext(f)
             ttip, sym = "Script Loaded!", ic.ICON_FILE_CHECK
+
+        
+        elif f.endswith(".json"):
+            ttip, sym = "Load Json File", ic.ICON_CODE_PYTHON #TODO; implement
+            from ars_cmds.bubble_cmds.open_j import open_workflow_prompt_editor
+            open_workflow_prompt_editor(self)
 
 
 
