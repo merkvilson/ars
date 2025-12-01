@@ -32,8 +32,12 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
 
 
     ars_window.render_manager.set_workflow(ars_window.prefs.json_ud_path)
+    workflow_template = ars_window.render_manager.workflow_template
 
-    with open(ars_window.prefs.json_ud_path, 'r', encoding='utf-8') as f: workflow_template = json.load(f)
+    # Check if there are any Airen nodes
+    if not any(node.get("class_type", "").startswith("Airen_") for node in workflow_template.values()):
+        ars_window.render_manager.propagate_custom_nodes()
+        workflow_template = ars_window.render_manager.workflow_template
 
     airen_class_types = ["Airen_Gui_Data", "Airen_Gui_Prompt"]#["Airen_Int", "Airen_Float", "Airen_Bool", "Airen_Str"]
 
