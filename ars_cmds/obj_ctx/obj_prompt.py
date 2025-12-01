@@ -63,10 +63,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         if check_queue(): 
             print("Render queue is busy, cannot start a new render.")
             return
-    
+
         default_object.seed += seed_step
-
-
 
         if type(default_object).__name__ == "CSprite":
             default_object.revert_cutout()
