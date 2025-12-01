@@ -43,6 +43,8 @@ def execute_cmd(ars_window):
     }
 
     def img_list(keyframe):
+        current_img_path = ars_window.img.current_image_path
+
         if not os.path.exists(get_path("keyframes")):
             return
         config2 = ContextMenuConfig()
@@ -58,18 +60,31 @@ def execute_cmd(ars_window):
             copy_file_to_dir(file_path=img_path, destination_dir=get_path("input"), copy_as=keyframe)
 
 
-        imgs_dict = {
-            img: (lambda img=img: define_img(img_path=img))
-            for img in items
-        }
-
         config2.image_items = {
             img: img
             for img in items
         }
 
 
-        config2.callbackL = imgs_dict
+        config2.callbackL = {
+            img: (lambda img=img: define_img(img_path=img))
+            for img in items}
+        
+        config2.callback_hover_in = {
+            img: (lambda img=img: ars_window.img.open_image(img))
+            for img in items
+        }
+
+        if current_img_path:
+            config2.callback_hover_out = {
+                img: (lambda: ars_window.img.open_image(current_img_path, -1, False))
+                for img in items
+            }
+        else:
+            config2.callback_hover_out = {
+                img: (lambda: ars_window.img.clear_image())
+                for img in items
+            }
 
         if config2.image_items:
             open_context(
