@@ -181,6 +181,7 @@ def execute_cmd(ars_window):
         ic.ICON_SPEED_UP,
         ic.ICON_SIZE,
         ic.ICON_WINDOW_FULLSCREEN,
+        ic.ICON_TRASH_X,
         "   ",
         ],
         ["   ", "timeline", "   ",],
@@ -415,6 +416,7 @@ def execute_cmd(ars_window):
         ic.ICON_SIZE: lambda: open_keyframes(ars_window),
         ic.ICON_WINDOW_FULLSCREEN: lambda: ars_window.img.fit_image(),
         ic.ICON_TXT_FONT: lambda: open_prompt_editor(ars_window),
+        ic.ICON_TRASH_X: lambda: ars_window.img.clear_image()
         }
 
 
