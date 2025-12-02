@@ -15,7 +15,7 @@ from ars_cmds.core_cmds.key_check import key_check_continuous
 from PIL import Image
 from collections import Counter
 from ars_cmds.bubble_cmds.open_keyframes import BBL_KEYFRAMES as open_keyframes
-from ars_cmds.bubble_cmds.prompt_editor_cmd import BBL_P as open_prompt_editor
+from ars_cmds.obj_ctx.prompt_editor_ctx import BBL_P as open_prompt_editor
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
