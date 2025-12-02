@@ -46,14 +46,19 @@
             "grid_y": 0
         },
         {
+            "symbol": "\ue97d",
+            "grid_x": 0,
+            "grid_y": 6
+        },
+        {
             "symbol": "\ue972",
             "grid_x": 0,
             "grid_y": 0
         },
         {
-            "symbol": "L",
+            "symbol": "\ue986",
             "grid_x": 0,
-            "grid_y": 5
+            "grid_y": 7
         },
         {
             "symbol": "\ue96c",
