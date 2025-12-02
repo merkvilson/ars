@@ -29,7 +29,7 @@
 - [ ] Implement better workflow conerter for open_j
 - [ ] 
 - [ ] 
-- [ ] 
+- [ ] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [ ] 
 
 
