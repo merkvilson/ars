@@ -47,12 +47,12 @@ def execute_cmd(ars_window):
         ic.ICON_SHADER_SMOOTH: "Render Mode",
         ic.ICON_A_B_2: "Swap"}
     
-    config.toggle_values = {ic.ICON_SHADER_SMOOTH: (0,7,0)}  # Render Mode options
+    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,7,0)}  # Render Mode options
 
     config.callbackL = {
         ic.ICON_GRID_POINTS: lambda: auto_sort(ars_window),
         ic.ICON_FILE_3D: lambda: load_ply(ars_window),
-        ic.ICON_SHADER_SMOOTH: lambda mode: ars_window.gs_viewer.set_render_mode(mode),
+        ic.ICON_SHADER_SMOOTH: lambda mode: ars_window.gs_viewer.set_render_mode(int(mode)),
         ic.ICON_A_B_2: lambda: ars_window.swap_widgets(),
     }
 
