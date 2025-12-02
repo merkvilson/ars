@@ -214,9 +214,9 @@ class SnakeGameOverlay(QWidget):
 # Modify your BBL_GAME function to launch the game:
 from theme.fonts import font_icons as ic
 
-BBL_GAME_CONFIG = {"symbol": ic.ICON_SPEED_SNAIL}
-def BBL_GAME(*args):
-    run_ext(__file__)
+# BBL_GAME_CONFIG = {"symbol": ic.ICON_SPEED_SNAIL}
+# def BBL_GAME(*args):
+#     run_ext(__file__)
 
 def execute_cmd(ars_window):
     print("start")
