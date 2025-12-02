@@ -47,18 +47,13 @@
         },
         {
             "symbol": "\ue97d",
-            "grid_x": 0,
-            "grid_y": 6
+            "grid_x": 15,
+            "grid_y": 0
         },
         {
             "symbol": "\ue972",
             "grid_x": 0,
             "grid_y": 0
-        },
-        {
-            "symbol": "\ue986",
-            "grid_x": 0,
-            "grid_y": 7
         },
         {
             "symbol": "\ue96c",
@@ -103,11 +98,6 @@
         {
             "symbol": "C",
             "grid_x": 23,
-            "grid_y": 0
-        },
-        {
-            "symbol": "G",
-            "grid_x": 15,
             "grid_y": 0
         },
         {
