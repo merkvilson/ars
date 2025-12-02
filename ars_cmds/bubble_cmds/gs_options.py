@@ -47,7 +47,7 @@ def execute_cmd(ars_window):
         ic.ICON_SHADER_SMOOTH: "Render Mode",
         ic.ICON_A_B_2: "Swap"}
     
-    config.toggle_values = {"?": (0,7,0)}  # Render Mode options
+    config.toggle_values = {ic.ICON_SHADER_SMOOTH: (0,7,0)}  # Render Mode options
 
     config.callbackL = {
         ic.ICON_GRID_POINTS: lambda: auto_sort(ars_window),
