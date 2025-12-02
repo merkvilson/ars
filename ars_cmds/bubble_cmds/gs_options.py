@@ -36,22 +36,24 @@ def auto_sort(ars_window):
     new_state = not gs.auto_sort
     gs.set_auto_sort(new_state)
     
-    status = "ON" if new_state else "OFF"
-    ars_window.msg(f"Auto-sort: {status}", auto_close=1000)
-
-
-
+  
 def execute_cmd(ars_window):
 
     config = ContextMenuConfig()
+    config.auto_close = False
     config.options =  {
         ic.ICON_GRID_POINTS: "Auto-Sort",
-        ic.ICON_FILE_3D: "Load PLY",}
+        ic.ICON_FILE_3D: "Load PLY",
+        ic.ICON_SHADER_SMOOTH: "Render Mode",
+        ic.ICON_A_B_2: "Swap"}
     
+    config.toggle_values = {"?": (0,7,0)}  # Render Mode options
 
     config.callbackL = {
         ic.ICON_GRID_POINTS: lambda: auto_sort(ars_window),
         ic.ICON_FILE_3D: lambda: load_ply(ars_window),
+        ic.ICON_SHADER_SMOOTH: lambda mode: ars_window.gs_viewer.set_render_mode(mode),
+        ic.ICON_A_B_2: lambda: ars_window.swap_widgets(),
     }
 
     ctx = open_context(config)
