@@ -41,6 +41,7 @@ def execute_cmd(ars_window):
 
     config = ContextMenuConfig()
     config.auto_close = False
+    config.show_value = True
     config.options =  {
         ic.ICON_GRID_POINTS: "Auto-Sort",
         ic.ICON_FILE_3D: "Load PLY",
@@ -49,7 +50,7 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_SCALE: "Scale"}
     
     config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,7,0),
-                            ic.ICON_GIZMO_SCALE: (0.01,100.0,1.0)} 
+                            ic.ICON_GIZMO_SCALE: (0.01,200.0,100.0)} 
     
     config.incremental_values = {ic.ICON_SHADER_SMOOTH: 1,
                                  ic.ICON_GIZMO_SCALE: 1}
@@ -59,7 +60,7 @@ def execute_cmd(ars_window):
         ic.ICON_FILE_3D: lambda: load_ply(ars_window),
         ic.ICON_SHADER_SMOOTH: lambda mode: ars_window.gs_viewer.set_render_mode(int(mode)),
         ic.ICON_A_B_2: lambda: ars_window.swap_widgets(),
-        ic.ICON_GIZMO_SCALE: lambda scale: ars_window.gs_viewer.set_scale(scale/10.0)
+        ic.ICON_GIZMO_SCALE: lambda scale: ars_window.gs_viewer.set_scale(scale/100.0)
     }
 
     ctx = open_context(config)
