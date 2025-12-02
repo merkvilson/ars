@@ -14,6 +14,7 @@ from ui.widgets.bubble_layout import FloatingBubblesManager
 from ui.widgets.cursor_follower import CursorFollowerWidget
 from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
+from gs_viewer.gs_widget import GaussianSplattingWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,6 +26,7 @@ class MainWindow(QMainWindow):
         self.layout = None
         self.viewport = None
         self.img = None
+        self.gs_viewer = None
         self._closing = False  # flag to prevent loop
 
         self._setup_ui()
@@ -69,6 +71,11 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.img)
         self.img.hide()  # start hidden
 
+        # Gaussian Splatting viewer
+        self.gs_viewer = GaussianSplattingWidget(self)
+        self.layout.addWidget(self.gs_viewer)
+        self.gs_viewer.hide()  # start hidden
+
         # Initialize hotkey_manager
         self.hotkey_manager = HotkeyManager(self.viewport._canvas.native)
 
@@ -94,12 +101,19 @@ class MainWindow(QMainWindow):
         self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
 
     def swap_widgets(self):
+        """Cycle through viewport -> img viewer -> gs_viewer -> viewport"""
         if self.viewport.isVisible():
             self.viewport.hide()
             self.img.show()
-        else:
+            self.msg("Image Viewer", auto_close=1000)
+        elif self.img.isVisible():
             self.img.hide()
+            self.gs_viewer.show()
+            self.msg("Gaussian Splatting Viewer", auto_close=1000)
+        else:
+            self.gs_viewer.hide()
             self.viewport.show()
+            self.msg("3D Viewport", auto_close=1000)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
