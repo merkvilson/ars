@@ -26,7 +26,7 @@
 - [80%] Store values inside ars_window.prefs
 - [80%] Read values from ars_window.prefs
 - [ ] A|B compare
-- [ ] 
+- [ ] Implement better workflow conerter for open_j
 - [ ] 
 - [ ] 
 - [ ] 
