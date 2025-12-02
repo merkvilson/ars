@@ -11,6 +11,6 @@
 - [✓] Move selected lines up/down using arrow keys.
 - [✓] Transparency Slider for revialing scene behind editor.
 - [ ] text ctx - set alpha to non selected
-- [ ] " sign converts selection into text-prompt.
+- [✓] " sign converts selection into text-prompt.
 - [ ] 
 - [ ] 
