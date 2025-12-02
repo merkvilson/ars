@@ -102,6 +102,7 @@ class BaseCodeEditor(QPlainTextEdit):
         self.textChanged.connect(self._ensure_trailing_newline)
         self.textChanged.connect(self._on_text_changed_linter)
 
+        self.current_alpha = 0.6
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
@@ -187,6 +188,7 @@ class BaseCodeEditor(QPlainTextEdit):
 
     def set_alpha(self, alpha: float):
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
+        self.current_alpha = alpha
         self.setStyleSheet(
             "QPlainTextEdit {"
             f"background-color: rgba(20, 20, 20, {alpha});"
@@ -555,6 +557,14 @@ class BaseCodeEditor(QPlainTextEdit):
             if delta != 0:
                 step = 1 if delta > 0 else -1
                 self._change_font_size(step)
+            event.accept()
+            return
+        elif event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+            delta = event.angleDelta().y()
+            if delta != 0:
+                step = 0.05 if delta > 0 else -0.05
+                new_alpha = max(0.0, min(1.0, self.current_alpha + step))
+                self.set_alpha(new_alpha)
             event.accept()
             return
         super().wheelEvent(event)
