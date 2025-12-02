@@ -45,15 +45,21 @@ def execute_cmd(ars_window):
         ic.ICON_GRID_POINTS: "Auto-Sort",
         ic.ICON_FILE_3D: "Load PLY",
         ic.ICON_SHADER_SMOOTH: "Render Mode",
-        ic.ICON_A_B_2: "Swap"}
+        ic.ICON_A_B_2: "Swap",
+        ic.ICON_GIZMO_SCALE: "Scale"}
     
-    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,7,0)}  # Render Mode options
+    config.slider_values = {ic.ICON_SHADER_SMOOTH: (0,7,0),
+                            ic.ICON_GIZMO_SCALE: (0.01,100.0,1.0)} 
+    
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 1,
+                                 ic.ICON_GIZMO_SCALE: 1}
 
     config.callbackL = {
         ic.ICON_GRID_POINTS: lambda: auto_sort(ars_window),
         ic.ICON_FILE_3D: lambda: load_ply(ars_window),
         ic.ICON_SHADER_SMOOTH: lambda mode: ars_window.gs_viewer.set_render_mode(int(mode)),
         ic.ICON_A_B_2: lambda: ars_window.swap_widgets(),
+        ic.ICON_GIZMO_SCALE: lambda scale: ars_window.gs_viewer.set_scale(scale/10.0)
     }
 
     ctx = open_context(config)
