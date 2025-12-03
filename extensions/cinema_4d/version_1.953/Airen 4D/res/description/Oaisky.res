@@ -1,7 +1,0 @@
-CONTAINER Oaisky
-{
-	NAME Oaisky;
-	INCLUDE Obase;
-
-	GROUP ID_OBJECTPROPERTIES{}
-} 
