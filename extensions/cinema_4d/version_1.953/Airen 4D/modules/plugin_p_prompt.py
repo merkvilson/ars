@@ -6,7 +6,7 @@ from airen_cmds  import *
 from airen_vars  import *
 from c4d_gui_fr  import *
 from c4d_gui_cmd import *
-
+import random
 
 class Opprompt(c4d.plugins.ObjectData): 
 

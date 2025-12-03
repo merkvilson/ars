@@ -156,7 +156,7 @@ if __name__ == "__main__":
     c4d.plugins.RegisterObjectPlugin    (id = AI_PARAMETRIC_P,str = "PROMPT_EFFECTOR_0",g = Opprompt, description = "Opprompt", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("parametric"))
     c4d.plugins.RegisterObjectPlugin    (id = AI_SKY,str = "Dome",g = Oaisky, description = "Oaisky", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("sky"))
     c4d.plugins.RegisterObjectPlugin    (id = AI_BG,str = "Background",g = Oaibg, description = "Oaibg", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("bg"))
-    c4d.plugins.RegisterObjectPlugin    (id = AI_TERRAIN_GEN,str = "Terrain",g = OAi_Terrain, description = "", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("height_gen"))
+    # c4d.plugins.RegisterObjectPlugin    (id = AI_TERRAIN_GEN,str = "Terrain",g = OAi_Terrain, description = "", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("height_gen"))
     c4d.plugins.RegisterObjectPlugin    (id = AI_3D,str = "3D Mesh",g = OAI_3D, description = "", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("obj3d"))
     c4d.plugins.RegisterObjectPlugin    (id = AI_SPRITE,str = "Sprite",g = OAI_SPRITE, description = "", info = c4d.OBJECT_GENERATOR|c4d.PLUGINFLAG_HIDEPLUGINMENU,icon = ico("sprite"))
 
