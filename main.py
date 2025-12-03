@@ -24,6 +24,10 @@ class Application:
     def run(self) -> None:
         self._app = QApplication(sys.argv)
         self._main_window = MainWindow()
+        
+        #from PyQt6.QtCore import Qt
+        #self._main_window.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+
         self._main_window.resize(1280, 720)
         self._main_window.show()
         #self._main_window.showMaximized()
