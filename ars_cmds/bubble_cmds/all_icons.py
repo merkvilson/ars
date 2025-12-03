@@ -3,9 +3,6 @@ import pyperclip
 from theme.fonts.new_fonts import get_font
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtGui import QCursor
-
-
 
 def copy_name(ars_window, k,v):
     pyperclip.copy(k)

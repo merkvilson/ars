@@ -4,18 +4,16 @@ This module provides functionality for rendering and playing back video sequence
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.load_object import selected_object
-from PyQt6.QtCore import QPoint, QTimer
+from PyQt6.QtCore import QTimer
 from prefs.pref_controller import get_path
 import os
 from ars_cmds.util_cmds.delete_files import delete_all_files_in_folder
-from ars_cmds.render_cmds.check import check_queue
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from PIL import Image
 from collections import Counter
 from ars_cmds.obj_ctx.open_keyframes import BBL_KEYFRAMES as open_keyframes
 from ars_cmds.obj_ctx.prompt_editor_ctx import BBL_P as open_prompt_editor
+
 
 BBL_VIDEO_CONFIG = {"symbol": ic.ICON_PLAYER_TRACK_NEXT}
 def BBL_VIDEO(*args):
@@ -24,6 +22,7 @@ def BBL_VIDEO(*args):
     Runs the current file as an extension.
     """
     run_ext(__file__)
+
 
 def execute_cmd(ars_window):
     """

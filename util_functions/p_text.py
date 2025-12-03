@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 p_text.py
 
@@ -191,8 +190,6 @@ def read_files(
     return project_files
 
 
-
-
 def save_project_files(project_files: Dict[str, str], directory_tree: str, output_file: str = DEFAULT_OUTPUT) -> None:
     """
     Save the directory tree and project files to output_file (overwrites if exists).
@@ -280,8 +277,6 @@ def main():
 
     # Optional console printing
     print_summary(files_content)
-
-
 
 if __name__ == "__main__":
     main()

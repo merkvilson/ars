@@ -1,7 +1,6 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context, close_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-import json
 from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
@@ -28,8 +27,6 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     config=ContextMenuConfig()
     config.options = {}
     config.extra_distance = [99999,0]
-
-
 
     ars_window.render_manager.set_workflow(ars_window.prefs.json_ud_path)
     workflow_template = ars_window.render_manager.workflow_template

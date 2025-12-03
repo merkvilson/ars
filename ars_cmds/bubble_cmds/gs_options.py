@@ -7,8 +7,6 @@ from PyQt6.QtWidgets import QFileDialog
 def BBL_ATOM(*args):
     run_ext(__file__)
 
-
-
 def load_ply(ars_window):
     """Load a PLY file into the Gaussian Splatting viewer."""
     file_path, _ = QFileDialog.getOpenFileName(

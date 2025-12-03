@@ -2,8 +2,6 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from PyQt6.QtWidgets import QFileDialog
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtGui import QCursor
-
 
 def load_bg_image(ars_window, image_path=None):
     if image_path is None:

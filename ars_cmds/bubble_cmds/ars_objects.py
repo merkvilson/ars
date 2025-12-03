@@ -2,7 +2,6 @@ import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.load_object import (
     add_mesh,
     add_sprite,
@@ -10,13 +9,10 @@ from ars_cmds.core_cmds.load_object import (
     add_primitive,
 )
 
-
 BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
-
 
 def BBL_OBJECT(*args):
     run_ext(__file__)
-
 
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
