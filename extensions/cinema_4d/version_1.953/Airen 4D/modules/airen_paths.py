@@ -1,7 +1,8 @@
 import os
 
 plugin_path       = os.path.dirname(os.path.split(__file__)[0])
-airen_root_path   = os.path.dirname(os.path.dirname(os.path.dirname(plugin_path)))
+# airen_root_path   = os.path.dirname(os.path.dirname(os.path.dirname(plugin_path)))
+airen_root_path   = r'C:\Airen_Engine'
 airen_models_path = os.path.join (airen_root_path ,"AIREN_MODELS")
 
 airen_custom_nodes_path = os.path.join(plugin_path, "res", "airen_custom_nodes")
@@ -16,8 +17,6 @@ def ai_paths_cmd(model_type):
 
 
 os.makedirs(os.path.join (airen_root_path ,"CUI"), exist_ok=True)
-
-
 user_comfy_ui      = os.listdir (os.path.join (airen_root_path ,"CUI"))[0]
 
 comfyui_path      = os.path.join (airen_root_path ,"CUI", user_comfy_ui, "ComfyUI")
@@ -26,7 +25,7 @@ comfyui_path      = os.path.join (airen_root_path ,"CUI", user_comfy_ui, "ComfyU
 comfyui_log_path  = os.path.join (airen_root_path ,"CUI", user_comfy_ui, "comfyui.log")
 comfyui_log2_path = os.path.join (airen_root_path ,"CUI", user_comfy_ui, "comfyui2.log")
 
-extra_model_yaml = os.path.join(comfyui_path, "extra_model_paths.yaml")
+# extra_model_yaml = os.path.join(comfyui_path, "extra_model_paths.yaml")
 
 
 sd_cstnodes_path  = os.path.join(comfyui_path, "custom_nodes")

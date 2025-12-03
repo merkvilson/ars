@@ -395,7 +395,8 @@ def apply_last_image(node, dir):
         node.SetDirty(c4d.DIRTYFLAGS_ALL)
         c4d.EventAdd()
     else:
-        print("No Images Detected!") 
+        # print("No Images Detected!") 
+        pass
 
 
 

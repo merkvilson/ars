@@ -32,19 +32,8 @@ with localimport('modules'):
 
 
 import c4d
-from   c4d.utils import Rad as r
-
-import random
 import subprocess
 
-import time
-import ast
-
-import json
-import base64
-import winreg
-import re
-import shutil
 
 
 
@@ -129,11 +118,6 @@ class C_DIR_TEX (c4d.plugins.CommandData):
         subprocess.Popen(['explorer', sd_tex_dir])
         return True
 
-class C_DIR_TERRAIN (c4d.plugins.CommandData):
-    def Execute(self, doc):
-        subprocess.Popen(['explorer', sd_terrain_dir])
-        return True
-
 class C_DIR_SPRITE (c4d.plugins.CommandData):
     def Execute(self, doc):
         subprocess.Popen(['explorer', sd_sprite_dir])
@@ -192,7 +176,7 @@ if __name__ == "__main__":
     c4d.plugins.RegisterCommandPlugin (AI_C_DIR_BG      , "Background"         , 134217728 | 268435456 , ico("folder") , "",        C_DIR_BG ())
     c4d.plugins.RegisterCommandPlugin (AI_C_DIR_DOME    , "Dome"               , 134217728 | 268435456 , ico("folder") , "",      C_DIR_DOME ())
     c4d.plugins.RegisterCommandPlugin (AI_C_DIR_TEX     , "Textures"           , 134217728 | 268435456 , ico("folder") , "",       C_DIR_TEX ())
-    c4d.plugins.RegisterCommandPlugin (AI_C_DIR_TERRAIN , "Terrain"            , 134217728 | 268435456 , ico("folder") , "",   C_DIR_TERRAIN ())
+    # c4d.plugins.RegisterCommandPlugin (AI_C_DIR_TERRAIN , "Terrain"            , 134217728 | 268435456 , ico("folder") , "",   C_DIR_TERRAIN ())
     c4d.plugins.RegisterCommandPlugin (AI_C_DIR_SPRITE  , "Sprite"             , 134217728 | 268435456 , ico("folder") , "",    C_DIR_SPRITE ())
     c4d.plugins.RegisterCommandPlugin (AI_C_DIR_RENDERS , "Renders"            , 134217728 | 268435456 , ico("folder") , "",   C_DIR_RENDERS ())
 
