@@ -1,9 +1,11 @@
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
-os.environ["QT_FONT_DPI"] = "200"
+os.environ["QT_FONT_DPI"] = "100"
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
 os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
+
+#Todo: Check if it is possible to add dict into os.environ for more complex settings
 
 import sys
 from PyQt6.QtWidgets import QApplication
