@@ -70,7 +70,7 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] Adaptive drag and drop area. When dropping image, it should show huge area for setting background and several small areas (h-list) of other options
 
-- [ ] 
+- [ ] C4D Mesh To Texture > insert 3d object and using canny controlnet, generate new texture for it.
 
 - [ ] 
 
