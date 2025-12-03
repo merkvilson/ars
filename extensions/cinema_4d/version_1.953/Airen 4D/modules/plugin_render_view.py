@@ -1,5 +1,4 @@
 import c4d
-from generate import *
 from airen_paths import *
 from c4d_gui import *
 from plugin_ids import *
@@ -7,7 +6,6 @@ from airen_cmds import *
 from airen_vars import *
 from c4d_gui_fr import *
 from c4d_gui_cmd import *
-from datetime import datetime
 import time
 import os
 import subprocess

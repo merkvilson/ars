@@ -9,9 +9,8 @@ exec(z.decompress(b.b64decode(blob)), vars(m)); _localimport=m;localimport=getat
 del blob, b, t, z, m;
 
 with localimport('modules'): 
-    from generate    import *
+    
     from airen_paths import *
-    from airen_nodes import *
     from c4d_gui     import *
     from c4d_gui_fr  import *
     from plugin_ids  import *

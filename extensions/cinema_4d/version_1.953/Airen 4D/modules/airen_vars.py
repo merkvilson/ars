@@ -1,11 +1,3 @@
-import c4d
-
-
-__DEBUG__ = True
-
-
-
-
 mods_ids =[
 
         1062683, # Random Picker

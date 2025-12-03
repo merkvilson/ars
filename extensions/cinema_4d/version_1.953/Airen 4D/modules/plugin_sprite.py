@@ -1,5 +1,4 @@
 import c4d
-from generate    import *
 from airen_paths import *
 from c4d_gui     import *
 from plugin_ids  import *

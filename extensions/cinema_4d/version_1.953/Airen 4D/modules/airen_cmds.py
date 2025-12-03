@@ -7,8 +7,6 @@ import shutil
 from urllib import request, parse
 
 
-
-from generate    import *
 from airen_paths import *
 from c4d_gui     import *
 from plugin_ids  import *
