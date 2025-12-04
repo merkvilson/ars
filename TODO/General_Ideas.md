@@ -27,7 +27,7 @@
 - [80%] Read values from ars_window.prefs
 - [ ] A|B compare
 - [ ] Implement better workflow conerter for open_j
-- [ ] 
+- [ ] Interactive infinite zoom
 - [ ] 
 - [ ] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [ ] 
