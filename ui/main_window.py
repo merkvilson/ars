@@ -16,6 +16,7 @@ from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -28,8 +29,9 @@ class MainWindow(QMainWindow):
         self.img = None
         self.gs_viewer = None
         self._closing = False  # flag to prevent loop
-
+        
         self._setup_ui()
+        self._setup_extensions()
         set_default_cursor("cursor")
 
         self.prefs = prefsConfig()
@@ -96,6 +98,15 @@ class MainWindow(QMainWindow):
         # Run startup commands
         self.execute_startup_commands()
 
+    def _setup_extensions(self):
+        """Initialize optional extensions"""
+        try:
+            from extensions.cinema_4d.bridge import C4DBridge
+            self.c4d_bridge = C4DBridge(self)
+            self.c4d_bridge.start()
+        except Exception as e:
+            print(f"[C4D] {e}")
+
     def msg(self, text: str, auto_close: int = 1500):
         text = str(text)
         self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
@@ -142,4 +153,6 @@ class MainWindow(QMainWindow):
             self._closing = True
             QTimer.singleShot(3000, self.close)
         else:
+            if hasattr(self, 'c4d_bridge'):
+                self.c4d_bridge.stop()
             event.accept()
