@@ -1,0 +1,6 @@
+- [ ] Replace airen window with latest screenshot when cursor is out of area.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
