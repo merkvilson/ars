@@ -14,7 +14,9 @@
 - [✓] ctrl+i opens icons list (autocomplete).
 - [✓] Move selected lines up/down using arrow keys.
 - [✓] Transparency Slider for revialing scene behind editor.
-- [ ] 
+- [ ] Auto Complete should give suggestions from commented data. 
+    example: 
+    self.something = True #Options: True, False, None
 - [ ] 
 - [ ] 
 - [ ] 
