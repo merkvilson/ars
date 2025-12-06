@@ -96,8 +96,14 @@ def execute_cmd(ars_window):
 
     options_list = [
         [
-            "   ",
             ic.ICON_ARROW_BARS_V,
+            ic.ICON_TXT_SIZE,
+            ic.ICON_SHADER_SMOOTH,
+            "   ",
+            ic.ICON_PLAYER_PLAY,
+            ic.ICON_POWER,
+            ic.ICON_PLAYER_STOP,
+            "   ",
         ],
         "   ",
     ]

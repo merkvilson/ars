@@ -73,6 +73,9 @@ def execute_cmd(ars_window):
 
     options_list = [
         [
+            ic.ICON_ARROW_BARS_V,
+            ic.ICON_TXT_SIZE,
+            ic.ICON_SHADER_SMOOTH,
             "   ",
             ic.ICON_LIST,
             ic.ICON_FOLDER_OPEN,
@@ -80,9 +83,6 @@ def execute_cmd(ars_window):
             ic.ICON_SAVE,
             ic.ICON_CODE_TERMINAL,
             "   ",
-            ic.ICON_TXT_SIZE,
-            ic.ICON_SHADER_SMOOTH,
-            ic.ICON_ARROW_BARS_V,
         ],
         ["   ", "PythonEditorWidget", "   "],
         "   ",
