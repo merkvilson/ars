@@ -35,9 +35,9 @@ def execute_cmd(ars_window):
         ars_window: The main application window instance.
     """
 
-    #Prepare GUI
-    ars_window.viewport.hide()
-    ars_window.img.show()
+    #Prepare GUI, #Temporary hide
+    #ars_window.viewport.hide()
+    #ars_window.img.show()
 
     # Timer and state for play_video
     if not hasattr(ars_window, '_loop_timer'):
@@ -421,5 +421,6 @@ def execute_cmd(ars_window):
 
     ctx = open_context(
         items=options_list,
-        config=config
+        config=config,
+        parent=ars_window.central_widget
     )
