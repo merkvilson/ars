@@ -377,13 +377,21 @@ class BButton(QGraphicsObject):
 
 
         # Default callbacks
-        def default_callback(value=None):
+        def default_callbackL(value=None):
             action = "clicked" if value is None else f"set to {value}"
             print(f"{self.symbol} {action}")
 
-        self.callbackL = config.callbackL if config.callbackL else default_callback
-        self.callbackR = config.callbackR if config.callbackR else default_callback
-        self.callbackM = config.callbackM if config.callbackM else default_callback
+        def default_callbackR(value=None):
+            action = "right-clicked" if value is None else f"set to {value}"
+            print(f"{self.symbol} {action}")
+        
+        def default_callbackM(value=None):
+            action = "middle-clicked" if value is None else f"set to {value}"
+            print(f"{self.symbol} {action}")
+
+        self.callbackL = config.callbackL if config.callbackL else default_callbackL
+        self.callbackR = config.callbackR if config.callbackR else default_callbackR
+        self.callbackM = config.callbackM if config.callbackM else default_callbackM
 
     def _create_hotkey_items(self):
         # Clear old hotkey items
