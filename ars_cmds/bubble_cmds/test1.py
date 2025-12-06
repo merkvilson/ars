@@ -6,7 +6,8 @@ from ars_cmds.core_cmds.run_ext import run_ext
 BBL_TEST_CONFIG ={"symbol": ic.ICON_TEST }
 def BBL_TEST(*args):
     run_ext(__file__)
-
+    
+DEFAULT_URL = r"http://127.0.0.1:8188/"
 
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
