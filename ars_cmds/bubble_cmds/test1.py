@@ -1,11 +1,10 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-import subprocess
-import sys
-import socket
-import threading
-import json
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QColor
 
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
@@ -14,133 +13,35 @@ def BBL_TEST(*args):
     
 DEFAULT_URL = r"http://127.0.0.1:8188/"
 
-# Browser controller class
-class BrowserController:
-    def __init__(self):
-        self.process = None
-        self.sock = None
-        self.port = 19283
+
+class BrowserWindow(QMainWindow):
+    def __init__(self, parent_window):
+        # No parent - separate window to avoid OpenGL conflict
+        super().__init__(None)
+        self.parent_window = parent_window
+        self.setWindowFlags(
+            Qt.WindowType.FramelessWindowHint | 
+            Qt.WindowType.Tool |
+            Qt.WindowType.WindowStaysOnTopHint
+        )
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
         
-    def start(self, url=DEFAULT_URL, width=1200, height=800, title="ARS Browser"):
-        code = f'''
-import webview
-import socket
-import threading
-import json
-
-class JsonApi:
-    def __init__(self, window):
-        self.window = window
-        self.running = True
-        
-    def handle_commands(self, port):
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind(("127.0.0.1", port))
-        server.listen(1)
-        server.settimeout(1)
-        
-        while self.running:
-            try:
-                conn, addr = server.accept()
-                data = conn.recv(4096).decode()
-                if data:
-                    cmd = json.loads(data)
-                    result = self.execute(cmd)
-                    conn.send(json.dumps(result).encode())
-                conn.close()
-            except socket.timeout:
-                continue
-            except Exception as e:
-                print(f"Error: {{e}}")
-        server.close()
+        self.browser = QWebEngineView()
+        self.browser.page().setBackgroundColor(QColor("#151515"))
+        self.browser.setUrl(QUrl(DEFAULT_URL))
+        self.setCentralWidget(self.browser)
+        self.setStyleSheet("background-color: #151515;")
     
-    def execute(self, cmd):
-        action = cmd.get("action")
-        try:
-            if action == "navigate":
-                self.window.load_url(cmd["url"])
-            elif action == "resize":
-                self.window.resize(cmd["width"], cmd["height"])
-            elif action == "set_title":
-                self.window.set_title(cmd["title"])
-            elif action == "fullscreen":
-                self.window.toggle_fullscreen()
-            elif action == "minimize":
-                self.window.minimize()
-            elif action == "get_url":
-                return {{"url": self.window.get_current_url()}}
-            elif action == "close":
-                self.running = False
-                self.window.destroy()
-            return {{"ok": True}}
-        except Exception as e:
-            return {{"error": str(e)}}
-
-def on_closed():
-    api.running = False
-
-window = webview.create_window(
-    "{title}",
-    "{url}",
-    width={width},
-    height={height},
-    resizable=True,
-    min_size=(400, 300),
-    background_color="#151515",
-    frameless=True
-)
-window.events.closed += on_closed
-
-api = JsonApi(window)
-cmd_thread = threading.Thread(target=api.handle_commands, args=({self.port},), daemon=True)
-cmd_thread.start()
-
-webview.start()
-'''
-        self.process = subprocess.Popen([sys.executable, "-c", code])
-        return self
-    
-    def send_command(self, cmd):
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(2)
-            sock.connect(("127.0.0.1", self.port))
-            sock.send(json.dumps(cmd).encode())
-            response = sock.recv(4096).decode()
-            sock.close()
-            return json.loads(response)
-        except:
-            return {"error": "Connection failed"}
-    
-    def navigate(self, url):
-        return self.send_command({"action": "navigate", "url": url})
-    
-    def resize(self, width, height):
-        return self.send_command({"action": "resize", "width": width, "height": height})
-    
-    def set_title(self, title):
-        return self.send_command({"action": "set_title", "title": title})
-    
-    def fullscreen(self):
-        return self.send_command({"action": "fullscreen"})
-    
-    def minimize(self):
-        return self.send_command({"action": "minimize"})
-    
-    def get_url(self):
-        return self.send_command({"action": "get_url"}).get("url", "")
-    
-    def close(self):
-        return self.send_command({"action": "close"})
+    def update_position(self, x, y, w, h):
+        self.setGeometry(x, y, w, h)
 
 
-_browser = None
+_browser_window = None
 
 def execute_cmd(ars_window):
-    global _browser
+    global _browser_window
     
-    browser_height = ars_window.prefs.code_editor_height if hasattr(ars_window.prefs, 'browser_height') else 600
+    browser_height = getattr(ars_window.prefs, 'browser_height', 600)
     
     config = ContextMenuConfig()
     config.use_extended_shape = False
@@ -151,19 +52,27 @@ def execute_cmd(ars_window):
     config.custom_width = ars_window.width()
     config.extra_distance = [0, 99999]
 
-    # Start browser if not running
-    if _browser is None or _browser.process.poll() is not None:
-        _browser = BrowserController().start(
-            url=DEFAULT_URL,
-            width=ars_window.width(),
-            height=browser_height - int(44 * 1.5)
-        )
+    # Create browser window
+    if _browser_window is None:
+        _browser_window = BrowserWindow(ars_window)
+    
+    # Position browser below the control bar
+    bar_height = int(44 * 1.5)
+    main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
+    _browser_window.update_position(
+        main_pos.x(),
+        main_pos.y() + ars_window.height() - browser_height + bar_height,
+        ars_window.width(),
+        browser_height - bar_height
+    )
+    _browser_window.show()
 
     options_list = [
         [
             "   ",
             ic.ICON_ARROW_BARS_V,
         ],
+        "   ",
     ]
 
     config.slider_values = {
@@ -173,12 +82,28 @@ def execute_cmd(ars_window):
         ic.ICON_ARROW_BARS_V: (-20, "y"),
     }
 
+    def resize_browser(value):
+        ctx.resize_top(value)
+        main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
+        _browser_window.update_position(
+            main_pos.x(),
+            main_pos.y() + ars_window.height() - int(value) + bar_height,
+            ars_window.width(),
+            int(value) - bar_height
+        )
+
+    def close_browser():
+        global _browser_window
+        if _browser_window:
+            _browser_window.close()
+            _browser_window = None
+        ctx.close_animated()
+
     config.callbackL = {
-        ic.ICON_ARROW_BARS_V: lambda value: (
-            ctx.resize_top(value),
-            _browser.resize(ars_window.width(), int(value) - int(44 * 1.5))
-        ),
+        ic.ICON_ARROW_BARS_V: resize_browser,
     }
+    
+    config.callback_on_close = lambda: (_browser_window.hide() if _browser_window else None)
 
     ctx = open_context(
         items=options_list,
