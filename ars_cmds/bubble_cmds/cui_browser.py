@@ -84,7 +84,7 @@ def execute_cmd(ars_window):
         _browser_window = BrowserWindow(ars_window)
     
     # Position browser below the control bar
-    bar_height = int(44 * 1.5)
+    bar_height = 50
     main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
     _browser_window.update_position(
         main_pos.x(),
@@ -103,7 +103,7 @@ def execute_cmd(ars_window):
     ]
 
     config.slider_values = {
-        ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, browser_height),
+        ic.ICON_ARROW_BARS_V: (55, ars_window.height() - 55 - 20, browser_height),
     }
     config.incremental_values = {
         ic.ICON_ARROW_BARS_V: (-20, "y"),
