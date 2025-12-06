@@ -30,6 +30,10 @@
 - [ ] Implement better workflow conerter for open_j
 - [ ] Interactive infinite zoom
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
+- [ ] alt+scroll move camera instead of zooming
+- [ ] 
+- [ ] 
+- [ ] 
 - [ ] 
 
 
