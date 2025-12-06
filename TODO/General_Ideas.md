@@ -9,7 +9,7 @@
 - [ ] Add undo/redo functionality
 - [ ] Optimize render pipeline performance
 - [✓] Save one extra image to prevent early image load
-- [ ] Middle click revert to default 
+- [✓] Middle click revert to default 
 - [30%] Implement prefs manager and config classes
 - [✓] BG image should generate upscaled image and set it to bg
 - [✓] set_workflow should be able to get only workflow name as well as full path
