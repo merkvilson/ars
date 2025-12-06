@@ -6,7 +6,8 @@
 	],
     "settings": {
         "files.associations": {
-            "*.arsp": "python"
+            "*.arsp": "python",
+            "*.pyp": "python"
         }
     }
 }
