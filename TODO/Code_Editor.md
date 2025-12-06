@@ -17,7 +17,7 @@
 - [ ] Auto Complete should give suggestions from commented data. 
     example: 
     self.something = True #Options: True, False, None
-- [ ] 
+- [ ] remove original cursor when placing multiple cursors
 - [ ] 
 - [ ] 
 - [ ] 
