@@ -4,7 +4,7 @@
 - [ ] Ctrl+F Find / Search
 - [80%] Multi cursor placement
 - [✓] Tab key adds ( ) signs when auto completing functions. 
-- [ ] Auto Complete def something with ( ): after opening first bracket 
+- [✓] Auto Complete def something with ( ): after opening first bracket 
 - [ ] Ctrl+Shift+A find all selected
 - [✓] Add terminal
 - [ ] Toggle line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
