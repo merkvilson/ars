@@ -1,6 +1,6 @@
 # Medium Priority
 
-- [ ] Browser Widget (for comfyui integration)
+- [✓] Browser Widget (for comfyui integration)
 - [ ] implement whisperthunder and pollinations as extensions/plugins
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
 - [30%] CUI workflow to CTX
