@@ -386,8 +386,43 @@ class BButton(QGraphicsObject):
             print(f"{self.symbol} {action}")
         
         def default_callbackM(value=None):
-            action = "middle-clicked" if value is None else f"set to {value}"
-            print(f"{self.symbol} {action}")
+            # Revert slider or toggle to default value
+            if self.slider_values:
+                _, _, default_val = self.slider_values
+                self._slider_value = default_val
+                self._update_additional_text()
+                
+                # Temporarily show value in symbol for small/incremental sliders
+                if not self.use_extended_shape:
+                    value_txt = str(int(round(self._slider_value)))
+                    self.main_symbol_item.setPlainText(value_txt)
+                    self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
+                    bounding = self.main_symbol_item.boundingRect()
+                    self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+                    self._start_revert_timer()
+                
+                self.update()
+                # Execute callbackL after reverting
+                if self.callbackL:
+                    if len(inspect.signature(self.callbackL).parameters) > 0:
+                        self.callbackL(self._slider_value)
+                    else:
+                        self.callbackL()
+            elif self.toggle_values:
+                _, _, default_val = self.toggle_values
+                self._toggle_value = default_val
+                self._update_additional_text()
+                self._update_colors()
+                self._refresh_color()
+                self.update()
+                # Execute callbackL after reverting
+                if self.callbackL:
+                    if len(inspect.signature(self.callbackL).parameters) > 0:
+                        self.callbackL(self._toggle_value)
+                    else:
+                        self.callbackL()
+            else:
+                print(f"{self.symbol} middle-clicked (no slider/toggle to revert)")
 
         self.callbackL = config.callbackL if config.callbackL else default_callbackL
         self.callbackR = config.callbackR if config.callbackR else default_callbackR
