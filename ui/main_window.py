@@ -15,7 +15,7 @@ from ui.widgets.cursor_follower import CursorFollowerWidget
 from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
-
+from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
             define_hotkeys(self)
             self.viewport.grid.start_animation(duration=2)
             play_sound("startup3")
+            open_timeline(self)
 
 
         QTimer.singleShot(100, lambda: startup_commands(self))
