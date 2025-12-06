@@ -57,7 +57,7 @@
         },
         {
             "symbol": "\ue91d",
-            "grid_x": 15,
+            "grid_x": 19,
             "grid_y": 0
         },
         {
@@ -81,8 +81,13 @@
             "grid_y": 0
         },
         {
+            "symbol": "\ue90e",
+            "grid_x": 20,
+            "grid_y": 0
+        },
+        {
             "symbol": "\ue99b",
-            "grid_x": 19,
+            "grid_x": 15,
             "grid_y": 0
         }
     ]

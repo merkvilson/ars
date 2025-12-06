@@ -1,9 +1,9 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QMainWindow, QApplication
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtCore import Qt, QUrl, QEvent
 from PyQt6.QtGui import QColor
 
 
@@ -16,13 +16,13 @@ DEFAULT_URL = r"http://127.0.0.1:8188/"
 
 class BrowserWindow(QMainWindow):
     def __init__(self, parent_window):
-        # No parent - separate window to avoid OpenGL conflict
         super().__init__(None)
         self.parent_window = parent_window
+        self._was_visible = False
+        self._resizing = False
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint | 
-            Qt.WindowType.Tool |
-            Qt.WindowType.WindowStaysOnTopHint
+            Qt.WindowType.Tool
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
         
@@ -31,9 +31,36 @@ class BrowserWindow(QMainWindow):
         self.browser.setUrl(QUrl(DEFAULT_URL))
         self.setCentralWidget(self.browser)
         self.setStyleSheet("background-color: #151515;")
+        
+        # Install event filter on main window to track focus/minimize
+        self.parent_window.installEventFilter(self)
+    
+    def eventFilter(self, obj, event):
+        if obj == self.parent_window:
+            if event.type() == QEvent.Type.WindowStateChange:
+                if self.parent_window.isMinimized():
+                    self._was_visible = self.isVisible()
+                    self.hide()
+                else:
+                    if self._was_visible:
+                        self.show()
+                        self.raise_()
+            elif event.type() == QEvent.Type.Hide:
+                self._was_visible = self.isVisible()
+                self.hide()
+            elif event.type() == QEvent.Type.Show:
+                if self._was_visible:
+                    self.show()
+                    self.raise_()
+        
+        return super().eventFilter(obj, event)
     
     def update_position(self, x, y, w, h):
+        self._resizing = True
         self.setGeometry(x, y, w, h)
+        self.show()
+        self.raise_()
+        self._resizing = False
 
 
 _browser_window = None
