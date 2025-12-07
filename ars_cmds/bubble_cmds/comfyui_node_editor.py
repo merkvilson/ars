@@ -1,11 +1,11 @@
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtWidgets import QMainWindow, QApplication
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import Qt, QUrl, QEvent
-from PyQt6.QtGui import QColor
-
+import subprocess
+import sys
+import os
+import ctypes
+from PyQt6.QtCore import QObject, QEvent, Qt
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
 def BBL_TEST(*args):
@@ -13,60 +13,87 @@ def BBL_TEST(*args):
     
 DEFAULT_URL = r"http://127.0.0.1:8188/"
 
+class BrowserManager(QObject):
+    def __init__(self, ars_window):
+        super().__init__(ars_window)
+        self.ars_window = ars_window
+        self.process = None
+        self.ars_window.installEventFilter(self)
+        self._hwnd = None
 
-class BrowserWindow(QMainWindow):
-    def __init__(self, parent_window):
-        super().__init__(None)
-        self.parent_window = parent_window
-        self._was_visible = False
-        self._resizing = False
-        self.setWindowFlags(
-            Qt.WindowType.FramelessWindowHint | 
-            Qt.WindowType.Tool
-        )
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
-        
-        self.browser = QWebEngineView()
-        self.browser.page().setBackgroundColor(QColor("#151515"))
-        self.browser.setUrl(QUrl(DEFAULT_URL))
-        self.setCentralWidget(self.browser)
-        self.setStyleSheet("background-color: #151515;")
-        
-        # Install event filter on main window to track focus/minimize
-        self.parent_window.installEventFilter(self)
-    
+    def _get_hwnd(self):
+        if self._hwnd and ctypes.windll.user32.IsWindow(self._hwnd):
+            return self._hwnd
+        self._hwnd = ctypes.windll.user32.FindWindowW(None, "ComfyUI")
+        return self._hwnd
+
     def eventFilter(self, obj, event):
-        if obj == self.parent_window:
+        if obj == self.ars_window:
             if event.type() == QEvent.Type.WindowStateChange:
-                if self.parent_window.isMinimized():
-                    self._was_visible = self.isVisible()
-                    self.hide()
+                if self.ars_window.isMinimized():
+                    self.set_visibility(False)
                 else:
-                    if self._was_visible:
-                        self.show()
-                        self.raise_()
-            elif event.type() == QEvent.Type.Hide:
-                self._was_visible = self.isVisible()
-                self.hide()
-            elif event.type() == QEvent.Type.Show:
-                if self._was_visible:
-                    self.show()
-                    self.raise_()
-        
+                    self.set_visibility(True)
+            elif event.type() == QEvent.Type.Close:
+                self.close_browser()
         return super().eventFilter(obj, event)
-    
-    def update_position(self, x, y, w, h):
-        self._resizing = True
-        self.setGeometry(x, y, w, h)
-        self.show()
-        self.raise_()
-        self._resizing = False
 
+    def set_visibility(self, visible):
+        hwnd = self._get_hwnd()
+        if hwnd:
+            # SW_MINIMIZE = 6, SW_RESTORE = 9
+            cmd = 9 if visible else 6
+            ctypes.windll.user32.ShowWindow(hwnd, cmd)
 
-_browser_window = None
+    def update_geometry(self, x, y, w, h):
+        hwnd = self._get_hwnd()
+        if hwnd:
+            ctypes.windll.user32.MoveWindow(hwnd, int(x), int(y), int(w), int(h), True)
+            return True
+        return False
+
+    def show_browser(self, x, y, w, h):
+        # If process exists and window is found, just move it
+        if self.process and self.process.poll() is None:
+            if self.update_geometry(x, y, w, h):
+                self.set_visibility(True)
+                return
+
+        # Kill existing if any (zombie or lost window)
+        self.close_browser()
+        
+        script = f'''
+import webview
+import sys
+window = webview.create_window(
+    'ComfyUI',
+    '{DEFAULT_URL}',
+    x={int(x)}, y={int(y)}, width={int(w)}, height={int(h)},
+    frameless=True,
+    easy_drag=False,
+    on_top=True
+)
+webview.start()
+'''
+        self.process = subprocess.Popen(
+            [sys.executable, '-c', script],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+    def close_browser(self):
+        if self.process:
+            if self.process.poll() is None:
+                self.process.terminate()
+            self.process = None
+        self._hwnd = None
+
+_manager = None
 
 def execute_cmd(ars_window):
-    global _browser_window
+    global _manager
+    if _manager is None:
+        _manager = BrowserManager(ars_window)
     
     browser_height = getattr(ars_window.prefs, 'browser_height', 600)
     
@@ -79,20 +106,15 @@ def execute_cmd(ars_window):
     config.custom_width = ars_window.width()
     config.extra_distance = [0, 99999]
 
-    # Create browser window
-    if _browser_window is None:
-        _browser_window = BrowserWindow(ars_window)
-    
-    # Position browser below the control bar
     bar_height = 50
     main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
-    _browser_window.update_position(
+    
+    _manager.show_browser(
         main_pos.x(),
         main_pos.y() + ars_window.height() - browser_height + bar_height,
         ars_window.width(),
         browser_height - bar_height
     )
-    _browser_window.show()
 
     options_list = [
         [
@@ -100,7 +122,6 @@ def execute_cmd(ars_window):
             ic.ICON_TXT_SIZE,
             ic.ICON_SHADER_SMOOTH,
             "   ",
-            
             "   ",
             ic.ICON_PLAYER_PLAY,
             ic.ICON_POWER,
@@ -119,25 +140,20 @@ def execute_cmd(ars_window):
     def resize_browser(value):
         ctx.resize_top(value)
         main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
-        _browser_window.update_position(
+        
+        # Try to update geometry directly first
+        success = _manager.update_geometry(
             main_pos.x(),
             main_pos.y() + ars_window.height() - int(value) + bar_height,
             ars_window.width(),
             int(value) - bar_height
         )
 
-    def close_browser():
-        global _browser_window
-        if _browser_window:
-            _browser_window.close()
-            _browser_window = None
-        ctx.close_animated()
-
     config.callbackL = {
         ic.ICON_ARROW_BARS_V: resize_browser,
     }
     
-    config.callback_on_close = lambda: (_browser_window.hide() if _browser_window else None)
+    config.callback_on_close = _manager.close_browser
 
     ctx = open_context(
         items=options_list,
