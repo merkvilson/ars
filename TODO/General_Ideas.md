@@ -1,5 +1,6 @@
 # Medium Priority
 
+- [ ] Switch to img viewer by choosing 2D camera in camera menu
 - [✓] Browser Widget (for comfyui integration)
 - [ ] implement whisperthunder and pollinations as extensions/plugins
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
@@ -31,7 +32,6 @@
 - [ ] Interactive infinite zoom
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [ ] alt+scroll move camera instead of zooming
-- [ ] 
 - [ ] 
 - [ ] 
 - [ ] 
