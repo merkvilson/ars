@@ -22,7 +22,7 @@ from typing import List, Tuple, Dict, Optional
 
 
 DEFAULT_FOLDER = os.path.join(".",)  # default project folder
-DEFAULT_EXTENSIONS = [".py", ".txt", ".qss", ".json"]   # set to None to include all files
+DEFAULT_EXTENSIONS = [".py", ".txt", ".qss", ".json", ".md", ".gsls", ".arsp", ".arsl", ".bat"]   # set to None to include all files
 EXCLUDE_FILES = []  # filenames to exclude from saved output
 #EXCLUDE_FILES = ["p_text.py", "project_files.txt", "InfiniteGrid.py", "bg.py", ]  # filenames to exclude from saved output
 MAX_FILE_LENGTH = 50_000_000  # bytes; set None to include everything
