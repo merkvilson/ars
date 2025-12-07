@@ -60,6 +60,19 @@ class BrowserManager(QObject):
         hwnd = self._get_hwnd()
         if hwnd and self.target_rect:
             x, y, w, h = self.target_rect
+            
+            # Set owner to main window to handle Z-order automatically
+            # GWL_HWNDPARENT = -8
+            try:
+                main_hwnd = int(self.ars_window.winId())
+                ctypes.windll.user32.SetWindowLongPtrW(hwnd, -8, main_hwnd)
+            except:
+                # Fallback for 32-bit python if needed
+                try:
+                    ctypes.windll.user32.SetWindowLongW(hwnd, -8, main_hwnd)
+                except:
+                    pass
+            
             ctypes.windll.user32.MoveWindow(hwnd, int(x), int(y), int(w), int(h), True)
             self.timer.stop()
 
@@ -77,6 +90,8 @@ class BrowserManager(QObject):
         
         # We pass coordinates to create_window, but we also enforce them with MoveWindow via timer
         # to ensure correct physical positioning regardless of pywebview's DPI handling.
+        # Removed on_top=True to avoid covering other applications.
+        # Z-order is handled by setting owner window in check_window_and_move.
         script = f'''
 import webview
 import sys
@@ -86,7 +101,8 @@ window = webview.create_window(
     x={int(x)}, y={int(y)}, width={int(w)}, height={int(h)},
     frameless=True,
     easy_drag=False,
-    on_top=True
+    on_top=False,
+    background_color='#151515'
 )
 webview.start()
 '''
