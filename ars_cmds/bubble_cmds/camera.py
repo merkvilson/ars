@@ -52,7 +52,7 @@ def execute_cmd(ars_window):
 
     config.toggle_values = {
         ic.ICON_CAMERA: (0, 1, ars_window.img.isVisible()),
-        ic.ICON_ORBIT: (0, 1, 0),
+        ic.ICON_ORBIT: (0, 1, ars_window.gs_viewer.isVisible()),
         ic.ICON_FLY: (0, 1, ars_window.viewport.isVisible()),
     }
 
