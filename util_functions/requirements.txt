@@ -1,3 +1,5 @@
+cupy
+extensions
 freetype_py
 jedi
 mapbox_earcut
@@ -5,9 +7,12 @@ matplotlib
 numpy
 opencv_python
 Pillow
+plyfile
 pydub
 pyflakes
 pygame
+pyglm
+PyOpenGL
 pyperclip
 PyQt6
 pyqt6_sip
@@ -16,6 +21,7 @@ Requests
 scipy
 Shapely
 stdlib_list
+torch
 trimesh
 vispy
 webcolors
