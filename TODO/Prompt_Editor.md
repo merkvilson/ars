@@ -12,5 +12,5 @@
 - [✓] Transparency Slider for revialing scene behind editor.
 - [ ] text ctx - set alpha to non selected
 - [✓] " sign converts selection into text-prompt.
-- [ ] 
+- [ ] "lora." shows loras dropdown(autocomplete) and keywords.
 - [ ] 
