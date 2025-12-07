@@ -5,6 +5,6 @@
 - [ ] Fix gizmo rotation
 - [✓] Resolve sprite rendering artifacts
 - [50%] Fix object manager deletion issues
-- [ ] 
+- [ ] Store default values separately for proper middle button revert
 - [ ] 
 - [ ] 
