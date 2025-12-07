@@ -27,7 +27,7 @@
 - [80%] Store values inside ars_window.prefs
 - [80%] Read values from ars_window.prefs
 - [ ] A|B compare
-- [ ] Implement better workflow conerter for open_j
+- [ ] Implement better workflow converter for open_j
 - [ ] Interactive infinite zoom
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [ ] alt+scroll move camera instead of zooming
