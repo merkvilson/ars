@@ -1,5 +1,6 @@
 # Medium Priority
 
+- [ ] Implement folder watcher or new file finder function with callbacks.
 - [✓] Switch to img viewer by choosing 2D camera in camera menu
 - [✓] Browser Widget (for comfyui integration)
 - [ ] implement whisperthunder and pollinations as extensions/plugins
