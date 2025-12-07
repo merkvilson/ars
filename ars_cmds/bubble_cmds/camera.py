@@ -27,7 +27,7 @@ def execute_cmd(ars_window):
     config = ContextMenuConfig()
     
     config.options = {
-        ic.ICON_CAMERA: "Scene Camera",
+        ic.ICON_CAMERA: "2D Camera",
         ic.ICON_ORBIT: "Orbit Camera",
         ic.ICON_FLY: "Fly Camera",
         ic.ICON_SPEED_UP: "Speed",
@@ -35,7 +35,7 @@ def execute_cmd(ars_window):
     }
 
     config.hotkey_items = {
-        ic.ICON_CAMERA: "S",
+        ic.ICON_CAMERA: "2",
         ic.ICON_ORBIT: "O",
         ic.ICON_FLY: "F",
     }
@@ -51,22 +51,24 @@ def execute_cmd(ars_window):
     }
 
     config.toggle_values = {
-        ic.ICON_CAMERA: (0, 1, 0),
+        ic.ICON_CAMERA: (0, 1, ars_window.img.isVisible()),
         ic.ICON_ORBIT: (0, 1, 0),
-        ic.ICON_FLY: (0, 1, 1),
+        ic.ICON_FLY: (0, 1, ars_window.viewport.isVisible()),
     }
 
     config.toggle_groups = [
         [ic.ICON_CAMERA, ic.ICON_ORBIT, ic.ICON_FLY],
     ]
     
-
-    config.show_hotkey = 0
+    def hide_view():
+        ars_window.viewport.hide()
+        ars_window.gs_viewer.hide()
+        ars_window.img.hide()
 
     config.callbackL = {
-        ic.ICON_CAMERA: lambda: print("1"),
-        ic.ICON_ORBIT: lambda: print('2'),
-        ic.ICON_FLY: lambda: print("3"),
+        ic.ICON_CAMERA: lambda: (hide_view(), ars_window.img.show()),
+        ic.ICON_ORBIT: lambda: (hide_view(), ars_window.gs_viewer.show()),
+        ic.ICON_FLY: lambda: (hide_view(), ars_window.viewport.show()),
         ic.ICON_SPEED_UP: lambda value: cam_speed(ars_window, value),
         ic.ICON_EYE_UP: lambda value: cam_zoom(ars_window, value),
     }
