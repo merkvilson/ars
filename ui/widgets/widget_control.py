@@ -240,7 +240,7 @@ def set_updated_config(widget, key: str, value):
 
         elif key == "slider_values":  # New handling for slider_values
             if isinstance(value, tuple) and len(value) == 3:
-                widget.slider_values = value
+                widget.slider_values = value + (value[2],)
                 widget._slider_value = value[2]
                 if widget.slider_values:
                     normal_alpha = int(widget.normal_color.alpha() * 0.7)
@@ -271,10 +271,16 @@ def set_updated_config(widget, key: str, value):
 
         elif key == "progress":
             if widget.slider_values:
-                min_val, max_val, _ = widget.slider_values
+                vals = widget.slider_values
+                min_val = vals[0]
+                max_val = vals[1]
+                
                 new_value = max(min_val, min(max_val, value))  # Clamp to min/max
                 widget._slider_value = new_value
-                widget.slider_values = (min_val, max_val, new_value)
+                
+                # Preserve extra values (like default value) if they exist
+                widget.slider_values = (min_val, max_val, new_value) + vals[3:]
+                
                 widget._update_additional_text()
                     
                 #widget._update_colors()
