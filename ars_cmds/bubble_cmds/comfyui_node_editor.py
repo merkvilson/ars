@@ -5,7 +5,7 @@ import subprocess
 import sys
 import os
 import ctypes
-from PyQt6.QtCore import QObject, QEvent, Qt
+from PyQt6.QtCore import QObject, QEvent, Qt, QTimer
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
 def BBL_TEST(*args):
@@ -20,6 +20,10 @@ class BrowserManager(QObject):
         self.process = None
         self.ars_window.installEventFilter(self)
         self._hwnd = None
+        self.target_rect = None
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.check_window_and_move)
+        self.timer.setInterval(50)
 
     def _get_hwnd(self):
         if self._hwnd and ctypes.windll.user32.IsWindow(self._hwnd):
@@ -52,7 +56,16 @@ class BrowserManager(QObject):
             return True
         return False
 
+    def check_window_and_move(self):
+        hwnd = self._get_hwnd()
+        if hwnd and self.target_rect:
+            x, y, w, h = self.target_rect
+            ctypes.windll.user32.MoveWindow(hwnd, int(x), int(y), int(w), int(h), True)
+            self.timer.stop()
+
     def show_browser(self, x, y, w, h):
+        self.target_rect = (x, y, w, h)
+        
         # If process exists and window is found, just move it
         if self.process and self.process.poll() is None:
             if self.update_geometry(x, y, w, h):
@@ -62,6 +75,8 @@ class BrowserManager(QObject):
         # Kill existing if any (zombie or lost window)
         self.close_browser()
         
+        # We pass coordinates to create_window, but we also enforce them with MoveWindow via timer
+        # to ensure correct physical positioning regardless of pywebview's DPI handling.
         script = f'''
 import webview
 import sys
@@ -80,8 +95,10 @@ webview.start()
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
+        self.timer.start()
 
     def close_browser(self):
+        self.timer.stop()
         if self.process:
             if self.process.poll() is None:
                 self.process.terminate()
