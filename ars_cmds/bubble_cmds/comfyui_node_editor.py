@@ -96,6 +96,7 @@ def execute_cmd(ars_window):
         _manager = BrowserManager(ars_window)
     
     browser_height = getattr(ars_window.prefs, 'browser_height', 600)
+    scale_factor = ars_window.devicePixelRatio()
     
     config = ContextMenuConfig()
     config.use_extended_shape = False
@@ -110,10 +111,10 @@ def execute_cmd(ars_window):
     main_pos = ars_window.mapToGlobal(ars_window.rect().topLeft())
     
     _manager.show_browser(
-        main_pos.x(),
-        main_pos.y() + ars_window.height() - browser_height + bar_height,
-        ars_window.width(),
-        browser_height - bar_height
+        main_pos.x() * scale_factor,
+        (main_pos.y() + ars_window.height() - browser_height + bar_height) * scale_factor,
+        ars_window.width() * scale_factor,
+        (browser_height - bar_height) * scale_factor
     )
 
     options_list = [
@@ -143,10 +144,10 @@ def execute_cmd(ars_window):
         
         # Try to update geometry directly first
         success = _manager.update_geometry(
-            main_pos.x(),
-            main_pos.y() + ars_window.height() - int(value) + bar_height,
-            ars_window.width(),
-            int(value) - bar_height
+            main_pos.x() * scale_factor,
+            (main_pos.y() + ars_window.height() - int(value) + bar_height) * scale_factor,
+            ars_window.width() * scale_factor,
+            (int(value) - bar_height) * scale_factor
         )
 
     config.callbackL = {
