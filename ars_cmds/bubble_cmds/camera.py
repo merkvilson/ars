@@ -41,8 +41,8 @@ def execute_cmd(ars_window):
     }
 
     config.slider_values = {
-        ic.ICON_SPEED_UP: (1, 100, ars_window.viewport._view.camera.scale_factor),
-        ic.ICON_EYE_UP: (1, 180, ars_window.viewport._view.camera.fov),
+        ic.ICON_SPEED_UP: (1, 100, ars_window.viewport._view.camera.scale_factor, 10),
+        ic.ICON_EYE_UP: (1, 180, ars_window.viewport._view.camera.fov, 60),
     }
 
     config.show_value_items = {
