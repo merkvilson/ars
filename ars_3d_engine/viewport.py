@@ -118,12 +118,23 @@ class ViewportWidget(QWidget):
                 
                 # 1. Handle Translation on the parent node
                 # This ensures translation happens independently of rotation and scale.
-                T = transforms.MatrixTransform()
-                T.translate(controller._object_translation)
-                obj.visual.transform = T
+                # Update existing transform instead of creating new one to avoid overhead
+                if isinstance(obj.visual.transform, transforms.MatrixTransform):
+                    m = np.eye(4, dtype=np.float32)
+                    m[3, :3] = controller._object_translation
+                    obj.visual.transform.matrix = m
+                else:
+                    T = transforms.MatrixTransform()
+                    T.translate(controller._object_translation)
+                    obj.visual.transform = T
                 
                 # The gizmo node itself also needs to follow the translation.
-                gizmo_node.transform = T
+                if isinstance(gizmo_node.transform, transforms.MatrixTransform):
+                    m = np.eye(4, dtype=np.float32)
+                    m[3, :3] = controller._object_translation
+                    gizmo_node.transform.matrix = m
+                else:
+                    gizmo_node.transform = obj.visual.transform
 
                 # 2. Handle Rotation and Scale on the child node
                 # This combines the latest rotation and scale from the gizmo controller.

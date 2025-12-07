@@ -20,7 +20,7 @@ class CPickingManager:
             else:
                 yield n
 
-    def register_visual(self, index: int, visual) -> None:
+    def register_visual(self, index: int, visual) -> int:
         pid = self._next_id
         self._next_id += 1
         for leaf in self._iter_leaf_visuals(visual):
@@ -32,6 +32,13 @@ class CPickingManager:
                 pass
             self._entries.append((leaf, flt))
         self._id_to_index[pid] = index
+        return pid
+
+    def update_index(self, pid: int, index: int) -> None:
+        self._id_to_index[pid] = index
+
+    def clear_index_map(self) -> None:
+        self._id_to_index.clear()
 
     def _set_enabled(self, enabled: bool) -> None:
         for leaf, flt in self._entries:

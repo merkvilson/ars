@@ -39,6 +39,7 @@ class ObjectHierarchyWindow(QWidget):
         self.viewport = viewport
         self.manager = viewport._objectManager
         self.id_to_obj = {}  # Map UID (id(obj)) to obj for safe reference
+        self.uid_to_item = {}  # Map UID to QTreeWidgetItem
 
         self.setFixedSize(200, 600)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint |
@@ -84,6 +85,7 @@ class ObjectHierarchyWindow(QWidget):
     def populate_from_manager(self):
         self.tree.clear()
         self.id_to_obj.clear()
+        self.uid_to_item.clear()
         for i, obj in enumerate(self.manager._objects):
             uid = id(obj)
             self.id_to_obj[uid] = obj
@@ -94,6 +96,7 @@ class ObjectHierarchyWindow(QWidget):
         item.setData(0, Qt.ItemDataRole.UserRole, uid)
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
         self.tree.insertTopLevelItem(index, item)
+        self.uid_to_item[uid] = item
 
 
     def on_object_added(self, index, obj):
@@ -105,7 +108,7 @@ class ObjectHierarchyWindow(QWidget):
         if parent_obj:
             # Find parent's tree item
             parent_uid = id(parent_obj)
-            parent_item, _ = self.find_item_by_uid(parent_uid)
+            parent_item = self.uid_to_item.get(parent_uid)
             if parent_item:
                 # Add as child of parent
                 item = QTreeWidgetItem([f"{obj.symbol}  {obj.name}"])
@@ -113,6 +116,7 @@ class ObjectHierarchyWindow(QWidget):
                 item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
                 parent_item.addChild(item)
                 parent_item.setExpanded(True)
+                self.uid_to_item[uid] = item
                 return
         
         # Add as top-level item - calculate correct position
@@ -126,32 +130,23 @@ class ObjectHierarchyWindow(QWidget):
         
         self.add_tree_item(top_level_index, obj, uid)
 
-    def find_item_by_uid(self, uid):
-        def search(parent_item=None):
-            if parent_item is None:
-                count = self.tree.topLevelItemCount()
-                get_item = self.tree.topLevelItem
-            else:
-                count = parent_item.childCount()
-                get_item = parent_item.child
-            for i in range(count):
-                item = get_item(i)
-                if item.data(0, Qt.ItemDataRole.UserRole) == uid:
-                    return item, parent_item
-                found_item, found_parent = search(item)
-                if found_item:
-                    return found_item, found_parent
-            return None, None
-        return search()
+    def cleanup_items_recursive(self, item):
+        uid = item.data(0, Qt.ItemDataRole.UserRole)
+        if uid in self.uid_to_item:
+            del self.uid_to_item[uid]
+        for i in range(item.childCount()):
+            self.cleanup_items_recursive(item.child(i))
 
     def on_object_removed(self, index, obj):
         uid = id(obj)
-        item, parent_item = self.find_item_by_uid(uid)
+        item = self.uid_to_item.get(uid)
         if item:
+            parent_item = item.parent()
             if parent_item is None:
                 self.tree.takeTopLevelItem(self.tree.indexOfTopLevelItem(item))
             else:
                 parent_item.takeChild(parent_item.indexOfChild(item))
+            self.cleanup_items_recursive(item)
         self.id_to_obj.pop(uid, None)
 
     def on_active_changed(self, index):
@@ -159,7 +154,7 @@ class ObjectHierarchyWindow(QWidget):
             return
         obj = self.manager._objects[index]
         uid = id(obj)
-        item, _ = self.find_item_by_uid(uid)
+        item = self.uid_to_item.get(uid)
         if item:
             self.tree.blockSignals(True)
             self.tree.clearSelection()
@@ -223,5 +218,4 @@ class ObjectHierarchyWindow(QWidget):
         for i in range(self.tree.topLevelItemCount()):
             collect_objs(self.tree.topLevelItem(i), all_objs)
 
-        self.manager._objects = all_objs
-        self.manager._rebuild_picking()
+        self.manager.reorder_objects(all_objs)

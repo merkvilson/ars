@@ -24,6 +24,7 @@ class CObjectManager(QObject):
         self._active_idx = -1
         self._selected_indices: List[int] = []
         self._selected_set: set[int] = set()
+        self._obj_to_pid = {}
 
     #used by camera
     def update_lights(self, light_dir):
@@ -37,7 +38,8 @@ class CObjectManager(QObject):
         index = len(self._objects)
         self._objects.append(obj)
         obj.visual.parent = self._view.scene
-        self._picking.register_visual(index=index, visual=obj.visual)
+        pid = self._picking.register_visual(index=index, visual=obj.visual)
+        self._obj_to_pid[id(obj)] = pid
         self.object_added.emit(index, obj)
         # Immediately deselect current selection
         self.set_selection_state([], None)
@@ -69,12 +71,22 @@ class CObjectManager(QObject):
         if index < 0 or index >= len(self._objects):
             return None
         obj = self._objects.pop(index)
+        if id(obj) in self._obj_to_pid:
+            del self._obj_to_pid[id(obj)]
+            
         for child in list(obj._children):
             child.set_parent(obj._parent)
         obj._children = []
         obj._parent = None
         obj.visual.parent = None
-        self._rebuild_picking()
+        
+        # Update indices for remaining objects without full rebuild
+        for i in range(index, len(self._objects)):
+            o = self._objects[i]
+            pid = self._obj_to_pid.get(id(o))
+            if pid is not None:
+                self._picking.update_index(pid, i)
+                
         self._selected_indices = [i for i in self._selected_indices if i != index]
         self._selected_set = set(self._selected_indices)
         self.object_removed.emit(index, obj)
@@ -87,8 +99,22 @@ class CObjectManager(QObject):
 
     def _rebuild_picking(self) -> None:
         self._picking = CPickingManager(self._canvas)
+        self._obj_to_pid.clear()
         for idx, o in enumerate(self._objects):
-            self._picking.register_visual(index=idx, visual=o.visual)
+            pid = self._picking.register_visual(index=idx, visual=o.visual)
+            self._obj_to_pid[id(o)] = pid
+
+    def reorder_objects(self, new_objects: List[CGeometry]) -> None:
+        self._objects = new_objects
+        self._picking.clear_index_map()
+        for i, obj in enumerate(self._objects):
+            pid = self._obj_to_pid.get(id(obj))
+            if pid is not None:
+                self._picking.update_index(pid, i)
+            else:
+                # Fallback if pid missing
+                pid = self._picking.register_visual(index=i, visual=obj.visual)
+                self._obj_to_pid[id(obj)] = pid
 
     def set_active(self, index: int) -> None:
         if 0 <= index < len(self._objects):
