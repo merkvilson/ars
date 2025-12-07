@@ -217,7 +217,7 @@ class BButton(QGraphicsObject):
 
 
         if self.progress_bar:
-            self.slider_values = (0, 100, 0)
+            self.slider_values = (0, 100, 0, 0)
             self._slider_value = 0
             self.slider_color = colors.slider_progress_color
             self.editable = False
@@ -228,8 +228,11 @@ class BButton(QGraphicsObject):
         
         # Handle slider_values with safety check
         if isinstance(config.slider_values, (tuple, list)) and len(config.slider_values) >= 3:
-            self.slider_values = config.slider_values[:3]
-            self._slider_value = config.slider_values[2]
+            vals = list(config.slider_values)
+            if len(vals) == 3:
+                vals.append(vals[2])  # Default is current if not provided
+            self.slider_values = tuple(vals[:4])
+            self._slider_value = self.slider_values[2]
         else:
             self.slider_values = None
             self._slider_value = None
@@ -388,7 +391,7 @@ class BButton(QGraphicsObject):
         def default_callbackM(value=None):
             # Revert slider or toggle to default value
             if self.slider_values:
-                default_val = self.slider_values[-1]
+                _, _, _, default_val = self.slider_values
                 self._slider_value = default_val
                 self._update_additional_text()
                 
@@ -599,7 +602,7 @@ class BButton(QGraphicsObject):
 
 
         if self.slider_values:
-            min_val, max_val, _ = self.slider_values
+            min_val, max_val = self.slider_values[:2]
             painter.save()
             path = self.shape()
             painter.setClipPath(path)
@@ -746,7 +749,7 @@ class BButton(QGraphicsObject):
             if delta < 0:
                 step = -step
             
-            min_val, max_val, _ = self.slider_values
+            min_val, max_val = self.slider_values[:2]
             new_value = self._slider_value + step
             self._slider_value = max(min_val, min(max_val, new_value))
             
@@ -774,7 +777,7 @@ class BButton(QGraphicsObject):
     def _update_slider_value(self, pos):
         if not (self.editable and self.slider_values):
             return
-        min_val, max_val, _ = self.slider_values
+        min_val, max_val = self.slider_values[:2]
         if self.incremental_value: # Calculate new value using cursor offset
             current_offset = self._cursor_modifier.get_accumulated_offset()
             
