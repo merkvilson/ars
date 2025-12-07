@@ -73,6 +73,18 @@ class BrowserManager(QObject):
                 except:
                     pass
             
+            # Hide from taskbar: Add WS_EX_TOOLWINDOW and remove WS_EX_APPWINDOW
+            try:
+                GWL_EXSTYLE = -20
+                WS_EX_TOOLWINDOW = 0x00000080
+                WS_EX_APPWINDOW = 0x00040000
+                
+                style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+                style = (style | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW
+                ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+            except:
+                pass
+            
             ctypes.windll.user32.MoveWindow(hwnd, int(x), int(y), int(w), int(h), True)
             self.timer.stop()
 
