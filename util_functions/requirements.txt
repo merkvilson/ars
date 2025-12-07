@@ -6,6 +6,7 @@ mapbox_earcut
 matplotlib
 numpy
 opencv_python
+opencv_python_headless
 Pillow
 plyfile
 pydub
@@ -13,12 +14,14 @@ pyflakes
 pygame
 pyglm
 PyOpenGL
+PyOpenGL
 pyperclip
 PyQt6
 pyqt6_sip
 pyvista
 Requests
 scipy
+setuptools
 Shapely
 stdlib_list
 torch
