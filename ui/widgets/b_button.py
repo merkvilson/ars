@@ -388,7 +388,7 @@ class BButton(QGraphicsObject):
         def default_callbackM(value=None):
             # Revert slider or toggle to default value
             if self.slider_values:
-                _, _, default_val = self.slider_values
+                default_val = self.slider_values[-1]
                 self._slider_value = default_val
                 self._update_additional_text()
                 
