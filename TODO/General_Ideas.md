@@ -40,6 +40,8 @@
 
 # Secret Release
 - [ ] Customer should get working version of Airen 
+- [ ] Closed playlist should be created on yourube
+- [ ]
 
 # General Ideas
 
