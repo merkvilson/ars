@@ -24,6 +24,33 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
 
 
+    def move_back(self, center = None, distance=1.0, animate=False):
+        if not center:
+            center = self.center
+
+        self.center = center
+
+        # Get the inverse rotation (Camera -> World)
+        # FlyCamera.rotation stores World->Camera transform (View Matrix rotation)
+        # So we need inverse to transform local Camera vectors to World vectors.
+        inv_rot = self.rotation.inverse()
+        
+        # In Camera space, Back is +Z (0, 0, 1) because Camera looks down -Z
+        back_vector = inv_rot.rotate_point([0, 0, 1])
+        back_vector = np.array(back_vector)
+        
+        # Normalize
+        norm = np.linalg.norm(back_vector)
+        if norm > 0:
+            back_vector /= norm
+            
+        # Update center
+        current_center = np.array(self.center)
+        new_center = current_center + back_vector * distance
+        self.center = tuple(new_center)
+        self.view_changed()
+
+
     def reset(self):
         self.center = self._reset_center
         self.rotation1 = self._reset_rotation1
