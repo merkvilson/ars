@@ -77,7 +77,10 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] C4D Mesh To Texture > insert 3d object and using canny controlnet, generate new texture for it.
 
-- [ ] 
+- [ ] Current Code: sound_manager.py (and pygame usage in main.py)
+Functionality: Initializes audio and plays sound effects.
+Recommended Library: playsound or simpleaudio
+Why: The project currently imports the heavy pygame library solely for playing simple sound effects. If you are not using Pygame for windowing or game loops, switching to a lightweight audio library can significantly reduce your dependency footprint.
 
 - [ ] 
 
