@@ -1,6 +1,8 @@
 import vispy
 import numpy as np
+import time
 from vispy.util.quaternion import Quaternion
+from vispy.app import Timer
 
 class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
     def __init__(self, *args, fly_bounds=None, **kwargs):
@@ -28,8 +30,6 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         if not center:
             center = self.center
 
-        self.center = center
-
         # Get the inverse rotation (Camera -> World)
         # FlyCamera.rotation stores World->Camera transform (View Matrix rotation)
         # So we need inverse to transform local Camera vectors to World vectors.
@@ -44,10 +44,41 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         if norm > 0:
             back_vector /= norm
             
-        # Update center
-        current_center = np.array(self.center)
-        new_center = current_center + back_vector * distance
-        self.center = tuple(new_center)
+        # Calculate target center
+        # If center (object position) is provided, we move relative to it.
+        # If not, we move relative to current camera position.
+        base_point = np.array(center)
+        target_center = base_point + back_vector * distance
+
+        if not animate:
+            self.center = tuple(target_center)
+            self.view_changed()
+        else:
+            # Animate from CURRENT camera position to the target position
+            self._anim_start_center = np.array(self.center)
+            self._anim_target_center = target_center
+            self._anim_duration = 0.5
+            self._anim_start_time = time.time()
+            
+            if hasattr(self, '_anim_timer'):
+                self._anim_timer.stop()
+            
+            self._anim_timer = Timer(interval=0.016, connect=self._on_anim_update, start=True)
+
+    def _on_anim_update(self, event):
+        elapsed = time.time() - self._anim_start_time
+        t = elapsed / self._anim_duration
+        
+        if t >= 1.0:
+            t = 1.0
+            self._anim_timer.stop()
+            
+        # Ease out cubic for smoother movement
+        t_ease = 1 - (1 - t) ** 3
+        
+        # Interpolate Center
+        self.center = (1 - t_ease) * self._anim_start_center + t_ease * self._anim_target_center
+        
         self.view_changed()
 
 
