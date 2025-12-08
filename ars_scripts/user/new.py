@@ -1,2 +1,2 @@
-ars_window.viewport.cam.move_back(center=(0,0,0), distance=5, animate=True)
+ars_window.viewport.cam.move_to(center=(0,0,0), offset=5, animate=True)
 

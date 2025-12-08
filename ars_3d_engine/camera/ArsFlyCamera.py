@@ -26,7 +26,7 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
 
 
-    def move_back(self, center = None, distance=1.0, animate=False):
+    def move_to(self, center = None, offset=1.0, animate=False):
         if not center:
             center = self.center
 
@@ -48,7 +48,7 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         # If center (object position) is provided, we move relative to it.
         # If not, we move relative to current camera position.
         base_point = np.array(center)
-        target_center = base_point + back_vector * distance
+        target_center = base_point + back_vector * offset
 
         if not animate:
             self.center = tuple(target_center)
