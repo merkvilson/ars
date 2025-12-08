@@ -1,5 +1,7 @@
 import vispy
 import numpy as np
+from vispy.util.quaternion import Quaternion
+
 class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
     def __init__(self, *args, fly_bounds=None, **kwargs):
         self.update_callback = None
@@ -9,12 +11,25 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._prev_interactive = True
         super().__init__(*args, **kwargs)
 
-        for k in "Down,Up,Left,Right,Space,I,J,K,L,F,C,Q,E".split(","):
+        for k in "Down,Up,Left,Right,Space,I,J,K,L,F,C,Q,E,Backspace".split(","):
             if k in self._keymap:
                 del self._keymap[k]
 
         self._keymap['Space'] = (+1, 3)
         self._keymap['F'] = (-1, 3)
+
+        # Custom Backspace reset
+        self._reset_center = (6, 3, 6)
+        self._reset_rotation1 = Quaternion.create_from_axis_angle(np.deg2rad(-45), 0, 1, 0)
+        self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
+        # self._keymap['Backspace'] = self.reset_view  <-- Removed this line to avoid TypeError
+
+
+    def reset_view(self):
+        self.center = self._reset_center
+        self.rotation1 = self._reset_rotation1
+        self.rotation2 = self._reset_rotation2
+        self.view_changed()
 
 
     def view_changed(self):
@@ -61,6 +76,13 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         if self._locked:
             event.handled = True
             return
+        
+        if event.key.name == 'Backspace':
+            if event.type == 'key_press':
+                self.reset_view()
+            event.handled = True
+            return
+
         super().viewbox_key_event(event)
 
     def viewbox_mouse_event(self, event):
