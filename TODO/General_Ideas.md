@@ -38,6 +38,9 @@
 - [ ] 
 
 
+# Secret Release
+- [ ] Customer should get working version of Airen 
+
 # General Ideas
 
 - [ ] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
