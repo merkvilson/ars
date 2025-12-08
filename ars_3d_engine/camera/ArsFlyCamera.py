@@ -22,10 +22,9 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._reset_center = (6, 3, 6)
         self._reset_rotation1 = Quaternion.create_from_axis_angle(np.deg2rad(-45), 0, 1, 0)
         self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
-        # self._keymap['Backspace'] = self.reset_view  <-- Removed this line to avoid TypeError
 
 
-    def reset_view(self):
+    def reset(self):
         self.center = self._reset_center
         self.rotation1 = self._reset_rotation1
         self.rotation2 = self._reset_rotation2
@@ -79,7 +78,7 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         
         if event.key.name == 'Backspace':
             if event.type == 'key_press':
-                self.reset_view()
+                self.reset()
             event.handled = True
             return
 

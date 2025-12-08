@@ -27,11 +27,8 @@ class ViewportWidget(QWidget):
         cam.update_callback = None
         cam.auto_roll = True
         cam.scale_factor = 10.0
-        cam.center = (6, 3, 6)
-        cam.rotation1 = Quaternion.create_from_axis_angle(np.deg2rad(-45), 0, 1, 0)
-        cam.rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
-        cam.view_changed()
         self.cam = cam
+        self.cam.reset()
         
         self._objectManager = CObjectManager(self._view, self._canvas, None, CPickingManager(self._canvas))
 
