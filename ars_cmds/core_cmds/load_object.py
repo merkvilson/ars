@@ -44,7 +44,7 @@ def process_mesh_file(file_path):
     mesh.export(temp_path)
     return temp_path
 
-def add_mesh(file_path=None, animated=False):
+def add_mesh(file_path=None, animated=False, position = (0,0,0)):
     window = ars_window()
     # Open file dialog for mesh selection
     if file_path is None:
@@ -80,7 +80,7 @@ def add_mesh(file_path=None, animated=False):
                 elapsed = time.time() - start_time
                 if elapsed >= duration:
                     timer.stop()
-                    obj.set_position(0, 0, 0)
+                    obj.set_position(*position)
                     play_sound("obj-drop-deep")
                     window.viewport._view.camera.view_changed()
                     return
@@ -88,7 +88,7 @@ def add_mesh(file_path=None, animated=False):
                 t = elapsed / duration
                 ease = t ** 2  # Ease-in quadratic
                 y = 2 - 2 * ease
-                obj.set_position(0, y, 0)
+                obj.set_position(position[0], position[1] + y, position[2])
                 window.viewport._view.camera.view_changed()
             
             timer.timeout.connect(update_position)
@@ -102,7 +102,7 @@ def add_mesh(file_path=None, animated=False):
 
 
 
-def add_sprite(size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", animated=False):
+def add_sprite(size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", animated=False, position=(0,0,0)):
     window = ars_window()
     if animated:
         play_sound("bbox-in")
@@ -113,6 +113,7 @@ def add_sprite(size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", anima
         grow_duration = 0
 
     obj = CSprite.create(size=size, color=color, name=name)
+    obj.set_position(*position)
     def add_to_scene():
         delete_bbox_animations(window.viewport._view.scene)
         window.viewport._objectManager.add_object(obj)
@@ -140,8 +141,9 @@ def add_point():
 def add_primitive(primitive_type = "cube", **params, ):
     obj = CPrimitive.create(primitive_type,**params)
     animated = params.get("animated")
-    obj.set_position(0, 2 if animated else 0, 0)
-    return add_mesh(file_path=obj, animated=animated)
+    position = params.get("position", (0,0,0))
+    obj.set_position(position[0], position[1] if not animated else position[1] + 2, position[2])
+    return add_mesh(file_path=obj, animated=animated, position=position)
 
 def selected_object():
     window = ars_window()
