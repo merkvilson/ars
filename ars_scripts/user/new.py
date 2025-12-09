@@ -1,2 +1,3 @@
-ars_window.viewport.cam.move_to(center=(0,0,0), offset=5, animate=True)
+my_object = get_selected()
+my_object.move_to(center=(10, 0, 0), offset=2.0, animate=True)
 
