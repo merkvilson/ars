@@ -32,7 +32,7 @@
 - [ ] Implement better workflow converter for open_j
 - [ ] Interactive infinite zoom
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
-- [ ] alt+scroll move camera instead of zooming
+- [✓] alt+scroll move camera instead of zooming
 - [ ] Camera fly to cursor ray omteresection on surface (need to plan the hotkey)
 - [ ] 
 - [ ] 
