@@ -35,9 +35,11 @@
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [✓] alt+scroll move camera instead of zooming
 - [✓] Camera fly to cursor ray interesection on surface (need to plan the hotkey)
+- [ ] Add new gizmo that will execute move_to and get_xyz commands.
 - [ ] 
 - [ ] 
-
+- [ ] 
+- [ ] 
 
 # Secret Release
 - [ ] Customer should get working version of Airen 
