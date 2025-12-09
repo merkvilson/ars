@@ -50,7 +50,7 @@ def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
         
     return None
 
-def get_xyz(ars_window):
+def get_xyz(ars_window, ignore_objs=None):
     """
     Calculates the 3D world coordinates of the point under the mouse cursor.
     Checks for intersection with scene objects first, then falls back to the ground plane (Y=0).
@@ -76,8 +76,21 @@ def get_xyz(ars_window):
         print(f"Error calculating ray: {e}")
         return None
 
+    # Handle ignore_objs
+    hidden_objects = []
+    if ignore_objs:
+        for obj in ignore_objs:
+            if hasattr(obj, 'visual') and obj.visual.visible:
+                obj.visual.visible = False
+                hidden_objects.append(obj)
+
     # Check for object intersection via picking
-    picked_idx = viewport._objectManager.picking().pick_at(x, y)
+    try:
+        picked_idx = viewport._objectManager.picking().pick_at(x, y)
+    finally:
+        # Restore visibility
+        for obj in hidden_objects:
+            obj.visual.visible = True
     
     closest_point = None
     

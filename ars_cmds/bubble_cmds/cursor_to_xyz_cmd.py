@@ -24,12 +24,12 @@ def execute_cmd(ars_window):
         return
 
     def update_pos():
-        new_xyz = get_xyz(ars_window)
+        new_xyz = get_xyz(ars_window, ignore_objs=[obj])
         if new_xyz:
             obj.set_position(*new_xyz)
             print(f"XYZ: {new_xyz}")
 
-    if get_xyz(ars_window):
+    if get_xyz(ars_window, ignore_objs=[obj]):
         key_check_continuous(
             callback=update_pos, 
             callback_end=lambda: (ars_window.hotkey_manager._bind_shortcuts(),print("binded")), 
