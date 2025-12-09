@@ -121,7 +121,7 @@ class CGeometry(ABC):
             self._anim_start_center = current_pos
             self._anim_target_center = target_center
             
-            self._anim_duration = 0.5
+            self._anim_duration = float(animate)
             self._anim_start_time = time.time()
             
             if hasattr(self, '_anim_timer'):
