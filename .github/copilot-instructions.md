@@ -1,15 +1,12 @@
 # ARS Project Instructions
 
 ## The most important aspect!
-- **NO OVERENGINEERING**: Always choose the simplest solution that works. Avoid unnecessary complexity. 
+- **AVOID OVERENGINEERING**: Always choose the simplest solution that works. Avoid unnecessary complexity, Keep solutions simple, functional, and direct.
+- **Minimalism**: Less code is better. Avoid unnecessary abstractions or complex patterns unless absolutely required.
+- **Pragmatism**: Focus on working features over theoretical purity.
 
 ## Project Overview
 ARS is a Python-based 3D application built with **PyQt6** (UI) and **Vispy** (3D rendering). It features a unique "Floating Bubble" interface and integrates with **ComfyUI** for rendering workflows.
-
-## Coding Philosophy
-- **Avoid Overengineering**: Keep solutions simple, functional, and direct.
-- **Minimalism**: Less code is better. Avoid unnecessary abstractions or complex patterns unless absolutely required.
-- **Pragmatism**: Focus on working features over theoretical purity.
 
 ## Architecture
 - **Entry Point**: `main.py` initializes `Application` and `MainWindow`.
