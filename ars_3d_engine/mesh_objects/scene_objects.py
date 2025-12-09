@@ -8,6 +8,9 @@ from vispy.geometry import MeshData
 from vispy.io import imread 
 from vispy.visuals.filters import TextureFilter 
 from theme.fonts import font_icons as ic
+import time
+from vispy.util.quaternion import Quaternion
+from vispy.app import Timer
 
 class CGeometry(ABC):
 
@@ -103,6 +106,43 @@ class CGeometry(ABC):
         tr = transforms.MatrixTransform()
         tr.translate((float(x), float(y), float(z)))
         self._node.transform = tr
+
+    def move_to(self, center = None, offset=0.0, animate=False):
+        current_pos = self.get_position()
+        if center is None:
+            center = current_pos
+        
+        target_center = np.array(center, dtype=float)
+        target_center[1] += offset
+
+        if not animate:
+            self.set_position(*target_center)
+        else:
+            self._anim_start_center = current_pos
+            self._anim_target_center = target_center
+            
+            self._anim_duration = 0.5
+            self._anim_start_time = time.time()
+            
+            if hasattr(self, '_anim_timer'):
+                self._anim_timer.stop()
+            
+            self._anim_timer = Timer(interval=0.016, connect=self._on_anim_update, start=True)
+
+    def _on_anim_update(self, event):
+        elapsed = time.time() - self._anim_start_time
+        t = elapsed / self._anim_duration
+        
+        if t >= 1.0:
+            t = 1.0
+            self._anim_timer.stop()
+            
+        # Ease out cubic
+        t_ease = 1 - (1 - t) ** 3
+        
+        # Interpolate Center
+        current_center = (1 - t_ease) * self._anim_start_center + t_ease * self._anim_target_center
+        self.set_position(*current_center)
 
     def set_prompt(self, prompt: str) -> None:
         """Set the text prompt associated with this object."""
