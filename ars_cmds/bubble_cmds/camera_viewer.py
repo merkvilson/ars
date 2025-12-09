@@ -25,7 +25,8 @@ def execute_cmd(ars_window):
         obj = get_selected()
         if not obj: return
         xyz=obj.get_position()
-        camera.move_to(center=tuple(xyz), offset=5, animate=True, rotation=default_rotation)
+        scale_sum = sum(obj.get_scale()) * 2
+        camera.move_to(center=tuple(xyz), offset=scale_sum, animate=True, rotation=default_rotation)
     
     def view_home():
         camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
@@ -37,7 +38,7 @@ def execute_cmd(ars_window):
 
     config.hotkey_items = {
         ic.ICON_HOME: "H",
-        ic.ICON_WINDOW_FULLSCREEN: "S",
+        ic.ICON_WINDOW_FULLSCREEN: "V",
         
     }
 
