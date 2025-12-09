@@ -20,6 +20,8 @@ def define_hotkeys(self):
     hk("cam_speed_down", lambda: cam_speed_down(self), "Shift+mouse-wheel-down")
     hk("cam_fow_add",    lambda: cam_fow_add(self),    "Ctrl+mouse-wheel-down")
     hk("cam_fow_sub",    lambda: cam_fow_sub(self),    "Ctrl+mouse-wheel-up")
+    hk("cam_move_in", lambda: cam_move_in(self), "Alt+mouse-wheel-up")
+    hk("cam_move_out", lambda: cam_move_out(self), "Alt+mouse-wheel-down")
 
     # Dynamically add hotkeys based on BBL functions
     for filename in os.listdir(os.path.join('ars_cmds', 'bubble_cmds')):
