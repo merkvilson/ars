@@ -18,17 +18,16 @@ def execute_cmd(ars_window):
     Args:
         ars_window: The main application window instance.
     """
-    ars_window.hotkey_manager._unbind_all()
     obj = selected_object()
     if not obj:
         return
+    ars_window.hotkey_manager._unbind_all()
+    ars_window.viewport.controller.set_handles([""]),
 
     def update_pos():
         new_xyz = get_xyz(ars_window, ignore_objs=[obj])
         if new_xyz:
-            # obj.set_position(*new_xyz)
             obj.move_to(center=new_xyz, offset=1.0, animate=True)
-            # print(f"XYZ: {new_xyz}")
 
     if get_xyz(ars_window, ignore_objs=[obj]):
         key_check_continuous(
