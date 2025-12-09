@@ -3,37 +3,53 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 import numpy as np
-from vispy.visuals.filters import Filter
+from ars_3d_engine.gizmo.gizmo import screen_to_world_ray
+from ars_cmds.core_cmds.load_object import selected_object
 
 BBL_CURSOR_XYZ_CONFIG = {"symbol": ic.ICON_OBJ_CIRCLE, "hotkey": "X"}
-
-class DepthFilter(Filter):
-    def __init__(self):
-        super().__init__()
-        self.fcode = """
-        void main() {
-            float d = gl_FragCoord.z;
-            const vec4 bitSh = vec4(16777216.0, 65536.0, 256.0, 1.0);
-            const vec4 bitMsk = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);
-            vec4 res = fract(d * bitSh);
-            res -= res.xxyz * bitMsk;
-            gl_FragColor = res;
-        }
-        """
 
 def BBL_CURSOR_XYZ(*args):
     run_ext(__file__)
 
-def _iter_leaf_visuals(node):
-    stack = [node]
-    while stack:
-        n = stack.pop()
-        if hasattr(n, 'children') and n.children:
-            stack.extend(n.children)
-        else:
-            yield n
+def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
+    # Vectorized Möller-Trumbore intersection algorithm
+    epsilon = 1e-6
+    edge1 = v1 - v0
+    edge2 = v2 - v0
+    h = np.cross(ray_dir, edge2)
+    a = np.einsum('ij,ij->i', edge1, h)
+    
+    mask = np.abs(a) > epsilon
+    if not np.any(mask):
+        return None
+        
+    f = 1.0 / a[mask]
+    s = ray_origin - v0[mask]
+    u = f * np.einsum('ij,ij->i', s, h[mask])
+    
+    mask_u = (u >= 0.0) & (u <= 1.0)
+    if not np.any(mask_u):
+        return None
+        
+    q = np.cross(s, edge1[mask])
+    v = f * np.einsum('j,ij->i', ray_dir, q)
+    
+    mask_v = (v >= 0.0) & (u + v <= 1.0)
+    if not np.any(mask_v):
+        return None
+        
+    t = f * np.einsum('ij,ij->i', edge2[mask], q)
+    mask_t = (t > epsilon)
+    
+    final_mask = mask_u & mask_v & mask_t
+    
+    if np.any(final_mask):
+        valid_t = t[final_mask]
+        return np.min(valid_t)
+        
+    return None
 
-def execute_cmd(ars_window):
+def get_xyz(ars_window):
     viewport = ars_window.viewport
     canvas = viewport._canvas
     view = viewport._view
@@ -43,199 +59,98 @@ def execute_cmd(ars_window):
     widget_pos = canvas.native.mapFromGlobal(global_pos)
     x, y = widget_pos.x(), widget_pos.y()
     
-    w, h = canvas.size
-    if x < 0 or x > w or y < 0 or y > h:
-        print("Cursor outside viewport")
-        return
-
-    # 2. Setup Depth Pass
-    # We will attach a DepthFilter to all objects, render 1 pixel, and read it.
-    
-    depth_filter = DepthFilter()
-    attached_visuals = []
-    
-    # Hide Grid and Gizmo to avoid interference
-    grid_visible = viewport.grid_node.visible
-    gizmo_visible = viewport.gizmo_node.visible
-    viewport.grid_node.visible = False
-    viewport.gizmo_node.visible = False
-    
+    # 2. Calculate Ray in World Space using Gizmo's robust method
     try:
-        # Attach filter to all object leaves
-        for obj in viewport._objectManager._objects:
-            # obj is CGeometry, obj.visual is the root node of the object
-            for leaf in _iter_leaf_visuals(obj.visual):
-                # Only attach to visuals that can have filters
-                if hasattr(leaf, 'attach'):
-                    leaf.attach(depth_filter)
-                    # Disable blending to ensure opaque write
-                    # Store old state? simpler to just force blend=False then restore default?
-                    # We don't know the default. But usually objects are opaque or translucent.
-                    # We'll just set blend=False.
-                    leaf.update_gl_state(blend=False)
-                    attached_visuals.append(leaf)
-        
-        # 3. Render 1 pixel
-        # Calculate crop coordinates (inverted Y)
-        ps = canvas.pixel_scale
-        fb_w, fb_h = int(canvas.size[0] * ps), int(canvas.size[1] * ps)
-        px = int(round(x * ps))
-        py = int(round(fb_h - (y * ps)))
-        
-        # Render
-        # bgcolor=(0,0,0,0) means depth=1.0 (alpha=0 in output if nothing hit? No, shader writes alpha)
-        # Wait, if nothing is hit, the clear color is used.
-        # If we clear to (0,0,0,0), then R=0, G=0, B=0, A=0.
-        # Unpacking (0,0,0,0) gives depth 0.0?
-        # But background is usually Far Plane (depth=1.0).
-        # We should clear to a color that represents depth=1.0.
-        # Depth 1.0 packs to (1, 1, 1, 1)? No.
-        # fract(1.0 * 2^24) = 0.
-        # Actually fract(integer) is 0.
-        # So depth 1.0 -> (0, 0, 0, 0) with the fract logic?
-        # Let's check 0.999999.
-        # It packs to (high, high, high, high).
-        # So 1.0 is tricky with fract.
-        # But usually we check if alpha is 0 (if we clear to alpha 0).
-        # If we hit an object, the shader writes gl_FragColor.
-        # The shader writes A = fract(d). If d=0.5, A=0.5.
-        # If d=1.0, A=0.0.
-        # So (0,0,0,0) could mean depth 1.0 OR depth 0.0.
-        # Depth 0.0 is Near Plane.
-        # Let's clear to (1, 0, 0, 0) or something distinct?
-        # Or just check if we hit anything?
-        # The shader ALWAYS writes.
-        # If we clear to (0,0,0,0), and we read (0,0,0,0), it's either background or near plane.
-        # Near plane is very rare (camera lens).
-        # So we can assume (0,0,0,0) is background.
-        
-        img = canvas.render(
-            crop=(px, py, 1, 1),
-            bgcolor=(0, 0, 0, 0),
-            alpha=True
-        )
-        
-        pixel = img[0, 0] # RGBA
-        
-    finally:
-        # 4. Cleanup
-        for leaf in attached_visuals:
-            leaf.detach(depth_filter)
-            # Restore blend? We don't know previous state easily.
-            # But usually we can set blend=True if it was translucent.
-            # Most objects are opaque.
-            # Let's just set blend=True as a safe default or try to be smarter?
-            # PickingManager sets blend=True/False based on enabled.
-            # Here we just want to restore.
-            # If we leave it blend=False, transparency breaks.
-            # If we set blend=True, opaque objects might blend?
-            # Vispy visuals usually manage their own state in `_prepare_draw`.
-            # Calling `update_gl_state` overrides it?
-            # Let's try to just detach. The state might persist?
-            # `update_gl_state` updates `self._gl_state`.
-            # We should probably read it before setting.
-            # But `leaf.gl_state` might be complex.
-            # Let's just set blend=True for now, assuming standard blending.
-            # Or better: don't change blend if we can avoid it?
-            # If we don't disable blend, translucent objects might blend with clear color.
-            # But we want the depth of the surface.
-            # If we don't disable blend, the shader output (packed depth) will be blended with (0,0,0,0).
-            # That corrupts the data.
-            # So we MUST disable blend.
-            pass
-            
-        # Restore visibility
-        viewport.grid_node.visible = grid_visible
-        viewport.gizmo_node.visible = gizmo_visible
-        
-        # Restore blend state properly?
-        # We can iterate and set blend='translucent' or something?
-        # For now, let's just set blend=True which is the default for most Vispy visuals?
-        # Actually, `CGeometry` sets `translucent` in `GridVisual`? No.
-        # `CGeometry` doesn't set state explicitly in `__init__`.
-        # `MeshVisual` sets `depth_test=True`.
-        # Let's just hope `leaf.update_gl_state(blend=True)` is safe enough or `blend='auto'`.
-        for leaf in attached_visuals:
-             leaf.update_gl_state(blend=True) 
-
-    # 5. Process Depth
-    # pixel is [R, G, B, A] uint8
-    r, g, b, a = pixel
-    
-    # Check for background (0,0,0,0)
-    if r == 0 and g == 0 and b == 0 and a == 0:
-        # Background (Depth = 1.0 or 0.0)
-        # Assume background -> Fallback to Grid
-        hit_object = False
-        depth_val = 1.0
-    else:
-        hit_object = True
-        # Unpack
-        # Shader:
-        # res = fract(d * bitSh);
-        # bitSh = (2^24, 2^16, 2^8, 1)
-        # R = fract(d * 2^24)
-        # A = fract(d)
-        
-        # Unpack:
-        # d = R * 2^-24 + G * 2^-16 + B * 2^-8 + A
-        # All values 0..1 (normalized from 0..255)
-        
-        rn = r / 255.0
-        gn = g / 255.0
-        bn = b / 255.0
-        an = a / 255.0
-        
-        depth_val = (rn / (256.0**3)) + (gn / (256.0**2)) + (bn / 256.0) + an
-        
-        # Handle the fract(1.0) = 0 case if needed?
-        # If depth was 1.0, we got 0.
-        # But we handled 0 above.
-    
-    # 6. Unproject
-    try:
-        # Transform from Canvas (pixels) to Scene (World)
-        # Use grid (VisualNode) as reference for World Space. 
-        # grid_node is a plain Node and might not have get_transform.
-        tr = viewport.grid.get_transform(map_from='canvas')
-        
-        # Map (x, y, depth, 1)
-        # Note: Vispy canvas coords have (0,0) at top-left?
-        # `mapFromGlobal` gives widget coords.
-        # Vispy events use (x, y).
-        # `tr.map` expects (x, y, z, w).
-        # Does `tr` handle the Y-flip?
-        # In `viewport.py`, `_on_mouse_press` uses `event.pos`.
-        # `event.pos` is (x, y) from top-left.
-        # The `tr` obtained from `view.scene.get_transform(map_from='canvas')` should handle it.
-        # In the previous code, we used `tr.map([x, y, 0, 1])`.
-        # So we should use `[x, y, depth_val, 1]`.
-        
-        world_pos_hom = tr.map([x, y, depth_val, 1])
-        world_pos = world_pos_hom[:3] / world_pos_hom[3]
-        
-        if hit_object:
-            print(f"Hit Surface: X={world_pos[0]:.4f}, Y={world_pos[1]:.4f}, Z={world_pos[2]:.4f}")
-        else:
-            # Fallback to Grid Intersection (Y=0)
-            # We have the ray from camera (depth=0) to far (depth=1)
-            # Or just use the previous analytical logic for grid
-            
-            p0 = tr.map([x, y, 0, 1])
-            p1 = tr.map([x, y, 1, 1])
-            p0 = p0[:3] / p0[3]
-            p1 = p1[:3] / p1[3]
-            
-            origin = p0
-            direction = p1 - p0
-            direction = direction / np.linalg.norm(direction)
-            
-            if abs(direction[1]) > 1e-6:
-                t = -origin[1] / direction[1]
-                grid_pos = origin + t * direction
-                print(f"Grid Projection (Y=0): X={grid_pos[0]:.2f}, Y={grid_pos[1]:.2f}, Z={grid_pos[2]:.2f}")
-            else:
-                print("Ray parallel to grid")
-
+        # screen_to_world_ray uses view.scene.transform to unproject
+        # This gives us the ray in the Scene coordinate system (World)
+        ray_origin, ray_dir = screen_to_world_ray(view, (x, y))
     except Exception as e:
-        print(f"Error calculating coordinates: {e}")
+        print(f"Error calculating ray: {e}")
+        return None
+
+    # 3. Check Picking
+    picked_idx = viewport._objectManager.picking().pick_at(x, y)
+    
+    closest_point = None
+    
+    if picked_idx is not None:
+        try:
+            obj = viewport._objectManager._objects[picked_idx]
+            # print(f"DEBUG: Object type: {type(obj)}")
+            
+            # Manual transform from World (view.scene) to Local (obj._visual)
+            # Avoid using get_transform(map_from=...) as it can be flaky with SubScenes
+            
+            # 1. World -> Node (obj.visual)
+            # obj.visual.transform maps Node -> World, so imap maps World -> Node
+            # We use imap (inverse map) to go down the hierarchy
+            # print("DEBUG: Step 1 - World to Node")
+            p_node_origin = obj.visual.transform.imap(ray_origin)
+            p_node_point = obj.visual.transform.imap(ray_origin + ray_dir)
+            
+            # 2. Node -> Local (obj._visual)
+            # obj._visual.transform maps Local -> Node, so imap maps Node -> Local
+            # print("DEBUG: Step 2 - Node to Local")
+            local_origin = obj._visual.transform.imap(p_node_origin)[:3]
+            local_point_on_ray = obj._visual.transform.imap(p_node_point)[:3]
+            
+            local_dir = local_point_on_ray - local_origin
+            
+            if hasattr(obj, '_visual') and hasattr(obj._visual, 'mesh_data') and obj._visual.mesh_data is not None:
+                md = obj._visual.mesh_data
+                vertices = md.get_vertices()
+                faces = md.get_faces()
+                
+                if vertices is not None and faces is not None:
+                    v0 = vertices[faces[:, 0]]
+                    v1 = vertices[faces[:, 1]]
+                    v2 = vertices[faces[:, 2]]
+                    
+                    t = ray_triangle_intersection(local_origin, local_dir, v0, v1, v2)
+                    
+                    if t is not None:
+                        # Calculate point in Local Space
+                        p_local = local_origin + t * local_dir
+                        
+                        # Transform back to World Space manually
+                        # 1. Local -> Node
+                        p_node = obj._visual.transform.map(p_local)
+                        
+                        # 2. Node -> World
+                        p_world = obj.visual.transform.map(p_node)[:3]
+                        
+                        closest_point = p_world
+
+        except Exception as e:
+            print(f"Error intersecting object: {e}")
+            import traceback
+            traceback.print_exc()
+            pass
+
+    if closest_point is not None:
+        return (closest_point[0], closest_point[1], closest_point[2])
+
+    # 4. Fallback to Grid Intersection (Y=0 plane)
+    # Ray P = O + t*D
+    # P.y = 0 => O.y + t*D.y = 0 => t = -O.y / D.y
+    if abs(ray_dir[1]) > 1e-6:
+        t = -ray_origin[1] / ray_dir[1]
+        # Allow t > 0 (forward)
+        # Also check if intersection is within reasonable bounds if needed
+        if t > 0:
+            grid_pos = ray_origin + t * ray_dir
+            return (grid_pos[0], grid_pos[1], grid_pos[2])
+            
+    return None
+
+def execute_cmd(ars_window):
+    obj = selected_object()
+    if not obj:
+        print("No object selected")
+        return
+    xyz = get_xyz(ars_window)
+    if xyz:
+        print(f"XYZ: {xyz}")
+        obj.set_position(*xyz)
+    else:
+        print("No intersection found")
