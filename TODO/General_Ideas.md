@@ -34,7 +34,7 @@
 - [ ] Interactive infinite zoom
 - [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
 - [✓] alt+scroll move camera instead of zooming
-- [ ] Camera fly to cursor ray omteresection on surface (need to plan the hotkey)
+- [✓] Camera fly to cursor ray interesection on surface (need to plan the hotkey)
 - [ ] 
 - [ ] 
 
