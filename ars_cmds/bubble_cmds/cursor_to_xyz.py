@@ -76,7 +76,6 @@ def get_xyz(ars_window):
     if picked_idx is not None:
         try:
             obj = viewport._objectManager._objects[picked_idx]
-            # print(f"DEBUG: Object type: {type(obj)}")
             
             # Manual transform from World (view.scene) to Local (obj._visual)
             # Avoid using get_transform(map_from=...) as it can be flaky with SubScenes
@@ -84,13 +83,11 @@ def get_xyz(ars_window):
             # 1. World -> Node (obj.visual)
             # obj.visual.transform maps Node -> World, so imap maps World -> Node
             # We use imap (inverse map) to go down the hierarchy
-            # print("DEBUG: Step 1 - World to Node")
             p_node_origin = obj.visual.transform.imap(ray_origin)
             p_node_point = obj.visual.transform.imap(ray_origin + ray_dir)
             
             # 2. Node -> Local (obj._visual)
             # obj._visual.transform maps Local -> Node, so imap maps Node -> Local
-            # print("DEBUG: Step 2 - Node to Local")
             local_origin = obj._visual.transform.imap(p_node_origin)[:3]
             local_point_on_ray = obj._visual.transform.imap(p_node_point)[:3]
             
@@ -123,8 +120,6 @@ def get_xyz(ars_window):
 
         except Exception as e:
             print(f"Error intersecting object: {e}")
-            import traceback
-            traceback.print_exc()
             pass
 
     if closest_point is not None:
