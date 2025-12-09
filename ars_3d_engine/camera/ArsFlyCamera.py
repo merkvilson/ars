@@ -26,14 +26,51 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
 
 
-    def move_to(self, center = None, offset=1.0, animate=False):
+    def _slerp(self, q1, q2, t):
+        v1 = np.array([q1.w, q1.x, q1.y, q1.z])
+        v2 = np.array([q2.w, q2.x, q2.y, q2.z])
+        
+        dot = np.dot(v1, v2)
+        
+        if dot < 0.0:
+            v2 = -v2
+            dot = -dot
+            
+        dot = np.clip(dot, -1.0, 1.0)
+        
+        theta_0 = np.arccos(dot)
+        sin_theta_0 = np.sin(theta_0)
+        
+        if sin_theta_0 < 1e-6:
+            v = (1.0 - t) * v1 + t * v2
+            v /= np.linalg.norm(v)
+        else:
+            theta = theta_0 * t
+            sin_theta = np.sin(theta)
+            
+            s0 = np.cos(theta) - dot * sin_theta / sin_theta_0
+            s1 = sin_theta / sin_theta_0
+            
+            v = s0 * v1 + s1 * v2
+            
+        return Quaternion(v[0], v[1], v[2], v[3])
+
+    def move_to(self, center = None, offset=1.0, animate=False, rotation=None):
         if not center:
             center = self.center
+
+        if rotation is None:
+            target_rotation = (self.rotation1, self.rotation2)
+            calc_rotation = self.rotation
+        else:
+            target_rotation = rotation
+            # Combine rotations: rotation2 * rotation1
+            calc_rotation = target_rotation[1] * target_rotation[0]
 
         # Get the inverse rotation (Camera -> World)
         # FlyCamera.rotation stores World->Camera transform (View Matrix rotation)
         # So we need inverse to transform local Camera vectors to World vectors.
-        inv_rot = self.rotation.inverse()
+        inv_rot = calc_rotation.inverse()
         
         # In Camera space, Back is +Z (0, 0, 1) because Camera looks down -Z
         back_vector = inv_rot.rotate_point([0, 0, 1])
@@ -52,11 +89,17 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
 
         if not animate:
             self.center = tuple(target_center)
+            self.rotation1 = target_rotation[0]
+            self.rotation2 = target_rotation[1]
             self.view_changed()
         else:
             # Animate from CURRENT camera position to the target position
             self._anim_start_center = np.array(self.center)
             self._anim_target_center = target_center
+            
+            self._anim_start_rotation = (self.rotation1, self.rotation2)
+            self._anim_target_rotation = target_rotation
+
             self._anim_duration = 0.5
             self._anim_start_time = time.time()
             
@@ -78,6 +121,14 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         
         # Interpolate Center
         self.center = (1 - t_ease) * self._anim_start_center + t_ease * self._anim_target_center
+        
+        # Interpolate Rotation
+        if hasattr(self, '_anim_start_rotation') and hasattr(self, '_anim_target_rotation'):
+             r1_start, r2_start = self._anim_start_rotation
+             r1_target, r2_target = self._anim_target_rotation
+             
+             self.rotation1 = self._slerp(r1_start, r1_target, t_ease)
+             self.rotation2 = self._slerp(r2_start, r2_target, t_ease)
         
         self.view_changed()
 

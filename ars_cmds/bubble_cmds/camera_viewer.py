@@ -26,7 +26,8 @@ def execute_cmd(ars_window):
         camera.move_to(center=tuple(xyz), offset=5, animate=True)
     
     def view_home():
-        camera.move_to(center=(0,0,0), offset=10, animate=True)
+        default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
+        camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
         
     config.callbackL = {
         ic.ICON_HOME: view_home,

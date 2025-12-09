@@ -1,5 +1,8 @@
 # ARS Project Instructions
 
+## The most important aspect!
+- **NO OVERENGINEERING**: Always choose the simplest solution that works. Avoid unnecessary complexity. 
+
 ## Project Overview
 ARS is a Python-based 3D application built with **PyQt6** (UI) and **Vispy** (3D rendering). It features a unique "Floating Bubble" interface and integrates with **ComfyUI** for rendering workflows.
 
