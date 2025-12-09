@@ -5,6 +5,7 @@ from PyQt6.QtGui import QCursor
 import numpy as np
 from ars_3d_engine.gizmo.gizmo import screen_to_world_ray
 from ars_cmds.core_cmds.load_object import selected_object
+from ars_cmds.core_cmds.key_check import key_check_continuous
 
 BBL_CURSOR_XYZ_CONFIG = {"symbol": ic.ICON_OBJ_CIRCLE, "hotkey": "X"}
 
@@ -153,13 +154,15 @@ def execute_cmd(ars_window):
     Args:
         ars_window: The main application window instance.
     """
+    ars_window.hotkey_manager._unbind_all()
     obj = selected_object()
     if not obj:
-        print("No object selected")
         return
     xyz = get_xyz(ars_window)
     if xyz:
-        print(f"XYZ: {xyz}")
-        obj.set_position(*xyz)
-    else:
-        print("No intersection found")
+        
+        key_check_continuous(
+            callback=lambda:(obj.set_position(*xyz), print(f"XYZ: {xyz}")), 
+            callback_end=lambda: ars_window.hotkey_manager._bind_shortcuts(), 
+            key='x', 
+            interval=100)
