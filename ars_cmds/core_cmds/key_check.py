@@ -47,7 +47,7 @@ def key_check_continuous(callback=None, key='l', interval=100, callback_start=No
         callback_start()
     
     # Create a new timer to check key state
-    check_timer = QTimer()
+    check_timer = QTimer(QApplication.instance())
     
     def check_key_state():
         if key_check(key):
