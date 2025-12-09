@@ -28,5 +28,5 @@ def execute_cmd(ars_window):
         key_check_continuous(
             callback=lambda:(obj.set_position(*xyz), print(f"XYZ: {xyz}")), 
             callback_end=lambda: (ars_window.hotkey_manager._bind_shortcuts(),print("binded")), 
-            key='x', 
+            key='X', 
             interval=100)
