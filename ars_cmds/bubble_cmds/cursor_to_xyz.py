@@ -9,10 +9,21 @@ from ars_cmds.core_cmds.load_object import selected_object
 BBL_CURSOR_XYZ_CONFIG = {"symbol": ic.ICON_OBJ_CIRCLE, "hotkey": "X"}
 
 def BBL_CURSOR_XYZ(*args):
+    """Entry point for the cursor to XYZ command."""
     run_ext(__file__)
 
 def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
-    # Vectorized Möller-Trumbore intersection algorithm
+    """
+    Calculates the intersection of a ray with a set of triangles using the Möller-Trumbore algorithm.
+    
+    Args:
+        ray_origin (np.array): Origin of the ray.
+        ray_dir (np.array): Direction of the ray.
+        v0, v1, v2 (np.array): Vertices of the triangles.
+        
+    Returns:
+        float or None: The distance to the closest intersection, or None if no intersection.
+    """
     epsilon = 1e-6
     edge1 = v1 - v0
     edge2 = v2 - v0
@@ -50,25 +61,32 @@ def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
     return None
 
 def get_xyz(ars_window):
+    """
+    Calculates the 3D world coordinates of the point under the mouse cursor.
+    Checks for intersection with scene objects first, then falls back to the ground plane (Y=0).
+    
+    Args:
+        ars_window: The main application window instance.
+        
+    Returns:
+        tuple: (x, y, z) coordinates of the intersection point, or None.
+    """
     viewport = ars_window.viewport
     canvas = viewport._canvas
     view = viewport._view
     
-    # 1. Get Mouse Position
+    # Get mouse position in widget coordinates
     global_pos = QCursor.pos()
     widget_pos = canvas.native.mapFromGlobal(global_pos)
     x, y = widget_pos.x(), widget_pos.y()
     
-    # 2. Calculate Ray in World Space using Gizmo's robust method
     try:
-        # screen_to_world_ray uses view.scene.transform to unproject
-        # This gives us the ray in the Scene coordinate system (World)
         ray_origin, ray_dir = screen_to_world_ray(view, (x, y))
     except Exception as e:
         print(f"Error calculating ray: {e}")
         return None
 
-    # 3. Check Picking
+    # Check for object intersection via picking
     picked_idx = viewport._objectManager.picking().pick_at(x, y)
     
     closest_point = None
@@ -77,17 +95,15 @@ def get_xyz(ars_window):
         try:
             obj = viewport._objectManager._objects[picked_idx]
             
-            # Manual transform from World (view.scene) to Local (obj._visual)
-            # Avoid using get_transform(map_from=...) as it can be flaky with SubScenes
+            # Transform ray from World Space to Object Local Space
+            # We manually traverse the transform hierarchy (World -> Node -> Local)
+            # to avoid issues with Vispy's get_transform in SubScenes.
             
-            # 1. World -> Node (obj.visual)
-            # obj.visual.transform maps Node -> World, so imap maps World -> Node
-            # We use imap (inverse map) to go down the hierarchy
+            # World -> Node (Translation)
             p_node_origin = obj.visual.transform.imap(ray_origin)
             p_node_point = obj.visual.transform.imap(ray_origin + ray_dir)
             
-            # 2. Node -> Local (obj._visual)
-            # obj._visual.transform maps Local -> Node, so imap maps Node -> Local
+            # Node -> Local (Rotation/Scale)
             local_origin = obj._visual.transform.imap(p_node_origin)[:3]
             local_point_on_ray = obj._visual.transform.imap(p_node_point)[:3]
             
@@ -106,14 +122,10 @@ def get_xyz(ars_window):
                     t = ray_triangle_intersection(local_origin, local_dir, v0, v1, v2)
                     
                     if t is not None:
-                        # Calculate point in Local Space
                         p_local = local_origin + t * local_dir
                         
-                        # Transform back to World Space manually
-                        # 1. Local -> Node
+                        # Transform intersection point back to World Space
                         p_node = obj._visual.transform.map(p_local)
-                        
-                        # 2. Node -> World
                         p_world = obj.visual.transform.map(p_node)[:3]
                         
                         closest_point = p_world
@@ -125,13 +137,9 @@ def get_xyz(ars_window):
     if closest_point is not None:
         return (closest_point[0], closest_point[1], closest_point[2])
 
-    # 4. Fallback to Grid Intersection (Y=0 plane)
-    # Ray P = O + t*D
-    # P.y = 0 => O.y + t*D.y = 0 => t = -O.y / D.y
+    # Fallback: Intersection with the ground plane (Y=0)
     if abs(ray_dir[1]) > 1e-6:
         t = -ray_origin[1] / ray_dir[1]
-        # Allow t > 0 (forward)
-        # Also check if intersection is within reasonable bounds if needed
         if t > 0:
             grid_pos = ray_origin + t * ray_dir
             return (grid_pos[0], grid_pos[1], grid_pos[2])
@@ -139,6 +147,12 @@ def get_xyz(ars_window):
     return None
 
 def execute_cmd(ars_window):
+    """
+    Executes the command to move the selected object to the cursor's 3D position.
+    
+    Args:
+        ars_window: The main application window instance.
+    """
     obj = selected_object()
     if not obj:
         print("No object selected")
