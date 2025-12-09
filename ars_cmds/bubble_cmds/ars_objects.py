@@ -2,6 +2,8 @@ import os
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
+from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
+
 from ars_cmds.core_cmds.load_object import (
     add_mesh,
     add_sprite,
@@ -16,6 +18,9 @@ def BBL_OBJECT(*args):
 
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
+    p = get_xyz(ars_window)
+    if p is None:
+        p = (0, 0, 0)
 
     config.options = {
         ic.ICON_OBJ_TXT_ABC: 'Text',
@@ -34,17 +39,17 @@ def execute_cmd(ars_window):
 
     config.callbackL = {
         ic.ICON_OBJ_TXT_ABC: lambda: add_text3d(),
-        ic.ICON_OBJ_SPRITE: lambda: add_sprite(animated=True),
-        ic.ICON_OBJ_BOX: lambda: add_primitive("cube", animated=True),
-        ic.ICON_OBJ_SPHERE: lambda: add_primitive("sphere", animated=True),
-        ic.ICON_OBJ_CYLINDER: lambda: add_primitive("cylinder", animated=True),
-        ic.ICON_OBJ_CONE: lambda: add_primitive("cone", animated=True),
-        ic.ICON_OBJ_PYRAMID: lambda: add_primitive("pyramid", animated=True),
-        ic.ICON_OBJ_PLANE: lambda: add_primitive("plane", animated=True),
-        ic.ICON_OBJ_DISC: lambda: add_primitive("disc", animated=True),
-        ic.ICON_OBJ_TORUS: lambda: add_primitive("torus", radius_inner=0.25, animated=True),
-        ic.ICON_ORIGAMI: lambda: add_mesh(os.path.join("res", "mesh files", "origami.obj"),animated=True,),
-        ic.ICON_FILE_3D: lambda: add_mesh(),
+        ic.ICON_OBJ_SPRITE: lambda: add_sprite(animated=True, position=p),
+        ic.ICON_OBJ_BOX: lambda: add_primitive("cube", animated=True, position=p),
+        ic.ICON_OBJ_SPHERE: lambda: add_primitive("sphere", animated=True, position=p),
+        ic.ICON_OBJ_CYLINDER: lambda: add_primitive("cylinder", animated=True, position=p),
+        ic.ICON_OBJ_CONE: lambda: add_primitive("cone", animated=True, position=p),
+        ic.ICON_OBJ_PYRAMID: lambda: add_primitive("pyramid", animated=True, position=p),
+        ic.ICON_OBJ_PLANE: lambda: add_primitive("plane", animated=True, position=p),
+        ic.ICON_OBJ_DISC: lambda: add_primitive("disc", animated=True, position=p),
+        ic.ICON_OBJ_TORUS: lambda: add_primitive("torus", radius_inner=0.25, animated=True, position=p),
+        ic.ICON_ORIGAMI: lambda: add_mesh(os.path.join("res", "mesh files", "origami.obj"), animated=True, position=p),
+        ic.ICON_FILE_3D: lambda: add_mesh(position=p),
     }
 
     config.hotkey_items = {
