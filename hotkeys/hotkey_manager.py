@@ -47,7 +47,7 @@ class HotkeyManager(QObject):  # Inherit from QObject
         if self.radials_present != new_state:
             self.radials_present = new_state
             if self.radials_present:
-                print("Hotkeys disabled: radial menu has hotkey_items.")
+                # print("Hotkeys disabled: radial menu has hotkey_items.")
                 self._unbind_all()
             elif self.current_profile:
                 self._bind_shortcuts()  # Re-bind if profile loaded
@@ -61,7 +61,7 @@ class HotkeyManager(QObject):  # Inherit from QObject
                 if self.radials_present != new_state:
                     self.radials_present = new_state
                     if self.radials_present:
-                        print("Hotkeys disabled: radial menu has hotkey_items.")
+                        # print("Hotkeys disabled: radial menu has hotkey_items.")
                         self._unbind_all()
                     elif self.current_profile:
                         self._bind_shortcuts()  # Re-bind if profile loaded
@@ -150,7 +150,7 @@ class HotkeyManager(QObject):  # Inherit from QObject
         if self.radials_present != new_state:
             self.radials_present = new_state
             if self.radials_present:
-                print("Hotkeys disabled: radial menu has hotkey_items.")
+                # print("Hotkeys disabled: radial menu has hotkey_items.")
                 self._unbind_all()
                 return
         if self.radials_present:
