@@ -18,15 +18,16 @@ def execute_cmd(ars_window):
     }
 
     camera = ars_window.viewport.cam
+    default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
+
 
     def view_selected():
         obj = get_selected()
         if not obj: return
         xyz=obj.get_position()
-        camera.move_to(center=tuple(xyz), offset=5, animate=True)
+        camera.move_to(center=tuple(xyz), offset=5, animate=True, rotation=default_rotation)
     
     def view_home():
-        default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
         camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
         
     config.callbackL = {
