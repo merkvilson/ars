@@ -573,7 +573,7 @@ class GizmoController:
         self._dragging = True
         
         if key_check("ctrl"):
-            print("press", event.button, self._ring_center, file=sys.stderr)
+            # print("press", event.button, self._ring_center, file=sys.stderr)
             viewport = self.canvas.native.parent()
             viewport._objectManager.duplicate_selected()
     
@@ -617,9 +617,10 @@ class GizmoController:
         if self._hover_axis != picked_name:
             if picked_name is not None:
                 play_sound("hover")
-                set_cursor("arrows-move", 'center')
+                # set_cursor("arrows-move", 'center')
             else:
-                set_cursor("cursor")
+                # set_cursor("cursor")
+                pass
             self._hover_axis = picked_name
             self.renderer.highlight(picked_name)
 
