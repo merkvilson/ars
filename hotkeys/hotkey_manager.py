@@ -69,7 +69,17 @@ class HotkeyManager(QObject):  # Inherit from QObject
                     return True  # Consume without execution
             
             if not self.radials_present:
-                delta = event.angleDelta().y()  # Positive = up, negative = down
+                delta = event.angleDelta().y()
+                if delta == 0:
+                    delta = event.angleDelta().x()
+                if delta == 0:
+                    delta = event.pixelDelta().y()
+                if delta == 0:
+                    delta = event.pixelDelta().x()
+                
+                if delta == 0:
+                    return super().eventFilter(obj, event)
+
                 direction = "up" if delta > 0 else "down"
                 
                 modifiers = event.modifiers()
