@@ -4,10 +4,10 @@ def clamp(n, min_value, max_value):
     return max(min_value, min(n, max_value))
 
 def cam_move_in(self):
-    self.viewport.cam.move_to(offset=-5, animate=True)
+    self.viewport.cam.move_to(offset=-10, animate=True)
 
 def cam_move_out(self):
-    self.viewport.cam.move_to(offset=5, animate=True)
+    self.viewport.cam.move_to(offset=10, animate=True)
 
 def cam_speed_up(self):
     current_value = self.viewport.cam.scale_factor
