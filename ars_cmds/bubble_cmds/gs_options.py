@@ -4,7 +4,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context, close_all_o
 from PyQt6.QtWidgets import QFileDialog
 
 
-def BBL_ATOM(*args):
+def BBL_BUBBLE(*args):
     run_ext(__file__)
 
 def load_ply(ars_window):
