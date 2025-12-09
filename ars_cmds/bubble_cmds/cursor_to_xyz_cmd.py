@@ -21,17 +21,18 @@ def execute_cmd(ars_window):
     obj = selected_object()
     if not obj:
         return
-    ars_window.hotkey_manager._unbind_all()
     ars_window.viewport.controller.set_handles([""]),
 
     def update_pos():
         new_xyz = get_xyz(ars_window, ignore_objs=[obj])
         if new_xyz:
-            obj.move_to(center=new_xyz, offset=1.0, animate=True)
+            obj.move_to(center=new_xyz, offset=1.0, animate=0.25)
 
     if get_xyz(ars_window, ignore_objs=[obj]):
+        ars_window.hotkey_manager._unbind_all()
+
         key_check_continuous(
             callback=update_pos, 
             callback_end=ars_window.hotkey_manager._bind_shortcuts, 
             key='X', 
-            interval=100)
+            interval=250)
