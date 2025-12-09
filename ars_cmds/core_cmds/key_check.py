@@ -14,9 +14,9 @@ def key_check(key):
     elif key == "meta":  result = modifiers & Qt.KeyboardModifier.MetaModifier
     
     # Check mouse buttons
-    elif key == "l":   result = QApplication.mouseButtons() & Qt.MouseButton.LeftButton
-    elif key == "r":  result = QApplication.mouseButtons() & Qt.MouseButton.RightButton
-    elif key == "m": result = QApplication.mouseButtons() & Qt.MouseButton.MiddleButton
+    elif key == "left":   result = QApplication.mouseButtons() & Qt.MouseButton.LeftButton
+    elif key == "right":  result = QApplication.mouseButtons() & Qt.MouseButton.RightButton
+    elif key == "middle": result = QApplication.mouseButtons() & Qt.MouseButton.MiddleButton
     
     else: result = None
 

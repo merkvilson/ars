@@ -267,7 +267,7 @@ def obj_color(self, position, callback=None):
 
 
     def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
-    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='right', interval=4) }
 
 
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]

@@ -41,7 +41,7 @@ def obj_att_mng(ars_window, ):
     }
 
     def move_ctx():ctx.move(ars_window.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
-    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='r', interval=4) }
+    config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='right', interval=4) }
 
 
     ctx = open_context(
