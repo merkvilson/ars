@@ -1,17 +1,6 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
-from theme.fonts import font_icons as ic
-from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 import numpy as np
 from ars_3d_engine.gizmo.gizmo import screen_to_world_ray
-from ars_cmds.core_cmds.load_object import selected_object
-from ars_cmds.core_cmds.key_check import key_check_continuous
-
-BBL_CURSOR_XYZ_CONFIG = {"symbol": ic.ICON_OBJ_CIRCLE, "hotkey": "X"}
-
-def BBL_CURSOR_XYZ(*args):
-    """Entry point for the cursor to XYZ command."""
-    run_ext(__file__)
 
 def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
     """
@@ -146,23 +135,3 @@ def get_xyz(ars_window):
             return (grid_pos[0], grid_pos[1], grid_pos[2])
             
     return None
-
-def execute_cmd(ars_window):
-    """
-    Executes the command to move the selected object to the cursor's 3D position.
-    
-    Args:
-        ars_window: The main application window instance.
-    """
-    ars_window.hotkey_manager._unbind_all()
-    obj = selected_object()
-    if not obj:
-        return
-    xyz = get_xyz(ars_window)
-    if xyz:
-        
-        key_check_continuous(
-            callback=lambda:(obj.set_position(*xyz), print(f"XYZ: {xyz}")), 
-            callback_end=lambda: ars_window.hotkey_manager._bind_shortcuts(), 
-            key='x', 
-            interval=100)
