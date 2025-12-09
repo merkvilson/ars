@@ -2,8 +2,6 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
-from ars_cmds.core_cmds.load_object import selected_object as get_selected
-
 
 def clamp(n, min_value, max_value):
     return max(min_value, min(n, max_value))
@@ -31,7 +29,6 @@ def execute_cmd(ars_window):
         ic.ICON_CAMERA: "2D Camera",
         ic.ICON_ORBIT: "Orbit Camera",
         ic.ICON_FLY: "Fly Camera",
-        ic.ICON_WINDOW_FULLSCREEN: "View Selected",
         ic.ICON_SPEED_UP: "Speed",
         ic.ICON_EYE_UP: "Field Of View",
     }
@@ -68,21 +65,13 @@ def execute_cmd(ars_window):
         ars_window.gs_viewer.hide()
         ars_window.img.hide()
         
-    def view_selected():
-        obj = get_selected()
-        if not obj: return
-        xyz=obj.get_position()
-        ars_window.viewport.cam.move_to(center=tuple(xyz), offset=5, animate=True)
-        
 
     config.callbackL = {
         ic.ICON_CAMERA: lambda: (hide_view(), ars_window.img.show()),
         ic.ICON_ORBIT: lambda: (hide_view(), ars_window.gs_viewer.show()),
         ic.ICON_FLY: lambda: (hide_view(), ars_window.viewport.show()),
         ic.ICON_SPEED_UP: lambda value: cam_speed(ars_window, value),
-        ic.ICON_EYE_UP: lambda value: cam_zoom(ars_window, value),
-        ic.ICON_WINDOW_FULLSCREEN: lambda: view_selected(),
-        
+        ic.ICON_EYE_UP: lambda value: cam_zoom(ars_window, value),        
     }
 
     ctx = open_context(config)
