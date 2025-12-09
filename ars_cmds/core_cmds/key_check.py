@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QTimer
+import ctypes
 
 
 def key_check(key):
@@ -18,6 +19,10 @@ def key_check(key):
     elif key == "right":  result = QApplication.mouseButtons() & Qt.MouseButton.RightButton
     elif key == "middle": result = QApplication.mouseButtons() & Qt.MouseButton.MiddleButton
     
+    # Check alphabet keys (Windows)
+    elif len(key) == 1 and key.isalpha():
+        result = ctypes.windll.user32.GetAsyncKeyState(ord(key.upper())) & 0x8000
+
     else: result = None
 
     return result
@@ -30,7 +35,7 @@ def key_check_continuous(callback=None, key='l', interval=100, callback_start=No
     
     Args:
         callback: Function to call repeatedly while key is held
-        key: Key to monitor ('l', 'r', 'm', 'shift', 'ctrl', 'alt', 'meta')
+        key: Key to monitor ('left', 'right', 'middle', 'shift', 'ctrl', 'alt', 'meta', 'a'-'z')
         interval: Check interval in milliseconds
         callback_start: Function to call once when monitoring starts
         callback_end: Function to call once when key is released
