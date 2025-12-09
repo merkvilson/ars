@@ -7,5 +7,5 @@
 - [50%] Fix object manager deletion issues
 - [✓] Store default values separately for proper middle button revert
 - [ ] Unused imports in code editor are not hilighted.
-- [ ] 
+- [ ] Comfy node editor is not visible in full-screen mode.
 - [ ]
