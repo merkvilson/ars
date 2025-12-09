@@ -10,6 +10,7 @@
 - [✓] Uniform scale
 - [ ] Add ctrl+z/ctrl+y undo/redo functionality
 - [ ] Optimize render pipeline performance
+- [ ] Add ctrl+shift+z/ctrl+shift+y camera move undo/redo functionality
 - [✓] Save one extra image to prevent early image load
 - [✓] Middle click revert to default 
 - [30%] Implement prefs manager and config classes
