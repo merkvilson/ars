@@ -5,7 +5,7 @@ from ars_cmds.core_cmds.load_object import selected_object as get_selected
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from ars_cmds.core_cmds.load_object import add_primitive
 from ars_cmds.core_cmds.key_check import key_check_continuous
-from core.cursor_modifier import set_cursor
+from core.cursor_modifier import get_cursor, set_cursor
 import time
 
 BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V"}
@@ -73,8 +73,14 @@ def execute_cmd(ars_window):
     def start():
         nonlocal start_time
         start_time = time.time()
-        set_cursor("map-pin", "center")
         ars_window.hotkey_manager._unbind_all()
+    
+
+    def during():
+        if get_cursor()[0] == "map-pin":
+           return
+        if time.time() - start_time > 0.15:
+            set_cursor("map-pin", "bottom")
 
     
     def end():
@@ -82,7 +88,7 @@ def execute_cmd(ars_window):
         ars_window.view_camera_last_end = time.time()
         set_cursor("cursor")
         try:
-            if time.time() - start_time > 0.1:
+            if time.time() - start_time > 0.15:
                 view_cursor()
             else:
                 open_context(config)
@@ -91,7 +97,7 @@ def execute_cmd(ars_window):
 
 
 
-    key_check_continuous(callback=None,
+    key_check_continuous(callback=during,
                          key="V",
                          interval=16,
                          callback_start=start,
