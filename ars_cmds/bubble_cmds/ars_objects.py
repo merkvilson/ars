@@ -89,6 +89,4 @@ def execute_cmd(ars_window):
                          key="G",
                          interval=16,
                          callback_start=ars_window.hotkey_manager._unbind_all,
-                         callback_end=lambda: (point.remove(),  open_context(config),ars_window.hotkey_manager._bind_shortcuts()))
-
-    
+                         callback_end=lambda: (point.remove(), open_context(config),ars_window.hotkey_manager._bind_shortcuts()))  
