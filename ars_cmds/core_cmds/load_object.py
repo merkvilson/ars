@@ -142,7 +142,7 @@ def add_primitive(primitive_type = "cube", **params, ):
     obj = CPrimitive.create(primitive_type,**params)
     animated = params.get("animated")
     position = params.get("position", (0,0,0))
-    position = (position[0], position[1]+obj.get_scale()[1], position[2])
+    position = (position[0], position[1]+obj.get_scale()[1], position[2]) if primitive_type not in ["plane", "circle"] else position
     obj.set_position(position[0], position[1] if not animated else position[1] + 2, position[2])
     return add_mesh(file_path=obj, animated=animated, position=position)
 
