@@ -37,7 +37,7 @@
 - [✓] Camera fly to cursor ray interesection on surface (need to plan the hotkey)
 - [ ] Add new gizmo that will execute move_to and get_xyz commands.
 - [ ] Hover over incremental value containing b-button shows value.
-- [ ] Remove preview object during pressing G and add distance depended point scale.
+- [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] 
 - [ ] 
 
