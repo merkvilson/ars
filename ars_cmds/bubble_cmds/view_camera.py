@@ -73,7 +73,7 @@ def execute_cmd(ars_window):
     def start():
         nonlocal start_time
         start_time = time.time()
-        set_cursor("arrows-move", "center")
+        set_cursor("point", "center")
         ars_window.hotkey_manager._unbind_all()
 
     
