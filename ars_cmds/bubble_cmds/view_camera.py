@@ -68,6 +68,10 @@ def execute_cmd(ars_window):
     
 
     def during():
+        #xyz = get_xyz(ars_window)
+        #xyz_str = str(tuple(round(float(x), 2) for x in xyz))
+        #ars_window.msg(xyz_str)
+
         if get_cursor()[0] == "map-pin":
            return
         if time.time() - start_time > 0.15:
