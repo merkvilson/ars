@@ -86,11 +86,11 @@ def execute_cmd(ars_window):
 
 
     def start():
-        set_cursor("arrows-move", "center")
+        set_cursor("point", "center")
         ars_window.hotkey_manager._unbind_all()
 
     def during():
-        point.set_position(new_p()[0],new_p()[1]+0.4,new_p()[2])
+        point.set_position(new_p()[0],new_p()[1]+0.25,new_p()[2])
         
     
     def end():
