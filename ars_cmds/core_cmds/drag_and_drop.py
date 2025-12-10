@@ -7,6 +7,7 @@ processing various file types such as images, 3D objects, layouts, and scripts.
 import os
 from theme.fonts import font_icons as ic
 from ars_cmds import bubble_cmds as Bcmd
+from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 
 imgs = (".png", ".jpg", ".jpeg", ".bmp")
 objs = ('.obj','.stl','.ply','.off','.dae','.glb','.gltf','.3mf')
@@ -83,7 +84,7 @@ def dd_drop(self, event):
     for f in files:
 
         if f.endswith(objs):
-            Bcmd.add_mesh(f, True)
+            Bcmd.add_mesh(f, True, get_xyz(self))
             ttip, sym = "Object Loaded!", ic.ICON_FILE_CHECK
 
         elif f.endswith(imgs):
