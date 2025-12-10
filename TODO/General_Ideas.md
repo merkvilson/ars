@@ -95,7 +95,7 @@ Why: The project currently imports the heavy pygame library solely for playing s
 - [ ] Browser widget should be stored inside ui/widgets as a class. it should be added inside main_window. It should have methods to hide/unhide, set_tab_id, get_tab_id, open_link, ...
 It will be used not only for ComfyUI but also for tabler & lucid icons, documentation viewer, video tutorial viewer, etc. 
 
-- [ ] Scrolling wheel during presing G key should switch between primitive objects.
+- [ ] Scrolling wheel during presing G key should switch between primitive objects and apply an apropriate symbol. (maybe via cursor_follower)
 
 - [ ] Scrolling wheel during pressing Q key should rotate the object.
 
