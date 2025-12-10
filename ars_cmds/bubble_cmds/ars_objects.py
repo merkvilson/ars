@@ -3,12 +3,14 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
+from ars_cmds.core_cmds.key_check import key_check_continuous
 
 from ars_cmds.core_cmds.load_object import (
     add_mesh,
     add_sprite,
     add_text3d,
     add_primitive,
+    add_point,
 )
 
 BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
@@ -18,9 +20,19 @@ def BBL_OBJECT(*args):
 
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
-    p = get_xyz(ars_window)
-    if p is None:
-        p = (0, 0, 0)
+    
+    p = (0, 0, 0)
+    ars_window.hotkey_manager._unbind_all()
+
+    #point=add_point()
+
+
+    def new_p():
+        nonlocal p
+        p = get_xyz(ars_window)
+        if p is None:
+          p = (0, 0, 0)
+        return p[0],p[1],p[2]
 
     config.options = {
         ic.ICON_OBJ_TXT_ABC: 'Text',
@@ -67,4 +79,11 @@ def execute_cmd(ars_window):
         ic.ICON_ORIGAMI: "O",
     }
 
-    ctx = open_context(config)
+
+    key_check_continuous(#callback=lambda:point.set_position(*new_p()),
+                         key="G",
+                         interval=100,
+                         callback_start=None,
+                         callback_end=lambda: (new_p(), open_context(config),ars_window.hotkey_manager._bind_shortcuts()))
+
+    
