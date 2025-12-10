@@ -66,14 +66,39 @@ def create_qcursor(name: str, bg_color: QColor | None = None, anchor: str = "top
     icon_y = (canvas_size.height() - icon_size.height()) / 2
     painter.drawPixmap(int(icon_x), int(icon_y), icon_pixmap)
     painter.end()
+    
     hot_x, hot_y = 0, 0
+    w, h = final_pixmap.width(), final_pixmap.height()
+    
     if anchor == "center":
-        hot_x = final_pixmap.width() // 2
-        hot_y = final_pixmap.height() // 2
+        hot_x, hot_y = w // 2, h // 2
+    elif anchor == "top_right":
+        hot_x, hot_y = w - 1, 0
+    elif anchor == "bottom_left":
+        hot_x, hot_y = 0, h - 1
+    elif anchor == "bottom_right":
+        hot_x, hot_y = w - 1, h - 1
+    elif anchor == "top":
+        hot_x, hot_y = w // 2, 0
+    elif anchor == "bottom":
+        hot_x, hot_y = w // 2, h - 1
+    elif anchor == "left":
+        hot_x, hot_y = 0, h // 2
+    elif anchor == "right":
+        hot_x, hot_y = w - 1, h // 2
+
     return QCursor(final_pixmap, hot_x, hot_y)
+
+_current_cursor_info = ("cursor", "top_left")
+
+def get_cursor() -> tuple[str, str]:
+    """Returns the current cursor name and anchor."""
+    return _current_cursor_info
 
 def set_default_cursor(cursor_name: str):
     """Sets the default, application-wide cursor."""
+    global _current_cursor_info
+    _current_cursor_info = (cursor_name, "top_left")
     app = QApplication.instance()
     if not app:
         print("Warning: QApplication instance not found. Cannot set default cursor.")
@@ -83,6 +108,8 @@ def set_default_cursor(cursor_name: str):
 
 def set_cursor(cursor_name: str, anchor: str = "top_left"):
     """Sets the application-wide cursor at any time."""
+    global _current_cursor_info
+    _current_cursor_info = (cursor_name, anchor)
     app = QApplication.instance()
     if not app:
         print("Warning: QApplication instance not found. Cannot set cursor.")
@@ -141,8 +168,12 @@ class CursorModifier(QObject):
         super().__init__(parent)
         if axis not in ("xy", "x", "y"):
             raise ValueError("Argument 'axis' must be one of 'xy', 'x', or 'y'.")
-        if anchor not in ("top_left", "center"):
-            raise ValueError("Argument 'anchor' must be one of 'top_left' or 'center'.")
+        
+        valid_anchors = ("top_left", "top_right", "bottom_left", "bottom_right", 
+                         "center", "top", "bottom", "left", "right")
+        if anchor not in valid_anchors:
+            raise ValueError(f"Argument 'anchor' must be one of {valid_anchors}.")
+        
         self.trigger_widget = trigger_widget
         self.teleport_back = teleport_back
         self.hide_on_press = hide_on_press
