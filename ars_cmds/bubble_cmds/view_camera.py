@@ -16,14 +16,9 @@ def BBL_CAMVIEWER(*args):
 
 
 def execute_cmd(ars_window):
-    if getattr(ars_window, "view_camera_active", False):
-        return
-    
-    # Prevent re-triggering from tail events
-    if time.time() - getattr(ars_window, "view_camera_last_end", 0) < 0.2:
-        return
-
-    ars_window.view_camera_active = True
+    if getattr(ars_window, "ctx_key_active", False):return
+    if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
+    ars_window.ctx_key_active = True
 
     config = ContextMenuConfig()
     config.options = {
@@ -84,8 +79,8 @@ def execute_cmd(ars_window):
 
     
     def end():
-        ars_window.view_camera_active = False
-        ars_window.view_camera_last_end = time.time()
+        ars_window.ctx_key_active = False
+        ars_window.ctx_key_last_end = time.time()
         set_cursor("cursor")
         try:
             if time.time() - start_time > 0.15:
