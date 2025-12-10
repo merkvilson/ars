@@ -93,6 +93,7 @@ Why: The project currently imports the heavy pygame library solely for playing s
 - [ ] add timer, if time is low use cursor_to_xyz_cmd inside gizmo selector with timer.  else open gizmo selector. (or set cursor_to_xyz_cmd to q>q)
 
 - [ ] Browser widget should be stored inside ui/widgets as a class. it should be added inside main_window. It should have methods to hide/unhide, set_tab_id, get_tab_id, open_link, ...
+It will be used not only for ComfyUI but also for tabler & lucid icons, documentation viewer, video tutorial viewer, etc. 
 
 - [ ] 
 
