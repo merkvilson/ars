@@ -24,12 +24,17 @@ def execute_cmd(ars_window):
     p = (0, 0, 0)
     ars_window.hotkey_manager._unbind_all()
 
-    #point=add_point()
+    point=add_primitive('cylinder', animated=False, )
+    point.set_scale((0.5,0.1,0.5))
+    point.set_color((1,1,1,1))
+    point.set_alpha(0.35)
+    point.set_shading(None)
 
 
     def new_p():
         nonlocal p
-        p = get_xyz(ars_window)
+        ars_window.viewport.controller.set_handles([""])
+        p = get_xyz(ars_window, [point])
         if p is None:
           p = (0, 0, 0)
         return p[0],p[1],p[2]
@@ -80,10 +85,10 @@ def execute_cmd(ars_window):
     }
 
 
-    key_check_continuous(#callback=lambda:point.set_position(*new_p()),
+    key_check_continuous(callback=lambda:point.set_position(*new_p()),
                          key="G",
-                         interval=100,
+                         interval=16,
                          callback_start=None,
-                         callback_end=lambda: (new_p(), open_context(config),ars_window.hotkey_manager._bind_shortcuts()))
+                         callback_end=lambda: (point.remove(),  open_context(config),ars_window.hotkey_manager._bind_shortcuts()))
 
     
