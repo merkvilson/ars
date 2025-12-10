@@ -69,14 +69,17 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_DRAG: "Q",
     }
 
-
+    def move_obj(time=0.25):
+            new_xyz = get_xyz(ars_window, ignore_objs=[obj])
+            if new_xyz:
+                obj.move_to(center=new_xyz, offset=obj.get_scale()[1], animate=time)
  
 
     config.callbackL = {
         ic.ICON_GIZMO_MOVE_3D: lambda: ars_window.viewport.controller.set_handles(["t"]),
         ic.ICON_GIZMO_SCALE: lambda: ars_window.viewport.controller.set_handles(["s"]),
         ic.ICON_GIZMO_ROTATE_3D: lambda: ars_window.viewport.controller.set_handles(["r"]),
-        # ic.ICON_GIZMO_DRAG: lambda: move_obj(ars_window),
+        ic.ICON_GIZMO_DRAG: lambda: move_obj(),
     }
 
 
@@ -94,10 +97,7 @@ def execute_cmd(ars_window):
 
     def during():
         if time.time() - start_time > 0.15:
-            new_xyz = get_xyz(ars_window, ignore_objs=[obj])
-            if new_xyz:
-                obj.move_to(center=new_xyz, offset=0.0, animate=0.25)
-
+            move_obj(False) # Should be False since we are updating continuously
             if get_cursor()[0] != "map-pin":
                 set_cursor("map-pin", "bottom")
 
