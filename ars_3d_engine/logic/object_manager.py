@@ -35,6 +35,7 @@ class CObjectManager(QObject):
 
 
     def add_object(self, obj: CGeometry) -> None:
+        obj.manager = self
         index = len(self._objects)
         self._objects.append(obj)
         obj.visual.parent = self._view.scene
@@ -66,6 +67,12 @@ class CObjectManager(QObject):
         # Select the new clones (deselect originals)
         self.set_selection_state(new_indices, new_indices[-1] if new_indices else None)
 
+    def remove_object(self, obj: CGeometry) -> None:
+        try:
+            index = self._objects.index(obj)
+            self.remove_object_at(index)
+        except ValueError:
+            pass
 
     def remove_object_at(self, index: int) -> Optional[CGeometry]:
         if index < 0 or index >= len(self._objects):

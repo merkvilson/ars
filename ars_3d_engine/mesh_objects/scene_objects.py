@@ -52,6 +52,11 @@ class CGeometry(ABC):
 
         self._update_gl_state()
 
+    def remove(self):
+        """Completely remove the object from project"""
+        if hasattr(self, 'manager') and self.manager:
+            self.manager.remove_object(self)
+
     def update_light_dir(self, light_dir):
         """Update the light direction for the shading filter (in view space)."""
         if self.shading_filter is not None:
