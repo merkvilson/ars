@@ -6,7 +6,10 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
-
+from ars_cmds.core_cmds.key_check import key_check_continuous
+from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
+from core.cursor_modifier import get_cursor, set_cursor
+import time
 
 BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
 
@@ -29,8 +32,14 @@ def execute_cmd(ars_window):
     Args:
         ars_window: The main application window instance.
     """
-    if not selected_object():
+    obj = selected_object()
+    if not obj:
         return
+
+    if getattr(ars_window, "ctx_key_active", False):return
+    if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
+    ars_window.ctx_key_active = True
+
 
     config = ContextMenuConfig()
 
@@ -38,25 +47,19 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_MOVE_3D: "Move",
         ic.ICON_GIZMO_ROTATE_3D: "Rotate",
         ic.ICON_GIZMO_SCALE: "Scale",
-        ic.ICON_GIZMO_DRAG: "New Gizmo",
+        ic.ICON_GIZMO_DRAG: "Quick Drag",
     }
 
-    config.callbackL = {
-        ic.ICON_GIZMO_MOVE_3D: lambda: ars_window.viewport.controller.set_handles(["t"]),
-        ic.ICON_GIZMO_SCALE: lambda: ars_window.viewport.controller.set_handles(["s"]),
-        ic.ICON_GIZMO_ROTATE_3D: lambda: ars_window.viewport.controller.set_handles(["r"]),
-        ic.ICON_GIZMO_DRAG: lambda: ars_window.viewport.controller.set_handles(["qq"]),
-    }
 
     config.toggle_values = {
         ic.ICON_GIZMO_MOVE_3D: (0, 1, ars_window.viewport.controller.get_visibility("move")),
         ic.ICON_GIZMO_SCALE: (0, 1, ars_window.viewport.controller.get_visibility("scale")),
         ic.ICON_GIZMO_ROTATE_3D: (0, 1, ars_window.viewport.controller.get_visibility("rotate")),
-        ic.ICON_GIZMO_DRAG: (0, 1, 0),
+        #ic.ICON_GIZMO_DRAG: (0, 1, 0),
     }
 
     config.toggle_groups = [
-        list(config.options.keys()),
+        [ic.ICON_GIZMO_MOVE_3D, ic.ICON_GIZMO_ROTATE_3D, ic.ICON_GIZMO_SCALE],
     ]
 
     config.hotkey_items = {
@@ -66,4 +69,56 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_DRAG: "Q",
     }
 
-    ctx = open_context(config)
+
+ 
+
+    config.callbackL = {
+        ic.ICON_GIZMO_MOVE_3D: lambda: ars_window.viewport.controller.set_handles(["t"]),
+        ic.ICON_GIZMO_SCALE: lambda: ars_window.viewport.controller.set_handles(["s"]),
+        ic.ICON_GIZMO_ROTATE_3D: lambda: ars_window.viewport.controller.set_handles(["r"]),
+        # ic.ICON_GIZMO_DRAG: lambda: move_obj(ars_window),
+    }
+
+
+    start_time = 0
+
+    def start():
+        nonlocal start_time
+        start_time = time.time()
+        ars_window.viewport.controller.set_handles([""]),
+
+        if get_xyz(ars_window, ignore_objs=[obj]):
+            ars_window.hotkey_manager._unbind_all()
+
+
+
+    def during():
+        if time.time() - start_time > 0.15:
+            new_xyz = get_xyz(ars_window, ignore_objs=[obj])
+            if new_xyz:
+                obj.move_to(center=new_xyz, offset=0.0, animate=0.25)
+
+            if get_cursor()[0] != "map-pin":
+                set_cursor("map-pin", "bottom")
+
+    
+    def end():
+        ars_window.ctx_key_active = False
+        ars_window.ctx_key_last_end = time.time()
+        set_cursor("cursor")
+        try:
+            if time.time() - start_time > 0.15:
+                print("end")
+            else:
+                open_context(config)
+        finally:
+            ars_window.hotkey_manager._bind_shortcuts()
+
+
+
+    key_check_continuous(callback=during,
+                         key="Q",
+                         interval=16,
+                         callback_start=start,
+                         callback_end=end
+                         )
