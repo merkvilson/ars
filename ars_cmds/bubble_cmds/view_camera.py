@@ -50,9 +50,12 @@ def execute_cmd(ars_window):
 
     config.hotkey_items = {
         ic.ICON_HOME: "H",
-        ic.ICON_WINDOW_FULLSCREEN: "V",
-        ic.ICON_CIRCLE_DASHED: "C",
+        ic.ICON_WINDOW_FULLSCREEN: "S",
+        ic.ICON_CIRCLE_DASHED: "V",
         
     }
+
+    #Start timer and move camera to position if time is < 100ms else open ctx.
+
 
     open_context(config)
