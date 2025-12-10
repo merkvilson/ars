@@ -36,7 +36,7 @@
 - [✓] alt+scroll move camera instead of zooming
 - [✓] Camera fly to cursor ray interesection on surface (need to plan the hotkey)
 - [ ] Add new gizmo that will execute move_to and get_xyz commands.
-- [ ] 
+- [ ] Hover over incremental value containing b-button shows value.
 - [ ] 
 - [ ] 
 - [ ] 
