@@ -6,7 +6,7 @@
 - [ ] implement whisperthunder and pollinations as extensions/plugins
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
 - [30%] CUI workflow to CTX
-- [✓] CUI Workflof: Checkbox to expose value in gui
+- [✓] CUI Workflow: Checkbox to expose value in gui
 - [✓] Uniform scale
 - [ ] Add ctrl+z/ctrl+y undo/redo functionality
 - [ ] Optimize render pipeline performance
@@ -32,9 +32,9 @@
 - [ ] A|B compare
 - [ ] Implement better workflow converter for open_j
 - [ ] Interactive infinite zoom
-- [✓] CLEANUP C4D PLUGIN!!!!!!!!!!!!!!!!!
+- [✓] CLEANUP C4D PLUGIN!
 - [✓] alt+scroll move camera instead of zooming
-- [✓] Camera fly to cursor ray interesection on surface (need to plan the hotkey)
+- [✓] Camera fly to cursor ray intersection on surface (need to plan the hotkey)
 - [ ] Add new gizmo that will execute move_to and get_xyz commands.
 - [ ] Hover over incremental value containing b-button shows value.
 - [ ] Remove preview object during pressing G and add distance depended point.
@@ -43,12 +43,12 @@
 
 # Secret Release
 - [ ] Customer should get working version of Airen 
-- [ ] Closed playlist should be created on yourube
+- [ ] Closed playlist should be created on youtube
 - [ ]
 
 # General Ideas
 
-- [✓] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
+- [✓] pressing G key starts displaying object placement indicator (sphere with ray from center up to sky) in viewport's surfaces. releasing opens ctx menu.
 
 - [70%] Save image steps inside final image as metadata
 
@@ -59,9 +59,9 @@
 - [ ] Solo mode. World grid shrinks to object_size * 5 and centers to it. bg gets darker. Unnecessary buttons get removed.
 focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite and switches to image viewer. in obj, it removes/hides all objects and zooms to object.
 
-- [50%] in gizmo mode(any gizmo mode) when modifier key(ctrl, shift, alt or else) is pressed, placement tool is activated. it displays placement pointer under cursor. first click drags object to that point in space. second click rotates it to appropriate direction[✓]: this feature is now implemented in different way. continiously pressing Q drags ojbect. rotation is not yet implemented.
+- [50%] in gizmo mode(any gizmo mode) when modifier key(ctrl, shift, alt or else) is pressed, placement tool is activated. it displays placement pointer under cursor. first click drags object to that point in space. second click rotates it to appropriate direction[✓]: this feature is now implemented in different way. continuously pressing Q drags object. rotation is not yet implemented.
 
-- [ ] Object Cration Object/Widget in Center: Right click opens objects list, left click opens object creation multiline prompt input
+- [ ] Object Creation Object/Widget in Center: Right click opens objects list, left click opens object creation multiline prompt input
 
 - [ ] Right click opens render dropdown, left click starts rendering.
 
@@ -69,9 +69,9 @@ focus/solo mode button in obj ctx menu. in sprite, it  zooms camera onto sprite 
 
 - [ ] Mouse wheel should change direction of follow mode
 
-- [ ] Sartup video, animated transition from top to world origin. in the end video slowly becamse transparent. another video of floating bubbles stack in top middle.
+- [ ] Startup video, animated transition from top to world origin. in the end video slowly became transparent. another video of floating bubbles stack in top middle.
 
-- [ ] Geometry primitives to ai mesh. Combine multiple primitives and generate mash based on depth path + canny.
+- [ ] Geometry primitives to ai mesh. Combine multiple primitives and generate mesh based on depth path + canny.
 
 - [✓] Floating window should open at the position of selected bubble. Fb messenger style
 
