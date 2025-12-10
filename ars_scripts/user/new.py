@@ -1,3 +1,4 @@
 from core.cursor_modifier import set_cursor
-
-set_cursor("cursor", "top-right", )
+import random
+print(random.random())
+set_cursor("cursor", "top-right", random.random()*5)
