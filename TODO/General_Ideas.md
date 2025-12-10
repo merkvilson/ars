@@ -97,7 +97,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 - [ ] Scrolling wheel during presing G key should switch between primitive objects.
 
-- [ ] 
+- [ ] Scrolling wheel during pressing Q key should rotate the object.
 
 - [ ] 
 
