@@ -9,7 +9,7 @@
 - [ ] Toggle line wrap: self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
 - [ ] Custom Themes. f"background-color: rgba(0,0,0,{1.0 if STANDALONE else 0.15})
 - [✓] Move selected lines up/down using arrow keys.
-- [✓] Transparency Slider for revialing scene behind editor.
+- [✓] Transparency Slider for revealing scene behind editor.
 - [ ] text ctx - set alpha to non selected
 - [✓] " sign converts selection into text-prompt.
 - [ ] "lora." shows loras dropdown(autocomplete) and keywords.
