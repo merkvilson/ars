@@ -3,6 +3,9 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object as get_selected
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
+from ars_cmds.core_cmds.load_object import add_primitive
+from ars_cmds.core_cmds.key_check import key_check_continuous
+from core.cursor_modifier import set_cursor
 
 BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V"}
 
@@ -55,7 +58,25 @@ def execute_cmd(ars_window):
         
     }
 
-    #Start timer and move camera to position if time is < 100ms else open ctx.
 
 
-    open_context(config)
+    def start():
+        set_cursor("arrows-move", "center")
+        ars_window.hotkey_manager._unbind_all()
+
+    
+    def end():
+        set_cursor("cursor")
+        view_cursor()
+        ars_window.hotkey_manager._bind_shortcuts()
+
+    #Start timer and execute key_check_continuous if time is < 100ms else execute open_context(config).
+
+
+
+    key_check_continuous(callback=None,
+                         key="V",
+                         interval=16,
+                         callback_start=start,
+                         callback_end=end
+                         )
