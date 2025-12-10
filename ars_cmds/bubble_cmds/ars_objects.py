@@ -4,7 +4,7 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from ars_cmds.core_cmds.key_check import key_check_continuous
-
+from core.cursor_modifier import set_cursor
 from ars_cmds.core_cmds.load_object import (
     add_mesh,
     add_sprite,
@@ -25,7 +25,7 @@ def execute_cmd(ars_window):
     
 
     point=add_primitive('sphere', animated=False, )
-    point.set_scale((0.5,0.4,0.5))
+    point.set_scale((0.35,0.24,0.35))
     point.set_color((1,1,1,1))
     point.set_alpha(0.35)
     point.set_shading(None)
@@ -85,8 +85,25 @@ def execute_cmd(ars_window):
     }
 
 
-    key_check_continuous(callback=lambda:point.set_position(new_p()[0],new_p()[1]+0.4,new_p()[2]),
+    def start():
+        set_cursor("arrows-move", "center")
+        ars_window.hotkey_manager._unbind_all()
+
+    def during():
+        point.set_position(new_p()[0],new_p()[1]+0.4,new_p()[2])
+        
+    
+    def end():
+        set_cursor("cursor")
+        point.remove()
+        open_context(config)
+        ars_window.hotkey_manager._bind_shortcuts()
+
+
+
+    key_check_continuous(callback=during,
                          key="G",
                          interval=16,
-                         callback_start=ars_window.hotkey_manager._unbind_all,
-                         callback_end=lambda: (point.remove(), open_context(config),ars_window.hotkey_manager._bind_shortcuts()))  
+                         callback_start=start,
+                         callback_end=end
+                         )
