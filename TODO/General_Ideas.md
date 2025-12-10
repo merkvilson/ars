@@ -90,6 +90,6 @@ Functionality: Initializes audio and plays sound effects.
 Recommended Library: playsound or simpleaudio
 Why: The project currently imports the heavy pygame library solely for playing simple sound effects. If you are not using Pygame for windowing or game loops, switching to a lightweight audio library can significantly reduce your dependency footprint.
 
-- [ ] 
+- [ ] add timer, if time is low use cursor_to_xyz_cmd inside gizmo selector with timer.  else open gizmo selector. (or set cursor_to_xyz_cmd to q>q)
 
 - [ ] 
