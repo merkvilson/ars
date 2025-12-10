@@ -35,15 +35,18 @@ class CursorIconWidget(QWidget):
             painter = QPainter(self)
             painter.drawPixmap(0, 0, self._pixmap)
 
-def create_qcursor(name: str, bg_color: QColor | None = None, anchor: str = "top_left") -> QCursor:
+def create_qcursor(name: str, bg_color: QColor | None = None, anchor: str = "top_left", scale: float = 1.0) -> QCursor:
     """Renders an SVG icon into a QCursor object."""
     icon_path = os.path.join("res", "icons", "cursor", f"{name}.svg")
     renderer = QSvgRenderer(icon_path)
     if not renderer.isValid():
         print(f"Warning: Could not load cursor SVG: {icon_path}. Falling back to default.")
         return QCursor(Qt.CursorShape.ArrowCursor)
-    icon_size = renderer.defaultSize()
-    radius = 22
+    
+    base_size = renderer.defaultSize()
+    icon_size = QSize(int(base_size.width() * scale), int(base_size.height() * scale))
+    
+    radius = int(22 * scale)
     diameter = radius * 2
     canvas_size = QSize(diameter, diameter) if bg_color else icon_size
     icon_pixmap = QPixmap(icon_size)
@@ -106,7 +109,7 @@ def set_default_cursor(cursor_name: str):
     default_cursor = create_qcursor(cursor_name, bg_color=None, anchor="top_left")
     QApplication.setOverrideCursor(default_cursor)
 
-def set_cursor(cursor_name: str, anchor: str = "top_left"):
+def set_cursor(cursor_name: str, anchor: str = "top_left", scale: float = 1.0):
     """Sets the application-wide cursor at any time."""
     global _current_cursor_info
     _current_cursor_info = (cursor_name, anchor)
@@ -117,7 +120,7 @@ def set_cursor(cursor_name: str, anchor: str = "top_left"):
     # Restore existing override if present (assuming it's the previous default)
     if QApplication.overrideCursor():
         QApplication.restoreOverrideCursor()
-    new_cursor = create_qcursor(cursor_name, bg_color=None, anchor=anchor)
+    new_cursor = create_qcursor(cursor_name, bg_color=None, anchor=anchor, scale=scale)
     QApplication.setOverrideCursor(new_cursor)
 
 def show_cursor(value: bool = True):
