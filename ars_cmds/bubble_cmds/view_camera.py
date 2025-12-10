@@ -6,6 +6,7 @@ from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from ars_cmds.core_cmds.load_object import add_primitive
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from core.cursor_modifier import set_cursor
+import time
 
 BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V"}
 
@@ -15,6 +16,15 @@ def BBL_CAMVIEWER(*args):
 
 
 def execute_cmd(ars_window):
+    if getattr(ars_window, "view_camera_active", False):
+        return
+    
+    # Prevent re-triggering from tail events
+    if time.time() - getattr(ars_window, "view_camera_last_end", 0) < 0.2:
+        return
+
+    ars_window.view_camera_active = True
+
     config = ContextMenuConfig()
     config.options = {
         ic.ICON_HOME: "Home",
@@ -54,23 +64,30 @@ def execute_cmd(ars_window):
     config.hotkey_items = {
         ic.ICON_HOME: "H",
         ic.ICON_WINDOW_FULLSCREEN: "S",
-        ic.ICON_CIRCLE_DASHED: "V",
+        ic.ICON_CIRCLE_DASHED: "C",
         
     }
 
-
+    start_time = 0
 
     def start():
+        nonlocal start_time
+        start_time = time.time()
         set_cursor("arrows-move", "center")
         ars_window.hotkey_manager._unbind_all()
 
     
     def end():
+        ars_window.view_camera_active = False
+        ars_window.view_camera_last_end = time.time()
         set_cursor("cursor")
-        view_cursor()
-        ars_window.hotkey_manager._bind_shortcuts()
-
-    #Start timer and execute key_check_continuous if time is < 100ms else execute open_context(config).
+        try:
+            if time.time() - start_time > 0.1:
+                view_cursor()
+            else:
+                open_context(config)
+        finally:
+            ars_window.hotkey_manager._bind_shortcuts()
 
 
 
