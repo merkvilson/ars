@@ -32,12 +32,8 @@ def execute_cmd(ars_window):
 
     def view_cursor():
         new_xyz = get_xyz(ars_window)
-        #TODO: add command to get object under cursor
-        if get_selected():
-            scale_sum = sum(get_selected().get_scale()) * 2
-        else:
-            scale_sum = 10
-        camera.move_to(center=new_xyz, offset=10, animate=True)
+        
+        camera.move_to(center=new_xyz, offset=10 if new_xyz else -10, animate=True)
 
 
     def view_selected():
