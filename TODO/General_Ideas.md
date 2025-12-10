@@ -48,7 +48,7 @@
 
 # General Ideas
 
-- [ ] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
+- [✓] pressing G key starts displaying object placement indicator (sphere with ray fron center up to sky) in viewport's surfaces. releasing opens ctx menu.
 
 - [70%] Save image steps inside final image as metadata
 
