@@ -55,7 +55,7 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_MOVE_3D: (0, 1, ars_window.viewport.controller.get_visibility("move")),
         ic.ICON_GIZMO_SCALE: (0, 1, ars_window.viewport.controller.get_visibility("scale")),
         ic.ICON_GIZMO_ROTATE_3D: (0, 1, ars_window.viewport.controller.get_visibility("rotate")),
-        #ic.ICON_GIZMO_DRAG: (0, 1, 0),
+        #ic.ICON_GIZMO_DRAG: (0, 1, 0), #TODO: Implement drag gizmo toggle
     }
 
     config.toggle_groups = [
