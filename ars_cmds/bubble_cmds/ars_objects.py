@@ -113,7 +113,7 @@ def execute_cmd(ars_window):
     def scroll(value):
         nonlocal current_value
         nonlocal select
-        play_sound("hover")
+        play_sound("click")
         primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
         current_value += value
         select = primitive_objs[current_value % len(primitive_objs)]
