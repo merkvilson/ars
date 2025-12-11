@@ -673,8 +673,10 @@ class GizmoController:
     ### MODIFIED ###
     def handle_mouse_wheel(self, event):
         # Allow mouse wheel rotation during a translate or scale drag operation.
+        #TODO: gizmo checks these methods even when not active; optimize!
         if not self._dragging or self._drag_mode not in ['translate', 'scale']:
             return
+        
         
         delta = event.delta[1]
         if delta == 0:

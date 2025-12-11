@@ -119,11 +119,14 @@ def execute_cmd(ars_window):
         finally:
             ars_window.hotkey_manager._bind_shortcuts()
 
+    def scroll(value):
+        print(value)
 
 
     key_check_continuous(callback=during,
                          key="Q",
                          interval=16,
                          callback_start=start,
-                         callback_end=end
+                         callback_end=end,
+                         scroll_callback=scroll
                          )
