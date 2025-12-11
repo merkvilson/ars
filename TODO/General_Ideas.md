@@ -1,10 +1,11 @@
 # Medium Priority
 
+- [80%] Read values from ars_window.prefs
+- [80%] Store values inside ars_window.prefs
 - [30%] CUI workflow to CTX
 - [30%] Implement prefs manager and config classes
 - [20%] Implement plugin system
-- [80%] Store values inside ars_window.prefs
-- [80%] Read values from ars_window.prefs
+- [ ] Move temp values to ars_window.prefs
 - [ ] Implement folder watcher or new file finder function with callbacks.
 - [ ] implement whisperthunder and pollinations as extensions/plugins
 - [ ] Keyframe right click: choose/edit 3d/edit 2d/etc.
