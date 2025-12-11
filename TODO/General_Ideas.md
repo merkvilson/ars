@@ -58,8 +58,6 @@ Recommended Library: playsound or simpleaudio
 Why: The project currently imports the heavy pygame library solely for playing simple sound effects. If you are not using Pygame for windowing or game loops, switching to a lightweight audio library can significantly reduce your dependency footprint.
 - [ ] Browser widget should be stored inside ui/widgets as a class. it should be added inside main_window. It should have methods to hide/unhide, set_tab_id, get_tab_id, open_link, ...
 It will be used not only for ComfyUI but also for tabler & lucid icons, documentation viewer, video tutorial viewer, etc. 
-- [ ] Scrolling wheel during presing G key should switch between primitive objects and apply an apropriate symbol. (maybe via cursor_follower)
-- [ ] Scrolling wheel during pressing Q key should rotate the object.
 - [ ] from ars_3d_engine.gizmo.gizmo import screen_to_world_ray, move screen_to_world_ray into its own module. 
 - [ ] Scroll selector dropdown menu. can be used with continious key checker to choose between different options by scrolling up and down. key release will select result of scroll. (alternatively can be used semi radial menus for the same purpose)
 - [ ] Tabs gui similar to the hierarchy menu
@@ -78,6 +76,8 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 ## Finished
 
+- [✓] Scrolling wheel during presing G key should switch between primitive objects and apply an apropriate symbol. (maybe via cursor_follower)
+- [✓] Scrolling wheel during pressing Q key should rotate the object.
 - [✓] Switch to img viewer by choosing 2D camera in camera menu
 - [✓] Browser Widget (for comfyui integration)
 - [✓] CUI Workflow: Checkbox to expose value in gui
