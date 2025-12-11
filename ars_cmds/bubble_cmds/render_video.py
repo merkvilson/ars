@@ -211,7 +211,7 @@ def execute_cmd(ars_window):
             ars_window._loop_timer.stop()
             ars_window._loop_timer.deleteLater()
             ars_window._loop_timer = None
-            print("Loop stopped")
+
             ctx.update_item(ic.ICON_PLAYER_PAUSE, "symbol", ic.ICON_PLAYER_PLAY)
 
             return True
@@ -346,7 +346,6 @@ def execute_cmd(ars_window):
         interval = int(1000 / initial_fps)
         
         ars_window._loop_timer.start(interval)
-        print(f"Loop started at {initial_fps} fps")
         
         # Show first frame immediately
         frame_next()

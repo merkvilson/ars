@@ -219,7 +219,6 @@ from theme.fonts import font_icons as ic
 #     run_ext(__file__)
 
 def execute_cmd(ars_window):
-    print("start")
     # Create and start the snake game overlay
     if not hasattr(ars_window, 'snake_game'):
         ars_window.snake_game = SnakeGameOverlay(ars_window)

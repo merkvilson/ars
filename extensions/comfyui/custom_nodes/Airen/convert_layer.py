@@ -35,9 +35,8 @@ def save_images_as_layers(base_image_path, steps_folder, output_path="image.tiff
             append_images=layers[1:],
             compression="tiff_deflate"
         )
-        print(f"✅ Saved {len(layers)} layers to {output_path}")
     else:
-        print("⚠️ No layers to save")
+        print("Warning: No layers to save")
 
 def extract_layers(tiff_path, output_folder="extracted_layers"):
     """
@@ -51,7 +50,6 @@ def extract_layers(tiff_path, output_folder="extracted_layers"):
     for i, page in enumerate(ImageSequence.Iterator(im)):
         out_path = outdir / f"{i}.png"
         page.save(out_path)
-        print(f"🖼️ Extracted layer {i} -> {out_path}")
 
 """
 # Example usage:

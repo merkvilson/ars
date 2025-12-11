@@ -97,7 +97,6 @@ def add_mesh(file_path=None, animated=False, position = (0,0,0)):
         # Wait 50 ms before starting the movement
         QTimer.singleShot(50, start_animation)
 
-    print(f"Added mesh: {name}")
     return obj
 
 
@@ -118,7 +117,6 @@ def add_sprite(size=(4.0, 4.0), color=(1.0, 1.0, 1.0, 0.3), name="Sprite", anima
         delete_bbox_animations(window.viewport._view.scene)
         window.viewport._objectManager.add_object(obj)
         window.viewport._view.camera.view_changed()
-        print(f"Added CSprite: {name}")
 
     QTimer.singleShot(int(grow_duration * 2000), add_to_scene)
     obj.set_shading(None)

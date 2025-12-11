@@ -3,10 +3,9 @@ import pyperclip
 from theme.fonts.new_fonts import get_font
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-
+#TODO; Popup name during hover
 def copy_name(ars_window, k,v):
     pyperclip.copy(k)
-    print(v)
     ars_window.CF.UP("additional_text", k,  v, 1200)
  
 def split_list(lst, size):
