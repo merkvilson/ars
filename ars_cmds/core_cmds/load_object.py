@@ -75,6 +75,8 @@ def add_mesh(file_path=None, animated=False, position = (0,0,0)):
             duration = 0.150
             
             timer = QTimer()
+            # Keep timer alive by storing on object to prevent garbage collection
+            obj._drop_timer = timer
             
             def update_position():
                 elapsed = time.time() - start_time
@@ -83,6 +85,9 @@ def add_mesh(file_path=None, animated=False, position = (0,0,0)):
                     obj.set_position(*position)
                     play_sound("obj-drop-deep")
                     window.viewport._view.camera.view_changed()
+                    # Clean up timer reference
+                    if hasattr(obj, '_drop_timer'):
+                        del obj._drop_timer
                     return
                 
                 t = elapsed / duration
