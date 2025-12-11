@@ -120,9 +120,10 @@ def execute_cmd(ars_window):
             ars_window.hotkey_manager._bind_shortcuts()
 
     def scroll(value):
+        if not obj:
+            return
         angle_deg = 15 * (1 if value > 0 else -1)
-        current_rot = obj.get_rotation()
-        obj.set_rotation(current_rot[0], current_rot[1] + angle_deg, current_rot[2])
+        obj.rotate_around_axis((0, 1, 0), angle_deg)
 
 
     key_check_continuous(callback=during,

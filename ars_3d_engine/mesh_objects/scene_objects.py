@@ -1,5 +1,6 @@
 from abc import ABC
 import numpy as np
+import warnings
 from vispy import scene
 from vispy.scene import transforms
 from vispy.visuals.transforms import NullTransform
@@ -12,6 +13,9 @@ import time
 from vispy.util.quaternion import Quaternion
 from vispy.app import Timer
 from scipy.spatial.transform import Rotation as ScipyRotation
+
+# Suppress gimbal lock warning - expected behavior with Euler angles
+warnings.filterwarnings('ignore', message='Gimbal lock detected')
 
 class CGeometry(ABC):
 
@@ -251,6 +255,58 @@ class CGeometry(ABC):
         rotation = ScipyRotation.from_matrix(rot_matrix)
         angles = rotation.as_euler('xyz', degrees=True)
         return tuple(angles)
+
+    def rotate_around_axis(self, axis: tuple, angle_deg: float) -> None:
+        """
+        Rotate the object incrementally around a given axis.
+        This method composes rotations without Euler angle conversion, avoiding gimbal lock.
+        
+        Args:
+            axis: The axis to rotate around as (x, y, z). Common values:
+                  (0, 1, 0) for Y-axis, (1, 0, 0) for X-axis, (0, 0, 1) for Z-axis.
+            angle_deg: The angle to rotate in degrees.
+        """
+        current_scale = self.get_scale()
+        current_matrix = self._visual.transform.matrix.copy()
+        
+        # Extract current rotation matrix (remove scale)
+        sx, sy, sz = current_scale
+        if sx < 1e-8: sx = 1e-8
+        if sy < 1e-8: sy = 1e-8
+        if sz < 1e-8: sz = 1e-8
+        
+        rot_matrix = current_matrix[:3, :3].copy()
+        rot_matrix[0, :] /= sx
+        rot_matrix[1, :] /= sy
+        rot_matrix[2, :] /= sz
+        
+        # Convert current rotation to ScipyRotation
+        current_rotation = ScipyRotation.from_matrix(rot_matrix)
+        
+        # Create delta rotation from axis-angle (like gizmo does)
+        axis = np.asarray(axis, dtype=float)
+        axis_norm = np.linalg.norm(axis)
+        if axis_norm < 1e-9:
+            return
+        axis = axis / axis_norm
+        
+        angle_rad = np.radians(angle_deg)
+        delta_rotation = ScipyRotation.from_rotvec(angle_rad * axis)
+        
+        # Compose rotations (local axis rotation)
+        new_rotation = current_rotation * delta_rotation
+        
+        # Build new transform matrix
+        R = np.eye(4, dtype=float)
+        R[:3, :3] = new_rotation.as_matrix()
+        
+        S = np.eye(4, dtype=float)
+        S[0, 0] = current_scale[0]
+        S[1, 1] = current_scale[1]
+        S[2, 2] = current_scale[2]
+        
+        new_matrix = (S @ R).astype(np.float32)
+        self._visual.transform.matrix = new_matrix
 
     def set_alpha(self, alpha: float) -> None:
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
