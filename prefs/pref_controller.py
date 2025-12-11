@@ -46,6 +46,10 @@ class prefsConfig:
         self.json_ud_path = ""
         self.json_positive = ""
         self.json_negative = ""
+
+
+        # Temporal Settings
+        self.last_sel_obj_id = 0
         
 
 

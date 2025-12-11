@@ -87,7 +87,6 @@ def execute_cmd(ars_window):
         ic.ICON_ORIGAMI: "O",
     }
 
-    current_value = 0
     select = None
 
     def start():
@@ -114,12 +113,11 @@ def execute_cmd(ars_window):
 
 
     def scroll(value):
-        nonlocal current_value
         nonlocal select
         play_sound("click")
         primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
-        current_value += value
-        select = primitive_objs[current_value % len(primitive_objs)]
+        ars_window.prefs.last_sel_obj_id += value
+        select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
         if select:
             point.set_primitive_type(select)
             point.set_scale(0.23)
@@ -135,6 +133,7 @@ def execute_cmd(ars_window):
             point.set_primitive_type("sphere")
             point.set_scale(0.1)
             ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
+
 
     key_check_continuous(callback=during,
                          key="G",
