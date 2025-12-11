@@ -40,6 +40,7 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
+    set_cursor("point", "center")
 
     config = ContextMenuConfig()
 
