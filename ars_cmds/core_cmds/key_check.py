@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import Qt
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import Qt, QTimer, QObject, QEvent
 import ctypes
 
 
@@ -27,9 +26,35 @@ def key_check(key):
 
     return result
 
+#TODO move scroll filter to its own file to use with hotkey_manager and prompt_editor 
 
 
-def key_check_continuous(callback=None, key='l', interval=100, callback_start=None, callback_end=None):
+class ScrollFilter(QObject):
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.Wheel:
+            delta = event.angleDelta().y()
+            if delta == 0:
+                delta = event.angleDelta().x()
+            if delta == 0:
+                delta = event.pixelDelta().y()
+            if delta == 0:
+                delta = event.pixelDelta().x()
+            
+            if delta > 0:
+                self.callback(1)
+                return True
+            elif delta < 0:
+                self.callback(-1)
+                return True
+        
+        return super().eventFilter(obj, event)
+
+
+def key_check_continuous(callback=None, key='l', interval=100, callback_start=None, callback_end=None, scroll_callback=None):
     """
     Continuously check if a key/button is held down and execute callbacks.
     
@@ -39,12 +64,18 @@ def key_check_continuous(callback=None, key='l', interval=100, callback_start=No
         interval: Check interval in milliseconds
         callback_start: Function to call once when monitoring starts
         callback_end: Function to call once when key is released
+        scroll_callback: Function to call when mouse wheel is scrolled (1 for up, -1 for down)
     
     Returns:
         QTimer object that can be stopped manually if needed
     """
     if callback_start:
         callback_start()
+    
+    scroll_filter = None
+    if scroll_callback:
+        scroll_filter = ScrollFilter(scroll_callback)
+        QApplication.instance().installEventFilter(scroll_filter)
     
     # Create a new timer to check key state
     check_timer = QTimer(QApplication.instance())
@@ -58,6 +89,10 @@ def key_check_continuous(callback=None, key='l', interval=100, callback_start=No
             check_timer.stop()
             if callback_end:
                 callback_end()
+            
+            if scroll_filter:
+                QApplication.instance().removeEventFilter(scroll_filter)
+                
             check_timer.deleteLater()
     
     check_timer.timeout.connect(check_key_state)
