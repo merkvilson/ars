@@ -63,7 +63,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 - [ ] from ars_3d_engine.gizmo.gizmo import screen_to_world_ray, move screen_to_world_ray into its own module. 
 - [ ] Scroll selector dropdown menu. can be used with continious key checker to choose between different options by scrolling up and down. key release will select result of scroll. (alternatively can be used semi radial menus for the same purpose)
 - [ ] Tabs gui similar to the hierarchy menu
-- [ ] 
+- [ ] Move object 2 units up during Q dragging mode and drop on end.
 - [ ] 
 - [ ] 
 - [ ] 
