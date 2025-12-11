@@ -12,7 +12,7 @@
 - [✓] fix bug when obj drop animation is not finished
 - [✓] fix bug when hotkeys are ignored after creating object
 - [ ] Hotkey can't handle non english letters.
-- [ ] 
+- [ ] code editor's Dropdown menu is lagging too long 
 - [ ] 
 - [ ] 
 - [ ] 
