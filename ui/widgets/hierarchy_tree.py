@@ -5,8 +5,27 @@ from PyQt6.QtWidgets import (
     QTreeWidgetItem, 
     QHeaderView,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
+from PyQt6.QtCore import Qt, QSize
 from theme import StyleSheets
+from theme.fonts.new_fonts import get_font
+
+
+def create_icon(symbol, color="#E0E0E0", size=128):
+    pixmap = QPixmap(size, size)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(pixmap)
+    font = get_font(size=int(size*0.8), font_name="icomoon.ttf")
+    painter.setFont(font)
+    painter.setPen(QColor(color))
+    painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, symbol)
+    painter.end()
+    
+    icon = QIcon(pixmap)
+    # Add the same pixmap for Selected mode to prevent automatic tinting
+    icon.addPixmap(pixmap, QIcon.Mode.Selected, QIcon.State.Off)
+    icon.addPixmap(pixmap, QIcon.Mode.Selected, QIcon.State.On)
+    return icon
 
 
 class HierarchyTree(QTreeWidget):
@@ -56,6 +75,7 @@ class ObjectHierarchyWindow(QWidget):
 
         # Tree widget
         self.tree = HierarchyTree(self.container)
+        self.tree.setIconSize(QSize(24, 24))
         self.tree.setHeaderHidden(True)
         self.tree.header().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tree.setAnimated(True)
@@ -92,7 +112,8 @@ class ObjectHierarchyWindow(QWidget):
             self.add_tree_item(i, obj, uid)
 
     def add_tree_item(self, index, obj, uid):
-        item = QTreeWidgetItem([f"{obj.symbol}  {obj.name}"])
+        item = QTreeWidgetItem([str(obj.name)])
+        item.setIcon(0, create_icon(obj.symbol))
         item.setData(0, Qt.ItemDataRole.UserRole, uid)
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
         self.tree.insertTopLevelItem(index, item)
@@ -111,7 +132,8 @@ class ObjectHierarchyWindow(QWidget):
             parent_item = self.uid_to_item.get(parent_uid)
             if parent_item:
                 # Add as child of parent
-                item = QTreeWidgetItem([f"{obj.symbol}  {obj.name}"])
+                item = QTreeWidgetItem([str(obj.name)])
+                item.setIcon(0, create_icon(obj.symbol))
                 item.setData(0, Qt.ItemDataRole.UserRole, uid)
                 item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
                 parent_item.addChild(item)
