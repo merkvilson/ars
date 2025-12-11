@@ -91,7 +91,7 @@ def execute_cmd(ars_window):
     select = None
 
     def start():
-        set_cursor("arrow-down-to-arc", "center")
+        set_cursor("point", "bottom")
         ars_window.hotkey_manager._unbind_all()
 
     def during():
