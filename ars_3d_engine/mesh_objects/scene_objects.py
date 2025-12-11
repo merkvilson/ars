@@ -36,6 +36,9 @@ class CGeometry(ABC):
         self._parent = None
         self._children = []
 
+        # Track cumulative rotation angles (avoids Euler angle representation issues)
+        self._rotation_angles = np.array([0.0, 0.0, 0.0], dtype=float)
+
         self.prompt = ""
         self.seed = 12345
         self.steps = 20
@@ -214,6 +217,9 @@ class CGeometry(ABC):
 
     def set_rotation(self, x: float, y: float, z: float) -> None:
         """Set the rotation of the object using Euler angles (in degrees). Order: XYZ."""
+        # Store the angles for retrieval
+        self._rotation_angles = np.array([x, y, z], dtype=float)
+        
         # Get current scale to preserve it
         current_scale = self.get_scale()
         
@@ -234,27 +240,7 @@ class CGeometry(ABC):
 
     def get_rotation(self) -> tuple:
         """Get the current rotation as Euler angles (in degrees). Order: XYZ."""
-        current_matrix = self._visual.transform.matrix.copy()
-        
-        # Extract scale
-        sx = np.linalg.norm(current_matrix[0, :3])
-        sy = np.linalg.norm(current_matrix[1, :3])
-        sz = np.linalg.norm(current_matrix[2, :3])
-        
-        if sx < 1e-8: sx = 1e-8
-        if sy < 1e-8: sy = 1e-8
-        if sz < 1e-8: sz = 1e-8
-        
-        # Extract pure rotation matrix
-        rot_matrix = current_matrix[:3, :3].copy()
-        rot_matrix[0, :] /= sx
-        rot_matrix[1, :] /= sy
-        rot_matrix[2, :] /= sz
-        
-        # Convert to Euler angles
-        rotation = ScipyRotation.from_matrix(rot_matrix)
-        angles = rotation.as_euler('xyz', degrees=True)
-        return tuple(angles)
+        return tuple(self._rotation_angles)
 
     def rotate_around_axis(self, axis: tuple, angle_deg: float) -> None:
         """
@@ -266,6 +252,21 @@ class CGeometry(ABC):
                   (0, 1, 0) for Y-axis, (1, 0, 0) for X-axis, (0, 0, 1) for Z-axis.
             angle_deg: The angle to rotate in degrees.
         """
+        # Update tracked angles for the corresponding axis
+        axis = np.asarray(axis, dtype=float)
+        axis_norm = np.linalg.norm(axis)
+        if axis_norm < 1e-9:
+            return
+        axis = axis / axis_norm
+        
+        # Update stored angles (approximate - works for single-axis rotations)
+        if abs(axis[0] - 1.0) < 0.01:
+            self._rotation_angles[0] += angle_deg
+        elif abs(axis[1] - 1.0) < 0.01:
+            self._rotation_angles[1] += angle_deg
+        elif abs(axis[2] - 1.0) < 0.01:
+            self._rotation_angles[2] += angle_deg
+        
         current_scale = self.get_scale()
         current_matrix = self._visual.transform.matrix.copy()
         
