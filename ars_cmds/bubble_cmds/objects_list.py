@@ -14,11 +14,11 @@ def execute_cmd(ars_window):
     config.expand = "y"
     config.auto_close = False
     config.close_on_outside = False
+    config.extra_distance=[9999,0]
 
 
-    options_list = [
-        ["1", "hierarchy"],
-    ]
+    options_list = ["1", "hierarchy", "   "]
+    
     
     hierarchy = ObjectHierarchyWindow(ars_window.viewport)
 
