@@ -737,6 +737,7 @@ class BButton(QGraphicsObject):
         super().mouseReleaseEvent(event)
 
     def wheelEvent(self, event):
+        
         if self.editable and self.slider_values:
             step = self.incremental_value if self.incremental_value else 1
             
@@ -761,6 +762,7 @@ class BButton(QGraphicsObject):
             if self.callbackL:
                 if len(inspect.signature(self.callbackL).parameters) > 0:
                     self.callbackL(self._slider_value)
+                    play_sound("click", volume=0.05)
                 else:
                     self.callbackL()
             
