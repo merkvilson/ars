@@ -8,4 +8,16 @@
 - [✓] Store default values separately for proper middle button revert
 - [ ] Unused imports in code editor are not highlighted.
 - [ ] Comfy node editor is not visible in full-screen mode.
-- [ ]
+- [ ] obj_color_ctx has wrong size color widgets.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
