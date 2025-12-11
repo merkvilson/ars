@@ -29,8 +29,7 @@ def execute_cmd(ars_window):
 
     point=add_primitive('sphere', animated=False, )
     point.set_scale(0.1)
-    point.set_color((1,1,1,1))
-    point.set_alpha(0.5)
+    point.set_color((1,1,1,0.3))
     point.set_shading(None)
 
 
@@ -124,6 +123,10 @@ def execute_cmd(ars_window):
 
             if select == "torus":
                 point.set_primitive_type("torus", radius_inner=0.25)
+            elif select == "cylinder":
+                point.set_color((0.5,0.5,0.5,1))
+            else:
+                point.set_color((1,1,1,0.4))
             ars_window.CF.UP(key="additional_text", value=select, auto_close = 1500)
         else:
             point.set_primitive_type("sphere")
