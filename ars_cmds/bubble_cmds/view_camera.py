@@ -40,7 +40,7 @@ def execute_cmd(ars_window):
         obj = get_selected()
         if not obj: return
         xyz=obj.get_position()
-        scale_sum = sum(obj.get_scale()) * 2
+        scale_sum = sum(obj.get_scale()) * 1.5
         camera.move_to(center=tuple(xyz), offset=scale_sum, animate=True, rotation=default_rotation)
     
     def view_home():
