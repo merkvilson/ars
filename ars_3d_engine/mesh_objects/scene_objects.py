@@ -11,6 +11,7 @@ from theme.fonts import font_icons as ic
 import time
 from vispy.util.quaternion import Quaternion
 from vispy.app import Timer
+from scipy.spatial.transform import Rotation as ScipyRotation
 
 class CGeometry(ABC):
 
@@ -206,6 +207,50 @@ class CGeometry(ABC):
         sy = np.linalg.norm(current_matrix[1, :3])
         sz = np.linalg.norm(current_matrix[2, :3])
         return (sx, sy, sz)
+
+    def set_rotation(self, x: float, y: float, z: float) -> None:
+        """Set the rotation of the object using Euler angles (in degrees). Order: XYZ."""
+        # Get current scale to preserve it
+        current_scale = self.get_scale()
+        
+        # Create rotation matrix from Euler angles (degrees)
+        rotation = ScipyRotation.from_euler('xyz', [x, y, z], degrees=True)
+        R = np.eye(4, dtype=float)
+        R[:3, :3] = rotation.as_matrix()
+        
+        # Create scale matrix
+        S = np.eye(4, dtype=float)
+        S[0, 0] = current_scale[0]
+        S[1, 1] = current_scale[1]
+        S[2, 2] = current_scale[2]
+        
+        # Combine scale and rotation (same order as gizmo: S @ R)
+        new_matrix = (S @ R).astype(np.float32)
+        self._visual.transform.matrix = new_matrix
+
+    def get_rotation(self) -> tuple:
+        """Get the current rotation as Euler angles (in degrees). Order: XYZ."""
+        current_matrix = self._visual.transform.matrix.copy()
+        
+        # Extract scale
+        sx = np.linalg.norm(current_matrix[0, :3])
+        sy = np.linalg.norm(current_matrix[1, :3])
+        sz = np.linalg.norm(current_matrix[2, :3])
+        
+        if sx < 1e-8: sx = 1e-8
+        if sy < 1e-8: sy = 1e-8
+        if sz < 1e-8: sz = 1e-8
+        
+        # Extract pure rotation matrix
+        rot_matrix = current_matrix[:3, :3].copy()
+        rot_matrix[0, :] /= sx
+        rot_matrix[1, :] /= sy
+        rot_matrix[2, :] /= sz
+        
+        # Convert to Euler angles
+        rotation = ScipyRotation.from_matrix(rot_matrix)
+        angles = rotation.as_euler('xyz', degrees=True)
+        return tuple(angles)
 
     def set_alpha(self, alpha: float) -> None:
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
