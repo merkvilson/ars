@@ -45,7 +45,7 @@ class CursorFollowerWidget(QWidget):
             hover_scale=1.0,  # No scaling
             additional_text="Info",
             use_extended_shape=True,  # Rounded rectangle
-            editable=False  # No interactions
+            #editable=False  # No interactions
         )
         self.b_button = BButton(button_config)
         self.scene.addItem(self.b_button)
