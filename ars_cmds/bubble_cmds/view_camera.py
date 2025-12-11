@@ -33,7 +33,7 @@ def execute_cmd(ars_window):
     def view_cursor():
         new_xyz = get_xyz(ars_window)
         
-        camera.move_to(center=new_xyz, offset=10 if new_xyz else -10, animate=True)
+        camera.move_to(center=new_xyz, offset=5 if new_xyz else -15, animate=True)
 
 
     def view_selected():
@@ -97,5 +97,4 @@ def execute_cmd(ars_window):
                          interval=16,
                          callback_start=start,
                          callback_end=end,
-                         scroll_callback=lambda value: print(value),
                          )
