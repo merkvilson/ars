@@ -44,7 +44,7 @@ def execute_cmd(ars_window):
     config.options = {
         ic.ICON_OBJ_TXT_ABC: 'Text',
         ic.ICON_OBJ_SPRITE: '2D Sprite',
-        ic.ICON_OBJ_BOX: 'Cube',
+        ic.ICON_OBJ_CUBE: 'Cube',
         ic.ICON_OBJ_SPHERE: 'Sphere',
         ic.ICON_OBJ_CYLINDER: 'Cylinder',
         ic.ICON_OBJ_CONE: 'Cone',
@@ -59,7 +59,7 @@ def execute_cmd(ars_window):
     config.callbackL = {
         ic.ICON_OBJ_TXT_ABC: lambda: add_text3d(),
         ic.ICON_OBJ_SPRITE: lambda: add_sprite(animated=True, position=p),
-        ic.ICON_OBJ_BOX: lambda: add_primitive("cube", animated=True, position=p),
+        ic.ICON_OBJ_CUBE: lambda: add_primitive("cube", animated=True, position=p),
         ic.ICON_OBJ_SPHERE: lambda: add_primitive("sphere", animated=True, position=p),
         ic.ICON_OBJ_CYLINDER: lambda: add_primitive("cylinder", animated=True, position=p),
         ic.ICON_OBJ_CONE: lambda: add_primitive("cone", animated=True, position=p),
@@ -74,7 +74,7 @@ def execute_cmd(ars_window):
     config.hotkey_items = {
         ic.ICON_OBJ_TXT_ABC: "A",
         ic.ICON_OBJ_SPRITE: "2",
-        ic.ICON_OBJ_BOX: "C",
+        ic.ICON_OBJ_CUBE: "C",
         ic.ICON_OBJ_SPHERE: "S",
         ic.ICON_OBJ_CYLINDER: "L",
         ic.ICON_OBJ_CONE: "Q",

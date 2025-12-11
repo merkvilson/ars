@@ -25,7 +25,7 @@ class CPrimitive(CGeometry):
         self.symbol = self._get_symbol_for_type(self.primitive_type)
     
     def _get_symbol_for_type(self, ptype):
-        return {'sphere': ic.ICON_OBJ_SPHERE, 'cube': ic.ICON_OBJ_BOX, 'plane': ic.ICON_OBJ_PLANE, 
+        return {'sphere': ic.ICON_OBJ_SPHERE, 'cube': ic.ICON_OBJ_CUBE, 'plane': ic.ICON_OBJ_PLANE, 
                 'cylinder': ic.ICON_OBJ_CYLINDER, 'cone': ic.ICON_OBJ_CONE, 'disc': ic.ICON_OBJ_DISC, 
                 'pyramid': ic.ICON_OBJ_PYRAMID, 'torus': ic.ICON_OBJ_TORUS}.get(ptype, ic.ICON_OBJ_BBOX)
 
