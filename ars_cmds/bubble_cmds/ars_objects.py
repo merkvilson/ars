@@ -87,11 +87,24 @@ def execute_cmd(ars_window):
         ic.ICON_ORIGAMI: "O",
     }
 
-    select = None
+    primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
+    select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
 
     def start():
+        nonlocal select
         set_cursor("point", "bottom")
         ars_window.hotkey_manager._unbind_all()
+        # Initialize with previously selected object
+        if select:
+            point.set_primitive_type(select)
+            point.set_scale(0.23)
+            if select == "torus":
+                point.set_primitive_type("torus", radius_inner=0.25)
+            elif select == "cylinder":
+                point.set_color((0.5,0.5,0.5,1))
+            else:
+                point.set_color((1,1,1,0.4))
+            ars_window.CF.UP(key="additional_text", value=select.capitalize(), auto_close = 2500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
 
     def during():
         point.set_position(new_p()[0],new_p()[1]+0.25,new_p()[2])
@@ -115,7 +128,6 @@ def execute_cmd(ars_window):
     def scroll(value):
         nonlocal select
         play_sound("click")
-        primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
         ars_window.prefs.last_sel_obj_id += value
         select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
         if select:
