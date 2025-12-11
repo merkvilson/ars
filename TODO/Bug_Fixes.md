@@ -8,7 +8,7 @@
 - [✓] Store default values separately for proper middle button revert
 - [ ] Unused imports in code editor are not highlighted.
 - [ ] Comfy node editor is not visible in full-screen mode.
-- [ ] obj_color_ctx has wrong size color widgets.
+- [✓] obj_color_ctx has wrong size color widgets.
 - [✓] fix bug when obj drop animation is not finished
 - [✓] fix bug when hotkeys are ignored after creating object
 - [ ] Hotkey can't handle non english letters.
