@@ -97,7 +97,7 @@ def execute_cmd(ars_window):
         # Initialize with previously selected object
         if select:
             point.set_primitive_type(select)
-            point.set_scale(0.23)
+            point.set_scale(0.45)
             if select == "torus":
                 point.set_primitive_type("torus", radius_inner=0.25)
             elif select == "cylinder":
@@ -107,7 +107,7 @@ def execute_cmd(ars_window):
             ars_window.CF.UP(key="additional_text", value=select.capitalize(), auto_close = 2500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
 
     def during():
-        point.set_position(new_p()[0],new_p()[1]+0.25,new_p()[2])
+        point.set_position(new_p()[0],new_p()[1]+0.45,new_p()[2])
         
     
     def end():
@@ -132,7 +132,7 @@ def execute_cmd(ars_window):
         select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
         if select:
             point.set_primitive_type(select)
-            point.set_scale(0.23)
+            point.set_scale(0.45)
 
             if select == "torus":
                 point.set_primitive_type("torus", radius_inner=0.25)
