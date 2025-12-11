@@ -96,5 +96,6 @@ def execute_cmd(ars_window):
                          key="V",
                          interval=16,
                          callback_start=start,
-                         callback_end=end
+                         callback_end=end,
+                         scroll_callback=lambda value: print(value),
                          )
