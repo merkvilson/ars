@@ -127,11 +127,11 @@ def execute_cmd(ars_window):
                 point.set_color((0.5,0.5,0.5,1))
             else:
                 point.set_color((1,1,1,0.4))
-            ars_window.CF.UP(key="additional_text", value=select, auto_close = 1500)
+            ars_window.CF.UP(key="additional_text", value=select, auto_close = 1500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
         else:
             point.set_primitive_type("sphere")
             point.set_scale(0.1)
-            ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 1500)
+            ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 1500,symbol=ic.ICON_OBJ_BBOX)
 
     key_check_continuous(callback=during,
                          key="G",
