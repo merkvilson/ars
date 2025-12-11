@@ -125,7 +125,7 @@ def execute_cmd(ars_window):
         angle_deg = 15 * (1 if value > 0 else -1)
 
         obj.rotate_around_axis((0, 1, 0), angle_deg)
-        #ars_window.CF.UP(key="additional_text", value=str(int(obj.get_rotation()[1])), auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
+        ars_window.CF.UP(key="additional_text", value=str(int(obj.get_rotation()[1])), auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
 
 
 
