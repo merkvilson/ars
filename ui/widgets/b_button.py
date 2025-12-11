@@ -274,6 +274,11 @@ class BButton(QGraphicsObject):
             self.normal_color = QColor(self.normal_color.red(), self.normal_color.green(), self.normal_color.blue(), normal_alpha)
             self.hover_color = QColor(self.hover_color.red(), self.hover_color.green(), self.hover_color.blue(), hover_alpha)
         
+        # Darken colors if not editable
+        if not self.editable:
+            self.normal_color = self.normal_color.darker(150)
+            self.hover_color = self.normal_color
+        
         self._update_colors()
         self._item_color = self.normal_color
         self.current_brush = QBrush(self._item_color)
@@ -297,6 +302,8 @@ class BButton(QGraphicsObject):
         # Main Symbol
         self.main_symbol_item = QGraphicsTextItem(self.symbol, self)
         self._symbol_color = config.symbol_color
+        if not self.editable:
+            self._symbol_color = self._symbol_color.darker(150)
         if not self.show_symbol:
             self._symbol_color = QColor(self._symbol_color.red(), self._symbol_color.green(), self._symbol_color.blue(), 0)
         self.main_symbol_item.setDefaultTextColor(self._symbol_color)
@@ -326,6 +333,8 @@ class BButton(QGraphicsObject):
             self._additional_font = config.additional_font
             self.additional_text_item.setFont(self._additional_font)
             self._additional_text_color = config.additional_text_color
+            if not self.editable:
+                self._additional_text_color = self._additional_text_color.darker(150)
             self.additional_text_item.setDefaultTextColor(self._additional_text_color)
             self.additional_text_item.setHtml(initial_text)
             add_bounding = self.additional_text_item.boundingRect()
