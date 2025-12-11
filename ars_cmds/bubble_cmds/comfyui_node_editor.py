@@ -3,9 +3,8 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import subprocess
 import sys
-import os
 import ctypes
-from PyQt6.QtCore import QObject, QEvent, Qt, QTimer
+from PyQt6.QtCore import QObject, QEvent, QTimer
 
 BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
 def BBL_TEST(*args):
