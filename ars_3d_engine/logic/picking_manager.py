@@ -4,13 +4,32 @@ from vispy.visuals.filters.picking import PickingFilter
 from typing import Optional
 
 class CPickingManager:
+    """Handles GPU-based object picking for mouse selection in 3D scenes.
+    
+    Uses PickingFilter to render unique IDs for each visual, enabling
+    accurate object selection via pixel color lookup.
+    """
+    
     def __init__(self, canvas: scene.SceneCanvas):
+        """Initialize the picking manager.
+        
+        Args:
+            canvas: The SceneCanvas used for rendering pick buffers.
+        """
         self._canvas = canvas
         self._next_id: int = 1
         self._entries: list[tuple[object, PickingFilter]] = []
         self._id_to_index: dict[int, int] = {}
 
     def _iter_leaf_visuals(self, node):
+        """Iterate over all leaf visuals in a node hierarchy.
+        
+        Args:
+            node: The root visual node to traverse.
+            
+        Yields:
+            Leaf visual nodes (nodes without children).
+        """
         stack = [node]
         while stack:
             n = stack.pop()
@@ -21,6 +40,15 @@ class CPickingManager:
                 yield n
 
     def register_visual(self, index: int, visual) -> int:
+        """Register a visual for picking.
+        
+        Args:
+            index: The object index to associate with this visual.
+            visual: The visual node to register.
+            
+        Returns:
+            The unique picking ID assigned to this visual.
+        """
         pid = self._next_id
         self._next_id += 1
         for leaf in self._iter_leaf_visuals(visual):
@@ -35,12 +63,24 @@ class CPickingManager:
         return pid
 
     def update_index(self, pid: int, index: int) -> None:
+        """Update the object index for a picking ID.
+        
+        Args:
+            pid: The picking ID to update.
+            index: The new object index.
+        """
         self._id_to_index[pid] = index
 
     def clear_index_map(self) -> None:
+        """Clear all picking ID to index mappings."""
         self._id_to_index.clear()
 
     def _set_enabled(self, enabled: bool) -> None:
+        """Enable or disable picking filters on all registered visuals.
+        
+        Args:
+            enabled: True to enable picking mode, False for normal rendering.
+        """
         for leaf, flt in self._entries:
             try:
                 flt.enabled = enabled
@@ -52,6 +92,15 @@ class CPickingManager:
                 pass
 
     def pick_at(self, x: float, y: float) -> Optional[int]:
+        """Pick an object at the given screen coordinates.
+        
+        Args:
+            x: Screen X coordinate.
+            y: Screen Y coordinate.
+            
+        Returns:
+            The object index at the coordinates, or None if nothing was picked.
+        """
         self._set_enabled(True)
         try:
             ps = float(self._canvas.pixel_scale or 1.0)

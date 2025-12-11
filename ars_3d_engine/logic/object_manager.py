@@ -5,6 +5,14 @@ from .picking_manager import CPickingManager
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 
 class CObjectManager(QObject):
+    """Manages 3D scene objects including selection, ordering, and picking.
+    
+    Signals:
+        object_added(int, CGeometry): Emitted when an object is added (index, object).
+        object_removed(int, CGeometry): Emitted when an object is removed (index, object).
+        active_changed(int): Emitted when the active object index changes.
+        selection_changed(): Emitted when the selection state changes.
+    """
     object_added = pyqtSignal(int, CGeometry)
     object_removed = pyqtSignal(int, CGeometry)
     active_changed = pyqtSignal(int)
@@ -15,6 +23,15 @@ class CObjectManager(QObject):
                  , mover: None
                  , picking: CPickingManager,
                  parent=None):
+        """Initialize the object manager.
+        
+        Args:
+            view: The ViewBox containing the 3D scene.
+            canvas: The SceneCanvas for rendering.
+            mover: Optional mover/gizmo controller.
+            picking: The picking manager for mouse selection.
+            parent: Optional Qt parent object.
+        """
         super().__init__(parent)
         self._view = view
         self._canvas = canvas
@@ -26,15 +43,23 @@ class CObjectManager(QObject):
         self._selected_set: set[int] = set()
         self._obj_to_pid = {}
 
-    #used by camera
     def update_lights(self, light_dir):
-            """Update light direction across all objects' shading filters."""
+            """Update light direction across all objects' shading filters.
+            
+            Args:
+                light_dir: The new light direction vector.
+            """
             for obj in self._objects:
                 if hasattr(obj, 'update_light_dir'):
                     obj.update_light_dir(light_dir)
 
 
     def add_object(self, obj: CGeometry) -> None:
+        """Add a geometry object to the scene.
+        
+        Args:
+            obj: The geometry object to add.
+        """
         obj.manager = self
         index = len(self._objects)
         self._objects.append(obj)
@@ -48,7 +73,11 @@ class CObjectManager(QObject):
         QTimer.singleShot(250, lambda: self.set_selection_state([index], index))
         
     def duplicate_selected(self, offset = (0,0,0)) -> None:
-        """Duplicate the currently selected objects and add them to the scene."""
+        """Duplicate the currently selected objects and add them to the scene.
+        
+        Args:
+            offset: Position offset (x, y, z) to apply to duplicates.
+        """
         selected = self.get_selected_objects()
         if not selected:
             return  # Nothing to duplicate
@@ -68,6 +97,11 @@ class CObjectManager(QObject):
         self.set_selection_state(new_indices, new_indices[-1] if new_indices else None)
 
     def remove_object(self, obj: CGeometry) -> None:
+        """Remove an object from the scene by reference.
+        
+        Args:
+            obj: The geometry object to remove.
+        """
         try:
             index = self._objects.index(obj)
             self.remove_object_at(index)
@@ -75,6 +109,14 @@ class CObjectManager(QObject):
             pass
 
     def remove_object_at(self, index: int) -> Optional[CGeometry]:
+        """Remove an object from the scene by index.
+        
+        Args:
+            index: The index of the object to remove.
+            
+        Returns:
+            The removed object, or None if index was invalid.
+        """
         if index < 0 or index >= len(self._objects):
             return None
         obj = self._objects.pop(index)
@@ -105,6 +147,7 @@ class CObjectManager(QObject):
         return obj
 
     def _rebuild_picking(self) -> None:
+        """Rebuild the picking manager and re-register all objects."""
         self._picking = CPickingManager(self._canvas)
         self._obj_to_pid.clear()
         for idx, o in enumerate(self._objects):
@@ -112,6 +155,11 @@ class CObjectManager(QObject):
             self._obj_to_pid[id(o)] = pid
 
     def reorder_objects(self, new_objects: List[CGeometry]) -> None:
+        """Reorder the objects list and update picking indices.
+        
+        Args:
+            new_objects: The new ordered list of geometry objects.
+        """
         self._objects = new_objects
         self._picking.clear_index_map()
         for i, obj in enumerate(self._objects):
@@ -124,32 +172,52 @@ class CObjectManager(QObject):
                 self._obj_to_pid[id(obj)] = pid
 
     def set_active(self, index: int) -> None:
+        """Set the active object by index.
+        
+        Args:
+            index: The index of the object to make active.
+        """
         if 0 <= index < len(self._objects):
             if self._active_idx != index:
                 self._active_idx = index
                 self.active_changed.emit(index)
 
     def active_object(self) -> Optional[CGeometry]:
+        """Get the currently active object.
+        
+        Returns:
+            The active geometry object, or None if no object is active.
+        """
         if 0 <= self._active_idx < len(self._objects):
             return self._objects[self._active_idx]
         return None
 
     def active_index(self) -> int:
+        """Get the index of the currently active object."""
         return self._active_idx
 
     def count(self) -> int:
+        """Get the total number of objects in the scene."""
         return len(self._objects)
 
     def picking(self) -> CPickingManager:
+        """Get the picking manager instance."""
         return self._picking
 
     def selected_indices(self) -> List[int]:
+        """Get a copy of the selected object indices."""
         return list(self._selected_indices)
 
     def get_selected_objects(self) -> List[CGeometry]:
+        """Get a list of currently selected geometry objects."""
         return [self._objects[i] for i in self._selected_indices if 0 <= i < len(self._objects)]
 
     def resolve_targets(self) -> List[CGeometry]:
+        """Get target objects for operations (selected or active).
+        
+        Returns:
+            Selected objects if any, otherwise the active object, or empty list.
+        """
         if self._selected_indices:
             return [self._objects[i] for i in self._selected_indices if 0 <= i < len(self._objects)]
         if 0 <= self._active_idx < len(self._objects):
@@ -157,6 +225,12 @@ class CObjectManager(QObject):
         return []
 
     def set_selection_state(self, indices: List[int], active: Optional[int]) -> None:
+        """Set the selection and active state.
+        
+        Args:
+            indices: List of object indices to select.
+            active: Index of the object to make active, or None.
+        """
         valid = []
         seen = set()
         n = len(self._objects)
