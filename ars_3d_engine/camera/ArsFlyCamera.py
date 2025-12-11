@@ -185,7 +185,7 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
             event.handled = True
             return
         
-        if event.key.name == 'Backspace':
+        if event.key is not None and event.key.name == 'Backspace':
             if event.type == 'key_press':
                 self.reset()
             event.handled = True
