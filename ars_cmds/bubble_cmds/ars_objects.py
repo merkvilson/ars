@@ -90,7 +90,7 @@ def execute_cmd(ars_window):
     select = None
 
     def start():
-        set_cursor("point", "center")
+        set_cursor("arrow-down-to-arc", "center")
         ars_window.hotkey_manager._unbind_all()
 
     def during():
@@ -106,7 +106,7 @@ def execute_cmd(ars_window):
             primitive = add_primitive(select, animated=True, position=p)
             if select == "torus":
                 primitive.set_primitive_type("torus", radius_inner=0.25)        
-        after(1000, lambda: ars_window.hotkey_manager._bind_shortcuts())
+        after(500, lambda: ars_window.hotkey_manager._bind_shortcuts())
         
 
 
