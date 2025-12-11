@@ -4,6 +4,7 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from ars_cmds.core_cmds.key_check import key_check_continuous
+from ars_cmds.util_cmds.time_cmd import after, delay
 from core.cursor_modifier import set_cursor
 from ars_cmds.core_cmds.load_object import (
     add_mesh,
@@ -25,9 +26,9 @@ def execute_cmd(ars_window):
     
 
     point=add_primitive('sphere', animated=False, )
-    point.set_scale((0.35,0.24,0.35))
+    point.set_scale(0.1)
     point.set_color((1,1,1,1))
-    point.set_alpha(0.35)
+    point.set_alpha(0.5)
     point.set_shading(None)
 
 
@@ -84,6 +85,8 @@ def execute_cmd(ars_window):
         ic.ICON_ORIGAMI: "O",
     }
 
+    current_value = 0
+    select = None
 
     def start():
         set_cursor("point", "center")
@@ -96,14 +99,38 @@ def execute_cmd(ars_window):
     def end():
         set_cursor("cursor")
         point.remove()
-        open_context(config)
-        ars_window.hotkey_manager._bind_shortcuts()
+        if select is None:
+            open_context(config)
+        else:
+            primitive = add_primitive(select, animated=True, position=p)
+            if select == "torus":
+                primitive.set_primitive_type("torus", radius_inner=0.25)        
+        after(1000, lambda: ars_window.hotkey_manager._bind_shortcuts())
+        
 
 
+    def scroll(value):
+        nonlocal current_value
+        nonlocal select
+        primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
+        current_value += value
+        select = primitive_objs[current_value % len(primitive_objs)]
+        if select:
+            point.set_primitive_type(select)
+            point.set_scale(0.23)
+
+            if select == "torus":
+                point.set_primitive_type("torus", radius_inner=0.25)
+            ars_window.CF.UP(key="additional_text", value=select, auto_close = 1500)
+        else:
+            point.set_primitive_type("sphere")
+            point.set_scale(0.1)
+            ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 1500)
 
     key_check_continuous(callback=during,
                          key="G",
                          interval=16,
                          callback_start=start,
-                         callback_end=end
+                         callback_end=end,
+                         scroll_callback=scroll
                          )
