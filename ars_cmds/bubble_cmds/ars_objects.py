@@ -13,6 +13,8 @@ from ars_cmds.core_cmds.load_object import (
     add_primitive,
     add_point,
 )
+from core.sound_manager import play_sound
+
 
 BBL_OBJECT_CONFIG = {"symbol": ic.ICON_OBJ_BBOX, "hotkey": "G"}
 
@@ -112,6 +114,7 @@ def execute_cmd(ars_window):
     def scroll(value):
         nonlocal current_value
         nonlocal select
+        play_sound("hover")
         primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
         current_value += value
         select = primitive_objs[current_value % len(primitive_objs)]
