@@ -1,5 +1,5 @@
 from   ui.widgets.bubble_layout import BubbleConfig
-from ars_cmds.core_cmds.DROPDOWN import r_dropdown
+from ars_cmds.core_cmds.r_dropdown import r_dropdown
 from   PyQt6.QtCore import QPoint
 from   theme.fonts.font_icons import *
 import os
