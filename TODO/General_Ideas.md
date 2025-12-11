@@ -99,6 +99,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 - [ ] Scrolling wheel during pressing Q key should rotate the object.
 
-- [ ] 
+- [ ] from ars_3d_engine.gizmo.gizmo import screen_to_world_ray, move screen_to_world_ray into its own module. 
+
 
 - [ ] 
