@@ -108,7 +108,8 @@ def execute_cmd(ars_window):
         set_cursor("cursor")
         try:
             if time.time() - start_time > 0.15:
-                print("end")
+                pass
+                #ars_window.CF.UP(key="additional_text", value="Drag", auto_close = 500, symbol=ic.ICON_GIZMO_DRAG)
             else:
                 open_context(config)
         finally:
