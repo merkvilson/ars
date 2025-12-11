@@ -762,7 +762,7 @@ class BButton(QGraphicsObject):
             if self.callbackL:
                 if len(inspect.signature(self.callbackL).parameters) > 0:
                     self.callbackL(self._slider_value)
-                    play_sound("click", volume=0.05)
+                    play_sound("click")
                 else:
                     self.callbackL()
             

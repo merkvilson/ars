@@ -9,6 +9,7 @@ def play_sound(name, volume=0.5):  # Default to half volume; pass a different va
     elif name == "back": volume = 0.1
     elif name == "hover2": volume = 0.6
     elif name == "delete-obj": volume = 0.6
+    elif name == "click": volume = 0.06
     sound = pygame.mixer.Sound(os.path.join(sound_path,f"{name}.mp3"))
     sound.set_volume(volume)
     sound.play()  # Non-blocking; overlaps fine
