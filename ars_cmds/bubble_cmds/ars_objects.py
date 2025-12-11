@@ -71,6 +71,7 @@ def execute_cmd(ars_window):
         ic.ICON_FILE_3D: lambda: add_mesh(position=p),
     }
 
+
     config.hotkey_items = {
         ic.ICON_OBJ_TXT_ABC: "A",
         ic.ICON_OBJ_SPRITE: "2",
@@ -104,9 +105,11 @@ def execute_cmd(ars_window):
             open_context(config)
         else:
             primitive = add_primitive(select, animated=True, position=p)
+            ars_window.CF.UP(key="additional_text", value=select.capitalize()+" Added", auto_close = 500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
             if select == "torus":
                 primitive.set_primitive_type("torus", radius_inner=0.25)        
         after(500, lambda: ars_window.hotkey_manager._bind_shortcuts())
+
         
 
 
@@ -127,11 +130,11 @@ def execute_cmd(ars_window):
                 point.set_color((0.5,0.5,0.5,1))
             else:
                 point.set_color((1,1,1,0.4))
-            ars_window.CF.UP(key="additional_text", value=select, auto_close = 1500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
+            ars_window.CF.UP(key="additional_text", value=select.capitalize(), auto_close = 2500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))
         else:
             point.set_primitive_type("sphere")
             point.set_scale(0.1)
-            ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 1500,symbol=ic.ICON_OBJ_BBOX)
+            ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
 
     key_check_continuous(callback=during,
                          key="G",
