@@ -10,6 +10,7 @@ from ars_cmds.core_cmds.key_check import key_check_continuous
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from core.cursor_modifier import get_cursor, set_cursor
 import time
+from core.sound_manager import play_sound
 
 BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
 
@@ -112,7 +113,7 @@ def execute_cmd(ars_window):
         try:
             if time.time() - start_time > 0.15:
                 pass
-                #ars_window.CF.UP(key="additional_text", value="Drag", auto_close = 500, symbol=ic.ICON_GIZMO_DRAG)
+                # ars_window.CF.UP(key="additional_text", value=str(int(obj.get_rotation()[1])), auto_close = 500,symbol=ic.ICON_OBJ_BBOX)
             else:
                 open_context(config)
                 set_cursor("point", "bottom")
@@ -120,10 +121,12 @@ def execute_cmd(ars_window):
             ars_window.hotkey_manager._bind_shortcuts()
 
     def scroll(value):
-        if not obj:
-            return
+        # play_sound("click") #Need to choose another sound for rotation
         angle_deg = 15 * (1 if value > 0 else -1)
+
         obj.rotate_around_axis((0, 1, 0), angle_deg)
+        #ars_window.CF.UP(key="additional_text", value=str(int(obj.get_rotation()[1])), auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
+
 
 
     key_check_continuous(callback=during,
