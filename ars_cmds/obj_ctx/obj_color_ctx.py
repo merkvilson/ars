@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QPoint, QRectF, Qt
 from PyQt6.QtGui import QColor, QCursor, QLinearGradient, QPainter, QPen
-from PyQt6.QtWidgets import QFileDialog, QSlider, QStyle, QStyleOptionSlider
+from PyQt6.QtWidgets import QApplication, QFileDialog, QSlider
 from vispy.color import Color as VispyColor
 
 from ars_cmds.core_cmds.key_check import key_check_continuous
@@ -10,7 +10,6 @@ from core.sound_manager import play_sound
 from theme.fonts import font_icons as ic
 from ui.widgets.context_menu import ContextMenuConfig, open_context
 from ui.widgets.screen_color_picker import ScreenshotOverlay
-from PyQt6.QtWidgets import QApplication
 
 class HSVSlider(QSlider):
     """
@@ -30,13 +29,9 @@ class HSVSlider(QSlider):
         self.setValue(initial_value)
         self.valueChanged.connect(self.on_value_changed)
 
-        # Ensure there's enough height to paint the groove + indicator without clipping.
-        self.setMinimumHeight(42)
-        self.setMinimumWidth(22 * 8)
-
-        # Remove any fixed width: let layout decide. Fixed widths were causing cropping previously.
-
-        # Minimal stylesheet: hide the default handle visuals so we can draw a custom indicator.
+        # Match extended shape b-button size: width = 8 * radius, height = 2 * radius (radius = 22)
+        self.setFixedHeight(22 * 2)
+        self.setFixedWidth(22 * 8)
 
 
     def on_value_changed(self, value):
@@ -64,10 +59,10 @@ class HSVSlider(QSlider):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # Use the style's groove rect so we match platform metrics.
-        opt = QStyleOptionSlider()
-        self.initStyleOption(opt)
-        groove_rect = self.style().subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderGroove, self)
+        # Use fixed groove rect matching widget size with padding for handle
+        handle_radius = self.height() * 0.4
+        padding = handle_radius + 2
+        groove_rect = QRectF(padding, 0, self.width() - 2 * padding, self.height())
 
         # Build the gradient according to type
         gradient = QLinearGradient(groove_rect.left(), groove_rect.top(), groove_rect.right(), groove_rect.top())
@@ -114,23 +109,18 @@ class HSVSlider(QSlider):
         painter.save()
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(gradient)
-        radius = min(22.0, groove_rect.height() / 2.0)
+        radius = groove_rect.height() / 2.0
         painter.drawRoundedRect(groove_rect, radius, radius)
         painter.restore()
 
         # Draw circular indicator (centered on groove, guaranteed to be inside widget)
         pos_fraction = (self.value() - self.minimum()) / max(1, (self.maximum() - self.minimum()))
         cx = groove_rect.left() + pos_fraction * groove_rect.width()
-        cy = groove_rect.center().y()
-        handle_radius = groove_rect.height() * 0.4
+        cy = self.height() / 2.0
+        handle_radius = self.height() * 0.4
 
         # Dynamic pen width based on hover
         pen_width = 3.5 if self.is_hovered else 2.0
-        half_pen = pen_width / 2.0
-
-        # Clamp cx to keep the handle fully within widget bounds, with extra 2px margin
-        widget_width = self.width()
-        cx = max(handle_radius + half_pen + 2, min(cx, widget_width - handle_radius - half_pen - 2))
 
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
