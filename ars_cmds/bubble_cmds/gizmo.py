@@ -40,7 +40,7 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-    set_cursor("point", "center")
+    
 
     config = ContextMenuConfig()
 
@@ -83,6 +83,8 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_DRAG: lambda: move_obj(),
     }
 
+    config.callback_on_close = lambda: set_cursor("cursor")
+
 
     start_time = 0
 
@@ -99,8 +101,8 @@ def execute_cmd(ars_window):
     def during():
         if time.time() - start_time > 0.15:
             move_obj(False) # Should be False since we are updating continuously
-            if get_cursor()[0] != "map-pin":
-                set_cursor("map-pin", "bottom")
+            if get_cursor()[0] != "point":
+                set_cursor("point", "bottom")
 
     
     def end():
@@ -113,6 +115,7 @@ def execute_cmd(ars_window):
                 #ars_window.CF.UP(key="additional_text", value="Drag", auto_close = 500, symbol=ic.ICON_GIZMO_DRAG)
             else:
                 open_context(config)
+                set_cursor("point", "bottom")
         finally:
             ars_window.hotkey_manager._bind_shortcuts()
 
