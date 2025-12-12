@@ -24,13 +24,17 @@ def execute_cmd(ars_window):
     config.use_extended_shape = False
     options_list = split_list(ic.ICON_FULL_LIST, 10)
 
-    vars_dict = {
+    config.callbackL = {
         value: (lambda key=name, val=value: copy_name(ars_window, key, val))
         for name, value in vars(ic).items()
         if isinstance(value, str) and value in ic.ICON_FULL_LIST
     }
 
-    config.callbackL = vars_dict
+    config.callback_hover_in = {
+        value: (lambda key=name, val=value: ars_window.msg(key))
+        for name, value in vars(ic).items()
+        if isinstance(value, str) and value in ic.ICON_FULL_LIST
+    }
 
     ctx = open_context(
         items=options_list,

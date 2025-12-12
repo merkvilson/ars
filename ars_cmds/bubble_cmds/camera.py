@@ -24,6 +24,7 @@ def BBL_CAMERA(*args):
 
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
+    config.incremental_value = 5
     
     config.options = {
         ic.ICON_CAMERA: "2D Camera",
