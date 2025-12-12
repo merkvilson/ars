@@ -10,3 +10,4 @@ https://huggingface.co/dx8152/Qwen-Edit-2509-Multi-Angle-Lighting
 https://github.com/BrokenSource/DepthFlow/
 https://github.com/PozzettiAndrea/ComfyUI-SAM3DObjects
 https://huggingface.co/dx8152/Qwen-Edit-2509-Light-Migration
+https://huggingface.co/spaces/linoyts/wan2-2-i2v-rCM
