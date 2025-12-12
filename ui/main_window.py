@@ -16,7 +16,6 @@ from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
 from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
-from tests import startup_test
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -54,6 +53,7 @@ class MainWindow(QMainWindow):
             open_timeline(self)
 
             
+            from tests import startup_test
 
             startup_test.run_tests(self)
 
