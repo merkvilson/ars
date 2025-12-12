@@ -1,6 +1,6 @@
 from ars_cmds.core_cmds.load_object import add_primitive
 from ars_cmds.util_cmds.time_cmd import after
-from ars_cmds.render_cmds.render_pass import save_normal
+# from ars_cmds.render_cmds.render_pass import save_normal
 
 
 def main(ars_window):
