@@ -56,6 +56,7 @@ class BaseCodeEditor(QPlainTextEdit):
         self.custom_namespace = {}
         self.project_file_path = None
         self.multi_cursors = []
+        self._last_click_was_alt = False
         
         # Initialize icon mappings
         self.ICON_TO_NAME = {}
@@ -160,6 +161,18 @@ class BaseCodeEditor(QPlainTextEdit):
                 if not hasattr(self, 'multi_cursors'):
                     self.multi_cursors = []
                 
+                # If starting a new multi-cursor session (first Alt+Click),
+                # move the main cursor to the clicked position instead of adding a new one.
+                # This effectively "removes" the original cursor position from the set.
+                if not self._last_click_was_alt and not self.multi_cursors:
+                    self.setTextCursor(cursor)
+                    self._last_click_was_alt = True
+                    self._update_multi_cursor_state()
+                    self.viewport().update()
+                    return True
+
+                self._last_click_was_alt = True
+
                 if cursor.position() != main_cursor.position():
                     found_idx = -1
                     for i, c in enumerate(self.multi_cursors):
@@ -178,6 +191,7 @@ class BaseCodeEditor(QPlainTextEdit):
                 return True # Consume event
             
             if event.button() == Qt.MouseButton.LeftButton:
+                self._last_click_was_alt = False
                 if hasattr(self, 'multi_cursors') and self.multi_cursors:
                     self.multi_cursors.clear()
                     self._update_multi_cursor_state()
@@ -396,6 +410,7 @@ class BaseCodeEditor(QPlainTextEdit):
             # If unsupported key, clear multi cursors?
             if key == Qt.Key.Key_Escape:
                 self.multi_cursors.clear()
+                self._last_click_was_alt = False
                 self._update_multi_cursor_state()
                 self.viewport().update()
                 event.accept()
