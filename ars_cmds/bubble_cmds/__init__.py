@@ -6,7 +6,7 @@ This package automatically discovers and imports all modules within the
 from these modules directly under the `ars_cmds.bubble_cmds` namespace.
 
 Usage:
-    from ars_cmds.startup_cmds import *
+    from ars_cmds.bubble_cmds import *
     # All functions defined in the modules of this folder are now available.
 """
 import os
