@@ -51,7 +51,7 @@ def add_mesh(file_path=None, animated=False, position = (0,0,0)):
         file_path, _ = QFileDialog.getOpenFileName(None, "Select Mesh", get_path("output"), f"Mesh Files {mesh_files}")
     
     initial_y = 2 if animated else 0
-    if file_path is None:
+    if not file_path:
         print("No file path provided.")
         return
     
