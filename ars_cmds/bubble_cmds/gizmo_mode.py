@@ -25,7 +25,6 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-    ars_window.viewport.controller.set_handles([""])
 
     
     def move_obj(time=0.25):
@@ -38,18 +37,16 @@ def execute_cmd(ars_window):
         # One-shot animated move on initial key press
         ars_window._gizmo_move_press_time = time.time()
         move_obj(0.25)
-        if get_cursor()[0] != "point":
-            set_cursor("point", "bottom")
+        set_cursor("point", "center")
+        play_sound("pop-clear", 0.05)
+        ars_window.viewport.controller.set_handles([""])
 
 
     def during():
         # Start continuous dragging only after the initial 0.25s move
         if time.time() - getattr(ars_window, "_gizmo_move_press_time", 0) < 0.25:
             return
-
         move_obj(False)  # Should be False since we are updating continuously
-        if get_cursor()[0] != "point":
-            set_cursor("point", "bottom")
     
     def end():
         ars_window.ctx_key_active = False
