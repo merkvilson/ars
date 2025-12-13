@@ -10,7 +10,6 @@ from vispy.io import imread
 from vispy.visuals.filters import TextureFilter 
 from theme.fonts import font_icons as ic
 import time
-from vispy.util.quaternion import Quaternion
 from vispy.app import Timer
 from scipy.spatial.transform import Rotation as ScipyRotation
 

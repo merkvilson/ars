@@ -283,11 +283,11 @@ class ViewportWidget(QWidget):
                     if idx not in indices:
                         indices.append(idx)
                     om.set_selection_state(indices, om.active_index())
-                    msg = f"[_on_mouse_press] : picked_index #{idx} (added to selection)"
+                    # msg = f"[_on_mouse_press] : picked_index #{idx} (added to selection)"
                 else:
                     om.set_selection_state([idx], idx)
                     play_sound("click")
-                    msg = f"[_on_mouse_press] : picked_index #{idx}"
+                    # msg = f"[_on_mouse_press] : picked_index #{idx}"
             else:
                 raise RuntimeError(f"Pick returned invalid index {idx}, len(objects)={cnt}")
                     
