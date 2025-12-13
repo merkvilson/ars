@@ -24,6 +24,7 @@ def BBL_OBJECT(*args):
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
     
+    p = (0, 0, 0)
 
     config.options = {
         ic.ICON_OBJ_TXT_ABC: 'Text',
@@ -75,7 +76,6 @@ def execute_cmd(ars_window):
         open_context(config)
         return
 
-    p = (0, 0, 0)
 
     def new_p():
         nonlocal p
