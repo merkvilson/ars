@@ -23,6 +23,28 @@ class CPickingManager:
         self._id_to_index: dict[int, int] = {}
         self._picking_enabled: bool = False
         self._last_pick: tuple[int, int, float, Optional[int]] = (-1, -1, 0.0, None)
+        self._enabled: bool = True
+
+    @property
+    def enabled(self) -> bool:
+        """Whether picking is enabled for this manager."""
+        return self._enabled
+
+    def set_enabled(self, enabled: bool) -> None:
+        """Enable or disable picking.
+
+        When disabled, calls to pick_at() return None and no offscreen pick render
+        is performed.
+        """
+        self._enabled = bool(enabled)
+
+    def enable(self) -> None:
+        """Convenience wrapper for set_enabled(True)."""
+        self.set_enabled(True)
+
+    def disable(self) -> None:
+        """Convenience wrapper for set_enabled(False)."""
+        self.set_enabled(False)
 
     def _iter_leaf_visuals(self, node):
         """Iterate over all leaf visuals in a node hierarchy.
@@ -106,6 +128,9 @@ class CPickingManager:
         Returns:
             The object index at the coordinates, or None if nothing was picked.
         """
+        if not self._enabled:
+            return None
+
         # Fast-path: repeated queries at the same pixel within a short time window.
         # This helps if pick_at is called multiple times in the same interaction.
         now = time.time()
