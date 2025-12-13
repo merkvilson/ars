@@ -1,5 +1,5 @@
 """
-Startup Commands Package.
+Bubble Commands Package.
 
 This package automatically discovers and imports all modules within the
 `ars_cmds/bubble_cmds` directory. It exposes all callable functions
