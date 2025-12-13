@@ -29,6 +29,7 @@
 - [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] https://github.com/meshsplatting/mesh-splatting
 - [ ] Sound effect and color animation when selecting object.
+- [ ] When pressing Q key, first play object move-to animation and then start realtime move-to dragging.
 - [ ] 
 
 # Secret Release
