@@ -65,7 +65,7 @@ class ViewportWidget(QWidget):
 
         self.controller = controller
 
-        # controller.set_handles(['t'])
+        controller.set_handles(['t'])
 
         gizmo_node.visible = False
 
