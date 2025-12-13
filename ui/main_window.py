@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
             open_timeline(self)
 
             
-            from tests import startup_test
+            from ars_cmds.startup_cmds import startup_test
 
             startup_test.run_tests(self)
 
