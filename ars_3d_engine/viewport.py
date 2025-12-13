@@ -13,6 +13,7 @@ from .gizmo.gizmo import *
 from scipy.spatial.transform import Rotation as ScipyRotation
 from ars_cmds import bubble_cmds
 from ars_cmds.obj_ctx.obj_att_mng import obj_att_mng
+from core.sound_manager import play_sound
 
 class ViewportWidget(QWidget):
     def __init__(self, parent=None,):
@@ -262,7 +263,7 @@ class ViewportWidget(QWidget):
         if event.button == 2:
             obj_att_mng(self.window())
             self.controller.set_handles([])
-
+            return
 
         # If the gizmo didn't handle it, proceed with object picking ONLY for left-clicks.
         if event.button != 1:
@@ -285,6 +286,7 @@ class ViewportWidget(QWidget):
                     msg = f"[_on_mouse_press] : picked_index #{idx} (added to selection)"
                 else:
                     om.set_selection_state([idx], idx)
+                    play_sound("click")
                     msg = f"[_on_mouse_press] : picked_index #{idx}"
             else:
                 raise RuntimeError(f"Pick returned invalid index {idx}, len(objects)={cnt}")
