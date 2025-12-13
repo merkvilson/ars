@@ -114,7 +114,7 @@ class ViewportWidget(QWidget):
                 gizmo_node.visible = True
                 
                 # Ensure handles are enabled (if they were disabled on hide)
-                controller.set_handles(['t'])  # Or your default mode
+                #controller.set_handles(['t'])  # Or your default mode
 
             else:
                 #gizmo_node.visible = False
