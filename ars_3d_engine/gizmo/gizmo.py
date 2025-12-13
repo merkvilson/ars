@@ -338,6 +338,10 @@ class GizmoController:
         self._drag_plane_normal = None
         self._initial_handle_pos = 0.0
         self._cumulative_angle = 0.0
+
+        # Scale-preview state (purely visual; snapped back on release)
+        self._scale_preview_active = False
+        self._scale_preview_handle = None
         
         self._uniform_scale_mode = True
 
@@ -428,6 +432,8 @@ class GizmoController:
 
     def _start_drag_scale(self, data, origin, direction):
         self._original_scale = self._object_scale.copy()
+        self._scale_preview_active = True
+        self._scale_preview_handle = self._drag_axis
         if "axis" in data:
             self._drag_axis_dir = normalize(data["axis"])
         else:
@@ -528,6 +534,33 @@ class GizmoController:
                 new_scale[axis_idx] *= scale_factor
         
         self.set_scale(new_scale, reset_originals=False)
+
+        # Visual-only feedback: move the active handle along the drag axis
+        # while scaling. On mouse release we call set_scale(..., reset_originals=True)
+        # which restores default handle positions (snap back).
+        if self._scale_preview_active and self._scale_preview_handle in self.renderer.mesh_nodes:
+            data = self.renderer.mesh_nodes[self._scale_preview_handle]
+            preview_pos = self._drag_axis_dir * float(new_projected_pos)
+
+            # Keep the same “hover highlight” look during the drag.
+            transform_scale = 1.4
+            tr = MatrixTransform()
+            tr.scale((transform_scale, transform_scale, transform_scale))
+            tr.translate(preview_pos)
+            data["mesh"].transform = tr
+
+            if "hit_sphere" in data:
+                sphere_scale = 1.15
+                sphere_tr = MatrixTransform()
+                sphere_tr.scale((sphere_scale, sphere_scale, sphere_scale))
+                sphere_tr.translate(preview_pos)
+                data["hit_sphere"].transform = sphere_tr
+                data["hit_sphere"].mesh.color = self.renderer.SPHERE_COLOR_HOVER
+
+            if "small_sphere" in data:
+                small_tr = MatrixTransform()
+                small_tr.translate(preview_pos)
+                data["small_sphere"].transform = small_tr
         
     def handle_mouse_press(self, event):    # --- Main Event Handlers ---
         if event.button not in [1, 2, 3]:  # Allow left, right, and middle click
@@ -648,6 +681,8 @@ class GizmoController:
             self._dragging = False
             self._drag_axis = None
             self._drag_mode = None
+            self._scale_preview_active = False
+            self._scale_preview_handle = None
             # Reset temporary drag state variables
             self._start_vec = self._fixed_normal = self._start_plane_pos = None
             self._drag_axis_dir = self._drag_plane_normal = None
