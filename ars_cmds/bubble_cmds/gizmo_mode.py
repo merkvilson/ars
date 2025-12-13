@@ -75,6 +75,7 @@ def execute_cmd(ars_window):
             new_xyz = get_xyz(ars_window, ignore_objs=[obj])
             if new_xyz:
                 obj.move_to(center=new_xyz, offset=obj.get_scale()[1], animate=time)
+                # if time: play_sound("pop-clear", 0.02)
  
 
     config.callbackL = {
