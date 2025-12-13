@@ -131,6 +131,7 @@ def execute_cmd(ars_window):
     def scroll(value):
         nonlocal select
         play_sound("click")
+
         ars_window.prefs.last_sel_obj_id += value
         select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
         if select:
@@ -148,6 +149,8 @@ def execute_cmd(ars_window):
             point.set_primitive_type("sphere")
             point.set_scale(0.1)
             ars_window.CF.UP(key="additional_text", value="Select Object", auto_close = 2500,symbol=ic.ICON_OBJ_BBOX)
+       
+        ars_window.viewport._pick_pulse.play(point)
 
 
     key_check_continuous(callback=during,
