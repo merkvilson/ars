@@ -60,6 +60,8 @@ class CPickingManager:
                 pass
             self._entries.append((leaf, flt))
         self._id_to_index[pid] = index
+        #TODO: uncomment and check later.
+        #print(f"Registered visual for picking with ID {pid} and index {index}")
         return pid
 
     def update_index(self, pid: int, index: int) -> None:
