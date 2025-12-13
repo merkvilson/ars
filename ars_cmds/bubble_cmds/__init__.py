@@ -1,3 +1,14 @@
+"""
+Startup Commands Package.
+
+This package automatically discovers and imports all modules within the
+`ars_cmds/bubble_cmds` directory. It exposes all callable functions
+from these modules directly under the `ars_cmds.bubble_cmds` namespace.
+
+Usage:
+    from ars_cmds.startup_cmds import *
+    # All functions defined in the modules of this folder are now available.
+"""
 import os
 import importlib
 
