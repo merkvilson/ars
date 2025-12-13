@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from vispy import scene
 from vispy.visuals.filters.picking import PickingFilter
 from typing import Optional
@@ -20,6 +21,8 @@ class CPickingManager:
         self._next_id: int = 1
         self._entries: list[tuple[object, PickingFilter]] = []
         self._id_to_index: dict[int, int] = {}
+        self._picking_enabled: bool = False
+        self._last_pick: tuple[int, int, float, Optional[int]] = (-1, -1, 0.0, None)
 
     def _iter_leaf_visuals(self, node):
         """Iterate over all leaf visuals in a node hierarchy.
@@ -83,15 +86,15 @@ class CPickingManager:
         Args:
             enabled: True to enable picking mode, False for normal rendering.
         """
+        if enabled == self._picking_enabled:
+            return
+
+        # Avoid per-pick GL-state churn. Toggling blend/depth per-leaf is expensive
+        # with many objects and isn't necessary for most opaque meshes.
         for leaf, flt in self._entries:
-            try:
-                flt.enabled = enabled
-            except Exception:
-                pass
-            try:
-                leaf.update_gl_state(blend=not enabled)
-            except Exception:
-                pass
+            flt.enabled = enabled
+
+        self._picking_enabled = enabled
 
     def pick_at(self, x: float, y: float) -> Optional[int]:
         """Pick an object at the given screen coordinates.
@@ -103,6 +106,15 @@ class CPickingManager:
         Returns:
             The object index at the coordinates, or None if nothing was picked.
         """
+        # Fast-path: repeated queries at the same pixel within a short time window.
+        # This helps if pick_at is called multiple times in the same interaction.
+        now = time.time()
+        lx, ly, lt, lres = self._last_pick
+        ix = int(round(float(x)))
+        iy = int(round(float(y)))
+        if ix == lx and iy == ly and (now - lt) < 0.05:
+            return lres
+
         self._set_enabled(True)
         try:
             ps = float(self._canvas.pixel_scale or 1.0)
@@ -119,6 +131,8 @@ class CPickingManager:
             obj_id = int(img.view(np.uint32)[0, 0, 0])
             if obj_id < 0:
                 return None
-            return self._id_to_index.get(obj_id, None)
+            res = self._id_to_index.get(obj_id, None)
+            self._last_pick = (ix, iy, now, res)
+            return res
         finally:
             self._set_enabled(False)
