@@ -72,13 +72,9 @@ def execute_cmd(ars_window):
     }
 
     def move_obj(time=0.25):
-        # Quick-drag should be as responsive as the gizmo:
-        # avoid GPU-based picking every frame.
         new_xyz = get_xyz(ars_window, ignore_objs=[obj])
         if new_xyz:
             obj.move_to(center=new_xyz, offset=obj.get_scale()[1], animate=time)
-            # if time: play_sound("pop-clear", 0.02)
- 
 
     config.callbackL = {
         ic.ICON_GIZMO_MOVE_3D: lambda: ars_window.viewport.controller.set_handles(["t"]),
