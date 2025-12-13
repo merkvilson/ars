@@ -293,10 +293,14 @@ class ViewportWidget(QWidget):
         idx = self._objectManager.picking().pick_at(x, y)
         om = self._objectManager
         prev_sel = set(om.selected_indices())
+        
+        om.set_selection_state([], None) #deselect all first
+        
         if idx is None:
-            om.set_selection_state([], None)
+
             msg = "[_on_mouse_press] : object not found, selection cleared"
         else:
+            # om.set_selection_state([], None)
             cnt = om.count()
             if 0 <= idx < cnt:
                 if QApplication.keyboardModifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
