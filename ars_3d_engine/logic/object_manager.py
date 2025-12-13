@@ -200,6 +200,12 @@ class CObjectManager(QObject):
         """Get the total number of objects in the scene."""
         return len(self._objects)
 
+    def object_at(self, index: int) -> Optional[CGeometry]:
+        """Get an object by index, or None if invalid."""
+        if 0 <= index < len(self._objects):
+            return self._objects[index]
+        return None
+
     def picking(self) -> CPickingManager:
         """Get the picking manager instance."""
         return self._picking
