@@ -116,8 +116,18 @@ class CGeometry(ABC):
 
 
     def set_position(self, x: float, y: float, z: float) -> None:
+        x = float(x)
+        y = float(y)
+        z = float(z)
+
+        if isinstance(self._node.transform, transforms.MatrixTransform):
+            m = np.eye(4, dtype=np.float32)
+            m[3, :3] = (x, y, z)
+            self._node.transform.matrix = m
+            return
+
         tr = transforms.MatrixTransform()
-        tr.translate((float(x), float(y), float(z)))
+        tr.translate((x, y, z))
         self._node.transform = tr
 
     def move_to(self, center = None, offset=0.0, animate=False):
