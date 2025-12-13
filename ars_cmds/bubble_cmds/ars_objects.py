@@ -3,7 +3,7 @@ from ui.widgets.context_menu import ContextMenuConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
-from ars_cmds.core_cmds.key_check import key_check_continuous
+from ars_cmds.core_cmds.key_check import key_check_continuous, key_check
 from ars_cmds.util_cmds.time_cmd import after, delay
 from core.cursor_modifier import set_cursor
 from ars_cmds.core_cmds.load_object import (
@@ -24,22 +24,6 @@ def BBL_OBJECT(*args):
 def execute_cmd(ars_window):
     config = ContextMenuConfig()
     
-    p = (0, 0, 0)
-    
-
-    point=add_primitive('sphere', animated=False, )
-    point.set_scale(0.1)
-    point.set_color((1,1,1,0.3))
-    point.set_shading(None)
-
-
-    def new_p():
-        nonlocal p
-        ars_window.viewport.controller.set_handles([""])
-        p = get_xyz(ars_window, [point])
-        if p is None:
-          p = (0, 0, 0)
-        return p[0],p[1],p[2]
 
     config.options = {
         ic.ICON_OBJ_TXT_ABC: 'Text',
@@ -86,6 +70,25 @@ def execute_cmd(ars_window):
         ic.ICON_FILE_3D: "L",
         ic.ICON_ORIGAMI: "O",
     }
+
+    if not key_check("G"):
+        open_context(config)
+        return
+
+    p = (0, 0, 0)
+
+    def new_p():
+        nonlocal p
+        ars_window.viewport.controller.set_handles([""])
+        p = get_xyz(ars_window, [point])
+        if p is None:
+          p = (0, 0, 0)
+        return p[0],p[1],p[2]
+
+    point=add_primitive('sphere', animated=False, )
+    point.set_scale(0.1)
+    point.set_color((1,1,1,0.3))
+    point.set_shading(None)
 
     primitive_objs = [None, "cube", "plane", "cylinder", "cone", "disc", "sphere", "torus", "pyramid"]
     select = primitive_objs[ars_window.prefs.last_sel_obj_id % len(primitive_objs)]
