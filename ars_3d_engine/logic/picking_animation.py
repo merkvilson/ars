@@ -70,7 +70,8 @@ class PickPulseAnimator(QtCore.QObject):
             try:
                 obj.set_scale((base_scale[0] * scale_factor, base_scale[1] * scale_factor, base_scale[2] * scale_factor))
                 r, g, b, a = base_color
-                obj.set_color((clamp01(r * bright_factor), clamp01(g * bright_factor), clamp01(b * bright_factor), a))
+                a2 = a if a >= 1.0 else clamp01(a * bright_factor)
+                obj.set_color((clamp01(r * bright_factor), clamp01(g * bright_factor), clamp01(b * bright_factor), a2))
             except Exception:
                 timer.stop()
                 return
