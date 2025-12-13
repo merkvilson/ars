@@ -38,14 +38,27 @@ def execute_cmd(ars_window):
             obj.move_to(center=new_xyz, offset=obj.get_scale()[1], animate=time)
 
 
+    def start():
+        # One-shot animated move on initial key press
+        ars_window._gizmo_move_press_time = time.time()
+        move_obj(0.25)
+        if get_cursor()[0] != "point":
+            set_cursor("point", "bottom")
+
+
     def during():
-        move_obj(False) # Should be False since we are updating continuously
+        # Start continuous dragging only after the initial 0.25s move
+        if time.time() - getattr(ars_window, "_gizmo_move_press_time", 0) < 0.25:
+            return
+
+        move_obj(False)  # Should be False since we are updating continuously
         if get_cursor()[0] != "point":
             set_cursor("point", "bottom")
     
     def end():
         ars_window.ctx_key_active = False
         ars_window.ctx_key_last_end = time.time()
+        ars_window._gizmo_move_press_time = 0
         set_cursor("cursor")
 
     def scroll(value):
@@ -60,7 +73,7 @@ def execute_cmd(ars_window):
     key_check_continuous(callback=during,
                          key="Q",
                          interval=16,
-                         #callback_start=start,
+                         callback_start=start,
                          callback_end=end,
                          scroll_callback=scroll
                          )
