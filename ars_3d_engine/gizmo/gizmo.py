@@ -1,4 +1,5 @@
 import sys, math, numpy as np
+import time
 from vispy import scene
 from vispy.visuals.transforms import MatrixTransform
 from scipy.spatial.transform import Rotation as ScipyRotation 
@@ -119,6 +120,7 @@ class GizmoRenderer:
         self._view = parent_view
         self.mesh_nodes = {}
         self._handle_offset_trans = 0.1
+        self._highlighted = None
 
         self._create_handle('tx', np.array([1.00, 0.00, 0.00]), offset=self._handle_offset_trans)
         self._create_handle('ty', np.array([0.00, 1.00, 0.00]), offset=self._handle_offset_trans)
@@ -141,6 +143,37 @@ class GizmoRenderer:
         self._create_planar_handle('rzx', [np.array([0.0,0.0,1.0]), np.array([1.0,0.0,0.0])], offset=self._handle_offset_trans)
         
         self.update_handle_positions(np.array([1.0, 1.0, 1.0]))
+
+    def _apply_hover_state(self, name: str, hovered: bool) -> None:
+        data = self.mesh_nodes.get(name)
+        if not data:
+            return
+
+        transform_scale = 1.4 if hovered else 1.0
+        sphere_scale = 1.15 if hovered else 1.0
+        sphere_color = self.SPHERE_COLOR_HOVER if hovered else self.SPHERE_COLOR_DEFAULT
+
+        pos = data.get("position")
+        if pos is None:
+            pos = np.zeros(3, dtype=float)
+
+        mesh = data["mesh"]
+        tr = MatrixTransform()
+        tr.scale((transform_scale, transform_scale, transform_scale))
+        tr.translate(pos)
+        mesh.transform = tr
+
+        if "hit_sphere" in data:
+            sphere_tr = MatrixTransform()
+            sphere_tr.scale((sphere_scale, sphere_scale, sphere_scale))
+            sphere_tr.translate(pos)
+            data["hit_sphere"].transform = sphere_tr
+            data["hit_sphere"].mesh.color = sphere_color
+
+        if "small_sphere" in data:
+            small_tr = MatrixTransform()
+            small_tr.translate(pos)
+            data["small_sphere"].transform = small_tr
 
     def _create_handle(self, name, axis, offset=None):
         color_key = name[1]
@@ -249,35 +282,18 @@ class GizmoRenderer:
                     data["small_sphere"].transform = small_tr
 
     def highlight(self, axis_name):
-        for name, data in self.mesh_nodes.items():
-            is_hovered = (name == axis_name)
-            mesh = data["mesh"]
+        if axis_name == self._highlighted:
+            return
 
-            # Determine scale and color based on hover state
-            transform_scale = 1.4 if is_hovered else 1.0
-            sphere_scale = 1.15 if is_hovered else 1.0
-            sphere_color = self.SPHERE_COLOR_HOVER if is_hovered else self.SPHERE_COLOR_DEFAULT
+        # Un-highlight previous
+        if self._highlighted is not None:
+            self._apply_hover_state(self._highlighted, hovered=False)
 
-            pos = data["position"]
+        self._highlighted = axis_name
 
-            # Apply transform to handle mesh
-            tr = MatrixTransform()
-            tr.scale((transform_scale, transform_scale, transform_scale))
-            tr.translate(pos)
-            mesh.transform = tr
-
-            # Apply transform and color to hit sphere
-            if "hit_sphere" in data:
-                sphere_tr = MatrixTransform()
-                sphere_tr.scale((sphere_scale, sphere_scale, sphere_scale))
-                sphere_tr.translate(pos)
-                data["hit_sphere"].transform = sphere_tr
-                data["hit_sphere"].mesh.color = sphere_color
-
-            if "small_sphere" in data:
-                small_tr = MatrixTransform()
-                small_tr.translate(pos)
-                data["small_sphere"].transform = small_tr
+        # Highlight new
+        if axis_name is not None:
+            self._apply_hover_state(axis_name, hovered=True)
 
 
 def screen_to_world_ray(view, screen_xy):
@@ -376,6 +392,11 @@ class GizmoController:
 
         self._enabled_handles = set()
         self.set_handles(['all'])
+
+        # Hover performance controls
+        self._hover_last_time = 0.0
+        self._hover_interval_s = 1.0 / 60.0
+        self._hover_last_pos = None
         
         self.on_update = None
 
@@ -554,10 +575,14 @@ class GizmoController:
 
         origin, direction = screen_to_world_ray(self.view, event.pos)
         candidates = self._get_candidates(origin, direction)
-        if not candidates: return
+        if not candidates:
+            return
 
-        candidates.sort(key=lambda x: x[0])
-        _, self._drag_axis, self._drag_mode, picked_p = candidates[0]
+        # If multiple hit-spheres overlap along the ray, choose the handle whose
+        # center is closest to the mouse in screen space (more intuitive than
+        # choosing the front-most sphere).
+        best = self._pick_best_candidate_by_screen_distance(candidates, event.pos)
+        _, self._drag_axis, self._drag_mode, picked_p = best
         
         # Check for alternative drag modes on translate handles
         if self._drag_axis.startswith('t'):
@@ -600,29 +625,60 @@ class GizmoController:
 
     def handle_mouse_move(self, event):
 
-        origin, direction = screen_to_world_ray(self.view, event.pos)
-
-        if self._dragging:# Call the appropriate helper to handle the drag update
-
-            if self._drag_mode == 'rotate': self._handle_drag_rotate(origin, direction)
-            elif self._drag_mode == 'translate': self._handle_drag_translate(origin, direction)
-            elif self._drag_mode == 'scale': self._handle_drag_scale(origin, direction)
+        # Dragging is intentionally unthrottled (feels good right now)
+        if self._dragging:
+            origin, direction = screen_to_world_ray(self.view, event.pos)
+            if self._drag_mode == 'rotate':
+                self._handle_drag_rotate(origin, direction)
+            elif self._drag_mode == 'translate':
+                self._handle_drag_translate(origin, direction)
+            elif self._drag_mode == 'scale':
+                self._handle_drag_scale(origin, direction)
             event.handled = True
             self.canvas.update()
             return
 
-        candidates = self._get_candidates(origin, direction)# Hover detection when not dragging
-        picked_name = candidates[0][1] if candidates else None
-        
+        # If gizmo isn't active/visible, skip *all* hover work.
+        if not self._enabled_handles:
+            if self._hover_axis is not None:
+                self._hover_axis = None
+                self.renderer.highlight(None)
+                self.canvas.update()
+            return
+
+        # Throttle hover hit-testing to reduce stutter.
+        now = time.perf_counter()
+        if (now - self._hover_last_time) < self._hover_interval_s:
+            return
+
+        # If mouse didn't move, don't recompute.
+        pos = tuple(event.pos)
+        if self._hover_last_pos == pos:
+            return
+        self._hover_last_pos = pos
+        self._hover_last_time = now
+
+        origin, direction = screen_to_world_ray(self.view, event.pos)
+        candidates = self._get_candidates(origin, direction)  # Hover detection
+
+        if not candidates:
+            picked_name = None
+        else:
+            # Prefer keeping the current hover if it's still a candidate to avoid
+            # jitter when multiple hit-spheres overlap.
+            if self._hover_axis is not None and any(c[1] == self._hover_axis for c in candidates):
+                picked_name = self._hover_axis
+            else:
+                best = self._pick_best_candidate_by_screen_distance(candidates, event.pos)
+                picked_name = best[1]
+
         if self._hover_axis != picked_name:
+            # Keep this simple: play once when entering a handle.
             if picked_name is not None:
                 play_sound("hover")
-                # set_cursor("arrows-move", 'center')
-            else:
-                # set_cursor("cursor")
-                pass
             self._hover_axis = picked_name
             self.renderer.highlight(picked_name)
+            self.canvas.update()
 
     def handle_mouse_release(self, event):
         if self._dragging:
@@ -669,6 +725,32 @@ class GizmoController:
                     mode = 'translate'
                 candidates.append((t, name, mode, p))
         return candidates
+
+    def _pick_best_candidate_by_screen_distance(self, candidates, screen_xy):
+        sx, sy = float(screen_xy[0]), float(screen_xy[1])
+        tform = self.view.scene.transform
+
+        best = None
+        best_d2 = None
+        for cand in candidates:
+            _, name, _, _ = cand
+            data = self.renderer.mesh_nodes.get(name)
+            if not data:
+                continue
+            center_world = self._ring_center + data.get('position', np.zeros(3))
+            pt = tform.map(np.array([center_world[0], center_world[1], center_world[2], 1.0], dtype=float))
+            if pt.shape[0] >= 4 and abs(pt[3]) > 1e-12:
+                cx = float(pt[0] / pt[3])
+                cy = float(pt[1] / pt[3])
+            else:
+                cx = float(pt[0])
+                cy = float(pt[1])
+            d2 = (cx - sx) * (cx - sx) + (cy - sy) * (cy - sy)
+            if best is None or d2 < best_d2:
+                best = cand
+                best_d2 = d2
+
+        return best if best is not None else candidates[0]
 
     ### MODIFIED ###
     def handle_mouse_wheel(self, event):
