@@ -8,6 +8,7 @@ from .camera.ArsFlyCamera import ArsFlyCamera
 from .bg import Background
 from .logic.picking_manager import CPickingManager
 from .logic.object_manager import CObjectManager
+from .logic.picking_animation import PickPulseAnimator
 from vispy.scene import transforms
 from .gizmo.gizmo import *
 from scipy.spatial.transform import Rotation as ScipyRotation
@@ -32,6 +33,24 @@ class ViewportWidget(QWidget):
         self.cam.reset()
         
         self._objectManager = CObjectManager(self._view, self._canvas, None, CPickingManager(self._canvas))
+
+        self._pick_pulse = PickPulseAnimator(canvas=self._canvas, parent=self)
+
+        self._last_selected_obj_ids: set[int] = set()
+
+        def _on_selection_changed_play_pick_animation():
+            selected = self._objectManager.get_selected_objects()
+            new_ids = {id(o) for o in selected}
+            added = new_ids - self._last_selected_obj_ids
+            self._last_selected_obj_ids = new_ids
+
+            if not added:
+                return
+            for obj in selected:
+                if id(obj) in added:
+                    self._pick_pulse.play(obj)
+
+        self._objectManager.selection_changed.connect(_on_selection_changed_play_pick_animation)
 
         # GIZMO SETUP
         gizmo_node = scene.Node(parent=self._view.scene)
@@ -272,6 +291,7 @@ class ViewportWidget(QWidget):
         x, y = event.pos
         idx = self._objectManager.picking().pick_at(x, y)
         om = self._objectManager
+        prev_sel = set(om.selected_indices())
         if idx is None:
             om.set_selection_state([], None)
             msg = "[_on_mouse_press] : object not found, selection cleared"
@@ -288,6 +308,12 @@ class ViewportWidget(QWidget):
                     om.set_selection_state([idx], idx)
                     play_sound("click")
                     # msg = f"[_on_mouse_press] : picked_index #{idx}"
+
+                # If selection didn't change, still play the pulse (repeat-click on same selection).
+                if set(om.selected_indices()) == prev_sel:
+                    obj = om.object_at(idx)
+                    if obj is not None:
+                        self._pick_pulse.play(obj)
             else:
                 raise RuntimeError(f"Pick returned invalid index {idx}, len(objects)={cnt}")
                     
