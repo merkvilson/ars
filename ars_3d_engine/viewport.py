@@ -15,6 +15,7 @@ from scipy.spatial.transform import Rotation as ScipyRotation
 from ars_cmds import bubble_cmds
 from ars_cmds.obj_ctx.obj_att_mng import obj_att_mng
 from core.sound_manager import play_sound
+from ars_cmds.core_cmds.key_check import key_check
 
 class ViewportWidget(QWidget):
     def __init__(self, parent=None,):
@@ -114,7 +115,7 @@ class ViewportWidget(QWidget):
                 gizmo_node.visible = True
                 
                 # Ensure handles are enabled (if they were disabled on hide)
-                #controller.set_handles(['t'])  # Or your default mode
+                if not key_check("G"): controller.set_handles(['t'])  # Or your default mode
 
             else:
                 #gizmo_node.visible = False
