@@ -124,7 +124,7 @@ def execute_cmd(ars_window):
             ars_window.hotkey_manager._bind_shortcuts()
 
     def scroll(value):
-        # play_sound("click") #Need to choose another sound for rotation
+        play_sound("click") #Need to choose another sound for rotation
         angle_deg = 15 * (1 if value > 0 else -1)
 
         obj.rotate_around_axis((0, 1, 0), angle_deg)
