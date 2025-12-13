@@ -1,11 +1,7 @@
-"""
-This module provides gizmo control functionality (move, rotate, scale) via a context menu.
-"""
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+"""This module provides gizmo control functionality (move) via hotkey hold."""
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtGui import QCursor
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from core.cursor_modifier import get_cursor, set_cursor
@@ -29,7 +25,7 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-    ars_window.viewport.controller.set_handles([""]),
+    ars_window.viewport.controller.set_handles([""])
 
     
     def move_obj(time=0.25):
