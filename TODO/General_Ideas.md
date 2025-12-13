@@ -28,7 +28,6 @@
 - [ ] Hover over incremental value containing b-button shows value.
 - [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] https://github.com/meshsplatting/mesh-splatting
-- [ ] Sound effect and color animation when selecting object.
 - [ ] When pressing Q key, first play object move-to animation and then start realtime move-to dragging.
 - [ ] 
 
@@ -78,6 +77,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 ## Finished
 
+- [✓] Sound effect and color animation when selecting object.
 - [✓] Scrolling wheel during presing G key should switch between primitive objects and apply an apropriate symbol. (maybe via cursor_follower)
 - [✓] Scrolling wheel during pressing Q key should rotate the object.
 - [✓] Switch to img viewer by choosing 2D camera in camera menu
