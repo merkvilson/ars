@@ -47,8 +47,8 @@ def execute_cmd(ars_window):
 
     config.options = {
         ic.ICON_GIZMO_MOVE_3D: "Move",
-        ic.ICON_GIZMO_ROTATE_3D: "Rotate",
-        ic.ICON_GIZMO_SCALE: "Scale",
+        #ic.ICON_GIZMO_ROTATE_3D: "Rotate",
+        #ic.ICON_GIZMO_SCALE: "Scale",
         ic.ICON_GIZMO_DRAG: "Quick Drag",
     }
 

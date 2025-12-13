@@ -125,22 +125,10 @@ class GizmoRenderer:
         self._create_handle('tx', np.array([1.00, 0.00, 0.00]), offset=self._handle_offset_trans)
         self._create_handle('ty', np.array([0.00, 1.00, 0.00]), offset=self._handle_offset_trans)
         self._create_handle('tz', np.array([0.00, 0.00, 1.00]), offset=self._handle_offset_trans)
-        
-        self._create_handle('sx', np.array([1.00, 0.00, 0.00]), offset=self._handle_offset_trans)
-        self._create_handle('sy', np.array([0.00, 1.00, 0.00]), offset=self._handle_offset_trans)
-        self._create_handle('sz', np.array([0.00, 0.00, 1.00]), offset=self._handle_offset_trans)
 
         self._create_planar_handle('txy', [np.array([1.0,0.0,0.0]), np.array([0.0,1.0,0.0])], offset=self._handle_offset_trans)
         self._create_planar_handle('tyz', [np.array([0.0,1.0,0.0]), np.array([0.0,0.0,1.0])], offset=self._handle_offset_trans)
         self._create_planar_handle('tzx', [np.array([0.0,0.0,1.0]), np.array([1.0,0.0,0.0])], offset=self._handle_offset_trans)
-
-        self._create_planar_handle('sxy', [np.array([1.0,0.0,0.0]), np.array([0.0,1.0,0.0])], offset=self._handle_offset_trans)
-        self._create_planar_handle('syz', [np.array([0.0,1.0,0.0]), np.array([0.0,0.0,1.0])], offset=self._handle_offset_trans)
-        self._create_planar_handle('szx', [np.array([0.0,0.0,1.0]), np.array([1.0,0.0,0.0])], offset=self._handle_offset_trans)
-
-        self._create_planar_handle('rxy', [np.array([1.0,0.0,0.0]), np.array([0.0,1.0,0.0])], offset=self._handle_offset_trans)
-        self._create_planar_handle('ryz', [np.array([0.0,1.0,0.0]), np.array([0.0,0.0,1.0])], offset=self._handle_offset_trans)
-        self._create_planar_handle('rzx', [np.array([0.0,0.0,1.0]), np.array([1.0,0.0,0.0])], offset=self._handle_offset_trans)
         
         self.update_handle_positions(np.array([1.0, 1.0, 1.0]))
 
@@ -176,17 +164,12 @@ class GizmoRenderer:
             data["small_sphere"].transform = small_tr
 
     def _create_handle(self, name, axis, offset=None):
+        # Translation-only gizmo
         color_key = name[1]
-        if name.startswith('t'):
-            pos = axis * (1.0 + offset)
-            verts, faces = build_arrow_mesh(name)
-            handle = scene.visuals.Mesh(vertices=verts, faces=faces, color=self.COLORS[color_key], parent=self.parent)
-            self.mesh_nodes[name] = {"mesh": handle, "axis": axis, "offset": offset, "position": pos}
-        else: # Scale handle
-            pos = axis # Default position for scale=1
-            size = 0.18
-            handle = scene.visuals.Box(width=size, height=size, depth=size, parent=self.parent, color=self.COLORS[color_key])
-            self.mesh_nodes[name] = {"mesh": handle, "axis": axis, "position": pos, "offset": offset}
+        pos = axis * (1.0 + offset)
+        verts, faces = build_arrow_mesh(name)
+        handle = scene.visuals.Mesh(vertices=verts, faces=faces, color=self.COLORS[color_key], parent=self.parent)
+        self.mesh_nodes[name] = {"mesh": handle, "axis": axis, "offset": offset, "position": pos}
 
         tr = MatrixTransform()
         tr.translate(pos)
@@ -208,18 +191,12 @@ class GizmoRenderer:
     def _create_planar_handle(self, name, axes, offset=None):
         axis1, axis2 = axes
         color_key = name[1:]
-        if name.startswith('t') or name.startswith('r'):
-            verts, faces = build_planar_mesh(axes)
-        else:
-            verts, faces = build_planar_mesh(axes, segments=2,radius=0.18, thickness=0.07, start_angle=110, end_angle=-20) 
+        # Translation-only gizmo
+        verts, faces = build_planar_mesh(axes)
         handle = scene.visuals.Mesh(vertices=verts, faces=faces, color=self.COLORS[color_key], parent=self.parent)
         
-        if name.startswith('t') or name.startswith('r'):
-            pos = normalize(axis1 + axis2) * (1.0 + (offset or 0))
-            self.mesh_nodes[name] = {"mesh": handle, "axes": axes, "offset": offset, "position": pos}
-        else: # Scale handle
-            pos = axis1 + axis2 # Default position for scale=1
-            self.mesh_nodes[name] = {"mesh": handle, "axes": axes, "position": pos, "offset": offset}
+        pos = normalize(axis1 + axis2) * (1.0 + (offset or 0))
+        self.mesh_nodes[name] = {"mesh": handle, "axes": axes, "offset": offset, "position": pos}
 
         tr = MatrixTransform()
         tr.translate(pos)
@@ -238,34 +215,22 @@ class GizmoRenderer:
         self.mesh_nodes[name]["hit_sphere"] = sphere
         self.mesh_nodes[name]["sphere_transform"] = sphere_tr
 
-        if name.startswith('r'):
-            small_radius = 0.05
-            small_sphere = scene.visuals.Sphere(radius=small_radius, color=self.COLORS[color_key], parent=self.parent)
-            small_tr = MatrixTransform()
-            small_tr.translate(pos)
-            small_sphere.transform = small_tr
-            small_sphere.set_gl_state('opaque', depth_test=False)
-            small_sphere.order = 3
-            self.mesh_nodes[name]["small_sphere"] = small_sphere
-
     def update_handle_positions(self, scale):
         # Update all handles
         for name, data in self.mesh_nodes.items():
-            if name.startswith('r'):
-                continue
             pos = None
-            if name.startswith('t') or name.startswith('s') or name.startswith('r'):
-                offset = data.get("offset", 0.0)
-                axis_letters = name[1:]
-                corner = np.zeros(3, dtype=float)
-                for letter in axis_letters:
-                    idx = {'x':0, 'y':1, 'z':2}[letter]
-                    corner[idx] = scale[idx]
-                if np.linalg.norm(corner) < 1e-9:
-                    dir = np.zeros(3)
-                else:
-                    dir = normalize(corner)
-                pos = corner + dir * offset
+            # Translation handles should not move with object scale.
+            offset = data.get("offset", 0.0)
+            axis_letters = name[1:]
+            corner = np.zeros(3, dtype=float)
+            for letter in axis_letters:
+                idx = {'x':0, 'y':1, 'z':2}[letter]
+                corner[idx] = 1.0
+            if np.linalg.norm(corner) < 1e-9:
+                dir = np.zeros(3)
+            else:
+                dir = normalize(corner)
+            pos = corner + dir * offset
             
             if pos is not None:
                 data['position'] = pos  # Store the authoritative position
@@ -276,10 +241,6 @@ class GizmoRenderer:
                     sphere_tr = MatrixTransform()
                     sphere_tr.translate(pos)
                     data["hit_sphere"].transform = sphere_tr
-                if "small_sphere" in data:
-                    small_tr = MatrixTransform()
-                    small_tr.translate(pos)
-                    data["small_sphere"].transform = small_tr
 
     def highlight(self, axis_name):
         if axis_name == self._highlighted:
@@ -352,10 +313,10 @@ def closest_point_between_ray_and_line(L0, u, origin, v):
 
 class GizmoController:
     _handle_groups = {
-        'r': ['rxy', 'ryz', 'rzx'],
+        # Visual gizmo is translation-only. Scale/rotate remain available as alternate
+        # actions on translate handles (see handle_mouse_press).
         't': ['tx', 'ty', 'tz', 'txy', 'tyz', 'tzx'],
-        's': ['sx', 'sy', 'sz', 'sxy', 'syz', 'szx'],
-        'all': ['rxy', 'ryz', 'rzx', 'tx', 'ty', 'tz', 'txy', 'tyz', 'tzx', 'sx', 'sy', 'sz', 'sxy', 'syz', 'szx'],
+        'all': ['tx', 'ty', 'tz', 'txy', 'tyz', 'tzx'],
     }
 
     def __init__(self, view, canvas, renderer: GizmoRenderer, rotation: Rotation):
@@ -557,10 +518,10 @@ class GizmoController:
         new_scale = self._original_scale.copy()
         if self._uniform_scale_mode:
             new_scale *= scale_factor
-        elif len(self._drag_axis) == 2: # Linear 'sx', 'sy', 'sz'
+        elif len(self._drag_axis) == 2: # Linear axis handle ('tx'/'ty'/'tz')
             axis_idx = {'x':0, 'y':1, 'z':2}[self._drag_axis[1]]
             new_scale[axis_idx] *= scale_factor
-        else: # Planar 'sxy', 'syz', 'szx'
+        else: # Planar handle ('txy'/'tyz'/'tzx')
             axis_letters = self._drag_axis[1:]
             for letter in axis_letters:
                 axis_idx = {'x':0, 'y':1, 'z':2}[letter]
@@ -698,14 +659,9 @@ class GizmoController:
 
 
     def get_visibility(self, mode):
-        _handle_groups = {
-            'move': ['tx', 'ty', 'tz', 'txy', 'tyz', 'tzx'],  # Translation
-            'rotate': ['rxy', 'ryz', 'rzx'],                     # Rotation
-            'scale': ['sx', 'sy', 'sz', 'sxy', 'syz', 'szx'], # Scale
-        }
-        if mode not in _handle_groups:
+        if mode != 'move':
             return False
-        return bool(self._enabled_handles.intersection(_handle_groups[mode]))
+        return bool(self._enabled_handles)
 
 
     def _get_candidates(self, origin, direction):
@@ -717,12 +673,7 @@ class GizmoController:
 
             hit, t, p = ray_intersect_sphere(origin, direction, center, 0.3)
             if hit:
-                if name.startswith('r'):
-                    mode = 'rotate'
-                elif name.startswith('s'):
-                    mode = 'scale'
-                else:
-                    mode = 'translate'
+                mode = 'translate'
                 candidates.append((t, name, mode, p))
         return candidates
 
@@ -769,9 +720,9 @@ class GizmoController:
         data = self.renderer.mesh_nodes[self._drag_axis]
         
         # Determine the axis of rotation from the handle
-        if "axis" in data:  # Linear handle (tx, sx, etc.)
+        if "axis" in data:  # Linear handle (tx/ty/tz)
             axis = data["axis"]
-        else:  # Planar handle (txy, sxy, etc.)
+        else:  # Planar handle (txy/tyz/tzx)
             axis1, axis2 = data["axes"]
             axis = normalize(np.cross(axis1, axis2))
         
