@@ -1,0 +1,1 @@
+print("quick_test executed")

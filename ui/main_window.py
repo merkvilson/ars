@@ -53,9 +53,7 @@ class MainWindow(QMainWindow):
             open_timeline(self)
 
             
-            from ars_cmds.startup_cmds import startup_test
-
-            startup_test.run_tests(self)
+            from ars_cmds import startup_cmds
 
 
         QTimer.singleShot(100, lambda: startup_commands(self))
