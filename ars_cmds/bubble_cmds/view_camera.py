@@ -38,7 +38,9 @@ def execute_cmd(ars_window):
 
     def view_selected():
         obj = get_selected()
-        if not obj: return
+        if not obj: 
+            view_home()
+            return
         xyz=obj.get_position()
         scale_sum = sum(obj.get_scale()) * 1.5
         camera.move_to(center=tuple(xyz), offset=scale_sum, animate=True, rotation=default_rotation)
@@ -83,10 +85,8 @@ def execute_cmd(ars_window):
         ars_window.ctx_key_last_end = time.time()
         set_cursor("cursor")
         try:
-            if time.time() - start_time > 0.15:
-                view_cursor()
-            else:
-                open_context(config)
+            if time.time() - start_time > 0.15:  view_cursor()
+            else: view_selected()
         finally:
             ars_window.hotkey_manager._bind_shortcuts()
 
