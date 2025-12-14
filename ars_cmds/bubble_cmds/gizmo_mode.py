@@ -8,7 +8,7 @@ from core.cursor_modifier import get_cursor, set_cursor
 import time
 from core.sound_manager import play_sound
 
-BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q"}
+BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q", "hidden": True}
 
 
 def BBL_GIZMO_MOVE(*args):

@@ -19,6 +19,8 @@ def distribute_bubbles(self):
                     if hasattr(module, config_var):
                         config_dict = getattr(module, config_var)
                         if isinstance(config_dict, dict):
+                            if config_dict.get("hidden"):
+                                continue
                             symbol = config_dict.get("symbol", stem)
                         else:
                             symbol = stem

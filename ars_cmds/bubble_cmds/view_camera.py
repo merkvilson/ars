@@ -8,7 +8,7 @@ from ars_cmds.core_cmds.key_check import key_check_continuous
 from core.cursor_modifier import get_cursor, set_cursor
 import time
 
-BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V"}
+BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V", "hidden": True}
 
 
 def BBL_CAMVIEWER(*args):
