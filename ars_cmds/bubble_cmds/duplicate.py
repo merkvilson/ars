@@ -13,24 +13,21 @@ def BBL_2(*args):
 
 def execute_cmd(ars_window):
 
-    originals = ars_window.viewport._objectManager.get_selected_objects()
-    if not originals:
+    original = selected_object()
+    if not original:
         return
 
     play_sound("pop-clear", 0.05)
 
     ars_window.viewport._objectManager.duplicate_selected()
 
-    # After duplication, selection becomes the newly created clone(s).
-    # Filter out originals just in case.
-    originals_ids = {id(o) for o in originals}
-    clones = [o for o in ars_window.viewport._objectManager.get_selected_objects() if id(o) not in originals_ids]
-    if not clones:
+    # After duplication, the clone becomes selected.
+    clone = selected_object()
+    if not clone or clone is original:
         return
 
-    new_xyz = get_xyz(ars_window, ignore_objs=[*originals, *clones])
+    new_xyz = get_xyz(ars_window)
     if new_xyz:
-        # Minimal behavior: move the first clone to cursor.
-        clones[0].move_to(center=new_xyz, offset=clones[0].get_scale()[1], animate=0.25)
+        clone.move_to(center=new_xyz, offset=clone.get_scale()[1], animate=0.25)
 
     ars_window.viewport.controller.set_handles([""])
