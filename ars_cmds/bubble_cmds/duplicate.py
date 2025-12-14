@@ -13,6 +13,8 @@ def BBL_2(*args):
 
 def execute_cmd(ars_window):
 
+    #Todo: during cloning animation color may be also cloned. need to add delay.
+
     original = selected_object()
     if not original:
         return

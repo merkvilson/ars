@@ -7,7 +7,8 @@
 - [ ] Comfy node editor is not visible in full-screen mode.
 - [ ] Hotkey can't handle non english letters.
 - [ ] code editor's Dropdown menu is lagging too long 
-- [ ] 
+- [ ] during cloning animation color may be also cloned. need to add delay.
+
 - [ ] 
 - [ ] 
 
