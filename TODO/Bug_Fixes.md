@@ -8,9 +8,9 @@
 - [ ] Hotkey can't handle non english letters.
 - [ ] code editor's Dropdown menu is lagging too long 
 - [ ] during cloning animation color may be also cloned. need to add delay.
+- [ ] fix obj changing position when making it a child.
+- [ ] 
 
-- [ ] 
-- [ ] 
 
 - [50%] Fix object manager deletion issues
 
