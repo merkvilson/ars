@@ -32,13 +32,8 @@
         },
         {
             "symbol": "\ue90e",
-            "grid_x": 20,
+            "grid_x": 14,
             "grid_y": 0
-        },
-        {
-            "symbol": "\ue9b9",
-            "grid_x": 0,
-            "grid_y": 2
         },
         {
             "symbol": "\ue913",
@@ -48,7 +43,7 @@
         {
             "symbol": "\ue957",
             "grid_x": 14,
-            "grid_y": 0
+            "grid_y": 3
         },
         {
             "symbol": "\ue986",
@@ -93,11 +88,6 @@
         {
             "symbol": "\ue99b",
             "grid_x": 15,
-            "grid_y": 0
-        },
-        {
-            "symbol": "\ue91c",
-            "grid_x": 6,
             "grid_y": 0
         }
     ]
