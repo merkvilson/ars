@@ -115,6 +115,12 @@ class CPickingManager:
         # with many objects and isn't necessary for most opaque meshes.
         for leaf, flt in self._entries:
             flt.enabled = enabled
+            if enabled:
+                if hasattr(leaf, 'push_gl_state'):
+                    leaf.push_gl_state(blend=False)
+            else:
+                if hasattr(leaf, 'pop_gl_state'):
+                    leaf.pop_gl_state()
 
         self._picking_enabled = enabled
 
