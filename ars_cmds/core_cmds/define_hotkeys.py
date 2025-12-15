@@ -2,8 +2,7 @@ from ars_cmds import bubble_cmds as Bcmd
 from hotkeys.hotkey_manager import HotkeyManager
 from hotkeys.hotkey_profile import HotkeyProfile
 from theme.fonts.font_icons import *
-from PyQt6.QtGui import QCursor, QColor
-from ars_cmds.camera_cmds.camera_cmds import *
+from PyQt6.QtGui import QCursor
 import os
 import importlib
 import inspect
@@ -16,12 +15,15 @@ def define_hotkeys(self):
         default_bindings[name] = key
 
     default_bindings = {}
+    """example hotkey definitions
+    from ars_cmds.camera_cmds.camera_cmds import *
     hk("cam_speed_up",   lambda: cam_speed_up(self),   "Shift+mouse-wheel-up")
     hk("cam_speed_down", lambda: cam_speed_down(self), "Shift+mouse-wheel-down")
     hk("cam_fow_add",    lambda: cam_fow_add(self),    "Ctrl+mouse-wheel-down")
     hk("cam_fow_sub",    lambda: cam_fow_sub(self),    "Ctrl+mouse-wheel-up")
     hk("cam_move_in", lambda: cam_move_in(self), "Alt+mouse-wheel-up")
     hk("cam_move_out", lambda: cam_move_out(self), "Alt+mouse-wheel-down")
+    """
 
     # Dynamically add hotkeys based on BBL functions
     for filename in os.listdir(os.path.join('ars_cmds', 'bubble_cmds')):
