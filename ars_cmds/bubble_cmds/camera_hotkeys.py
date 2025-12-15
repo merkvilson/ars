@@ -69,3 +69,8 @@ def BBL_cam_move_in(*args):
 BBL_cam_move_out_CONFIG = {"symbol": ic.ICON_ZOOM_OUT, "hotkey": "Alt+mouse-wheel-down", "hidden": True}
 def BBL_cam_move_out(*args):
     cam_move_out(ars_window())
+
+
+BBL_tst_CONFIG = {"symbol": None, "hotkey": "#", "hidden": True}
+def BBL_tst(*args):
+    print("Test")
