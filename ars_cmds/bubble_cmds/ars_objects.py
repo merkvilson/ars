@@ -86,6 +86,7 @@ def execute_cmd(ars_window):
         return p[0],p[1],p[2]
 
     point=add_primitive('sphere', animated=False, )
+    point.set_name("Object_Preview")
     point.set_scale(0.1)
     point.set_color((1,1,1,0.3))
     point.set_shading(None)
