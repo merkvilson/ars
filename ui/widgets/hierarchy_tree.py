@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
 from PyQt6.QtCore import Qt, QSize
+import numpy as np
 from theme import StyleSheets
 from theme.fonts.new_fonts import get_font
 
@@ -201,7 +202,60 @@ class ObjectHierarchyWindow(QWidget):
             if obj:
                 obj.name = item.text(0)
 
+    def get_transform_matrix(self, transform):
+        if hasattr(transform, 'matrix'):
+            return transform.matrix
+        return np.eye(4, dtype=np.float32)
+
+    def get_node_world_matrix(self, node):
+        # Build chain from node up to scene
+        chain = []
+        current = node
+        while current is not None and current != self.manager._view.scene:
+            chain.append(current)
+            current = current.parent
+        
+        # Calculate World = Local @ Parent @ ... @ Root (Row-Major)
+        matrix = np.eye(4, dtype=np.float32)
+        for n in chain:
+            if hasattr(n, 'transform') and hasattr(n.transform, 'matrix'):
+                matrix = matrix @ n.transform.matrix
+        
+        return matrix
+
+    def get_object_world_matrix(self, obj):
+        return self.get_node_world_matrix(obj.rotation_visual)
+
+    def set_object_world_matrix(self, obj, target_matrix):
+        parent_node = obj.visual.parent
+        parent_matrix = self.get_node_world_matrix(parent_node)
+        
+        try:
+            inv_parent = np.linalg.inv(parent_matrix)
+        except np.linalg.LinAlgError:
+            inv_parent = np.eye(4)
+            
+        # Local = World @ inv(Parent) (Row-Major)
+        local_matrix = target_matrix @ inv_parent
+        
+        # Extract translation (Row 3 in Row-Major)
+        translation = local_matrix[3, :3].copy()
+        
+        # Extract rotation/scale (remove translation)
+        rs_matrix = local_matrix.copy()
+        rs_matrix[3, :3] = 0.0
+        rs_matrix[3, 3] = 1.0
+        
+        # Apply
+        obj.set_position(*translation)
+        obj.rotation_visual.transform.matrix = rs_matrix
+
     def sync_manager_order(self):
+        # Capture world transforms
+        world_transforms = {}
+        for obj in self.manager._objects:
+            world_transforms[id(obj)] = self.get_object_world_matrix(obj)
+
         # Reset parents and children
         for obj in self.manager._objects:
             obj._parent = None
@@ -226,6 +280,19 @@ class ObjectHierarchyWindow(QWidget):
                 obj.visual.parent = self.manager._view.scene
             else:
                 obj.visual.parent = obj._parent.visual
+
+        # Restore transforms in top-down order to ensure parents are positioned before children
+        def restore_transforms_recursive(item: QTreeWidgetItem):
+            uid = item.data(0, Qt.ItemDataRole.UserRole)
+            obj = self.id_to_obj.get(uid)
+            if obj and id(obj) in world_transforms:
+                self.set_object_world_matrix(obj, world_transforms[id(obj)])
+            
+            for i in range(item.childCount()):
+                restore_transforms_recursive(item.child(i))
+
+        for i in range(self.tree.topLevelItemCount()):
+            restore_transforms_recursive(self.tree.topLevelItem(i))
 
         # Collect all objects in depth-first order
         def collect_objs(item: QTreeWidgetItem, objs: list):
