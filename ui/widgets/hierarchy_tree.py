@@ -10,6 +10,7 @@ from PyQt6.QtCore import Qt, QSize
 import numpy as np
 from theme import StyleSheets
 from theme.fonts.new_fonts import get_font
+from core.sound_manager import play_sound
 
 
 def create_icon(symbol, color="#E0E0E0", size=128):
@@ -32,6 +33,11 @@ def create_icon(symbol, color="#E0E0E0", size=128):
 class HierarchyTree(QTreeWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setMouseTracking(True)
+        self.itemEntered.connect(self.on_item_entered)
+
+    def on_item_entered(self, item, column):
+        play_sound("hover")
 
     def dropEvent(self, event):
         # Preserve active object across reorder
