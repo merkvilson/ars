@@ -59,6 +59,12 @@ class CGeometry(ABC):
 
         self._update_gl_state()
 
+    def get_name(self):
+        return self._name
+
+    def set_name(self, name):
+        self._name = name
+
     def remove(self):
         """Completely remove the object from project"""
         if hasattr(self, 'manager') and self.manager:
