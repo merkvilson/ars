@@ -763,6 +763,7 @@ class GizmoController:
         
         # Apply rotation and update the scene
         self.rotation.rotate_around_local_axis(axis, angle_deg)
+        play_sound("click")
         if self.on_update:
             self.on_update()
         self.canvas.update()
