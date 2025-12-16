@@ -299,7 +299,7 @@ class ViewportWidget(QWidget):
         if idx is None:
 
             msg = "[_on_mouse_press] : object not found, selection cleared"
-        else:
+        if idx is not None:
             # om.set_selection_state([], None)
             cnt = om.count()
             if 0 <= idx < cnt:
