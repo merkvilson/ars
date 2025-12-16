@@ -1,4 +1,5 @@
-from core.cursor_modifier import set_cursor
-import random
-print(random.random())
-set_cursor("cursor", "top-right", random.random()*5)
+cube = add_primitive("cube")
+sphere = add_primitive("sphere")
+sphere.set_position(3,0,3)
+
+sphere.set_parent(cube)
