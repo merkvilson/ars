@@ -429,6 +429,9 @@ class CGeometry(ABC):
             self.visual.parent = parent.rotation_visual
         elif hasattr(self, 'manager') and self.manager:
             self.visual.parent = self.manager._view.scene
+        
+        if hasattr(self, 'manager') and self.manager:
+            self.manager.notify_parent_changed(self, parent)
 
 
 

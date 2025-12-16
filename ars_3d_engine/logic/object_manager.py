@@ -17,6 +17,7 @@ class CObjectManager(QObject):
     object_removed = pyqtSignal(int, CGeometry)
     active_changed = pyqtSignal(int)
     selection_changed = pyqtSignal()
+    parent_changed = pyqtSignal(object, object)
 
     def __init__(self, view: scene.widgets.ViewBox
                  , canvas: scene.SceneCanvas
@@ -53,6 +54,9 @@ class CObjectManager(QObject):
                 if hasattr(obj, 'update_light_dir'):
                     obj.update_light_dir(light_dir)
 
+    def notify_parent_changed(self, child: CGeometry, new_parent: Optional[CGeometry]) -> None:
+        """Notify listeners that an object's parent has changed."""
+        self.parent_changed.emit(child, new_parent)
 
     def add_object(self, obj: CGeometry) -> None:
         """Add a geometry object to the scene.

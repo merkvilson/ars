@@ -101,6 +101,7 @@ class ObjectHierarchyWindow(QWidget):
         self.manager.object_added.connect(self.on_object_added)
         self.manager.object_removed.connect(self.on_object_removed)
         self.manager.active_changed.connect(self.on_active_changed)
+        self.manager.parent_changed.connect(self.on_parent_changed)
         self.tree.itemSelectionChanged.connect(self.on_tree_selection_changed)
         self.tree.itemChanged.connect(self.on_item_renamed)
 
@@ -177,6 +178,33 @@ class ObjectHierarchyWindow(QWidget):
                 parent_item.takeChild(parent_item.indexOfChild(item))
             self.cleanup_items_recursive(item)
         self.id_to_obj.pop(uid, None)
+
+    def on_parent_changed(self, child_obj, parent_obj):
+        child_uid = id(child_obj)
+        child_item = self.uid_to_item.get(child_uid)
+        
+        if not child_item:
+            return
+
+        # Detach from current parent
+        current_parent_item = child_item.parent()
+        if current_parent_item:
+            current_parent_item.takeChild(current_parent_item.indexOfChild(child_item))
+        else:
+            self.tree.takeTopLevelItem(self.tree.indexOfTopLevelItem(child_item))
+
+        # Attach to new parent
+        if parent_obj:
+            parent_uid = id(parent_obj)
+            parent_item = self.uid_to_item.get(parent_uid)
+            if parent_item:
+                parent_item.addChild(child_item)
+                parent_item.setExpanded(True)
+            else:
+                # Fallback: add to top level if parent not found in tree
+                self.tree.addTopLevelItem(child_item)
+        else:
+            self.tree.addTopLevelItem(child_item)
 
     def on_active_changed(self, index):
         if index < 0 or index >= len(self.manager._objects):
