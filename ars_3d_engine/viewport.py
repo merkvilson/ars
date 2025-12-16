@@ -135,24 +135,58 @@ class ViewportWidget(QWidget):
                 # --- APPLY TRANSFORMATION LOGIC ---
                 
                 # 1. Handle Translation on the parent node
-                # This ensures translation happens independently of rotation and scale.
-                # Update existing transform instead of creating new one to avoid overhead
+                # We need to convert the gizmo's WORLD translation to the object's LOCAL translation.
+                
+                # Get parent's world matrix
+                parent_node = obj.visual.parent
+                parent_matrix = np.eye(4, dtype=np.float32)
+                
+                # Traverse up to calculate parent world matrix
+                chain = []
+                current = parent_node
+                while current is not None:
+                    chain.append(current)
+                    current = current.parent
+                    if not isinstance(current, scene.Node):
+                        break
+                
+                for n in chain:
+                    if hasattr(n, 'transform') and hasattr(n.transform, 'matrix'):
+                        parent_matrix = parent_matrix @ n.transform.matrix
+                
+                # Calculate inverse of parent matrix
+                try:
+                    inv_parent = np.linalg.inv(parent_matrix)
+                except np.linalg.LinAlgError:
+                    inv_parent = np.eye(4)
+                
+                # Create world translation matrix from gizmo position
+                world_translation = np.eye(4, dtype=np.float32)
+                world_translation[3, :3] = controller._object_translation
+                
+                # Calculate local translation: Local = World @ inv(Parent)
+                local_matrix = world_translation @ inv_parent
+                local_translation = local_matrix[3, :3]
+
+                # Apply local translation to object
                 if isinstance(obj.visual.transform, transforms.MatrixTransform):
                     m = np.eye(4, dtype=np.float32)
-                    m[3, :3] = controller._object_translation
+                    m[3, :3] = local_translation
                     obj.visual.transform.matrix = m
                 else:
                     T = transforms.MatrixTransform()
-                    T.translate(controller._object_translation)
+                    T.translate(local_translation)
                     obj.visual.transform = T
                 
-                # The gizmo node itself also needs to follow the translation.
+                # The gizmo node itself needs to stay at the WORLD position (controller._object_translation)
                 if isinstance(gizmo_node.transform, transforms.MatrixTransform):
                     m = np.eye(4, dtype=np.float32)
                     m[3, :3] = controller._object_translation
                     gizmo_node.transform.matrix = m
                 else:
-                    gizmo_node.transform = obj.visual.transform
+                    T = transforms.MatrixTransform()
+                    T.translate(controller._object_translation)
+                    gizmo_node.transform = T
 
                 # 2. Handle Rotation and Scale on the child node
                 # This combines the latest rotation and scale from the gizmo controller.

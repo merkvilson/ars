@@ -107,8 +107,32 @@ class CGeometry(ABC):
         """The visual that holds the rotation and scale transform."""
         return self._visual
 
+    def get_world_matrix(self):
+        """Calculate the full world transformation matrix."""
+        chain = []
+        current = self._node
+        # Traverse up the hierarchy
+        while current is not None:
+            chain.append(current)
+            current = current.parent
+            # Stop if we reach a node that isn't a standard scene node (like the ViewBox or SceneCanvas)
+            if not isinstance(current, scene.Node):
+                break
+        
+        # Calculate World = Local @ Parent @ ... @ Root (Row-Major)
+        matrix = np.eye(4, dtype=np.float32)
+        for n in chain:
+            if hasattr(n, 'transform') and hasattr(n.transform, 'matrix'):
+                matrix = matrix @ n.transform.matrix
+        return matrix
+
     def get_position(self) -> np.ndarray:
-        # Map the local origin [0,0,0] into world coordinates
+        """Get the world position of the object."""
+        # Extract translation from world matrix (Row 3 in Row-Major)
+        return self.get_world_matrix()[3, :3]
+
+    def get_local_position(self) -> np.ndarray:
+        """Get the local position relative to the parent."""
         return self._node.transform.map([0, 0, 0])[:3]
 
     # homogeneous version (handles 4D coords / perspective parents) (Not used currently but kept for reference)
