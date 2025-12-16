@@ -280,13 +280,6 @@ class ObjectHierarchyWindow(QWidget):
         for i in range(self.tree.topLevelItemCount()):
             set_parents(self.tree.topLevelItem(i), None)
 
-        # Set visual parents
-        for obj in self.manager._objects:
-            if obj._parent is None:
-                obj.visual.parent = self.manager._view.scene
-            else:
-                obj.visual.parent = obj._parent.visual
-
         # Restore transforms in top-down order to ensure parents are positioned before children
         def restore_transforms_recursive(item: QTreeWidgetItem):
             uid = item.data(0, Qt.ItemDataRole.UserRole)
