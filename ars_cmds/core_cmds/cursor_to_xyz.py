@@ -98,19 +98,39 @@ def get_xyz(ars_window, ignore_objs=None):
         try:
             obj = viewport._objectManager._objects[picked_idx]
             
-            # Transform ray from World Space to Object Local Space
-            # We manually traverse the transform hierarchy (World -> Node -> Local)
-            # to avoid issues with Vispy's get_transform in SubScenes.
+            # Build transform chain from Mesh Visual up to Scene Root
+            # This handles arbitrary hierarchy depth (Child -> Parent -> ... -> World)
+            chain = []
+            # Start with the visual that holds the mesh (Rotation/Scale node)
+            current = obj._visual 
             
-            # World -> Node (Translation)
-            p_node_origin = obj.visual.transform.imap(ray_origin)
-            p_node_point = obj.visual.transform.imap(ray_origin + ray_dir)
+            # Traverse up
+            while current is not None and current != view.scene:
+                chain.append(current)
+                current = current.parent
             
-            # Node -> Local (Rotation/Scale)
-            local_origin = obj._visual.transform.imap(p_node_origin)[:3]
-            local_point_on_ray = obj._visual.transform.imap(p_node_point)[:3]
+            # Calculate World Matrix (Row-Major: v_world = v_local @ M)
+            world_matrix = np.eye(4, dtype=np.float32)
+            for node in chain:
+                if hasattr(node, 'transform') and hasattr(node.transform, 'matrix'):
+                    world_matrix = world_matrix @ node.transform.matrix
             
-            local_dir = local_point_on_ray - local_origin
+            try:
+                inv_world_matrix = np.linalg.inv(world_matrix)
+            except np.linalg.LinAlgError:
+                raise Exception("Singular matrix")
+
+            # Transform Ray to Local Space
+            # Origin
+            ro_4 = np.append(ray_origin, 1.0)
+            ro_local = ro_4 @ inv_world_matrix
+            local_origin = ro_local[:3] / ro_local[3]
+
+            # Direction (using point + dir to handle perspective correctly if needed)
+            rd_point_4 = np.append(ray_origin + ray_dir, 1.0)
+            rd_local = rd_point_4 @ inv_world_matrix
+            local_point = rd_local[:3] / rd_local[3]
+            local_dir = local_point - local_origin
             
             if hasattr(obj, '_visual') and hasattr(obj._visual, 'mesh_data') and obj._visual.mesh_data is not None:
                 md = obj._visual.mesh_data
@@ -128,10 +148,9 @@ def get_xyz(ars_window, ignore_objs=None):
                         p_local = local_origin + t * local_dir
                         
                         # Transform intersection point back to World Space
-                        p_node = obj._visual.transform.map(p_local)
-                        p_world = obj.visual.transform.map(p_node)[:3]
-                        
-                        closest_point = p_world
+                        p_local_4 = np.append(p_local, 1.0)
+                        p_world_4 = p_local_4 @ world_matrix
+                        closest_point = p_world_4[:3] / p_world_4[3]
 
         except Exception as e:
             print(f"Error intersecting object: {e}")
