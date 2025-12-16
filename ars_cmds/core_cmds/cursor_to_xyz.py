@@ -50,7 +50,7 @@ def ray_triangle_intersection(ray_origin, ray_dir, v0, v1, v2):
         
     return None
 
-def get_xyz(ars_window, ignore_objs=None):
+def get_xyz(ars_window, ignore_objs=None, callback_object=None, callback_background=None, callback_grid=None):
     """
     Calculates the 3D world coordinates of the point under the mouse cursor.
     Checks for intersection with scene objects first, then falls back to the ground plane (Y=0).
@@ -156,14 +156,20 @@ def get_xyz(ars_window, ignore_objs=None):
             print(f"Error intersecting object: {e}")
             pass
 
-    if closest_point is not None:
+    if closest_point is not None: # Intersection with an object
+        if callback_object:
+            callback_object()
         return (closest_point[0], closest_point[1], closest_point[2])
 
-    # Fallback: Intersection with the ground plane (Y=0)
-    if abs(ray_dir[1]) > 1e-6:
+   
+    if abs(ray_dir[1]) > 1e-6: # Fallback: Intersection with the ground plane (Y=0)
         t = -ray_origin[1] / ray_dir[1]
         if t > 0:
+            if callback_grid:
+                callback_grid()
             grid_pos = ray_origin + t * ray_dir
             return (grid_pos[0], grid_pos[1], grid_pos[2])
             
+    if callback_background:
+        callback_background()
     return None
