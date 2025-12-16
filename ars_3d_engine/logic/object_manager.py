@@ -64,7 +64,8 @@ class CObjectManager(QObject):
         index = len(self._objects)
         self._objects.append(obj)
         obj.visual.parent = self._view.scene
-        pid = self._picking.register_visual(index=index, visual=obj.visual)
+        # Use rotation_visual (the mesh) for picking to avoid traversing children
+        pid = self._picking.register_visual(index=index, visual=obj.rotation_visual)
         self._obj_to_pid[id(obj)] = pid
         self.object_added.emit(index, obj)
         # Immediately deselect current selection
@@ -123,18 +124,17 @@ class CObjectManager(QObject):
         if id(obj) in self._obj_to_pid:
             del self._obj_to_pid[id(obj)]
             
+        if obj._parent:
+            obj._parent._children.remove(obj)
+
         for child in list(obj._children):
             child.set_parent(obj._parent)
         obj._children = []
         obj._parent = None
         obj.visual.parent = None
         
-        # Update indices for remaining objects without full rebuild
-        for i in range(index, len(self._objects)):
-            o = self._objects[i]
-            pid = self._obj_to_pid.get(id(o))
-            if pid is not None:
-                self._picking.update_index(pid, i)
+        # Rebuild picking to ensure clean state and correct indices
+        self._rebuild_picking()
                 
         self._selected_indices = [i for i in self._selected_indices if i != index]
         self._selected_set = set(self._selected_indices)
@@ -151,7 +151,7 @@ class CObjectManager(QObject):
         self._picking = CPickingManager(self._canvas)
         self._obj_to_pid.clear()
         for idx, o in enumerate(self._objects):
-            pid = self._picking.register_visual(index=idx, visual=o.visual)
+            pid = self._picking.register_visual(index=idx, visual=o.rotation_visual)
             self._obj_to_pid[id(o)] = pid
 
     def reorder_objects(self, new_objects: List[CGeometry]) -> None:
@@ -168,7 +168,7 @@ class CObjectManager(QObject):
                 self._picking.update_index(pid, i)
             else:
                 # Fallback if pid missing
-                pid = self._picking.register_visual(index=i, visual=obj.visual)
+                pid = self._picking.register_visual(index=i, visual=obj.rotation_visual)
                 self._obj_to_pid[id(obj)] = pid
 
     def set_active(self, index: int) -> None:

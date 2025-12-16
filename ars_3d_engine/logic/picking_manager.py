@@ -76,14 +76,17 @@ class CPickingManager:
         """
         pid = self._next_id
         self._next_id += 1
-        for leaf in self._iter_leaf_visuals(visual):
-            flt = PickingFilter(id_=pid)
-            leaf.attach(flt)
-            try:
-                flt.enabled = False
-            except Exception:
-                pass
-            self._entries.append((leaf, flt))
+        
+        # Attach directly to the passed visual (assumed to be the mesh/drawable)
+        # We do NOT traverse children to avoid attaching to child objects in the hierarchy
+        flt = PickingFilter(id_=pid)
+        visual.attach(flt)
+        try:
+            flt.enabled = False
+        except Exception:
+            pass
+        self._entries.append((visual, flt))
+        
         self._id_to_index[pid] = index
         #TODO: uncomment and check later.
         #print(f"Registered visual for picking with ID {pid} and index {index}")
