@@ -144,7 +144,46 @@ class CGeometry(ABC):
         return p[:3].copy()
 
 
+    def get_parent_world_matrix(self):
+        """Calculate the world transformation matrix of the parent node."""
+        chain = []
+        current = self._node.parent
+        # Traverse up the hierarchy
+        while current is not None:
+            chain.append(current)
+            current = current.parent
+            if not isinstance(current, scene.Node):
+                break
+        
+        matrix = np.eye(4, dtype=np.float32)
+        for n in chain:
+            if hasattr(n, 'transform') and hasattr(n.transform, 'matrix'):
+                matrix = matrix @ n.transform.matrix
+        return matrix
+
+    def set_world_position(self, x: float, y: float, z: float) -> None:
+        """Set the object's position in world coordinates."""
+        parent_matrix = self.get_parent_world_matrix()
+        
+        try:
+            inv_parent = np.linalg.inv(parent_matrix)
+        except np.linalg.LinAlgError:
+            inv_parent = np.eye(4)
+            
+        # Create world point (homogeneous)
+        world_point = np.array([x, y, z, 1.0], dtype=np.float32)
+        
+        # Transform to local space: Local = World @ inv(Parent)
+        local_point = world_point @ inv_parent
+        
+        # Normalize if w != 1 (though for affine transforms it usually is)
+        if abs(local_point[3]) > 1e-12:
+            local_point /= local_point[3]
+            
+        self.set_position(local_point[0], local_point[1], local_point[2])
+
     def set_position(self, x: float, y: float, z: float) -> None:
+        """Set the object's local position relative to its parent."""
         x = float(x)
         y = float(y)
         z = float(z)
@@ -160,7 +199,7 @@ class CGeometry(ABC):
         self._node.transform = tr
 
     def move_to(self, center = None, offset=0.0, animate=False):
-        current_pos = self.get_position()
+        current_pos = self.get_position() # World Position
         if center is None:
             center = current_pos
         
@@ -168,7 +207,7 @@ class CGeometry(ABC):
         target_center[1] += offset
 
         if not animate:
-            self.set_position(*target_center)
+            self.set_world_position(*target_center)
         else:
             self._anim_start_center = current_pos
             self._anim_target_center = target_center
@@ -192,9 +231,9 @@ class CGeometry(ABC):
         # Ease out cubic
         t_ease = 1 - (1 - t) ** 3
         
-        # Interpolate Center
+        # Interpolate Center (World Space)
         current_center = (1 - t_ease) * self._anim_start_center + t_ease * self._anim_target_center
-        self.set_position(*current_center)
+        self.set_world_position(*current_center)
 
     def set_prompt(self, prompt: str) -> None:
         """Set the text prompt associated with this object."""
