@@ -28,7 +28,14 @@ def execute_cmd(ars_window):
 
     
     def move_obj(time=0.25):
-        new_xyz = get_xyz(ars_window, ignore_objs=[obj])
+        def cb_obj(target_obj):
+            if target_obj != obj:
+                obj.set_parent(target_obj)
+        
+        def cb_none():
+            obj.set_parent(None)
+
+        new_xyz = get_xyz(ars_window, ignore_objs=[obj], callback_object=cb_obj, callback_grid=cb_none, callback_background=cb_none)
         if new_xyz:
             obj.move_to(center=new_xyz, offset=obj.get_scale()[1], animate=time)
 
