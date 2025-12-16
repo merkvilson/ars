@@ -158,7 +158,7 @@ def get_xyz(ars_window, ignore_objs=None, callback_object=None, callback_backgro
 
     if closest_point is not None: # Intersection with an object
         if callback_object:
-            callback_object()
+            callback_object(obj)
         return (closest_point[0], closest_point[1], closest_point[2])
 
    
