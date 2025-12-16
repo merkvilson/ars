@@ -1,7 +1,5 @@
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-# os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1" #This breaks browser rendering
-# os.environ["QT_FONT_DPI"] = "200"  #This breaks browser rendering
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
 os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
 
