@@ -66,7 +66,7 @@ class ViewportWidget(QWidget):
 
         self.controller = controller
 
-        controller.set_handles(['t'])
+        # controller.set_handles(['t'])
 
         gizmo_node.visible = False
 
@@ -115,14 +115,14 @@ class ViewportWidget(QWidget):
                 gizmo_node.visible = True
                 
                 # Ensure handles are enabled (if they were disabled on hide)
-                if not key_check("G"): controller.set_handles(['t'])  # Or your default mode
+                # if not key_check("G"): controller.set_handles(['t'])  # Or your default mode
 
             else:
                 #gizmo_node.visible = False
                # controller.reset() 
                 #controller._ring_center = np.array([0.0, 0.0, 0.0], dtype=float)  # Add this to reset hit centers
                 controller.set_handles([])  # Add this to skip raycasts entirely when hidden
-
+                
 
         self._objectManager.selection_changed.connect(update_gizmo_visibility_and_position)
         update_gizmo_visibility_and_position()
@@ -200,8 +200,8 @@ class ViewportWidget(QWidget):
         def on_mouse_release(event):
             # If a drag operation was in progress, commit the new scale
             # by updating the baseline scale for the next operation.
-            if controller._dragging and controller._drag_mode == 'scale':
-                controller.set_scale(controller._object_scale, reset_originals=True)
+            # if controller._dragging and controller._drag_mode == 'scale':
+            #     controller.set_scale(controller._object_scale, reset_originals=True)
             
             controller.handle_mouse_release(event)
             self._view.camera.interactive = True
@@ -312,6 +312,8 @@ class ViewportWidget(QWidget):
                 else:
                     om.set_selection_state([idx], idx)
                     play_sound("click")
+                    if not key_check("G"): self.controller.set_handles(['t'])  # Or your default mode
+
                     # msg = f"[_on_mouse_press] : picked_index #{idx}"
 
                 # If selection didn't change, still play the pulse (repeat-click on same selection).
