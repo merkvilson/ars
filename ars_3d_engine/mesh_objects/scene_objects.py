@@ -536,4 +536,3 @@ class CGeometry(ABC):
         new_obj._update_gl_state()
 
         return new_obj
-
