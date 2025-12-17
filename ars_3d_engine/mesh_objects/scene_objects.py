@@ -421,6 +421,13 @@ class CGeometry(ABC):
     def set_parent(self, parent):
         if self._parent == parent:
             return
+
+        # 1. Capture current world state (Visual World Matrix)
+        # World_Visual = Local_Visual @ World_Node
+        old_world_node = self.get_world_matrix()
+        old_visual_world = self._visual.transform.matrix @ old_world_node
+        old_pos = self.get_position()
+
         if self._parent:
             self._parent._children.remove(self)
         self._parent = parent
@@ -432,6 +439,39 @@ class CGeometry(ABC):
         
         if hasattr(self, 'manager') and self.manager:
             self.manager.notify_parent_changed(self, parent)
+
+        # 2. Restore World Position (Updates self._node translation)
+        self.set_world_position(*old_pos)
+
+        # 3. Restore World Rotation/Scale (Updates self._visual transform)
+        # New_Local_Visual = Old_Visual_World @ Inverse(New_World_Node)
+        new_world_node = self.get_world_matrix()
+        try:
+            inv_new_world_node = np.linalg.inv(new_world_node)
+        except np.linalg.LinAlgError:
+            inv_new_world_node = np.eye(4)
+            
+        new_local_visual = old_visual_world @ inv_new_world_node
+        self._visual.transform.matrix = new_local_visual
+
+        # 4. Update stored Euler angles from the new matrix
+        # Extract rotation part (normalize basis vectors to remove scale)
+        m = new_local_visual
+        sx = np.linalg.norm(m[0, :3])
+        sy = np.linalg.norm(m[1, :3])
+        sz = np.linalg.norm(m[2, :3])
+        
+        if sx > 1e-8 and sy > 1e-8 and sz > 1e-8:
+            rot_matrix = m[:3, :3].copy()
+            rot_matrix[0, :] /= sx
+            rot_matrix[1, :] /= sy
+            rot_matrix[2, :] /= sz
+            
+            try:
+                r = ScipyRotation.from_matrix(rot_matrix)
+                self._rotation_angles = r.as_euler('xyz', degrees=True)
+            except Exception:
+                pass
 
 
 

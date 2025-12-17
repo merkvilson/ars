@@ -7,6 +7,7 @@ from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from core.cursor_modifier import get_cursor, set_cursor
 import time
 from core.sound_manager import play_sound
+from PyQt6.QtCore import QTimer
 
 BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q", "hidden": True}
 
@@ -30,10 +31,16 @@ def execute_cmd(ars_window):
     def move_obj(time=0.25):
         def cb_obj(target_obj):
             if target_obj != obj:
-                obj.set_parent(target_obj)
+                if time:
+                    QTimer.singleShot(int(time * 1000), lambda: obj.set_parent(target_obj))
+                else:
+                    obj.set_parent(target_obj)
         
         def cb_none():
-            obj.set_parent(None)
+            if time:
+                QTimer.singleShot(int(time * 1000), lambda: obj.set_parent(None))
+            else:
+                obj.set_parent(None)
 
         new_xyz = get_xyz(ars_window, ignore_objs=[obj], callback_object=cb_obj, callback_grid=cb_none, callback_background=cb_none)
         if new_xyz:
