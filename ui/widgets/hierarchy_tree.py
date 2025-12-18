@@ -225,9 +225,12 @@ class ObjectHierarchyWindow(QWidget):
             uid = selected[0].data(0, Qt.ItemDataRole.UserRole)
             obj = self.id_to_obj.get(uid)
             if obj:
-                index = self.manager._objects.index(obj)
-                # Set selection state which triggers selection_changed signal
-                self.manager.set_selection_state([index], index)
+                try:
+                    index = self.manager._objects.index(obj)
+                    # Set selection state which triggers selection_changed signal
+                    self.manager.set_selection_state([index], index)
+                except ValueError:
+                    pass
 
     def on_item_renamed(self, item, column):
         if column == 0:
