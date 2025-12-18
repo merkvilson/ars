@@ -5,6 +5,10 @@ Airen Studio is an AI-powered 3D aimed media software designed to integrate
 advanced 3D rendering with AI workflows. This application features a unique
 "Floating Bubble" interface, ComfyUI integration, and a modular command system.
 
+Airen Studio - Standalone application
+Airen 4D - Plugin for Cinema 4D
+Airen Comfy - ComfyUI Extension
+
 Main Application Entry Point.
 """
 
