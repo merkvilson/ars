@@ -13,7 +13,7 @@ from theme.fonts.new_fonts import get_font
 from core.sound_manager import play_sound
 
 
-def create_icon(symbol, color="#E0E0E0", size=128):
+def create_icon(symbol, color=QColor(255, 255, 255, 180), size=128):
     pixmap = QPixmap(size, size)
     pixmap.fill(Qt.GlobalColor.transparent)
     painter = QPainter(pixmap)
