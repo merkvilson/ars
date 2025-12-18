@@ -1,3 +1,13 @@
+"""
+Airen Studio (ARS) - Alpha Version
+
+Airen Studio is an AI-powered 3D aimed media software designed to integrate
+advanced 3D rendering with AI workflows. This application features a unique
+"Floating Bubble" interface, ComfyUI integration, and a modular command system.
+
+Main Application Entry Point.
+"""
+
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
