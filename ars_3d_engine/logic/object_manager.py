@@ -43,6 +43,11 @@ class CObjectManager(QObject):
         self._selected_indices: List[int] = []
         self._selected_set: set[int] = set()
         self._obj_to_pid = {}
+        
+        # Timer for auto-selecting newly added objects
+        self._auto_select_timer = QTimer()
+        self._auto_select_timer.setSingleShot(True)
+        self._auto_select_timer.setInterval(250)
 
     def update_lights(self, light_dir):
             """Update light direction across all objects' shading filters.
@@ -74,8 +79,16 @@ class CObjectManager(QObject):
         self.object_added.emit(index, obj)
         # Immediately deselect current selection
         self.set_selection_state([], None)
-        # Schedule new object selection after 250ms delay
-        QTimer.singleShot(250, lambda: self.set_selection_state([index], index))
+        
+        # Schedule new object selection (restarts timer if already running)
+        # This ensures only the last added object in a batch is selected
+        try:
+            self._auto_select_timer.timeout.disconnect()
+        except TypeError:
+            pass # No connection
+            
+        self._auto_select_timer.timeout.connect(lambda: self.set_selection_state([index], index))
+        self._auto_select_timer.start()
         
     def duplicate_selected(self, offset = (0,0,0)) -> None:
         """Duplicate the currently selected objects and add them to the scene.
@@ -241,6 +254,10 @@ class CObjectManager(QObject):
             indices: List of object indices to select.
             active: Index of the object to make active, or None.
         """
+        # Stop auto-selection timer if manual selection occurs
+        if self._auto_select_timer.isActive():
+            self._auto_select_timer.stop()
+
         valid = []
         seen = set()
         n = len(self._objects)

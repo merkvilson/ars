@@ -243,6 +243,16 @@ class CGeometry(ABC):
         """Get the text prompt associated with this object."""
         return self._prompt
 
+    def pick(self):
+        """Select this object."""
+        if hasattr(self, 'manager') and self.manager:
+            try:
+                index = self.manager._objects.index(self)
+                print(f"Picking object: {self.get_name()} (ID: {index})")
+                self.manager.set_selection_state([index], index)
+            except (ValueError, AttributeError) as e:
+                print(f"Pick failed for {self.get_name()}: {e}")
+
     def set_color(self, color: tuple) -> None:
         """Set the color of the visual. Color should be a tuple (r, g, b) or (r, g, b, a) with values 0-1."""
         if hasattr(self._visual, 'color'):
