@@ -114,10 +114,34 @@ class ObjectHierarchyWindow(QWidget):
         self.tree.clear()
         self.id_to_obj.clear()
         self.uid_to_item.clear()
-        for i, obj in enumerate(self.manager._objects):
+        
+        # First pass: Create all items
+        for obj in self.manager._objects:
             uid = id(obj)
             self.id_to_obj[uid] = obj
-            self.add_tree_item(i, obj, uid)
+            
+            item = QTreeWidgetItem([str(obj.name)])
+            item.setIcon(0, create_icon(obj.symbol))
+            item.setData(0, Qt.ItemDataRole.UserRole, uid)
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+            self.uid_to_item[uid] = item
+
+        # Second pass: Build hierarchy
+        for obj in self.manager._objects:
+            uid = id(obj)
+            item = self.uid_to_item[uid]
+            parent_obj = getattr(obj, '_parent', None)
+            
+            if parent_obj:
+                parent_uid = id(parent_obj)
+                parent_item = self.uid_to_item.get(parent_uid)
+                if parent_item:
+                    parent_item.addChild(item)
+                    parent_item.setExpanded(True)
+                else:
+                    self.tree.addTopLevelItem(item)
+            else:
+                self.tree.addTopLevelItem(item)
 
     def add_tree_item(self, index, obj, uid):
         item = QTreeWidgetItem([str(obj.name)])
