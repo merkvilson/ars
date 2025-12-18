@@ -1,5 +1,5 @@
 """
-Airen Studio (ARS) - Alpha Version
+Airen Studio (ARS) - Alpha Version - 0.50
 
 Airen Studio is an AI-powered 3D aimed media software designed to integrate
 advanced 3D rendering with AI workflows. This application features a unique
