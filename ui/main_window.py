@@ -23,7 +23,7 @@ from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Airen Studio 2025")
+        self.setWindowTitle("Airen Studio 2026 - Alpha Version 0.50")
         self.setWindowIcon(QIcon(os.path.join("res", "icon.ico")))
         self.radial_menu = None
         self.bubbles_overlay = None
