@@ -18,17 +18,17 @@ def execute_cmd(ars_window):
     is_z = grid._z_axis_visible
     is_xyz = is_x and is_y and is_z
 
-    config = CtxConfig()
-    config.show_value = True
-    config.auto_close = False
-
-    config.options = {
+    config = CtxConfig(options = {
         ic.ICON_AXIS_X: "X",
         ic.ICON_AXIS_Y: "Y",
         ic.ICON_AXIS_Z: "Z",
         ic.ICON_GRID: "grid",
         ic.ICON_GIZMO_AXIS_3D: "xyz",
-    }
+    })
+    config.show_value = True
+    config.auto_close = False
+
+    # config.
 
     def update_xyz_toggle(ctx):
         new_is_xyz = grid._x_axis_visible and grid._y_axis_visible and grid._z_axis_visible

@@ -82,6 +82,11 @@ class ContextMenuConfig:
 
 class CtxConfig(ContextMenuConfig):
 
+    def __init__(self, options: dict = None):
+        super().__init__()
+        if options is not None:
+            self.options = options
+
     def set_arc_range(self, start_degrees: float, end_degrees: float):
         self.start_angle = math.radians(start_degrees)
         self.arc_span = math.radians(end_degrees - start_degrees)
@@ -505,7 +510,7 @@ def open_context(config=None, parent = None, items = None, position=None, ):
     if hasattr(config, 'options'):
         items = list(config.options.keys())
         config.additional_texts = config.options
-        
+
     # Check if a menu with the same items is already open
     for ctx in find_all_open_context_menus(parent):
         if ctx.items == items:
