@@ -505,6 +505,7 @@ def open_context(config=None, parent = None, items = None, position=None, ):
     if hasattr(config, 'options'):
         items = list(config.options.keys())
         config.additional_texts = config.options
+        
     # Check if a menu with the same items is already open
     for ctx in find_all_open_context_menus(parent):
         if ctx.items == items:
