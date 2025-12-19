@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
@@ -18,7 +18,7 @@ def execute_cmd(ars_window):
     is_z = grid._z_axis_visible
     is_xyz = is_x and is_y and is_z
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.show_value = True
     config.auto_close = False
 
@@ -70,4 +70,4 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_AXIS_3D: is_xyz,
     }
 
-    ctx = open_context(config)
+    ctx = config.open_context()

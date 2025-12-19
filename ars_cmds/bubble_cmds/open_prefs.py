@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from prefs.pref_controller import edit_pref, read_pref
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -28,7 +28,7 @@ def start_comfy(server = False, cpu = False):
     
 
 def open_comfy():
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     config.close_on_outside = False
 
@@ -41,10 +41,7 @@ def open_comfy():
 
     config.callbackL = { "a": lambda: start_comfy(server=ctx.get_value("b"), cpu=ctx.get_value("c"))}
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = config.open_context(items=options_list)
 
 
 BBL_X_CONFIG ={"symbol": ic.ICON_SETTINGS }
@@ -53,7 +50,7 @@ def BBL_X(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
 
     config.options = {
     "1": "ComfyUI Path",
@@ -69,4 +66,4 @@ def execute_cmd(ars_window):
     
     "4": open_comfy,}
 
-    ctx = open_context(config)
+    ctx = config.open_context()

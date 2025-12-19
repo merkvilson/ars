@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 import pyperclip
 from theme.fonts.new_fonts import get_font
 from theme.fonts import font_icons as ic
@@ -17,7 +17,7 @@ def BBL_ICONS(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.item_radius = 25
     config.font = get_font(25)
     config.background_color = (30, 30, 30, 230)
@@ -36,7 +36,4 @@ def execute_cmd(ars_window):
         if isinstance(value, str) and value in ic.ICON_FULL_LIST
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = config.open_context(items=options_list)

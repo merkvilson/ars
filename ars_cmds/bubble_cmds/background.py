@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from PyQt6.QtWidgets import QFileDialog
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -23,7 +23,7 @@ def BBL_RENDER(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
 
     config.options = {
         ic.ICON_IMAGE: "Change BG",
@@ -35,4 +35,4 @@ def execute_cmd(ars_window):
         ic.ICON_BACKGROUND: lambda: ars_window.viewport.bg.clear_image(),
     }
 
-    ctx = open_context(config)
+    ctx = config.open_context()

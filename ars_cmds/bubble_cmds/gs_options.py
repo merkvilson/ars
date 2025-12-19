@@ -1,6 +1,6 @@
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from ui.widgets.context_menu import ContextMenuConfig, open_context, close_all_open_context_menus
+from ui.widgets.context_menu import CtxConfig, close_all_open_context_menus
 from PyQt6.QtWidgets import QFileDialog
 
 
@@ -37,7 +37,7 @@ def auto_sort(ars_window):
   
 def execute_cmd(ars_window):
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     config.show_value = True
     config.options =  {
@@ -61,4 +61,4 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_SCALE: lambda scale: ars_window.gs_viewer.set_scale(scale/100.0)
     }
 
-    ctx = open_context(config)
+    ctx = config.open_context()

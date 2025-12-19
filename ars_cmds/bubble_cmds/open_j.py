@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context, close_all_open_context_menus
+from ui.widgets.context_menu import CtxConfig, close_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtWidgets import QFileDialog
@@ -24,7 +24,7 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     open_render_video(ars_window)
 
 
-    config=ContextMenuConfig()
+    config=CtxConfig()
     config.options = {}
     config.extra_distance = [99999,0]
 
@@ -118,7 +118,7 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
     config.hover_color[ic.ICON_PLAYER_PLAY] = QColor.fromRgbF(0.3822,  0.657188, 0.98,  1.0)
     config.callbackL[ic.ICON_PLAYER_PLAY] = start_render
     
-    ctx = open_context(config)
+    ctx = config.open_context()
 
 
 def execute_cmd(ars_window):

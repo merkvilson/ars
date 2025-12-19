@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
@@ -23,7 +23,7 @@ def BBL_CAMERA(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.incremental_value = 5
     
     config.options = {
@@ -75,4 +75,4 @@ def execute_cmd(ars_window):
         ic.ICON_EYE_UP: lambda value: cam_zoom(ars_window, value),        
     }
 
-    ctx = open_context(config)
+    ctx = config.open_context()

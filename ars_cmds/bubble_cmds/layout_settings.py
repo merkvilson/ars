@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from PyQt6.QtCore import Qt, QTimer
 from theme.fonts import font_icons as ic
 import os
@@ -28,7 +28,7 @@ def BBL_MENU(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
 
     config.options = {
         ic.ICON_POWER: "Close App",
@@ -54,4 +54,4 @@ def execute_cmd(ars_window):
     }
 
 
-    ctx = open_context(config)
+    ctx = config.open_context()
