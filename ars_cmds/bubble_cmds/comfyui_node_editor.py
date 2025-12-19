@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import subprocess
@@ -142,7 +142,7 @@ def execute_cmd(ars_window):
     browser_height = getattr(ars_window.prefs, 'browser_height', 600)
     scale_factor = ars_window.devicePixelRatio()
     
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.use_extended_shape = False
     config.auto_close = False
     config.close_on_outside = False
@@ -200,9 +200,6 @@ def execute_cmd(ars_window):
     
     config.callback_on_close = _manager.close_browser
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = config.open_context(items=options_list)
     return ctx
 

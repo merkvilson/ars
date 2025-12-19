@@ -1,5 +1,5 @@
 import os
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
@@ -22,7 +22,7 @@ def BBL_OBJECT(*args):
     run_ext(__file__)
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     
     p = (0, 0, 0)
 
@@ -73,7 +73,7 @@ def execute_cmd(ars_window):
     }
 
     if not key_check("G"):
-        open_context(config)
+        config.open_context()
         return
 
 
@@ -118,7 +118,7 @@ def execute_cmd(ars_window):
         set_cursor("cursor")
         point.remove()
         if select is None:
-            open_context(config)
+            config.open_context()
         else:
             primitive = add_primitive(select, animated=True, position=p)
             ars_window.CF.UP(key="additional_text", value=select.capitalize()+" Added", auto_close = 500, symbol=getattr(ic, "ICON_OBJ_"+select.upper()))

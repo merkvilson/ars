@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from ars_cmds.core_cmds.run_ext import run_ext
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object as get_selected
@@ -20,7 +20,7 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.options = {
         ic.ICON_HOME: "Home",
         ic.ICON_WINDOW_FULLSCREEN: "Selected",

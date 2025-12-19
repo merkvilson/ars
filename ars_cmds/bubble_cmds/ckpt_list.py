@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
@@ -28,7 +28,7 @@ def BBL_CKPTLIST(*args):
     run_ext(__file__)
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     config.item_radius = 15
 
@@ -48,7 +48,4 @@ def execute_cmd(ars_window):
     
     #config.toggle_groups = [ckpt_index_list]
 
-    ctx = open_context(
-        items=ckpt_index_list,
-        config=config
-    )
+    ctx = config.open_context(items=ckpt_index_list)
