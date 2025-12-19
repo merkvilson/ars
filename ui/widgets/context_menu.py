@@ -80,9 +80,14 @@ class ContextMenuConfig:
         self.custom_width = None
         self.custom_height = None
 
+class CtxConfig(ContextMenuConfig):
+
     def set_arc_range(self, start_degrees: float, end_degrees: float):
         self.start_angle = math.radians(start_degrees)
         self.arc_span = math.radians(end_degrees - start_degrees)
+
+    def open_context(self, parent=None, items=None, position=None):
+        return open_context(config=self, parent=parent, items=items, position=position)
 
 
 class ContextButtonWindow(QWidget):
