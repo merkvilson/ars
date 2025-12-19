@@ -1,9 +1,7 @@
-from ui.widgets.context_menu import CtxConfig
 from ars_cmds.core_cmds.run_ext import run_ext
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object as get_selected
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
-from ars_cmds.core_cmds.load_object import add_primitive
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from core.cursor_modifier import get_cursor, set_cursor
 import time
@@ -20,12 +18,6 @@ def execute_cmd(ars_window):
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-    config = CtxConfig()
-    config.options = {
-        ic.ICON_HOME: "Home",
-        ic.ICON_WINDOW_FULLSCREEN: "Selected",
-        ic.ICON_CIRCLE_DASHED: "Cursor"
-    }
 
     camera = ars_window.viewport.cam
     default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
@@ -48,18 +40,6 @@ def execute_cmd(ars_window):
     def view_home():
         camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
         
-    config.callbackL = {
-        ic.ICON_HOME: view_home,
-        ic.ICON_WINDOW_FULLSCREEN: view_selected,
-        ic.ICON_CIRCLE_DASHED: view_cursor,
-    }
-
-    config.hotkey_items = {
-        ic.ICON_HOME: "H",
-        ic.ICON_WINDOW_FULLSCREEN: "S",
-        ic.ICON_CIRCLE_DASHED: "C",
-        
-    }
 
     start_time = 0
 
@@ -70,9 +50,6 @@ def execute_cmd(ars_window):
     
 
     def during():
-        #xyz = get_xyz(ars_window)
-        #xyz_str = str(tuple(round(float(x), 2) for x in xyz))
-        #ars_window.msg(xyz_str)
 
         if get_cursor()[0] == "map-pin":
            return
