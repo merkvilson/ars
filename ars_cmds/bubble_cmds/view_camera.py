@@ -1,3 +1,39 @@
+"""
+Camera View Control Module
+==========================
+
+This module implements smart camera focusing functionality, allowing users to quickly navigate the 3D view
+based on context and input duration. It distinguishes between a "Short Press" and a "Long Press" of the hotkey
+to trigger different focusing behaviors.
+
+Functionality:
+--------------
+- **Activation**: Triggered by the configured hotkey (Default: 'V').
+- **Short Press (< 0.15s)**: Focus on Selection.
+    - Centers the camera on the currently selected object.
+    - Adjusts the zoom distance based on the object's scale.
+    - Resets camera rotation to default.
+    - If no object is selected, resets the view to the "Home" position (0,0,0).
+- **Long Press (> 0.15s)**: Focus on Cursor.
+    - Centers the camera on the 3D point directly under the mouse cursor (raycast).
+    - Useful for quickly navigating to a specific part of the scene or grid.
+- **Visual Feedback**:
+    - The cursor changes to a "map-pin" icon during a long press to indicate that the "Focus on Cursor" mode is active.
+
+Key Components:
+---------------
+- `BBL_CAMVIEWER_CONFIG`: Configuration for the bubble command.
+- `execute_cmd`: Main logic wrapper.
+    - `view_cursor`: Logic to raycast and move camera to cursor position.
+    - `view_selected`: Logic to move camera to selected object or home.
+    - `start`, `during`, `end`: Callbacks for `key_check_continuous` that measure press duration and trigger the appropriate action.
+
+Dependencies:
+-------------
+- `ars_cmds.core_cmds`: For object selection and coordinate conversion.
+- `core`: For cursor management.
+- `vispy` (via `ars_window.viewport.cam`): For camera manipulation.
+"""
 from ars_cmds.core_cmds.run_ext import run_ext
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object as get_selected

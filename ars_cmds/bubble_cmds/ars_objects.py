@@ -1,3 +1,40 @@
+"""
+Object Creation Command Module
+==============================
+
+This module implements the "Add Object" functionality, providing two distinct workflows for creating 
+3D objects in the scene: a context menu for quick selection and a hotkey-driven interactive placement mode.
+
+Functionality:
+--------------
+- **Activation**: Triggered by the configured hotkey (Default: 'G').
+- **Context Menu Mode** (Click):
+    - If the hotkey is pressed and released quickly (or clicked via UI), a context menu opens.
+    - **Options**: Allows adding Primitives (Cube, Sphere, etc.), 2D Sprites, 3D Text, or loading external files.
+- **Interactive Placement Mode** (Hold):
+    - **Preview**: While holding the hotkey, a semi-transparent preview of the object follows the cursor in 3D space.
+    - **Selection**: Mouse scroll cycles through available primitive shapes (Cube, Plane, Cylinder, etc.).
+    - **Placement**: Releasing the hotkey instantiates the selected object at the cursor's last position.
+    - **Fallback**: If the cycle reaches the "Select Object" state, releasing the key opens the full context menu.
+- **Visual/Audio Feedback**:
+    - Real-time preview of the object shape and position.
+    - Floating text notifications indicating the currently selected shape.
+    - Sound effects on scroll.
+
+Key Components:
+---------------
+- `BBL_OBJECT_CONFIG`: Configuration for the bubble command (Icon, Hotkey).
+- `execute_cmd`: Main logic wrapper.
+    - Defines the `CtxConfig` for the context menu.
+    - Sets up `key_check_continuous` for the hold-interaction loop.
+    - `start`, `during`, `end`, `scroll`: Callbacks managing the preview object, position updates, and final placement.
+
+Dependencies:
+-------------
+- `ars_cmds.core_cmds`: For object loading (`add_mesh`, `add_primitive`, etc.) and input handling.
+- `ui.widgets.context_menu`: For the selection menu.
+- `core`: For cursor and sound management.
+"""
 import os
 from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
