@@ -45,10 +45,7 @@ class Application:
 def main() -> None:
 
     myappid = 'airen.studio.ars.0.50' # arbitrary string
-    try:
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    except Exception:
-        pass
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     app = Application()
     app.run()
