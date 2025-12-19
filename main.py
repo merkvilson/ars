@@ -22,6 +22,7 @@ os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
 import sys
 from PyQt6.QtWidgets import QApplication
 from ui.main_window import MainWindow
+import ctypes
 
 import pygame
 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
@@ -42,6 +43,13 @@ class Application:
         sys.exit(self._app.exec())
 
 def main() -> None:
+
+    myappid = 'airen.studio.ars.0.50' # arbitrary string
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    except Exception:
+        pass
+
     app = Application()
     app.run()
 
