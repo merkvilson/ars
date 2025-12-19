@@ -1,4 +1,41 @@
-"""This module provides gizmo control functionality (move) via hotkey hold."""
+"""
+Gizmo Move Command Module
+=========================
+
+This module implements the "Gizmo Move" functionality, allowing users to interactively move and rotate 
+selected 3D objects using a hotkey-driven workflow.
+
+Functionality:
+--------------
+- **Activation**: Triggered by the configured hotkey (Default: 'Q').
+- **Object Movement**: 
+    - On initial press, the selected object animates to the cursor's 3D position.
+    - While holding the key, the object continuously follows the cursor in 3D space.
+    - Uses raycasting (`get_xyz`) to determine the 3D position on the grid or other objects.
+- **Parenting**: 
+    - Automatically reparents the selected object if dropped onto another object.
+    - Unparents if dropped on the grid or background.
+- **Rotation**: 
+    - Mouse scroll while holding the hotkey rotates the object around the Y-axis in 15-degree increments.
+    - Provides visual feedback of the current rotation angle.
+- **Visual/Audio Feedback**:
+    - Changes cursor style during operation.
+    - Plays sound effects on activation and rotation.
+    - Hides standard gizmo handles during the move operation.
+
+Key Components:
+---------------
+- `BBL_GIZMO_MOVE_CONFIG`: Configuration for the bubble command (Icon, Hotkey, Visibility).
+- `execute_cmd`: Main logic wrapper setting up the continuous key check and state management.
+    - `move_obj`: Handles the logic for calculating position and setting parent relationships.
+    - `start`, `during`, `end`, `scroll`: Callbacks for the `key_check_continuous` input loop.
+
+Dependencies:
+-------------
+- `ars_cmds.core_cmds`: For object selection, input handling, and coordinate conversion.
+- `core`: For cursor management and sound effects.
+- `PyQt6`: For timer-based delayed actions.
+"""
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.core_cmds.run_ext import run_ext
