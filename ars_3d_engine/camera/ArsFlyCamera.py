@@ -26,6 +26,9 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self._reset_rotation2 = Quaternion.create_from_axis_angle(np.deg2rad(20), 1, 0, 0)
 
 
+
+
+
     def _slerp(self, q1, q2, t):
         v1 = np.array([q1.w, q1.x, q1.y, q1.z])
         v2 = np.array([q2.w, q2.x, q2.y, q2.z])
@@ -138,6 +141,10 @@ class ArsFlyCamera(vispy.scene.cameras.FlyCamera):
         self.rotation1 = self._reset_rotation1
         self.rotation2 = self._reset_rotation2
         self.view_changed()
+        
+        self.update_callback = None
+        self.auto_roll = True
+        self.scale_factor = 10.0
 
 
     def view_changed(self):

@@ -27,10 +27,8 @@ class ViewportWidget(QWidget):
         bounds = ((-150, 150), (0.5, 100), (-150, 150))
         cam = ArsFlyCamera(fov=60, up='+y', fly_bounds=bounds)
         self._view.camera = cam
-        cam.update_callback = None
-        cam.auto_roll = True
-        cam.scale_factor = 10.0
         self.cam = cam
+        
         self.cam.reset()
         
         self._objectManager = CObjectManager(self._view, self._canvas, None, CPickingManager(self._canvas))
