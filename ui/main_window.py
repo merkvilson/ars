@@ -1,6 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 from ars_3d_engine.viewport import ViewportWidget
 from ars_cmds.core_cmds.define_hotkeys import define_hotkeys
@@ -17,10 +18,13 @@ from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
 from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
 
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Airen Studio 2025")
+        self.setWindowIcon(QIcon(os.path.join("res", "icon.ico")))
         self.radial_menu = None
         self.bubbles_overlay = None
         self.central_widget = None
