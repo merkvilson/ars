@@ -21,7 +21,6 @@ os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
 
 import sys
 from PyQt6.QtWidgets import QApplication
-from core.cursor_modifier import set_default_cursor
 from ui.main_window import MainWindow
 
 import pygame
@@ -45,7 +44,6 @@ class Application:
 def main() -> None:
     app = Application()
     app.run()
-    set_default_cursor("cursor")
 
 if __name__ == "__main__":
     main()
