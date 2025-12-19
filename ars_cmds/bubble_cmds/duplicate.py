@@ -1,3 +1,35 @@
+"""
+Object Duplication Command Module
+=================================
+
+This module implements the "Duplicate Object" functionality, allowing users to quickly clone selected 3D objects.
+
+Functionality:
+--------------
+- **Activation**: Triggered by the configured hotkey (Default: 'Ctrl+D').
+- **Duplication**: 
+    - Creates an exact copy of the currently selected object using the object manager.
+    - The new copy becomes the active selection.
+- **Placement**: 
+    - Immediately after duplication, the clone is animated to the current cursor position in 3D space.
+    - This prevents the clone from overlapping perfectly with the original, making it visible immediately.
+- **Visual/Audio Feedback**:
+    - Plays a "pop-clear" sound effect on activation.
+    - Temporarily hides gizmo handles to reduce visual clutter during the move.
+
+Key Components:
+---------------
+- `BBL_2_CONFIG`: Configuration for the bubble command (Icon, Hotkey).
+- `execute_cmd`: Main logic wrapper.
+    - Checks for selection.
+    - Calls `ars_window.viewport._objectManager.duplicate_selected()`.
+    - Calculates new position using `get_xyz` and moves the clone.
+
+Dependencies:
+-------------
+- `ars_cmds.core_cmds`: For object selection and coordinate conversion.
+- `core`: For sound management.
+"""
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.core_cmds.run_ext import run_ext
