@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext

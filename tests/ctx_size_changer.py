@@ -1,6 +1,6 @@
-from ui.widgets.context_menu import open_context, ContextMenuConfig
+from ui.widgets.context_menu import CtxConfig
 
-config = ContextMenuConfig()
+config = CtxConfig()
 config.custom_width = ars_window.width() 
 config.options = {"1": "Slider 1",}
 config.slider_values = {"1": (10,500,50)}
@@ -16,4 +16,4 @@ def update_geometry(value):
 config.callbackL={"1": update_geometry}
 config.incremental_values={"1": 3}
 
-ctx = open_context(config)
+ctx = config.open_context()

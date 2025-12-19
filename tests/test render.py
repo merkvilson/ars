@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 import os
@@ -8,7 +8,7 @@ def BBL_TEST3(*args):
 
 
 def execute_cmd(self):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     
     config.options = {
     "0": "Current Workflow",
@@ -35,4 +35,4 @@ def execute_cmd(self):
     config.callback_hover_in = {"0": lambda: self.msg("render_workflow")}
     config.callback_hover_out = {"0": lambda: self.msg("render_manager")}
 
-    ctx = open_context(config)
+    ctx = config.open_context()

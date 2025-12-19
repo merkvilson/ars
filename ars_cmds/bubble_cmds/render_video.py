@@ -1,7 +1,7 @@
 """
 This module provides functionality for rendering and playing back video sequences.
 """
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtCore import QTimer
@@ -149,7 +149,7 @@ def execute_cmd(ars_window):
         return None
 
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.use_extended_shape_items = {"timeline": (ars_window.width() / (40), 1)} #40 stands for item diameter
     config.hover_scale_items = {"timeline": 0.95}
     config.auto_close = False
@@ -418,8 +418,7 @@ def execute_cmd(ars_window):
         }
 
 
-    ctx = open_context(
+    ctx = config.open_context(
         items=options_list,
-        config=config,
         parent=ars_window.central_widget
     )

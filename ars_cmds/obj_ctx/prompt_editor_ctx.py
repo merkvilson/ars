@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from ui.ars_code import PromptEditor
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -8,7 +8,7 @@ def BBL_P(*args):
     run_ext(__file__)
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.use_extended_shape = False
     config.auto_close = False
     config.close_on_outside = False
@@ -81,8 +81,7 @@ def execute_cmd(ars_window):
         ),
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
+    ctx = config.open_context(
+        items=options_list
     )
     return ctx, editor

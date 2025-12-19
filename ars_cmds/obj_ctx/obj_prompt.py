@@ -13,7 +13,7 @@ from ars_cmds.render_cmds.render_pass import save_depth, save_render
 from ars_cmds.util_cmds.copy_to import copy_file_to_dir
 from prefs.pref_controller import get_path
 from theme.fonts import font_icons as ic
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from ui.ars_code import PromptEditor
 
 def prompt_ctx(self, position, default_object = None, callback = None):
@@ -23,7 +23,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             pass        
         callback = close_callback 
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     config.close_on_outside = False
     config.use_extended_shape = False
@@ -144,9 +144,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
     config.custom_widget_items = {"PromptEditorWidget": editor}
 
-    ctx = open_context(
+    ctx = config.open_context(
         parent=self.central_widget,
         items=options_list,
-        position=position,
-        config=config
+        position=position
     )

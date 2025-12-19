@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from ui.ars_code import CodeEditor
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
@@ -26,7 +26,7 @@ def _list_user_scripts():
 
 def scripts_ctx(ars_window, callback_ctx):
     py_files = _list_user_scripts()
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = True
     config.close_on_outside = False
     config.show_symbol = False
@@ -45,10 +45,7 @@ def scripts_ctx(ars_window, callback_ctx):
         config.callbackL[index_str] = lambda f=full_path: callback_ctx(f)  # Use lambda to capture current full_path
         config.callbackR[index_str] = lambda f=full_path: open_file(f)
 
-    ctx = open_context(
-        items=[str(i) for i in range(len(py_files))],
-        config=config
-    )
+    ctx = config.open_context(items=[str(i) for i in range(len(py_files))])
 
 
 
@@ -57,7 +54,7 @@ def execute_cmd(ars_window):
     if not py_files:
         print("No python scripts found in ars_scripts/user")
         return
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.use_extended_shape = False
     config.auto_close = False
     config.close_on_outside = False
@@ -145,8 +142,5 @@ def execute_cmd(ars_window):
             ),
     }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
-    )
+    ctx = config.open_context(items=options_list)
     return ctx, code_editor

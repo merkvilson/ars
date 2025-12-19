@@ -8,7 +8,7 @@ from ars_cmds.core_cmds.load_object import selected_object
 from ars_cmds.util_cmds.color_convert import hsv_to_rgb, rgb_to_hsv
 from core.sound_manager import play_sound
 from theme.fonts import font_icons as ic
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from ui.widgets.screen_color_picker import ScreenshotOverlay
 from PyQt6.QtWidgets import QApplication
 
@@ -270,11 +270,10 @@ def obj_color(self, position, callback=None):
 
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
 
-    ctx = open_context(
+    ctx = config.open_context(
         parent=self.central_widget,
         items=options_list,
-        position=position,
-        config=config
+        position=position
     )
 
     

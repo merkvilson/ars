@@ -1,5 +1,5 @@
 import os
-from ui.widgets.context_menu import ContextMenuConfig, open_context, find_all_open_context_menus
+from ui.widgets.context_menu import CtxConfig, find_all_open_context_menus
 from theme.fonts import font_icons as ic
 from ui.widgets.keyframes import KeyframesWidget
 from prefs.pref_controller import get_path
@@ -20,7 +20,7 @@ def execute_cmd(ars_window):
             keyframes_open = True
     if not keyframes_open: delete_all_files_in_folder( get_path("input") )
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     config.close_on_outside = False
     config.distribution_mode = "x"
@@ -47,7 +47,7 @@ def execute_cmd(ars_window):
 
         if not os.path.exists(get_path("keyframes")):
             return
-        config2 = ContextMenuConfig()
+        config2 = CtxConfig()
         config2.expand = "y"
         config2.show_symbol = False
         config2.close_on_outside = True
@@ -87,9 +87,8 @@ def execute_cmd(ars_window):
             }
 
         if config2.image_items:
-            open_context(
-            items=items,
-            config=config2
+            config2.open_context(
+            items=items
         )
 
     config.callbackL = {
@@ -97,7 +96,6 @@ def execute_cmd(ars_window):
         "2": lambda: img_list("2"),
         }
 
-    ctx = open_context(
-        items=options_list,
-        config=config
+    ctx = config.open_context(
+        items=options_list
     )

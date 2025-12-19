@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.key_check import key_check_continuous
 
@@ -14,7 +14,7 @@ def obj_scale(self, position, callback):
     obj = selected[0]
 
 
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = False
@@ -61,9 +61,8 @@ def obj_scale(self, position, callback):
 
 
 
-    ctx = open_context(
+    ctx = config.open_context(
         parent=self.central_widget,
         items=options_list,
-        position=position,
-        config=config
+        position=position
     )

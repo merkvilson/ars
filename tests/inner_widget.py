@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtGui import QPainter, QLinearGradient, QColor, QPen
 from PyQt6.QtCore import Qt
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 
 # water_widget.py
@@ -359,7 +359,7 @@ def BBL_Y(self, position):
     water_2d = WaterWidget2()
     #custom_widget.position = 30 / 100.0  # Set initial position based on slider default
     #custom_widget.setFixedSize(100, 500)  # Fixed size for the custom widget
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.auto_close = False
     options_list = ["X", "Y", "Z", "A", "B", "C",]
 
@@ -367,11 +367,10 @@ def BBL_Y(self, position):
     config.slider_values = {"Y": (0,100,30), "Z": (0,100,30), "A": (0,100,30)}
     config.editable_items = {"X": False}
 
-    ctx = open_context(
+    ctx = config.open_context(
         parent=self.central_widget,
         items=options_list,
-        position=position,
-        config=config
+        position=position
     )
     
     return ctx  # Return the context menu if you need to handle its result

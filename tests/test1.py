@@ -1,4 +1,4 @@
-from ui.widgets.context_menu import ContextMenuConfig, open_context
+from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
@@ -12,7 +12,7 @@ def BBL_TEST(*args):
 
 
 def execute_cmd(ars_window):
-    config = ContextMenuConfig()
+    config = CtxConfig()
 
 
     options_list = [
@@ -30,10 +30,9 @@ def execute_cmd(ars_window):
         "2": lambda: print("Button 2 pressed"),
     }
 
-    ctx = open_context(
+    ctx = config.open_context(
         parent=ars_window.central_widget,
         items=options_list,
-        position=ars_window.central_widget.mapFromGlobal(QCursor.pos()),
-        config=config
+        position=ars_window.central_widget.mapFromGlobal(QCursor.pos())
     )
 
