@@ -19,7 +19,7 @@ app.registerExtension({
     settings: [
         {
             id: 'ARS_PreviewSaver.LatentPreview',
-            category: ['🎨 ARS Preview Saver', 'Sampling', 'Latent Previews'],
+            category: ['ARS Preview Saver', 'Sampling', 'Latent Previews'],
             name: 'Display animated previews when sampling',
             type: 'boolean',
             defaultValue: true,
@@ -39,7 +39,7 @@ app.registerExtension({
         },
         {
             id: "ARS_PreviewSaver.LatentPreviewRate",
-            category: ['🎨 ARS Preview Saver', 'Sampling', 'Latent Preview Rate'],
+            category: ['ARS Preview Saver', 'Sampling', 'Latent Preview Rate'],
             name: "Playback rate override.",
             type: 'number',
             attrs: {
