@@ -22,6 +22,10 @@ import server
 
 # Force latent preview mode
 args.preview_method = LatentPreviewMethod.Latent2RGB
+try:
+    latent_preview.default_preview_method = LatentPreviewMethod.Latent2RGB
+except Exception as e:
+    print(f"[ARS Preview Saver] Failed to set default_preview_method: {e}")
 
 # Configuration
 STEPS_DIR = os.path.join(folder_paths.get_output_directory(), "steps")
@@ -65,16 +69,16 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
         else:
             raise Exception("Unsupported preview type for Animated Frame Saver")
 
-    def decode_latent_to_preview_image(self, preview_format, x0):
+    def decode_latent_to_preview_image(self, preview_format, x0, *args, **kwargs):
         """Main entry point - routes to appropriate handler"""
         # Single image (step preview) - delegate to base previewer
         if x0.ndim == 4 and x0.size(0) == 1:
-            return self.base_previewer.decode_latent_to_preview_image(preview_format, x0)
+            return self.base_previewer.decode_latent_to_preview_image(preview_format, x0, *args, **kwargs)
         
         # Multi-image (animated sequence) - handle frame saving
-        return self._handle_animated_sequence(x0, preview_format)
+        return self._handle_animated_sequence(x0, preview_format, *args, **kwargs)
     
-    def _handle_animated_sequence(self, x0, preview_format="JPEG"):
+    def _handle_animated_sequence(self, x0, preview_format="JPEG", *args, **kwargs):
         """Process and save animated frame sequence"""
         # Reshape 5D tensor to 4D if needed
         if x0.ndim == 5:
@@ -85,7 +89,7 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
 
         # If it's just a single frame (e.g. 5D tensor with 1 frame), treat as step preview
         if num_frames == 1:
-            return self.base_previewer.decode_latent_to_preview_image(preview_format, x0)
+            return self.base_previewer.decode_latent_to_preview_image(preview_format, x0, *args, **kwargs)
         
         current_time = time.time()
         num_previews = int((current_time - self.last_time) * self.frame_rate)
@@ -192,13 +196,27 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
 # Saves each sampling step to output/steps/
 # ============================================================================
 
-def create_step_saver_callback(model, steps, x0_output_dict=None):
+def create_step_saver_callback(model, steps, x0_output_dict=None, *args, **kwargs):
     """Create callback that saves preview at each sampling step"""
     preview_format = "JPEG"
+    
+    # Try to get previewer
     previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
+
+    # Fallback: If previewer is None, try forcing Latent2RGB
+    # FIX (2025-12-20): Recent ComfyUI updates introduced per-queue preview overrides (set_preview_method)
+    # which can reset the preview method to NoPreviews/None just before this callback runs.
+    # We detect this case and temporarily force Latent2RGB to ensure we get a valid previewer
+    # so step saving continues to work regardless of the UI settings.
+    if not previewer:
+        # print("[ARS Preview Saver] Previewer is None, attempting to force Latent2RGB...")
+        original_method = args.preview_method
+        args.preview_method = LatentPreviewMethod.Latent2RGB
+        previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
+        args.preview_method = original_method
     pbar = comfy.utils.ProgressBar(steps)
     
-    def callback(step, x0, x, total_steps):
+    def callback(step, x0, x, total_steps, *args, **kwargs):
         # Update output dict if provided
         if x0_output_dict is not None:
             x0_output_dict["x0"] = x0
