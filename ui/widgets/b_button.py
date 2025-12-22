@@ -33,6 +33,7 @@ from typing import Optional, Callable, Tuple, Any, Union, List
 
 
 import inspect
+import time
 from theme.fonts.new_fonts import get_font
 from theme import colors
 from .widget_control import set_updated_config
@@ -51,6 +52,7 @@ class SliderHandle(QGraphicsRectItem):
         self._drag_button = None
         self.is_incremental = parent.incremental_value
         self.initial_click_x = 0.0
+        self._press_timestamp = 0.0
 
     def mousePressEvent(self, event):
         if self.parent_button.slider_values and self.parent_button.editable:
@@ -69,6 +71,7 @@ class SliderHandle(QGraphicsRectItem):
             self.initial_click_x = event.pos().x()
             self.grabMouse()
             if event.button() == Qt.MouseButton.LeftButton:
+                self._press_timestamp = time.time()
                 if self.is_incremental:
                     self.parent_button._initial_slider_value = self.parent_button._slider_value
                 else:
@@ -81,7 +84,10 @@ class SliderHandle(QGraphicsRectItem):
             self.parent_button._start_ripple()
             self.ungrabMouse()
 
-            if event.button() != Qt.MouseButton.LeftButton:
+            if event.button() == Qt.MouseButton.LeftButton:
+                if time.time() - self._press_timestamp < 0.15:
+                    QTimer.singleShot(0, self.parent_button._open_edit_field)
+            else:
                 self.parent_button._trigger_callback()
 
             self._is_dragging = False
