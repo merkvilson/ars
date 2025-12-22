@@ -365,6 +365,10 @@ class BButton(QGraphicsObject):
         initial_base = self.additional_text if self.additional_text else ""
         initial_text = initial_base
         
+        self._additional_text_color = config.additional_text_color
+        if not self.editable:
+            self._additional_text_color = self._additional_text_color.darker(150)
+
         if self.show_value:
             if self.slider_values:
                 initial_value = f" {int(round(self._slider_value))}{"%" if self.progress_bar else ""}"
@@ -377,15 +381,16 @@ class BButton(QGraphicsObject):
                     initial_value = f" {self._toggle_value}"
                 initial_text = initial_base + initial_value
             elif self.text_value is not None:
-                initial_text = self.text_value
+                if self.text_value == "":
+                    initial_text = initial_base
+                    self._additional_text_color = self._additional_text_color.darker(150)
+                else:
+                    initial_text = self.text_value
 
         if initial_text:
             self.additional_text_item = QGraphicsTextItem(self)
             self._additional_font = config.additional_font
             self.additional_text_item.setFont(self._additional_font)
-            self._additional_text_color = config.additional_text_color
-            if not self.editable:
-                self._additional_text_color = self._additional_text_color.darker(150)
             self.additional_text_item.setDefaultTextColor(self._additional_text_color)
             self.additional_text_item.setHtml(initial_text)
             add_bounding = self.additional_text_item.boundingRect()
@@ -554,6 +559,10 @@ class BButton(QGraphicsObject):
             hover_alpha = int(self.hover_color.alpha() * 0.7)
             self.normal_color = QColor(self.normal_color.red(), self.normal_color.green(), self.normal_color.blue(), normal_alpha)
             self.hover_color = QColor(self.hover_color.red(), self.hover_color.green(), self.hover_color.blue(), hover_alpha)
+        
+        if self.text_value is not None:
+            self.hover_color = self.normal_color.darker(200)
+            self.normal_color = self.normal_color.darker(250)
 
     def _refresh_color(self):
         if hasattr(self, 'color_anim') and self.color_anim and self.color_anim.state() == QPropertyAnimation.State.Running:
@@ -1061,6 +1070,10 @@ class BButton(QGraphicsObject):
             base = self.additional_text if self.additional_text else ""
             new_text = base
             
+            text_color = self.config.additional_text_color
+            if not self.editable:
+                text_color = text_color.darker(150)
+
             if self.show_value:
                 if self.slider_values:
                     percent = "%" if self.progress_bar else ""
@@ -1074,8 +1087,13 @@ class BButton(QGraphicsObject):
                         value_str = f" {self._toggle_value}"
                     new_text = base + value_str
                 elif self.text_value is not None:
-                    new_text = self.text_value
+                    if self.text_value == "":
+                        new_text = base
+                        text_color = text_color.darker(150)
+                    else:
+                        new_text = self.text_value
 
+            self.additional_text_item.setDefaultTextColor(text_color)
             self.additional_text_item.setHtml(new_text)
             add_bounding = self.additional_text_item.boundingRect()
             main_bounding = self.main_symbol_item.boundingRect()
