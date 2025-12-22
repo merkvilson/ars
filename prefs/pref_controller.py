@@ -106,13 +106,15 @@ def get_path(key = "image"):
     if key == "video_frames":     res = opj(output,"video_frames")
     if key == "keyframes":        res = opj(output,"keyframes")
     if key == "sprite":           res = opj(output,"sprite")
-    if key == "last_step":        
-        if last_step_path:
-            return last_step_path  # Return the file path directly without abspath
-        else:
-            return ""  # Return empty string if no file exists
     if key == "output":           res = output
     if key == "custom_nodes":     res = opj("extensions","comfyui")
+
+    if key == "documents":        res = opj(os.path.expanduser("~"), "Documents", "Airen Studio")
+
+    if key == "last_step":        
+        if last_step_path: return last_step_path  # Return the file path directly without abspath
+        else: return ""  # Return empty string if no file exists
+
     if key == "extra_model_yaml": 
         return os.path.abspath(opj(cui, "extra_model_paths.yaml"))  # Just return the file path, don't create directories
 

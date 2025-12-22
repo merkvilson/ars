@@ -7,7 +7,9 @@ import os
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 from ars_cmds.util_cmds.time_cmd import after
 from PyQt6.QtGui import QColor
-#
+from prefs import pref_controller
+
+
 
 def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
@@ -15,7 +17,8 @@ def BBL_CODE_TERMINAL(*args):
 
 
 # Filter for .py files only
-user_script_dir = os.path.join("ars_scripts", "user")
+docs = pref_controller.get_path("documents")
+user_script_dir = os.path.join(docs, "scripts")
 
 def _list_user_scripts():
     return sorted(
@@ -122,7 +125,7 @@ def execute_cmd(ars_window):
 
     config.callbackL = {
         ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
-        ic.ICON_FOLDER_OPEN: lambda: open_file(os.path.join("ars_scripts", "user")),
+        ic.ICON_FOLDER_OPEN: lambda: open_file(user_script_dir),
         ic.ICON_PLAYER_PLAY: lambda: code_editor.run_code(default_namespace_injection),
         ic.ICON_SAVE: lambda: code_editor.save_script(),
         ic.ICON_CODE_TERMINAL: lambda: open_file(code_editor.project_file_path),
