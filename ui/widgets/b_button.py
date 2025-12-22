@@ -999,6 +999,7 @@ class BButton(QGraphicsObject):
         elif self._drag_button == Qt.MouseButton.MiddleButton and self.callbackM:
             if len(inspect.signature(self.callbackM).parameters) > 0:
                 self.callbackM(self._slider_value)
+                play_sound("click")
             else:
                 self.callbackM()
 
