@@ -53,7 +53,7 @@ class DraggableGraphicsView(QGraphicsView):
                 self.indicator_item.setTransformOriginPoint(rect.center())
                 self.indicator_item.setScale(0.95)
                 
-                pen = QPen(colors.toggle_hover_color)
+                pen = QPen(colors.symbol_color)
                 pen.setWidth(4)
                 self.indicator_item.setPen(pen)
                 self.indicator_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
@@ -617,6 +617,10 @@ class ContextButtonWindow(QWidget):
             animated_effects.open_effect(self, 0, start_radius)
 
     def keyPressEvent(self, event):
+        if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_E:
+            self.toggle_edit_mode()
+            event.accept()
+            return
         hotkey_press(self, event)
         super().keyPressEvent(event)
 
