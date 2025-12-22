@@ -10,18 +10,192 @@ from .utils import animated_effects
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QScrollArea,
     QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QStyle,
+    QStyle, QGraphicsRectItem, QGraphicsPathItem
 )
 from PyQt6.QtGui import (
     QPainter, QColor,  QBrush, QCursor,
-    QFont, QPainterPath, QRegion
+    QFont, QPainterPath, QRegion, QDrag, QPixmap, QPen
 )
 from PyQt6.QtCore import (
-    Qt, QPoint, QPointF, QRect, QRectF, QEvent, QTimer
+    Qt, QPoint, QPointF, QRect, QRectF, QEvent, QTimer, QMimeData
 )
 
 from core.sound_manager import play_sound
 from theme.fonts import font_icons as ic
+from theme import colors
+
+class DraggableGraphicsView(QGraphicsView):
+    def __init__(self, scene, parent_window, symbol):
+        super().__init__(scene)
+        self.parent_window = parent_window
+        self.symbol = symbol
+        self.setAcceptDrops(True)
+        self.drag_start_pos = None
+        self.indicator_item = None
+
+    def _show_indicator(self):
+        should_play = self.indicator_item is None or not self.indicator_item.isVisible()
+        if self.indicator_item is None:
+            # Find the BButton to get the correct shape
+            b_button = None
+            for item in self.scene().items():
+                if isinstance(item, BButton):
+                    b_button = item
+                    break
+            
+            if b_button:
+                path = b_button.shape()
+                self.indicator_item = QGraphicsPathItem(path)
+                self.indicator_item.setPos(b_button.pos())
+                
+                # Scale down to avoid cropping
+                rect = path.boundingRect()
+                self.indicator_item.setTransformOriginPoint(rect.center())
+                self.indicator_item.setScale(0.95)
+                
+                pen = QPen(colors.toggle_hover_color)
+                pen.setWidth(4)
+                self.indicator_item.setPen(pen)
+                self.indicator_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
+                self.indicator_item.setZValue(100)
+                self.scene().addItem(self.indicator_item)
+            else:
+                rect = self.sceneRect()
+                self.indicator_item = QGraphicsRectItem(rect)
+                
+                # Scale down to avoid cropping
+                self.indicator_item.setTransformOriginPoint(rect.center())
+                self.indicator_item.setScale(0.95)
+                
+                pen = QPen(colors.toggle_hover_color)
+                pen.setWidth(3)
+                pen.setStyle(Qt.PenStyle.DashLine)
+                self.indicator_item.setPen(pen)
+                self.indicator_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
+                self.indicator_item.setZValue(100)
+                self.scene().addItem(self.indicator_item)
+        
+        if should_play:
+            play_sound("hover")
+        self.indicator_item.setVisible(True)
+
+    def _hide_indicator(self):
+        if self.indicator_item:
+            self.indicator_item.setVisible(False)
+
+    def mousePressEvent(self, event):
+        if self.parent_window.edit_mode:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.drag_start_pos = event.pos()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.parent_window.edit_mode:
+            if not (event.buttons() & Qt.MouseButton.LeftButton):
+                super().mouseMoveEvent(event)
+                return
+            if not self.drag_start_pos:
+                return
+            if (event.pos() - self.drag_start_pos).manhattanLength() < QApplication.startDragDistance():
+                return
+            
+            drag = QDrag(self)
+            mime = QMimeData()
+            mime.setText(str(self.symbol))
+            drag.setMimeData(mime)
+            
+            # Find the BButton item
+            b_button = None
+            for item in self.scene().items():
+                if isinstance(item, BButton):
+                    b_button = item
+                    break
+            
+            if b_button:
+                # Create a round pixmap
+                radius = b_button.radius
+                diameter = radius * 2
+                pixmap = QPixmap(diameter, diameter)
+                pixmap.fill(Qt.GlobalColor.transparent)
+                
+                painter = QPainter(pixmap)
+                painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                painter.setOpacity(0.7)
+                
+                # Draw background
+                painter.setBrush(b_button.current_brush)
+                painter.setPen(Qt.PenStyle.NoPen)
+                painter.drawEllipse(0, 0, diameter, diameter)
+                
+                # Draw symbol
+                if b_button.show_symbol:
+                    painter.setFont(b_button._font)
+                    painter.setPen(b_button._symbol_color)
+                    painter.drawText(QRectF(0, 0, diameter, diameter), Qt.AlignmentFlag.AlignCenter, b_button.symbol)
+                
+                painter.end()
+                
+                drag.setPixmap(pixmap)
+                drag.setHotSpot(QPoint(radius, radius))
+            else:
+                pixmap = self.grab()
+                drag.setPixmap(pixmap)
+                drag.setHotSpot(event.pos())
+            
+            # Visual feedback: make source semi-transparent
+            for item in self.scene().items():
+                item.setOpacity(0.3)
+            
+            drag.exec(Qt.DropAction.MoveAction)
+            
+            # Restore opacity
+            for item in self.scene().items():
+                item.setOpacity(1.0)
+        else:
+            super().mouseMoveEvent(event)
+
+    def dragEnterEvent(self, event):
+        if self.parent_window.edit_mode and event.mimeData().hasText():
+            if event.mimeData().text() != str(self.symbol):
+                self._show_indicator()
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragLeaveEvent(self, event):
+        self._hide_indicator()
+
+    def dragMoveEvent(self, event):
+        if self.parent_window.edit_mode and event.mimeData().hasText():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        self._hide_indicator()
+        if self.parent_window.edit_mode:
+            source_symbol = event.mimeData().text()
+            target_symbol = self.symbol
+            if source_symbol != str(target_symbol):
+                self.parent_window.reorder_items(source_symbol, target_symbol)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+class DropContainer(QWidget):
+    def __init__(self, parent_window):
+        super().__init__()
+        self.parent_window = parent_window
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        if self.parent_window.edit_mode and event.mimeData().hasText():
+            event.acceptProposedAction()
+            
+    def dropEvent(self, event):
+        if self.parent_window.edit_mode:
+            event.acceptProposedAction()
 
 class ContextMenuConfig:
     def __init__(self):
@@ -104,6 +278,7 @@ class ContextButtonWindow(QWidget):
         self.config = config
         self.items = items
         self.symbol = symbol
+        self.edit_mode = False
         
         self.scroll_area = None
         self._restore_scroll_timer = QTimer()
@@ -302,7 +477,7 @@ class ContextButtonWindow(QWidget):
             self.setMask(region)
         else:
             # ---- Content widget (must be transparent) ----
-            content_widget = QWidget()
+            content_widget = DropContainer(self)
             content_widget.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
             content_widget.setStyleSheet("background: transparent;")
             main_layout = QHBoxLayout(content_widget) if config.distribution_mode == "y" else QVBoxLayout(content_widget)
@@ -335,7 +510,7 @@ class ContextButtonWindow(QWidget):
                         scene = QGraphicsScene()
                         scene.addItem(btn)
                         scene.setSceneRect(0, 0, full_rect.width(), full_rect.height())
-                        view = QGraphicsView(scene)
+                        view = DraggableGraphicsView(scene, self, action)
                         view.setFixedSize(int(full_rect.width()), int(full_rect.height()))
                         view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
                         view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -476,6 +651,59 @@ class ContextButtonWindow(QWidget):
         if self._close_on_outside:
             QApplication.instance().removeEventFilter(self)
         super().closeEvent(event)
+
+    def toggle_edit_mode(self):
+        self.edit_mode = not self.edit_mode
+        # Visual feedback could be added here
+        # e.g. change background color or show a message
+        if self.edit_mode:
+            play_sound("hover") # Feedback sound
+        else:
+            play_sound("back")
+
+    def reorder_items(self, source_symbol, target_symbol):
+        # Find source and target views
+        source_view = None
+        target_view = None
+        source_layout = None
+        target_layout = None
+        
+        # Helper to find view and layout
+        def find_view_and_layout(symbol):
+            if not self.scroll_area: return None, None
+            content = self.scroll_area.widget()
+            if not content: return None, None
+            main_layout = content.layout()
+            if not main_layout: return None, None
+            
+            for i in range(main_layout.count()):
+                col_item = main_layout.itemAt(i)
+                if not col_item or not col_item.layout(): continue
+                col_layout = col_item.layout()
+                
+                for j in range(col_layout.count()):
+                    item = col_layout.itemAt(j)
+                    if not item or not item.widget(): continue
+                    widget = item.widget()
+                    if isinstance(widget, DraggableGraphicsView) and str(widget.symbol) == str(symbol):
+                        return widget, col_layout
+            return None, None
+
+        source_view, source_layout = find_view_and_layout(source_symbol)
+        target_view, target_layout = find_view_and_layout(target_symbol)
+        
+        if source_view and target_view and source_layout and target_layout:
+            # Remove source
+            source_layout.removeWidget(source_view)
+            
+            # Find index of target
+            target_index = target_layout.indexOf(target_view)
+            
+            # Insert source at target index
+            target_layout.insertWidget(target_index, source_view, alignment=Qt.AlignmentFlag.AlignHCenter)
+            
+            # Note: We are not updating self.items here because the structure can be complex (tuples, spacers).
+            # Visual reordering is achieved.
 
     def resizeEvent(self, event):
         path = QPainterPath()
