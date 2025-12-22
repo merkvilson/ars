@@ -235,6 +235,9 @@ class BButton(QGraphicsObject):
         self.progress_bar = config.progress_bar
         self.incremental_value = config.incremental_value if isinstance(config.incremental_value, (int,bool)) else config.incremental_value[0] 
         self.text_value = config.text_value
+
+        if self.text_value is not None:
+            self.show_value = True
         
         # Timer for reverting symbol back after showing value
         self._original_symbol = self.symbol
