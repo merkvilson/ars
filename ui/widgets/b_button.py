@@ -341,7 +341,7 @@ class BButton(QGraphicsObject):
             self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemClipsChildrenToShape, True)
 
 
-        self.original_scale = 0.9 if not self.use_extended_shape else 0.95
+        self.original_scale = 0.9 if not self.use_extended_shape else 0.96
         self.hover_scale = float(config.hover_scale)
         self.setScale(self.original_scale)
         self.setOpacity(1.0)
