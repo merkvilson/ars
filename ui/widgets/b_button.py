@@ -4,7 +4,8 @@ from PyQt6.QtWidgets import (
     QGraphicsRectItem,
     QGraphicsItem,
     QGraphicsProxyWidget, 
-    QWidget,)
+    QWidget,
+    QLineEdit,)
 
 from PyQt6.QtGui import (
     QPainter,
@@ -53,6 +54,14 @@ class SliderHandle(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         if self.parent_button.slider_values and self.parent_button.editable:
+            if (event.button() == Qt.MouseButton.RightButton and 
+                self.parent_button.use_extended_shape and 
+                self.parent_button.config.callbackR is None):
+                
+                QTimer.singleShot(0, self.parent_button._open_edit_field)
+                event.accept()
+                return
+
             self._is_dragging = True
             self._drag_button = event.button()
             self.parent_button._is_dragging = True
@@ -126,6 +135,35 @@ class RoundedRectOutline(QGraphicsRectItem):
         painter.setPen(self.pen())
         painter.drawPath(path)
 
+
+class EditField(QLineEdit):
+    def __init__(self, b_button):
+        super().__init__()
+        self.b_button = b_button
+        # Prevent context menu from appearing
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.b_button._cancel_edit_value()
+        else:
+            super().keyPressEvent(event)
+            
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        # We rely on editingFinished which is emitted on focus loss too.
+        # But sometimes it's safer to trigger commit here if editingFinished doesn't fire.
+        # However, editingFinished usually fires.
+        # To be safe against double calls, _commit_edit_value checks for edit_proxy existence.
+        self.b_button._commit_edit_value()
+
+    def mouseReleaseEvent(self, event):
+        # Consume Right Click Release to prevent any default behavior (like context menu triggers)
+        # that might cause focus loss.
+        if event.button() == Qt.MouseButton.RightButton:
+            event.accept()
+            return
+        super().mouseReleaseEvent(event)
 
 @dataclass
 class BButtonConfig:
@@ -411,7 +449,7 @@ class BButton(QGraphicsObject):
                 if not self.use_extended_shape:
                     value_txt = str(int(round(self._slider_value)))
                     self.main_symbol_item.setPlainText(value_txt)
-                    self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
+                    self.main_symbol_item.setFont(QFont("Arial", 18 - len(value_txt), QFont.Weight.Bold))
                     bounding = self.main_symbol_item.boundingRect()
                     self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
                     self._start_revert_timer()
@@ -513,6 +551,99 @@ class BButton(QGraphicsObject):
             self.itemColor = self.hover_color
         else:
             self.itemColor = self.normal_color
+
+    def _open_edit_field(self):
+        if hasattr(self, 'edit_proxy') and self.edit_proxy:
+            return
+
+        self.edit_field = EditField(self)
+        val = self._slider_value
+        if isinstance(val, float):
+            text = f"{val:.2f}".rstrip('0').rstrip('.')
+        else:
+            text = str(val)
+            
+        self.edit_field.setText(text)
+        self.edit_field.selectAll()
+        
+        font = self._additional_font
+        color = self._additional_text_color
+        self.edit_field.setFont(font)
+        self.edit_field.setStyleSheet(f"""
+            QLineEdit {{
+                background: transparent; 
+                color: {color.name()}; 
+                border: none;
+                padding: 0px;
+                selection-background-color: #808080;
+                selection-color: white;
+            }}
+        """)
+        
+        self.edit_proxy = QGraphicsProxyWidget(self)
+        self.edit_proxy.setWidget(self.edit_field)
+        self.edit_proxy.setZValue(1000) # Ensure it's on top
+        
+        if self.additional_text_item:
+            self.additional_text_item.setVisible(False)
+            pos = self.additional_text_item.pos()
+            available_width = self._bounding.right() - pos.x() - 10
+            if available_width < 50: available_width = 50
+            
+            self.edit_field.setFixedWidth(int(available_width))
+            self.edit_field.setFixedHeight(int(self.additional_text_item.boundingRect().height()) + 4)
+            
+            self.edit_proxy.setPos(pos.x(), -self.edit_field.height() / 2)
+        else:
+            self.edit_proxy.setPos(0, -10)
+            self.edit_field.setFixedWidth(50)
+
+        self.edit_field.editingFinished.connect(self._commit_edit_value)
+        self.edit_field.setFocus()
+
+    def _commit_edit_value(self):
+        # Use QTimer to defer the commit/cleanup to avoid crashing if called from an event handler
+        QTimer.singleShot(0, self._commit_edit_value_deferred)
+
+    def _commit_edit_value_deferred(self):
+        if not hasattr(self, 'edit_proxy') or not self.edit_proxy:
+            return
+            
+        text = self.edit_field.text()
+        try:
+            if '.' in text:
+                new_val = float(text)
+            else:
+                new_val = int(text)
+                
+            min_val, max_val = self.slider_values[:2]
+            new_val = max(min_val, min(max_val, new_val))
+            
+            self._slider_value = new_val
+            self._update_additional_text()
+            
+            if self.callbackL:
+                 if len(inspect.signature(self.callbackL).parameters) > 0:
+                    self.callbackL(self._slider_value)
+                 else:
+                    self.callbackL()
+                    
+        except ValueError:
+            pass 
+            
+        self._cancel_edit_value()
+
+    def _cancel_edit_value(self):
+        if hasattr(self, 'edit_proxy') and self.edit_proxy:
+            self.edit_proxy.setVisible(False)
+            self.edit_proxy.setParentItem(None)
+            self.edit_proxy.deleteLater()
+            self.edit_proxy = None
+            
+        self.edit_field = None
+            
+        if self.additional_text_item:
+            self.additional_text_item.setVisible(True)
 
     def _toggle_state(self):
         if not self.editable or not self.toggle_values:
@@ -687,6 +818,14 @@ class BButton(QGraphicsObject):
         scene = self.scene()
 
         if self.slider_values and not (self.slider_handle and self.slider_handle.contains(event.pos())):
+            if (event.button() == Qt.MouseButton.RightButton and 
+                self.use_extended_shape and 
+                self.config.callbackR is None):
+                
+                self._open_edit_field()
+                event.accept()
+                return
+
             if not self.incremental_value:
                 self._is_dragging = True
                 self._drag_button = event.button()
