@@ -455,6 +455,7 @@ class BButton(QGraphicsObject):
         
         def default_callbackM(value=None):
             # Revert slider or toggle to default value
+            play_sound("click")
             if self.slider_values:
                 if len(self.slider_values) >= 4:
                     default_val = self.slider_values[3]
@@ -492,8 +493,18 @@ class BButton(QGraphicsObject):
                         self.callbackL(self._toggle_value)
                     else:
                         self.callbackL()
+            elif self.text_value is not None:
+                self.text_value = self.config.text_value
+                self._update_additional_text()
+                self._update_colors()
+                self.update()
+                if self.callbackL:
+                    if len(inspect.signature(self.callbackL).parameters) > 0:
+                        self.callbackL(self.text_value)
+                    else:
+                        self.callbackL()
             else:
-                print(f"{self.symbol} middle-clicked (no slider/toggle to revert)")
+                print(f"{self.symbol} middle-clicked (no value to revert)")
 
         self.callbackL = config.callbackL if config.callbackL else default_callbackL
         self.callbackR = config.callbackR if config.callbackR else default_callbackR
@@ -1041,7 +1052,7 @@ class BButton(QGraphicsObject):
         elif self._drag_button == Qt.MouseButton.MiddleButton and self.callbackM:
             if len(inspect.signature(self.callbackM).parameters) > 0:
                 self.callbackM(self._slider_value)
-                play_sound("click")
+                
             else:
                 self.callbackM()
 
