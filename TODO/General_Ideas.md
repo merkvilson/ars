@@ -16,7 +16,6 @@
 - [ ] Open tutorial videos from right click dropdown.
 - [ ] Optimize memory usage in mesh loader.
 - [ ] 2D edit area b-button (shape extended) 
-- [ ] Text edit area for b-button
 - [ ] Add material system for mesh objects
 - [ ] Implement scene save/load functionality
 - [ ] Create user documentation
@@ -28,7 +27,6 @@
 - [ ] Hover over incremental value containing b-button shows value.
 - [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] https://github.com/meshsplatting/mesh-splatting
-- [ ] Q drag should change parent of the object. grid=None, obj=obj
 - [ ] 
 
 # Secret Release
@@ -64,7 +62,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 - [ ] Tabs gui similar to the hierarchy menu
 - [ ] Move object 2 units up during Q dragging mode and drop on end.
 - [ ] Delete gizmo from viewport completely and re initilize it only if needed.
-- [ ] 
+- [ ] Single click on b_button should activate text edit field event.
 - [ ] 
 - [ ] 
 - [ ] 
@@ -77,6 +75,8 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 ## Finished
 
+- [✓] Text edit area for b-button
+- [✓] Q drag should change parent of the object. grid=None, obj=obj
 - [✓] When pressing Q key, first play object move-to animation and then start realtime move-to dragging.
 - [✓] Sound effect and color animation when selecting object.
 - [✓] Scrolling wheel during presing G key should switch between primitive objects and apply an apropriate symbol. (maybe via cursor_follower)
