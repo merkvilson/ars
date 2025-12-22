@@ -207,6 +207,7 @@ class BButtonConfig:
     clip_to_shape: bool = True
     incremental_value: bool | tuple = False
     inner_widget: Optional[QWidget] = None
+    text_value: Optional[str] = None
 
 
 class BButton(QGraphicsObject):
@@ -233,6 +234,7 @@ class BButton(QGraphicsObject):
         self.editable = config.editable
         self.progress_bar = config.progress_bar
         self.incremental_value = config.incremental_value if isinstance(config.incremental_value, (int,bool)) else config.incremental_value[0] 
+        self.text_value = config.text_value
         
         # Timer for reverting symbol back after showing value
         self._original_symbol = self.symbol
@@ -358,20 +360,22 @@ class BButton(QGraphicsObject):
 
         # Additional Text (including slider/toggle value if applicable)
         initial_base = self.additional_text if self.additional_text else ""
+        initial_text = initial_base
+        
         if self.show_value:
             if self.slider_values:
                 initial_value = f" {int(round(self._slider_value))}{"%" if self.progress_bar else ""}"
+                initial_text = initial_base + initial_value
             elif self.toggle_values:
                 min_val, max_val, _ = self.toggle_values
                 if min_val == 0 and max_val == 1:
                     initial_value = f"   {'On' if self._toggle_value else 'Off'}"
                 else:
                     initial_value = f" {self._toggle_value}"
-            else:
-                initial_value = ""
-        else:
-            initial_value = ""
-        initial_text = initial_base + initial_value
+                initial_text = initial_base + initial_value
+            elif self.text_value is not None:
+                initial_text = self.text_value
+
         if initial_text:
             self.additional_text_item = QGraphicsTextItem(self)
             self._additional_font = config.additional_font
@@ -566,11 +570,15 @@ class BButton(QGraphicsObject):
             return
 
         self.edit_field = EditField(self)
-        val = self._slider_value
-        if isinstance(val, float):
-            text = f"{val:.2f}".rstrip('0').rstrip('.')
+        
+        if self.text_value is not None:
+            text = self.text_value
         else:
-            text = str(val)
+            val = self._slider_value
+            if isinstance(val, float):
+                text = f"{val:.2f}".rstrip('0').rstrip('.')
+            else:
+                text = str(val)
             
         self.edit_field.setText(text)
         self.edit_field.selectAll()
@@ -619,6 +627,18 @@ class BButton(QGraphicsObject):
             return
             
         text = self.edit_field.text()
+        
+        if self.text_value is not None:
+            self.text_value = text
+            self._update_additional_text()
+            if self.callbackL:
+                 if len(inspect.signature(self.callbackL).parameters) > 0:
+                    self.callbackL(self.text_value)
+                 else:
+                    self.callbackL()
+            self._cancel_edit_value()
+            return
+
         try:
             if '.' in text:
                 new_val = float(text)
@@ -842,11 +862,15 @@ class BButton(QGraphicsObject):
         elif not self.slider_values:
             value = None
             if event.button() == Qt.MouseButton.LeftButton:
+                if self.text_value is not None:
+                    QTimer.singleShot(0, self._open_edit_field)
+                    return
+
                 if self.toggle_values:
                     self._toggle_state()
                     value = self._toggle_value
                 if self.callbackL:
-                    if value is not None and len(inspect.signature(self.callbackL).parameters) > 0:
+                    if len(inspect.signature(self.callbackL).parameters) > 0:
                         self.callbackL(value)
                     else:
                         self.callbackL()
@@ -856,7 +880,7 @@ class BButton(QGraphicsObject):
                 if self.toggle_values:
                     value = self._toggle_value
                 if self.callbackR:
-                    if value is not None and len(inspect.signature(self.callbackR).parameters) > 0:
+                    if len(inspect.signature(self.callbackR).parameters) > 0:
                         self.callbackR(value)
                     else:
                         self.callbackR()
@@ -864,7 +888,7 @@ class BButton(QGraphicsObject):
                 if self.toggle_values:
                     value = self._toggle_value
                 if self.callbackM:
-                    if value is not None and len(inspect.signature(self.callbackM).parameters) > 0:
+                    if len(inspect.signature(self.callbackM).parameters) > 0:
                         self.callbackM(value)
                     else:
                         self.callbackM()
@@ -1030,23 +1054,25 @@ class BButton(QGraphicsObject):
 
 
     def _update_additional_text(self):
-        if self.additional_text_item and (self.slider_values or self.toggle_values):
+        if self.additional_text_item and (self.slider_values or self.toggle_values or self.text_value is not None):
             base = self.additional_text if self.additional_text else ""
+            new_text = base
+            
             if self.show_value:
                 if self.slider_values:
                     percent = "%" if self.progress_bar else ""
                     value_str = f" {int(round(self._slider_value))}{percent}"
+                    new_text = base + value_str
                 elif self.toggle_values:
                     min_val, max_val, _ = self.toggle_values
                     if min_val == 0 and max_val == 1:
                         value_str = f"   {'On' if self._toggle_value else 'Off'}"
                     else:
                         value_str = f" {self._toggle_value}"
-                else:
-                    value_str = ""
-            else:
-                value_str = ""
-            new_text = base + value_str
+                    new_text = base + value_str
+                elif self.text_value is not None:
+                    new_text = self.text_value
+
             self.additional_text_item.setHtml(new_text)
             add_bounding = self.additional_text_item.boundingRect()
             main_bounding = self.main_symbol_item.boundingRect()

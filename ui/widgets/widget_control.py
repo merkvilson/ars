@@ -163,6 +163,11 @@ def set_updated_config(widget, key: str, value):
             widget._update_additional_text()
             widget.update()
 
+        elif key == "text_value":
+            widget.text_value = value
+            widget._update_additional_text()
+            widget.update()
+
 
         elif key == "show_symbol":
             widget.show_symbol = value

@@ -58,6 +58,8 @@ class ContextMenuConfig:
         self.auto_close = True
         self.slider_values = {}
         self.slider_color = {}
+        self.text_values = {}
+        self.text_value = {} # Alias for text_values
         self.toggle_values = {}
         self.toggle_color = {}
         self.toggle_hover_color = {}
@@ -185,6 +187,7 @@ class ContextButtonWindow(QWidget):
                         "image_path": config.image_items.get(action),
                         "incremental_value": config.incremental_values.get(action, config.incremental_value),
                         "inner_widget": config.inner_widgets.get(action),
+                        "text_value": config.text_values.get(action) if config.text_values.get(action) else config.text_value.get(action),
                     }
                     if action in config.additional_texts:
                         button_config_kwargs["additional_text"] = config.additional_texts[action]
