@@ -42,6 +42,8 @@ from ars_cmds.core_cmds.key_check import key_check_continuous
 from core.cursor_modifier import get_cursor, set_cursor
 import time
 
+from util_functions.ars_window import ars_window as ars_wind
+
 BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V", "hidden": True}
 
 
@@ -49,33 +51,40 @@ def BBL_CAMVIEWER(*args):
     run_ext(__file__)
 
 
+
+def view_selected():
+    camera = ars_wind().viewport.cam
+    obj = get_selected()
+    if not obj: 
+        view_home()
+        return
+    xyz=obj.get_position()
+    scale_sum = sum(obj.get_scale()) * 1.5
+    default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
+
+    camera.move_to(center=tuple(xyz), offset=scale_sum, animate=True, rotation=default_rotation)
+
+def view_home():
+    camera = ars_wind().viewport.cam
+    default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
+    camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
+    
+
+
+
 def execute_cmd(ars_window):
     if getattr(ars_window, "ctx_key_active", False):return
     if time.time() - getattr(ars_window, "ctx_key_last_end", 0) < 0.2:return
     ars_window.ctx_key_active = True
 
-
     camera = ars_window.viewport.cam
-    default_rotation = (camera._reset_rotation1, camera._reset_rotation2)
+
 
     def view_cursor():
         new_xyz = get_xyz(ars_window)
         
         camera.move_to(center=new_xyz, offset=5 if new_xyz else -15, animate=True)
 
-
-    def view_selected():
-        obj = get_selected()
-        if not obj: 
-            view_home()
-            return
-        xyz=obj.get_position()
-        scale_sum = sum(obj.get_scale()) * 1.5
-        camera.move_to(center=tuple(xyz), offset=scale_sum, animate=True, rotation=default_rotation)
-    
-    def view_home():
-        camera.move_to(center=(0,0,0), offset=10, animate=True, rotation=default_rotation)
-        
 
     start_time = 0
 
