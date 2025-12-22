@@ -25,7 +25,6 @@ from ui.main_window import MainWindow
 import ctypes
 
 import pygame
-pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
 
 class Application:
 
@@ -44,6 +43,7 @@ class Application:
 
 def main() -> None:
 
+    pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
     myappid = 'airen.studio.ars.0.50' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
