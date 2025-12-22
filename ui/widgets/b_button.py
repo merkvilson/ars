@@ -556,6 +556,9 @@ class BButton(QGraphicsObject):
         if hasattr(self, 'edit_proxy') and self.edit_proxy:
             return
 
+        if not self.additional_text_item:
+            return
+
         self.edit_field = EditField(self)
         val = self._slider_value
         if isinstance(val, float):
