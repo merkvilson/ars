@@ -109,7 +109,7 @@ class SimpleButton(QPushButton):
                 background-color: rgba(150, 150, 150, 200);
             }
             QPushButton#simple_btn:pressed {
-                background-color: rgba(120, 150, 255, 230);
+                background-color: rgba(255, 255, 255, 150);
             }
         """
         self.setStyleSheet(base_style)
