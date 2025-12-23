@@ -16,6 +16,7 @@ from PyQt6.QtGui import (
     QPainter, QColor,  QBrush, QCursor,
     QFont, QPainterPath, QRegion, QDrag, QPixmap, QPen
 )
+from PyQt6.QtSvg import QSvgRenderer
 from PyQt6.QtCore import (
     Qt, QPoint, QPointF, QRect, QRectF, QEvent, QTimer, QMimeData
 )
@@ -130,9 +131,23 @@ class DraggableGraphicsView(QGraphicsView):
                 
                 # Draw symbol
                 if b_button.show_symbol:
-                    painter.setFont(b_button._font)
-                    painter.setPen(b_button._symbol_color)
-                    painter.drawText(QRectF(0, 0, diameter, diameter), Qt.AlignmentFlag.AlignCenter, b_button.symbol)
+                    if hasattr(b_button, '_is_svg_symbol') and b_button._is_svg_symbol:
+                        # Render SVG icon
+                        svg_renderer = QSvgRenderer(b_button.symbol)
+                        if svg_renderer.isValid():
+                            # Calculate size and position to center the SVG
+                            svg_size = radius * 1.5
+                            svg_rect = QRectF(
+                                (diameter - svg_size) / 2,
+                                (diameter - svg_size) / 2,
+                                svg_size,
+                                svg_size
+                            )
+                            svg_renderer.render(painter, svg_rect)
+                    else:
+                        painter.setFont(b_button._font)
+                        painter.setPen(b_button._symbol_color)
+                        painter.drawText(QRectF(0, 0, diameter, diameter), Qt.AlignmentFlag.AlignCenter, b_button.symbol)
                 
                 painter.end()
                 

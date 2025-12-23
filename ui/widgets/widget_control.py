@@ -1,5 +1,6 @@
 from PyQt6.QtGui import QColor, QBrush, QPen, QPixmap, QImageReader
-from PyQt6.QtWidgets import QGraphicsTextItem, QGraphicsItem
+from PyQt6.QtWidgets import QGraphicsTextItem, QGraphicsItem, QGraphicsColorizeEffect
+from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 from PyQt6.QtCore import Qt, QRectF
 
 
@@ -21,12 +22,40 @@ def set_updated_config(widget, key: str, value):
         # Handle BButton specific keys
         if key == "symbol":
             widget.symbol = value
-            symbol_item = widget.childItems()[0] if widget.childItems() else None
-            if symbol_item:
-                symbol_item.setPlainText(value)
-                bounding = symbol_item.boundingRect()
-                symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
-                widget.update()
+            is_svg = isinstance(value, str) and value.lower().endswith('.svg')
+            
+            # Remove old symbol item
+            if widget.main_symbol_item:
+                widget.main_symbol_item.setParentItem(None)
+            
+            if is_svg:
+                widget._is_svg_symbol = True
+                widget.main_symbol_item = QGraphicsSvgItem(value, widget)
+                # Apply colorize effect to tint SVG with symbol color
+                widget._svg_colorize = QGraphicsColorizeEffect()
+                widget._svg_colorize.setColor(widget._symbol_color)
+                widget._svg_colorize.setStrength(1.0)
+                widget.main_symbol_item.setGraphicsEffect(widget._svg_colorize)
+                svg_bounds = widget.main_symbol_item.boundingRect()
+                if svg_bounds.width() > 0 and svg_bounds.height() > 0:
+                    target_size = widget.radius * 1.5
+                    scale_factor = min(target_size / svg_bounds.width(), target_size / svg_bounds.height())
+                    widget.main_symbol_item.setScale(scale_factor)
+                    scaled_width = svg_bounds.width() * scale_factor
+                    scaled_height = svg_bounds.height() * scale_factor
+                    widget.main_symbol_item.setPos(-scaled_width / 2, -scaled_height / 2)
+                if not widget.show_symbol:
+                    widget.main_symbol_item.setOpacity(0)
+                elif not widget.editable:
+                    widget.main_symbol_item.setOpacity(0.5)
+            else:
+                widget._is_svg_symbol = False
+                widget.main_symbol_item = QGraphicsTextItem(value, widget)
+                widget.main_symbol_item.setDefaultTextColor(widget._symbol_color)
+                widget.main_symbol_item.setFont(widget._font)
+                bounding = widget.main_symbol_item.boundingRect()
+                widget.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+            widget.update()
         
 
         elif key == "additional_text":
@@ -77,9 +106,13 @@ def set_updated_config(widget, key: str, value):
 
         elif key == "symbol_color":
             widget._symbol_color = value
-            symbol_item = widget.childItems()[0] if widget.childItems() else None
-            if symbol_item:
-                symbol_item.setDefaultTextColor(value)
+            if widget._is_svg_symbol:
+                # Update colorize effect for SVG
+                if hasattr(widget, '_svg_colorize'):
+                    widget._svg_colorize.setColor(value)
+                widget.update()
+            else:
+                widget.main_symbol_item.setDefaultTextColor(value)
                 widget.update()
         
 
@@ -171,8 +204,11 @@ def set_updated_config(widget, key: str, value):
 
         elif key == "show_symbol":
             widget.show_symbol = value
-            widget._symbol_color = QColor(widget.config.symbol_color.red(), widget.config.symbol_color.green(), widget.config.symbol_color.blue(), 255 if value else 0)
-            widget.main_symbol_item.setDefaultTextColor(widget._symbol_color)
+            if widget._is_svg_symbol:
+                widget.main_symbol_item.setOpacity(1.0 if value else 0.0)
+            else:
+                widget._symbol_color = QColor(widget.config.symbol_color.red(), widget.config.symbol_color.green(), widget.config.symbol_color.blue(), 255 if value else 0)
+                widget.main_symbol_item.setDefaultTextColor(widget._symbol_color)
             widget.update()
         
 

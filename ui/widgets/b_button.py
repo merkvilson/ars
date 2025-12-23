@@ -5,7 +5,10 @@ from PyQt6.QtWidgets import (
     QGraphicsItem,
     QGraphicsProxyWidget, 
     QWidget,
-    QLineEdit,)
+    QLineEdit,
+    QGraphicsColorizeEffect,)
+
+from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
 from PyQt6.QtGui import (
     QPainter,
@@ -336,7 +339,9 @@ class BButton(QGraphicsObject):
         self._original_symbol = self.symbol
         self._revert_timer = None
 
-        if len(self.symbol) > 2: self.show_symbol = False
+        # Hide symbol if text is too long (but not for SVG paths)
+        if len(self.symbol) > 2 and not self.symbol.lower().endswith('.svg'):
+            self.show_symbol = False
         
         self.image_path = config.image_path  
         self.pixmap = None 
@@ -441,18 +446,42 @@ class BButton(QGraphicsObject):
 
         self.setTransformOriginPoint(self.boundingRect().center())
 
-        # Main Symbol
-        self.main_symbol_item = QGraphicsTextItem(self.symbol, self)
+        # Main Symbol (text or SVG)
+        self._is_svg_symbol = isinstance(self.symbol, str) and self.symbol.lower().endswith('.svg')
         self._symbol_color = config.symbol_color
         if not self.editable:
             self._symbol_color = self._symbol_color.darker(150)
         if not self.show_symbol:
             self._symbol_color = QColor(self._symbol_color.red(), self._symbol_color.green(), self._symbol_color.blue(), 0)
-        self.main_symbol_item.setDefaultTextColor(self._symbol_color)
         self._font = config.font
-        self.main_symbol_item.setFont(self._font)
-        bounding = self.main_symbol_item.boundingRect()
-        self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
+        
+        if self._is_svg_symbol:
+            self.main_symbol_item = QGraphicsSvgItem(self.symbol, self)
+            # Apply colorize effect to tint SVG with symbol color
+            self._svg_colorize = QGraphicsColorizeEffect()
+            self._svg_colorize.setColor(self._symbol_color)
+            self._svg_colorize.setStrength(1.0)
+            self.main_symbol_item.setGraphicsEffect(self._svg_colorize)
+            # Scale SVG to fit within radius
+            svg_bounds = self.main_symbol_item.boundingRect()
+            if svg_bounds.width() > 0 and svg_bounds.height() > 0:
+                target_size = self.radius * 1.5
+                scale_factor = min(target_size / svg_bounds.width(), target_size / svg_bounds.height())
+                self.main_symbol_item.setScale(scale_factor)
+                scaled_width = svg_bounds.width() * scale_factor
+                scaled_height = svg_bounds.height() * scale_factor
+                self.main_symbol_item.setPos(-scaled_width / 2, -scaled_height / 2)
+            if not self.show_symbol:
+                self.main_symbol_item.setOpacity(0)
+            elif not self.editable:
+                self.main_symbol_item.setOpacity(0.5)
+            bounding = QRectF(-self.radius * 0.75, -self.radius * 0.75, self.radius * 1.5, self.radius * 1.5)
+        else:
+            self.main_symbol_item = QGraphicsTextItem(self.symbol, self)
+            self.main_symbol_item.setDefaultTextColor(self._symbol_color)
+            self.main_symbol_item.setFont(self._font)
+            bounding = self.main_symbol_item.boundingRect()
+            self.main_symbol_item.setPos(-bounding.width() / 2, -bounding.height() / 2)
 
         # Additional Text (including slider/toggle value if applicable)
         initial_base = self.additional_text if self.additional_text else ""
@@ -557,8 +586,8 @@ class BButton(QGraphicsObject):
                 self._slider_value = default_val
                 self._update_additional_text()
                 
-                # Temporarily show value in symbol for small/incremental sliders
-                if not self.use_extended_shape:
+                # Temporarily show value in symbol for small/incremental sliders (text only)
+                if not self.use_extended_shape and not self._is_svg_symbol:
                     value_txt = str(int(round(self._slider_value)))
                     self.main_symbol_item.setPlainText(value_txt)
                     self.main_symbol_item.setFont(QFont("Arial", 18 - len(value_txt), QFont.Weight.Bold))
@@ -1095,7 +1124,7 @@ class BButton(QGraphicsObject):
                 else:
                     self.callbackL()
             
-            if not self.use_extended_shape:
+            if not self.use_extended_shape and not self._is_svg_symbol:
                 value_txt = str(int(round(self._slider_value)))
                 self.main_symbol_item.setPlainText(value_txt)
                 self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
@@ -1156,8 +1185,8 @@ class BButton(QGraphicsObject):
         self._update_additional_text()
         self._trigger_callback()
         
-        # Temporarily show value in symbol if incremental_value is active
-        if self.incremental_value and not self.use_extended_shape:
+        # Temporarily show value in symbol if incremental_value is active (text only)
+        if self.incremental_value and not self.use_extended_shape and not self._is_svg_symbol:
             value_txt = str(int(round(self._slider_value)))
             self.main_symbol_item.setPlainText(value_txt)
             self.main_symbol_item.setFont(QFont("Arial", 16 - len(value_txt), QFont.Weight.Bold))
@@ -1191,6 +1220,8 @@ class BButton(QGraphicsObject):
 
     def _revert_symbol(self):
         """Revert the symbol back to its original text after showing the value."""
+        if self._is_svg_symbol:
+            return  # SVG symbols don't need reverting
         if not self._original_symbol.replace('.', '', 1).replace('-', '', 1).isdigit():
             self.main_symbol_item.setPlainText(self._original_symbol)
             self.main_symbol_item.setFont(self._font)
