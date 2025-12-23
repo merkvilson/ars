@@ -10,7 +10,8 @@ import os
 
 BBL_AUDIO_STUDIO_CONFIG = {
     "symbol": ic.ICON_VOLUME_2,
-    "hotkey": ""
+    "hotkey": "shift+A",
+    "hidden": True
 }
 
 
