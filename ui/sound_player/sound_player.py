@@ -65,33 +65,71 @@ class BButtonWidget(QWidget):
 
 class SimpleButton(QPushButton):
     def __init__(self, text, icon_char=None, callback=None, parent=None):
-        super().__init__(text, parent)
+        super().__init__(parent)
         self.callback = callback
-        if icon_char:
-            self.setText(f"{icon_char} {text}" if text else icon_char)
-            # Assuming icon_char is from a font like FontAwesome or similar
-            # You might need to set the font here if it's a special icon font
-            # self.setFont(QFont("YourIconFont", 12)) 
         
-        # Basic styling to match the dark theme roughly
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                color: #ddd;
-                border: none;
-                padding: 5px;
-                text-align: left;
+        # Use a layout to manage icon and text separately for different font sizes
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(12, 0, 12, 0)
+        layout.setSpacing(10)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        
+        if icon_char:
+            self.icon_label = QLabel(icon_char)
+            self.icon_label.setStyleSheet("background: transparent; border: none; color: rgba(255, 255, 255, 180);")
+            # Larger font for symbol (icon)
+            from theme.fonts.new_fonts import get_font
+            self.icon_label.setFont(get_font(16)) 
+            self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(self.icon_label)
+            
+        if text:
+            self.text_label = QLabel(text)
+            self.text_label.setStyleSheet("background: transparent; border: none; color: rgba(255, 255, 255, 180);")
+            # Smaller font for additional text
+            self.text_label.setFont(QFont("Arial", 10))
+            self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            layout.addWidget(self.text_label)
+            layout.addStretch(1) # Push content to left
+        else:
+            # Center icon if no text
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Use object name for specific styling to avoid inheritance issues
+        self.setObjectName("simple_btn")
+
+        base_style = """
+            QPushButton#simple_btn {
+                background-color: rgba(70, 70, 70, 200);
+                border: 1px solid transparent;
+                border-radius: 15px;
             }
-            QPushButton:hover {
-                background-color: rgba(255, 255, 255, 20);
-                border-radius: 4px;
+            QPushButton#simple_btn:hover {
+                background-color: rgba(150, 150, 150, 200);
             }
-            QPushButton:pressed {
-                background-color: rgba(255, 255, 255, 40);
+            QPushButton#simple_btn:pressed {
+                background-color: rgba(120, 150, 255, 230);
             }
-        """)
+        """
+        self.setStyleSheet(base_style)
+        
+        # If it's an icon-only button (no text), make it a circle
+        if not text:
+            self.setFixedSize(42, 42)
+            # Update style for circle
+            new_style = base_style.replace("border-radius: 15px;", "border-radius: 21px;") 
+            self.setStyleSheet(new_style)
+        else:
+            # Ensure height is consistent
+            self.setFixedHeight(42)
+            
         if callback:
             self.clicked.connect(callback)
+            
+    def setText(self, text):
+        if hasattr(self, 'text_label'):
+            self.text_label.setText(text)
 
 class SoundItemWidget(QWidget):
     item_clicked = pyqtSignal(Path)
@@ -111,30 +149,21 @@ class SoundItemWidget(QWidget):
         # Play/Name Button
         # Using standard QPushButton instead of heavy BButtonWidget
         self.btn_play = SimpleButton(file_path.stem, ic.ICON_PLAYER_PLAY, self.request_play)
-        # Set font for icon if needed, assuming 'ic' provides characters for a specific font
-        from theme.fonts.new_fonts import get_font
-        self.btn_play.setFont(get_font(14))
         layout.addWidget(self.btn_play, stretch=1)
         
         # Copy Name Button
         self.btn_copy = SimpleButton("", ic.ICON_CLIPBOARD_PASTE, self.copy_name)
-        self.btn_copy.setFont(get_font(14))
         self.btn_copy.setToolTip("Copy Name")
-        self.btn_copy.setFixedWidth(30)
         layout.addWidget(self.btn_copy)
         
         # Rename Button
         self.btn_rename = SimpleButton("", ic.ICON_TEXT_INPUT, self.rename_file)
-        self.btn_rename.setFont(get_font(14))
         self.btn_rename.setToolTip("Rename")
-        self.btn_rename.setFixedWidth(30)
         layout.addWidget(self.btn_rename)
         
         # Delete Button
         self.btn_delete = SimpleButton("", ic.ICON_TRASH, self.delete_file)
-        self.btn_delete.setFont(get_font(14))
         self.btn_delete.setToolTip("Delete")
-        self.btn_delete.setFixedWidth(30)
         layout.addWidget(self.btn_delete)
 
     def mousePressEvent(self, event):
@@ -280,7 +309,7 @@ class SoundboardApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Soundboard")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(200, 200)
         self.setCentralWidget(SoundboardWidget())
 
 if __name__ == '__main__':
