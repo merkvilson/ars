@@ -41,6 +41,28 @@ def scripts_ctx(ars_window, callback_ctx):
     config.additional_texts = {}
     config.callbackL = {}
     config.callbackR = {}
+    config.text_values = {}
+    config.show_symbol_items = {}
+
+    # New File Item
+    new_file_key = ic.ICON_TEXT_INPUT
+    config.additional_texts[new_file_key] = "New File"
+    config.text_value[new_file_key] = ""
+    config.show_symbol_items[new_file_key] = True
+
+    def create_new_file(filename):
+        if not filename: return
+        filename = filename.replace(" ", "_")
+        if not filename.endswith(".py"): filename += ".py"
+        full_path = os.path.join(user_script_dir, filename)
+        if not os.path.exists(full_path):
+            with open(full_path, 'w') as f:
+                f.write(f"#{filename}\n")
+        ars_window.msg(f"Created: {filename}")
+        callback_ctx(full_path)
+        ctx.close_animated()
+
+    config.callbackL[new_file_key] = create_new_file
 
     for i, filename in enumerate(py_files):
         index_str = str(i)
@@ -49,7 +71,8 @@ def scripts_ctx(ars_window, callback_ctx):
         config.callbackL[index_str] = lambda x=None, f=full_path: callback_ctx(f)  # Use lambda to capture current full_path
         config.callbackR[index_str] = lambda x=None, f=full_path: open_file(f)
 
-    ctx = config.open_context(items=[str(i) for i in range(len(py_files))])
+    items_list = [new_file_key] + [str(i) for i in range(len(py_files))]
+    ctx = config.open_context(items=items_list)
 
 
 
