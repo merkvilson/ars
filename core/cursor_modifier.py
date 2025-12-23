@@ -1,5 +1,5 @@
 # cursor_modifier.py
-from PyQt6.QtWidgets import QWidget, QApplication, QGraphicsObject, QGraphicsView, QLineEdit, QTextEdit, QPlainTextEdit, QSplitterHandle, QSplitter
+from PyQt6.QtWidgets import QWidget, QApplication, QGraphicsObject, QGraphicsView, QLineEdit, QTextEdit, QPlainTextEdit, QSplitterHandle, QSplitter, QAbstractButton, QComboBox
 from PyQt6.QtCore import QObject, QEvent, Qt, QPoint, QSize
 from PyQt6.QtGui import QCursor, QPixmap, QMouseEvent, QColor, QPainter, QPaintEvent
 from PyQt6.QtSvg import QSvgRenderer
@@ -131,6 +131,19 @@ class GlobalCursorWatcher(QObject):
                 if not isinstance(temp_widget, QWidget):
                     break
             
+            # Check for clickable widgets (Buttons, ComboBoxes)
+            is_pointer = False
+            if not is_text:
+                temp_widget = widget
+                while temp_widget:
+                    if isinstance(temp_widget, (QAbstractButton, QComboBox)):
+                        if temp_widget.isEnabled():
+                            is_pointer = True
+                        break
+                    temp_widget = temp_widget.parent()
+                    if not isinstance(temp_widget, QWidget):
+                        break
+
             # Check for splitter handles
             is_splitter = False
             splitter_orientation = None
@@ -191,6 +204,9 @@ class GlobalCursorWatcher(QObject):
                                         if item.text_value is not None or item.slider_values:
                                             is_text = True
                                             break
+                                        else:
+                                            is_pointer = True
+                                            break
                     except Exception:
                         pass
 
@@ -218,6 +234,11 @@ class GlobalCursorWatcher(QObject):
                     if self._current_type != "resize_v":
                         set_cursor("arrows-move-vertical", anchor="center")
                         self._current_type = "resize_v"
+            elif is_pointer:
+                #TODO: replace "cursor" with "pointer" cursor when available
+                if self._current_type != "cursor":
+                    set_cursor("cursor", anchor="top_left")
+                    self._current_type = "cursor"
             else:
                 if self._current_type != "default":
                     name, anchor = _app_default_cursor_info
