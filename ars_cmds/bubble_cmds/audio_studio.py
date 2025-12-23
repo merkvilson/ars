@@ -8,7 +8,7 @@ from prefs import pref_controller
 import os
 
 
-BBL_AUDIO_STUDIO_CONFIG = {"symbol": ic.ICON_VOLUME_2,"hotkey": "shift+A","hidden": True}
+BBL_AUDIO_STUDIO_CONFIG = {"symbol": ic.ICON_VOLUME_2, "hotkey": "shift+A", "visible": False}
 
 
 def BBL_AUDIO_STUDIO(*args):

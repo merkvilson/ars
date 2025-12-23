@@ -44,7 +44,7 @@ import time
 
 from util_functions.ars_window import ars_window as ars_wind
 
-BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V", "hidden": True}
+BBL_CAMVIEWER_CONFIG = {"symbol": ic.ICON_WINDOW_MINIMIZE, "hotkey": "V", "visible": False}
 
 
 def BBL_CAMVIEWER(*args):

@@ -36,7 +36,7 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.core_cmds.cursor_to_xyz import get_xyz
 from core.sound_manager import play_sound
 
-BBL_2_CONFIG = {"symbol": ic.ICON_FILES, "hotkey": "Ctrl+D", "hidden": True}
+BBL_2_CONFIG = {"symbol": ic.ICON_FILES, "hotkey": "Ctrl+D", "visible": False}
 
 
 def BBL_2(*args):

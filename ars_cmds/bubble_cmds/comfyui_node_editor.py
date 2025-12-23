@@ -6,7 +6,7 @@ import sys
 import ctypes
 from PyQt6.QtCore import QObject, QEvent, QTimer
 
-BBL_comfyui_node_editor_CONFIG = {"symbol": ic.ICON_TEST, "hidden": True}
+BBL_comfyui_node_editor_CONFIG = {"symbol": ic.ICON_TEST, "visible": False}
 def BBL_comfyui_node_editor(*args):
     run_ext(__file__)
     

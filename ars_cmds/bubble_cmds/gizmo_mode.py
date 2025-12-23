@@ -46,7 +46,7 @@ import time
 from core.sound_manager import play_sound
 from PyQt6.QtCore import QTimer
 
-BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q", "hidden": True}
+BBL_GIZMO_MOVE_CONFIG = {"symbol": ic.ICON_GIZMO_MOVE, "hotkey": "Q", "visible": False}
 
 
 def BBL_GIZMO_MOVE(*args):

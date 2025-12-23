@@ -7,7 +7,7 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 
 
-BBL_TRASH_CONFIG = {'symbol': ic.ICON_TRASH, 'hotkey': 'del', "hidden": True}
+BBL_TRASH_CONFIG = {'symbol': ic.ICON_TRASH, 'hotkey': 'del', "visible": False}
 def BBL_TRASH(*args):
     run_ext(__file__)
 
