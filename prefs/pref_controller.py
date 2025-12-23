@@ -108,6 +108,7 @@ def get_path(key = "image"):
     if key == "sprite":           res = opj(output,"sprite")
     if key == "output":           res = output
     if key == "custom_nodes":     res = opj("extensions","comfyui")
+    if key == "sounds":           res = opj("res","sounds")
 
     if key == "documents":        res = opj(os.path.expanduser("~"), "Documents", "Airen Studio")
 
