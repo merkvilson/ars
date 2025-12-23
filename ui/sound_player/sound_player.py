@@ -43,7 +43,7 @@ class BButtonWidget(QWidget):
         rect = self.button.childrenBoundingRect() | self.button.boundingRect()
         
         # Add padding for hover effects/ripples
-        margin = 10 
+        margin = 0 
         width = rect.width() + margin
         height = rect.height() + margin
         
@@ -69,6 +69,7 @@ class SoundItemWidget(QWidget):
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         
         # Play/Name Button
         play_config = BButtonConfig(
