@@ -74,6 +74,7 @@ class SoundItemWidget(QWidget):
         play_config = BButtonConfig(
             symbol=ic.ICON_PLAYER_PLAY,
             additional_text=file_path.stem,
+            use_extended_shape=True,
             callbackL=self.play_sound,
         )
         self.btn_play = BButtonWidget(play_config)

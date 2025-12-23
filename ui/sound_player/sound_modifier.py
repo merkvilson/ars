@@ -181,7 +181,7 @@ class AudioModifierWidget(QWidget):
         super().__init__()
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setContentsMargins(0, 0, 0, 0)
         
         self.waveform = WaveformWidget()
         layout.addWidget(self.waveform)
