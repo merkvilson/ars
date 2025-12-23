@@ -1,5 +1,5 @@
 from ui.widgets.context_menu import CtxConfig
-from ui.ars_code import CodeEditor
+from ui.ars_code import CodeEditor, TerminalWidget
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.util_cmds.open_file import open_file
@@ -7,7 +7,8 @@ import os
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 from ars_cmds.util_cmds.time_cmd import after
 from PyQt6.QtGui import QColor, QTextCursor
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtWidgets import QSplitter
 from prefs import pref_controller
 
 
@@ -79,9 +80,19 @@ def scripts_ctx(ars_window, callback_ctx):
 
 def execute_cmd(ars_window):
     py_files = _list_user_scripts()
+
     if not py_files:
-        print("No python scripts found in ars_scripts/user")
-        return
+        default_script = "script_1.py"
+        full_path = os.path.join(user_script_dir, default_script)
+        if not os.path.exists(user_script_dir):
+            os.makedirs(user_script_dir)
+        with open(full_path, 'w') as f:
+            f.write("# New script\n")
+        py_files = [default_script]
+
+    # if not py_files:
+    #     print("No python scripts found in ars_scripts/user")
+    #     return
     config = CtxConfig()
     config.use_extended_shape = False
     config.auto_close = False
@@ -109,15 +120,33 @@ def execute_cmd(ars_window):
             ic.ICON_CODE_TERMINAL,
             "   ",
         ],
-        ["   ", "PythonEditorWidget", "   "],
+        ["   ", "SplitterWidget", "   "],
         "   ",
     ]
 
-    code_editor = CodeEditor()
-    code_editor.setFixedSize(int(ars_window.width() - 10), int(config.custom_height - int(44 * 1.5)))
-    code_editor.setPlainText(current_code_text)
+    available_height = int(config.custom_height - int(44 * 1.5))
+    
+    # Create Splitter
+    splitter = QSplitter(Qt.Orientation.Vertical)
+    splitter.setFixedSize(int(ars_window.width() - 10), available_height)
 
-    config.custom_widget_items = {"PythonEditorWidget": code_editor}
+    # Create Editor
+    code_editor = CodeEditor()
+    code_editor.setPlainText(current_code_text)
+    
+    # Create Terminal
+    terminal = TerminalWidget()
+    
+    # Add to Splitter
+    splitter.addWidget(code_editor)
+    splitter.addWidget(terminal)
+    
+    # Set initial sizes (4:1 ratio)
+    splitter.setSizes([int(available_height * 0.8), int(available_height * 0.2)])
+
+    config.custom_widget_items = {
+        "SplitterWidget": splitter
+    }
     config.slider_values = {
         ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha*100),
         ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, ars_window.prefs.code_editor_height),
@@ -173,7 +202,7 @@ def execute_cmd(ars_window):
             ),
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
-            code_editor.setFixedHeight(int(value - int(44 * 1.5))),
+            splitter.setFixedHeight(int(value - int(44 * 1.5))),
             setattr(ars_window.prefs, 'code_editor_height', int(value)),
             ),
     }
