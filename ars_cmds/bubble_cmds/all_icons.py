@@ -25,7 +25,7 @@ def execute_cmd(ars_window):
     options_list = split_list(ic.ICON_FULL_LIST, 10)
 
     config.callbackL = {
-        value: (lambda key=name, val=value: copy_name(ars_window, key, val))
+        value: (lambda x=None, key=name, val=value: copy_name(ars_window, key, val))
         for name, value in vars(ic).items()
         if isinstance(value, str) and value in ic.ICON_FULL_LIST
     }
