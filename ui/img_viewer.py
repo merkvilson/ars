@@ -135,9 +135,70 @@ class ImageViewerWidget(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.view)
 
-    def fit_image(self):
-        if self.view.image_rect is not None:
+    def fit_image(self, animated=False, duration=250):
+        """Fit the image in the view, optionally with animation.
+        
+        Args:
+            animated: If True, smoothly animate to the fit view.
+            duration: Animation duration in milliseconds (default 250).
+        """
+        if self.view.image_rect is None:
+            return
+            
+        if not animated:
             self.view.fitInView(self.view.image_rect, Qt.AspectRatioMode.KeepAspectRatio)
+            return
+        
+        # Stop any existing fit animation
+        if hasattr(self, '_fit_anim') and self._fit_anim.state() == QVariantAnimation.State.Running:
+            self._fit_anim.stop()
+        
+        # Calculate target transform
+        view_rect = self.view.viewport().rect()
+        image_rect = self.view.image_rect
+        
+        # Calculate scale to fit image in view while keeping aspect ratio
+        scale_x = view_rect.width() / image_rect.width()
+        scale_y = view_rect.height() / image_rect.height()
+        target_scale = min(scale_x, scale_y)
+        
+        # Get current transform values
+        current_transform = self.view.transform()
+        current_scale = current_transform.m11()
+        
+        # Get current and target center positions
+        current_center = self.view.mapToScene(self.view.viewport().rect().center())
+        target_center = image_rect.center()
+        
+        # Store start values
+        self._fit_start_scale = current_scale
+        self._fit_target_scale = target_scale
+        self._fit_start_center = current_center
+        self._fit_target_center = target_center
+        
+        # Create animation
+        self._fit_anim = QVariantAnimation(self)
+        self._fit_anim.setStartValue(0.0)
+        self._fit_anim.setEndValue(1.0)
+        self._fit_anim.setDuration(duration)
+        self._fit_anim.valueChanged.connect(self._update_fit_animation)
+        self._fit_anim.start()
+    
+    def _update_fit_animation(self, progress):
+        """Update view transform during fit animation."""
+        # Interpolate scale (use easing for smoother feel)
+        eased = progress * (2 - progress)  # Ease out quad
+        
+        current_scale = self._fit_start_scale + (self._fit_target_scale - self._fit_start_scale) * eased
+        
+        # Interpolate center position
+        current_x = self._fit_start_center.x() + (self._fit_target_center.x() - self._fit_start_center.x()) * eased
+        current_y = self._fit_start_center.y() + (self._fit_target_center.y() - self._fit_start_center.y()) * eased
+        
+        # Reset and apply new transform
+        self.view.resetTransform()
+        self.view.scale(current_scale, current_scale)
+        self.view.centerOn(QPointF(current_x, current_y))
 
     def open_image(self, file_path=None, layer = -1, auto_fit=True):
         if hasattr(self, 'anim') and self.anim.state() == QVariantAnimation.State.Running:

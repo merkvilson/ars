@@ -412,7 +412,7 @@ def execute_cmd(ars_window):
         ic.ICON_GIZMO_SCALE: lambda val: setattr(ars_window.prefs, 'timeline_resolution', int(val)),
         ic.ICON_STEPS: lambda val: setattr(ars_window.prefs, 'timeline_steps', int(val)),
         ic.ICON_SIZE: lambda: open_keyframes(ars_window),
-        ic.ICON_WINDOW_FULLSCREEN: lambda: ars_window.img.fit_image(),
+        ic.ICON_WINDOW_FULLSCREEN: lambda: ars_window.img.fit_image(True),
         ic.ICON_TXT_FONT: lambda: open_prompt_editor(ars_window),
         ic.ICON_TRASH_X: lambda: ars_window.img.clear_image()
         }
