@@ -41,8 +41,18 @@ from core.cursor_modifier import CursorModifier
 
 from core.sound_manager import play_sound
 
+
 class SliderHandle(QGraphicsRectItem):
-    """Custom handle for the slider, handling drag events."""
+    """Invisible handle overlay for slider interaction.
+    
+    Captures mouse events for slider dragging and provides:
+    - Left-click drag: Update slider value
+    - Right-click: Open inline edit field (if no callbackR defined)
+    - Short left-click (<0.15s): Open inline edit field
+    
+    Args:
+        parent: The parent BButton instance.
+    """
     def __init__(self, parent):
         super().__init__(parent)
         self.parent_button = parent
@@ -143,6 +153,14 @@ class RoundedRectOutline(QGraphicsRectItem):
 
 
 class EditField(QLineEdit):
+    """Inline text input field for editing slider or text_value values.
+    
+    A transparent QLineEdit that appears over the button's additional text area.
+    Handles keyboard events (Escape to cancel, Enter to commit) and focus loss.
+    
+    Args:
+        b_button: The parent BButton instance.
+    """
     def __init__(self, b_button):
         super().__init__()
         self.b_button = b_button
@@ -173,6 +191,45 @@ class EditField(QLineEdit):
 
 @dataclass
 class BButtonConfig:
+    """Configuration dataclass for BButton widgets.
+    
+    Attributes:
+        symbol: Icon/text displayed in the button center (1-2 chars for icon fonts).
+        radius: Base radius for button sizing.
+        color: Normal background color.
+        hover_color: Background color on hover.
+        symbol_color: Color of the center symbol.
+        additional_text_color: Color for label/value text.
+        hotkey_text_color: Color for hotkey badge text.
+        font: Font for the main symbol.
+        additional_font: Font for additional text/values.
+        hover_scale: Scale factor on hover (1.0 = no scale).
+        callbackL: Left-click callback. Receives value if slider/toggle/text_value.
+        callbackR: Right-click callback. If None on sliders, opens edit field.
+        callbackM: Middle-click callback. Default reverts to initial value.
+        callback_hover_in: Called on mouse enter.
+        callback_hover_out: Called on mouse leave.
+        additional_text: Label text displayed next to symbol.
+        hotkey_text: Hotkey badge text (e.g., "Ctrl K").
+        use_extended_shape: True for pill shape, tuple (w_mult, h_mult) for custom size.
+        auto_close: Reserved for menu auto-close behavior.
+        slider_values: Tuple (min, max, current[, default]) for slider mode.
+        slider_color: Fill color for slider progress.
+        toggle_values: Tuple (min, max, current) or bool for toggle mode.
+        toggle_color: Background when toggle is on.
+        toggle_hover_color: Hover color when toggle is on.
+        toggle_disabled_color: Background when toggle is off.
+        toggle_disabled_hover_color: Hover color when toggle is off.
+        show_value: Display current value in additional text area.
+        show_symbol: Show/hide the center symbol.
+        editable: Enable/disable user interaction.
+        progress_bar: Display as non-editable progress bar.
+        image_path: Path to background image.
+        clip_to_shape: Clip children to button shape.
+        incremental_value: Step size for incremental slider mode, or tuple (step, axis).
+        inner_widget: QWidget to embed inside the button.
+        text_value: String value for text input mode. If set, enables inline editing.
+    """
     symbol: str = ""
     radius: int = 22
     color: QColor = field(default_factory=lambda: colors.button_color)
@@ -211,7 +268,43 @@ class BButtonConfig:
 
 
 class BButton(QGraphicsObject):
-    """Bubble button with configurable properties, animation support, and slider/toggle functionality."""
+    """Versatile bubble button widget for the ARS floating UI system.
+    
+    Supports multiple modes:
+    - **Basic Button**: Simple clickable button with icon and optional label.
+    - **Slider Mode**: Horizontal slider with drag/click interaction (slider_values).
+    - **Toggle Mode**: On/off or multi-state toggle (toggle_values).
+    - **Text Input Mode**: Editable text field (text_value).
+    - **Progress Bar**: Non-interactive progress display (progress_bar).
+    
+    Interaction:
+    - Left-click: Primary action / toggle state / open text edit (for text_value).
+    - Right-click: Secondary action / open edit field (sliders without callbackR).
+    - Middle-click: Revert to default value.
+    - Short left-click (<0.15s) on slider: Open edit field.
+    - Scroll wheel: Increment/decrement slider value.
+    
+    Visual Features:
+    - Ripple animation on click.
+    - Hover color/scale animation.
+    - Hotkey badge display.
+    - Image background support.
+    - Embedded inner widgets.
+    
+    Args:
+        config: BButtonConfig instance with all button properties.
+    
+    Example:
+        >>> config = BButtonConfig(
+        ...     symbol="",
+        ...     additional_text="Volume",
+        ...     slider_values=(0, 100, 50),
+        ...     show_value=True,
+        ...     use_extended_shape=True,
+        ...     callbackL=lambda v: print(f"Volume: {v}")
+        ... )
+        >>> button = BButton(config)
+    """
     def __init__(self, config: BButtonConfig):
         super().__init__()
         self.config = config
@@ -511,6 +604,7 @@ class BButton(QGraphicsObject):
         self.callbackM = config.callbackM if config.callbackM else default_callbackM
 
     def _create_hotkey_items(self):
+        """Create hotkey badge text items with rounded outline backgrounds."""
         # Clear old hotkey items
         for item in self.hotkey_text_items:
             item.setParentItem(None)
@@ -556,6 +650,13 @@ class BButton(QGraphicsObject):
             current_left += bounding.width() + space_between
 
     def _update_colors(self):
+        """Recalculate normal_color and hover_color based on current state.
+        
+        Applies color adjustments for:
+        - Toggle on/off states
+        - Slider transparency
+        - Text value darkening (no hover effect)
+        """
         if self.toggle_values and self._toggle_value > 0:
             self.normal_color = self.toggle_color
             self.hover_color = self.toggle_hover_color
@@ -576,6 +677,7 @@ class BButton(QGraphicsObject):
             self.normal_color = self.normal_color.darker(250)
 
     def _refresh_color(self):
+        """Apply the appropriate color based on hover/editable state."""
         if hasattr(self, 'color_anim') and self.color_anim and self.color_anim.state() == QPropertyAnimation.State.Running:
             self.color_anim.stop()
         if not self.editable:
@@ -586,6 +688,13 @@ class BButton(QGraphicsObject):
             self.itemColor = self.normal_color
 
     def _open_edit_field(self):
+        """Create and display an inline text edit field.
+        
+        Opens a transparent QLineEdit overlay for manual value entry.
+        For sliders: displays current numeric value, commits on Enter/focus loss.
+        For text_value: displays current text, updates on commit.
+        Press Escape to cancel without saving.
+        """
         if hasattr(self, 'edit_proxy') and self.edit_proxy:
             return
 
@@ -642,10 +751,20 @@ class BButton(QGraphicsObject):
         self.edit_field.setFocus()
 
     def _commit_edit_value(self):
-        # Use QTimer to defer the commit/cleanup to avoid crashing if called from an event handler
+        """Schedule deferred commit of the edit field value.
+        
+        Uses QTimer.singleShot(0) to safely clean up the edit field
+        without crashing when called from within an event handler.
+        """
         QTimer.singleShot(0, self._commit_edit_value_deferred)
 
     def _commit_edit_value_deferred(self):
+        """Apply the edited value and close the edit field.
+        
+        For sliders: parses numeric input, clamps to min/max, triggers callback.
+        For text_value: updates the text directly, triggers callback.
+        Invalid numeric input is silently ignored.
+        """
         if not hasattr(self, 'edit_proxy') or not self.edit_proxy:
             return
             
@@ -686,6 +805,7 @@ class BButton(QGraphicsObject):
         self._cancel_edit_value()
 
     def _cancel_edit_value(self):
+        """Close the edit field without saving changes."""
         if hasattr(self, 'edit_proxy') and self.edit_proxy:
             self.edit_proxy.setVisible(False)
             self.edit_proxy.setParentItem(None)
@@ -698,6 +818,11 @@ class BButton(QGraphicsObject):
             self.additional_text_item.setVisible(True)
 
     def _toggle_state(self):
+        """Cycle the toggle value and update visuals.
+        
+        For radio groups: turns on this button and turns off others.
+        For regular toggles: cycles through min to max values.
+        """
         if not self.editable or not self.toggle_values:
             return
         if self.radio_group:
@@ -984,6 +1109,14 @@ class BButton(QGraphicsObject):
             super().wheelEvent(event)
 
     def _update_slider_value(self, pos):
+        """Calculate and apply new slider value from position or cursor offset.
+        
+        For incremental mode: uses accumulated cursor offset from CursorModifier.
+        For direct mode: calculates value from click/drag position ratio.
+        
+        Args:
+            pos: Mouse position in parent coordinates.
+        """
         if not (self.editable and self.slider_values):
             return
         min_val, max_val = self.slider_values[:2]
@@ -1038,7 +1171,7 @@ class BButton(QGraphicsObject):
         self.update()    # Update visuals and trigger related logic
 
     def _trigger_callback(self):
-        """Helper method to trigger the appropriate callback based on drag button."""
+        """Invoke the appropriate callback based on which mouse button is being dragged."""
         if self._drag_button == Qt.MouseButton.LeftButton and self.callbackL:
             if len(inspect.signature(self.callbackL).parameters) > 0:
                 self.callbackL(self._slider_value)
@@ -1077,6 +1210,15 @@ class BButton(QGraphicsObject):
 
 
     def _update_additional_text(self):
+        """Update the displayed text based on current value.
+        
+        Handles display logic for:
+        - Sliders: "Label Value" or "Label Value%" (progress bar)
+        - Toggles: "Label On/Off" or "Label N" (multi-state)
+        - Text value: Shows text_value, or additional_text as placeholder if empty
+        
+        Empty text_value displays additional_text in darker color as placeholder.
+        """
         if self.additional_text_item and (self.slider_values or self.toggle_values or self.text_value is not None):
             base = self.additional_text if self.additional_text else ""
             new_text = base
@@ -1114,6 +1256,7 @@ class BButton(QGraphicsObject):
             self.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
 
     def _start_ripple(self):
+        """Start the ripple click animation from the current ripple_center."""
         if not self.editable:
             return
         if self.ripple_anim_group:
@@ -1138,6 +1281,7 @@ class BButton(QGraphicsObject):
         self.ripple_anim_group.start()
 
     def _reset_ripple(self):
+        """Reset ripple state and animate color back to normal if not hovering."""
         self._ripple_radius = 0.0
         self._ripple_opacity = 0.0
         self.update()
