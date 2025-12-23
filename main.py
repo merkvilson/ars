@@ -1,5 +1,5 @@
 """
-Airen Studio (ARS) - Alpha Version - 0.50
+Airen Studio (ARS) - Alpha Version - 0.51
 
 Airen Studio is an AI-powered 3D aimed media software designed to integrate
 advanced 3D rendering with AI workflows. This application features a unique
@@ -44,7 +44,7 @@ class Application:
 def main() -> None:
 
     pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
-    myappid = 'airen.studio.ars.0.50' # arbitrary string
+    myappid = 'airen.studio.ars.0.51' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     app = Application()
