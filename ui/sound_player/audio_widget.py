@@ -3,18 +3,23 @@ from pathlib import Path
 from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QSplitter
 from PyQt6.QtCore import Qt
 
+# Add project root to sys.path to allow imports from ui, core, etc.
+project_root = Path(__file__).parents[2]
+if str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
+
 # Handle imports whether run as script or module
 try:
-    from .sount_player import SoundboardWidget
+    from .sound_player import SoundboardWidget
     from .sound_modifier import AudioModifierWidget
 except ImportError:
     try:
-        from sount_player import SoundboardWidget
+        from sound_player import SoundboardWidget
         from sound_modifier import AudioModifierWidget
     except ImportError:
         # Add current directory to path if needed
         sys.path.append(str(Path(__file__).parent))
-        from sount_player import SoundboardWidget
+        from sound_player import SoundboardWidget
         from sound_modifier import AudioModifierWidget
 
 class AudioStudio(QWidget):

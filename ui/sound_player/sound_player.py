@@ -1,5 +1,11 @@
 import sys
 from pathlib import Path
+
+# Add project root to sys.path to allow imports from ui, core, etc.
+project_root = Path(__file__).parents[2]
+if str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
+
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QListWidget, 
                              QListWidgetItem, QInputDialog, QMessageBox,
@@ -62,17 +68,13 @@ class SoundItemWidget(QWidget):
         self.parent_list_widget = parent_list_widget
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setContentsMargins(0, 0, 0, 0)
         
         # Play/Name Button
         play_config = BButtonConfig(
             symbol=ic.ICON_PLAYER_PLAY,
             additional_text=file_path.stem,
             callbackL=self.play_sound,
-            radius=15,
-            font=QFont("Arial", 12),
-            additional_font=QFont("Arial", 12),
-            additional_text_color=QColor("white")
         )
         self.btn_play = BButtonWidget(play_config)
         layout.addWidget(self.btn_play)
@@ -83,8 +85,6 @@ class SoundItemWidget(QWidget):
         copy_config = BButtonConfig(
             symbol=ic.ICON_CLIPBOARD_PASTE,
             callbackL=self.copy_name,
-            radius=15,
-            font=QFont("Arial", 12)
         )
         self.btn_copy = BButtonWidget(copy_config)
         layout.addWidget(self.btn_copy)
@@ -93,8 +93,6 @@ class SoundItemWidget(QWidget):
         rename_config = BButtonConfig(
             symbol=ic.ICON_TEXT_INPUT,
             callbackL=self.rename_file,
-            radius=15,
-            font=QFont("Arial", 12)
         )
         self.btn_rename = BButtonWidget(rename_config)
         layout.addWidget(self.btn_rename)
@@ -103,8 +101,6 @@ class SoundItemWidget(QWidget):
         delete_config = BButtonConfig(
             symbol=ic.ICON_TRASH,
             callbackL=self.delete_file,
-            radius=15,
-            font=QFont("Arial", 12)
         )
         self.btn_delete = BButtonWidget(delete_config)
         layout.addWidget(self.btn_delete)
@@ -182,8 +178,10 @@ class SoundboardWidget(QWidget):
         
         self.list_widget.itemClicked.connect(self.on_item_clicked)
     
-        sounds_dir = Path(__file__).parent / "sounds"
-        sounds_dir.mkdir(exist_ok=True)
+        # Point to res/sounds from ui/sound_player/sound_player.py
+        # Path(__file__).parents[2] is the project root (ARS)
+        sounds_dir = Path(__file__).parents[2] / "res" / "sounds"
+        sounds_dir.mkdir(parents=True, exist_ok=True)
         sound_files = [f for f in sounds_dir.iterdir() if f.suffix in ['.mp3', '.wav', '.ogg', '.m4a', '.flac']]
         
         for f in sorted(sound_files):
