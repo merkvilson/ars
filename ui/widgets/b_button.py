@@ -270,8 +270,12 @@ class BButton(QGraphicsObject):
         ... )
         >>> button = BButton(config)
     """
+    _pixmap_cache = {}
+
     def __init__(self, config: BButtonConfig):
         super().__init__()
+        self._shape_path = None
+        self._last_additional_text = None
         self.config = config
         self.symbol = config.symbol
         self.additional_text = config.additional_text
@@ -308,21 +312,26 @@ class BButton(QGraphicsObject):
         self.image_path = config.image_path  
         self.pixmap = None 
         if self.image_path:
-            if self.image_path.lower().endswith(('.tif', '.tiff')):
-                reader = QImageReader(self.image_path)
-                count = reader.imageCount()
-                if count > 0:
-                    reader.jumpToImage(count - 1)
-                    image = reader.read()
-                    if not image.isNull():
-                        self.pixmap = QPixmap.fromImage(image)
+            if self.image_path in BButton._pixmap_cache:
+                self.pixmap = BButton._pixmap_cache[self.image_path]
+            else:
+                if self.image_path.lower().endswith(('.tif', '.tiff')):
+                    reader = QImageReader(self.image_path)
+                    count = reader.imageCount()
+                    if count > 0:
+                        reader.jumpToImage(count - 1)
+                        image = reader.read()
+                        if not image.isNull():
+                            self.pixmap = QPixmap.fromImage(image)
 
-            if self.pixmap is None:
-                self.pixmap = QPixmap(self.image_path) 
+                if self.pixmap is None:
+                    self.pixmap = QPixmap(self.image_path) 
 
-            if self.pixmap.isNull():
-                self.pixmap = None
-                print(f"Warning: Failed to load image from '{self.image_path}'") 
+                if not self.pixmap.isNull():
+                    BButton._pixmap_cache[self.image_path] = self.pixmap
+                else:
+                    self.pixmap = None
+                    print(f"Warning: Failed to load image from '{self.image_path}'") 
 
 
         if self.progress_bar:
@@ -840,6 +849,7 @@ class BButton(QGraphicsObject):
     def set_updated_config(self, key: str, value):
         """Update a specific configuration property in real-time."""
         set_updated_config(self, key, value)
+        self._shape_path = None
 
 
 
@@ -879,12 +889,14 @@ class BButton(QGraphicsObject):
         return self._bounding
 
     def shape(self):
-        path = QPainterPath()
-        if self.use_extended_shape:
-            path.addRoundedRect(self._bounding, self.radius, self.radius)
-        else:
-            path.addEllipse(self._bounding)
-        return path
+        if self._shape_path is None:
+            path = QPainterPath()
+            if self.use_extended_shape:
+                path.addRoundedRect(self._bounding, self.radius, self.radius)
+            else:
+                path.addEllipse(self._bounding)
+            self._shape_path = path
+        return self._shape_path
 
     def paint(self, painter, option, widget=None):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -1239,8 +1251,11 @@ class BButton(QGraphicsObject):
                     else:
                         new_text = self.text_value
 
-            self.additional_text_item.setDefaultTextColor(text_color)
-            self.additional_text_item.setHtml(new_text)
+            if new_text != self._last_additional_text or text_color != self.additional_text_item.defaultTextColor():
+                self.additional_text_item.setDefaultTextColor(text_color)
+                self.additional_text_item.setHtml(new_text)
+                self._last_additional_text = new_text
+
             add_bounding = self.additional_text_item.boundingRect()
             if self._is_svg_symbol:
                 main_right = self.radius * 0.75
