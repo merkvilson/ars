@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QListWidget, 
                              QListWidgetItem, QInputDialog, QMessageBox,
                              QGraphicsView, QGraphicsScene)
-from PyQt6.QtCore import Qt, QUrl, pyqtSignal
+from PyQt6.QtCore import Qt, QUrl, pyqtSignal, QTimer
 from PyQt6.QtGui import QPainter, QFont, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
@@ -63,8 +63,41 @@ class BButtonWidget(QWidget):
         self.button._update_additional_text()
         self.adjust_size()
 
+class SimpleButton(QPushButton):
+    def __init__(self, text, icon_char=None, callback=None, parent=None):
+        super().__init__(text, parent)
+        self.callback = callback
+        if icon_char:
+            self.setText(f"{icon_char} {text}" if text else icon_char)
+            # Assuming icon_char is from a font like FontAwesome or similar
+            # You might need to set the font here if it's a special icon font
+            # self.setFont(QFont("YourIconFont", 12)) 
+        
+        # Basic styling to match the dark theme roughly
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #ddd;
+                border: none;
+                padding: 5px;
+                text-align: left;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 20);
+                border-radius: 4px;
+            }
+            QPushButton:pressed {
+                background-color: rgba(255, 255, 255, 40);
+            }
+        """)
+        if callback:
+            self.clicked.connect(callback)
+
 class SoundItemWidget(QWidget):
     item_clicked = pyqtSignal(Path)
+    play_requested = pyqtSignal(Path)
+    rename_requested = pyqtSignal(Path, str) # old_path, new_name
+    delete_requested = pyqtSignal(Path)
 
     def __init__(self, file_path, parent_list_widget):
         super().__init__()
@@ -72,57 +105,41 @@ class SoundItemWidget(QWidget):
         self.parent_list_widget = parent_list_widget
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setContentsMargins(5, 2, 5, 2)
+        layout.setSpacing(10)
         
         # Play/Name Button
-        play_config = BButtonConfig(
-            symbol=ic.ICON_PLAYER_PLAY,
-            additional_text=file_path.stem,
-            #use_extended_shape=True,
-            callbackL=self.play_sound,
-            clip_to_shape = False
-        )
-        self.btn_play = BButtonWidget(play_config)
-        layout.addWidget(self.btn_play)
-        
-        layout.addStretch(1)
+        # Using standard QPushButton instead of heavy BButtonWidget
+        self.btn_play = SimpleButton(file_path.stem, ic.ICON_PLAYER_PLAY, self.request_play)
+        # Set font for icon if needed, assuming 'ic' provides characters for a specific font
+        from theme.fonts.new_fonts import get_font
+        self.btn_play.setFont(get_font(14))
+        layout.addWidget(self.btn_play, stretch=1)
         
         # Copy Name Button
-        copy_config = BButtonConfig(
-            symbol=ic.ICON_CLIPBOARD_PASTE,
-            callbackL=self.copy_name,
-        )
-        self.btn_copy = BButtonWidget(copy_config)
+        self.btn_copy = SimpleButton("", ic.ICON_CLIPBOARD_PASTE, self.copy_name)
+        self.btn_copy.setFont(get_font(14))
+        self.btn_copy.setToolTip("Copy Name")
+        self.btn_copy.setFixedWidth(30)
         layout.addWidget(self.btn_copy)
         
         # Rename Button
-        rename_config = BButtonConfig(
-            symbol=ic.ICON_TEXT_INPUT,
-            callbackL=self.rename_file,
-        )
-        self.btn_rename = BButtonWidget(rename_config)
+        self.btn_rename = SimpleButton("", ic.ICON_TEXT_INPUT, self.rename_file)
+        self.btn_rename.setFont(get_font(14))
+        self.btn_rename.setToolTip("Rename")
+        self.btn_rename.setFixedWidth(30)
         layout.addWidget(self.btn_rename)
         
         # Delete Button
-        delete_config = BButtonConfig(
-            symbol=ic.ICON_TRASH,
-            callbackL=self.delete_file,
-        )
-        self.btn_delete = BButtonWidget(delete_config)
+        self.btn_delete = SimpleButton("", ic.ICON_TRASH, self.delete_file)
+        self.btn_delete.setFont(get_font(14))
+        self.btn_delete.setToolTip("Delete")
+        self.btn_delete.setFixedWidth(30)
         layout.addWidget(self.btn_delete)
-
-        # Audio Player
-        self.player = QMediaPlayer()
-        self.audio = QAudioOutput()
-        self.player.setAudioOutput(self.audio)
-        self.player.setSource(QUrl.fromLocalFile(str(self.file_path)))
-        self.audio.setVolume(0.7)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.item_clicked.emit(self.file_path)
-            self.play_sound()
             # Also select the item in the list widget visually
             for i in range(self.parent_list_widget.count()):
                 item = self.parent_list_widget.item(i)
@@ -131,12 +148,8 @@ class SoundItemWidget(QWidget):
                     break
         super().mousePressEvent(event)
 
-    def play_sound(self):
-        self.item_clicked.emit(self.file_path) # Also select when playing
-        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            self.player.stop()
-        self.player.setPosition(0)
-        self.player.play()
+    def request_play(self):
+        self.play_requested.emit(self.file_path)
 
     def copy_name(self):
         QApplication.clipboard().setText(self.file_path.stem)
@@ -144,33 +157,17 @@ class SoundItemWidget(QWidget):
     def rename_file(self):
         new_name, ok = QInputDialog.getText(self, "Rename", "New name:", text=self.file_path.stem)
         if ok and new_name:
-            new_path = self.file_path.with_name(new_name + self.file_path.suffix)
-            try:
-                self.player.setSource(QUrl()) # Release file lock
-                self.file_path.rename(new_path)
-                self.file_path = new_path
-                self.btn_play.update_text(new_name)
-                self.player.setSource(QUrl.fromLocalFile(str(self.file_path)))
-            except Exception as e:
-                self.player.setSource(QUrl.fromLocalFile(str(self.file_path))) # Restore on error
-                QMessageBox.critical(self, "Error", f"Could not rename file: {e}")
+            self.rename_requested.emit(self.file_path, new_name)
+
+    def update_path(self, new_path):
+        self.file_path = new_path
+        self.btn_play.setText(f"{ic.ICON_PLAYER_PLAY} {new_path.stem}")
 
     def delete_file(self):
         reply = QMessageBox.question(self, "Delete", f"Are you sure you want to delete {self.file_path.name}?",
                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
-            try:
-                self.player.setSource(QUrl()) # Release file lock
-                self.file_path.unlink()
-                # Remove from list
-                for i in range(self.parent_list_widget.count()):
-                    item = self.parent_list_widget.item(i)
-                    if self.parent_list_widget.itemWidget(item) == self:
-                        self.parent_list_widget.takeItem(i)
-                        break
-            except Exception as e:
-                self.player.setSource(QUrl.fromLocalFile(str(self.file_path))) # Restore on error
-                QMessageBox.critical(self, "Error", f"Could not delete file: {e}")
+            self.delete_requested.emit(self.file_path)
 
 class SoundboardWidget(QWidget):
     sound_selected = pyqtSignal(Path)
@@ -184,18 +181,95 @@ class SoundboardWidget(QWidget):
         
         self.list_widget.itemClicked.connect(self.on_item_clicked)
     
+        # Shared Media Player
+        self.player = QMediaPlayer()
+        self.audio = QAudioOutput()
+        self.player.setAudioOutput(self.audio)
+        self.audio.setVolume(0.7)
+
+        # Defer loading to prevent UI freeze
+        QTimer.singleShot(10, self.populate_list)
+
+    def populate_list(self):
         # Point to res/sounds from ui/sound_player/sound_player.py
         # Path(__file__).parents[2] is the project root (ARS)
         sounds_dir = Path(__file__).parents[2] / "res" / "sounds"
         sounds_dir.mkdir(parents=True, exist_ok=True)
-        sound_files = [f for f in sounds_dir.iterdir() if f.suffix in ['.mp3', '.wav', '.ogg', '.m4a', '.flac']]
         
-        for f in sorted(sound_files):
-            item = QListWidgetItem(self.list_widget)
-            item_widget = SoundItemWidget(f, self.list_widget)
-            item_widget.item_clicked.connect(self.sound_selected.emit)
-            item.setSizeHint(item_widget.sizeHint())
-            self.list_widget.setItemWidget(item, item_widget)
+        # Use a generator or chunking to avoid blocking
+        self.sound_files = sorted([f for f in sounds_dir.iterdir() if f.suffix in ['.mp3', '.wav', '.ogg', '.m4a', '.flac']])
+        self.load_index = 0
+        self.chunk_size = 10
+        
+        self.load_timer = QTimer(self)
+        self.load_timer.timeout.connect(self.load_chunk)
+        self.load_timer.start(20) # Increased from 0 to 20ms to allow UI updates
+
+    def load_chunk(self):
+        if self.load_index >= len(self.sound_files):
+            self.load_timer.stop()
+            return
+
+        end_index = min(self.load_index + self.chunk_size, len(self.sound_files))
+        # Temporarily disable updates to prevent layout thrashing
+        self.list_widget.setUpdatesEnabled(False)
+        try:
+            for i in range(self.load_index, end_index):
+                f = self.sound_files[i]
+                item = QListWidgetItem(self.list_widget)
+                item_widget = SoundItemWidget(f, self.list_widget)
+                
+                # Connect signals
+                item_widget.item_clicked.connect(self.sound_selected.emit)
+                item_widget.play_requested.connect(self.play_sound)
+                item_widget.rename_requested.connect(self.rename_file)
+                item_widget.delete_requested.connect(self.delete_file)
+                
+                item.setSizeHint(item_widget.sizeHint())
+                self.list_widget.setItemWidget(item, item_widget)
+        finally:
+            self.list_widget.setUpdatesEnabled(True)
+        
+        self.load_index = end_index
+
+    def play_sound(self, file_path):
+        self.sound_selected.emit(file_path)
+        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+            self.player.stop()
+        self.player.setSource(QUrl.fromLocalFile(str(file_path)))
+        self.player.play()
+
+    def rename_file(self, old_path, new_name):
+        new_path = old_path.with_name(new_name + old_path.suffix)
+        try:
+            self.player.setSource(QUrl()) # Release file lock
+            old_path.rename(new_path)
+            
+            # Update widget
+            for i in range(self.list_widget.count()):
+                item = self.list_widget.item(i)
+                widget = self.list_widget.itemWidget(item)
+                if widget and widget.file_path == old_path:
+                    widget.update_path(new_path)
+                    break
+                    
+            # Restore player if needed (optional, maybe don't auto-play after rename)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Could not rename file: {e}")
+
+    def delete_file(self, file_path):
+        try:
+            self.player.setSource(QUrl()) # Release file lock
+            file_path.unlink()
+            # Remove from list
+            for i in range(self.list_widget.count()):
+                item = self.list_widget.item(i)
+                widget = self.list_widget.itemWidget(item)
+                if widget and widget.file_path == file_path:
+                    self.list_widget.takeItem(i)
+                    break
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Could not delete file: {e}")
 
     def on_item_clicked(self, item):
         widget = self.list_widget.itemWidget(item)
