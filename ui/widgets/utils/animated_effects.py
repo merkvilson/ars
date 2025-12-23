@@ -5,8 +5,8 @@ def open_effect(widget, duration: int = 200, start_radius: int = 50):
     """
     Show the window with an animated blur that decreases from start_radius to 0.
     """
-    # Apply blur effect if not already
-    if not hasattr(widget, "_blur_effect"):
+    # Apply blur effect if not already attached
+    if not hasattr(widget, "_blur_effect") or widget.graphicsEffect() != widget._blur_effect:
         widget._blur_effect = QGraphicsBlurEffect(widget)
         widget.setGraphicsEffect(widget._blur_effect)
 
@@ -25,6 +25,12 @@ def open_effect(widget, duration: int = 200, start_radius: int = 50):
     anim.setEndValue(0)
     anim.setEasingCurve(QEasingCurve.Type.OutCubic)
 
+    # Remove the effect when animation finishes to restore performance
+    def on_finished():
+        widget.setGraphicsEffect(None)
+
+    anim.finished.connect(on_finished)
+
     # Keep reference so it’s not garbage-collected
     widget._blur_anim = anim
     anim.start()
@@ -33,7 +39,8 @@ def close_effect(widget, duration: int = 250, end_radius: int = 50):
     """
     Close the window with an animated blur that increases from 0 to end_radius.
     """
-    if not hasattr(widget, "_blur_effect"):
+    # Ensure effect is attached (it might have been removed by open_effect)
+    if not hasattr(widget, "_blur_effect") or widget.graphicsEffect() != widget._blur_effect:
         widget._blur_effect = QGraphicsBlurEffect(widget)
         widget.setGraphicsEffect(widget._blur_effect)
 
@@ -48,7 +55,10 @@ def close_effect(widget, duration: int = 250, end_radius: int = 50):
 
     # When animation finishes, close the window
     anim.finished.connect(widget.close)
-    widget.window().viewport._canvas.native.setFocus()
+    try:
+        widget.window().viewport._canvas.native.setFocus()
+    except AttributeError:
+        pass
 
     widget._blur_anim = anim  # keep reference
     anim.start()
