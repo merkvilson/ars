@@ -25,6 +25,9 @@ from core.sound_manager import play_sound
 from theme.fonts import font_icons as ic
 from theme import colors
 
+from util_functions.ars_window import ars_window
+
+
 class DraggableGraphicsView(QGraphicsView):
     def __init__(self, scene, parent_window, symbol):
         super().__init__(scene)
@@ -690,12 +693,12 @@ class ContextButtonWindow(QWidget):
 
     def toggle_edit_mode(self):
         self.edit_mode = not self.edit_mode
-        # Visual feedback could be added here
-        # e.g. change background color or show a message
         if self.edit_mode:
-            play_sound("hover") # Feedback sound
+            play_sound("hover")
+            ars_window().msg("Edit Mode: ON")
         else:
             play_sound("back")
+            ars_window().msg("Edit Mode: OFF")
 
     def reorder_items(self, source_symbol, target_symbol, insert_after=False):
         # Find source and target views
