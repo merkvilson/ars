@@ -6,7 +6,8 @@ from ars_cmds.util_cmds.open_file import open_file
 import os
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 from ars_cmds.util_cmds.time_cmd import after
-from PyQt6.QtGui import QColor
+from PyQt6.QtGui import QColor, QTextCursor
+from PyQt6.QtCore import QTimer
 from prefs import pref_controller
 
 
@@ -132,6 +133,14 @@ def execute_cmd(ars_window):
             content = f.read()
         code_editor.setPlainText(content)
         code_editor.project_file_path = current_code_file
+        
+        def set_focus_delayed():
+            code_editor.setFocus()
+            cursor = code_editor.textCursor()
+            cursor.movePosition(QTextCursor.MoveOperation.End)
+            code_editor.setTextCursor(cursor)
+
+        QTimer.singleShot(100, set_focus_delayed)
 
     default_namespace_injection = {
         'ars_window': ars_window,
