@@ -1242,8 +1242,10 @@ class BButton(QGraphicsObject):
             self.additional_text_item.setDefaultTextColor(text_color)
             self.additional_text_item.setHtml(new_text)
             add_bounding = self.additional_text_item.boundingRect()
-            main_bounding = self.main_symbol_item.boundingRect()
-            main_right = main_bounding.width() / 2
+            if self._is_svg_symbol:
+                main_right = self.radius * 0.75
+            else:
+                main_right = self.main_symbol_item.boundingRect().width() / 2
             padding = 3
             add_left = main_right + padding
             self.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
