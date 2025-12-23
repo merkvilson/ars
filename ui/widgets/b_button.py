@@ -194,45 +194,7 @@ class EditField(QLineEdit):
 
 @dataclass
 class BButtonConfig:
-    """Configuration dataclass for BButton widgets.
-    
-    Attributes:
-        symbol: Icon/text displayed in the button center (1-2 chars for icon fonts).
-        radius: Base radius for button sizing.
-        color: Normal background color.
-        hover_color: Background color on hover.
-        symbol_color: Color of the center symbol.
-        additional_text_color: Color for label/value text.
-        hotkey_text_color: Color for hotkey badge text.
-        font: Font for the main symbol.
-        additional_font: Font for additional text/values.
-        hover_scale: Scale factor on hover (1.0 = no scale).
-        callbackL: Left-click callback. Receives value if slider/toggle/text_value.
-        callbackR: Right-click callback. If None on sliders, opens edit field.
-        callbackM: Middle-click callback. Default reverts to initial value.
-        callback_hover_in: Called on mouse enter.
-        callback_hover_out: Called on mouse leave.
-        additional_text: Label text displayed next to symbol.
-        hotkey_text: Hotkey badge text (e.g., "Ctrl K").
-        use_extended_shape: True for pill shape, tuple (w_mult, h_mult) for custom size.
-        auto_close: Reserved for menu auto-close behavior.
-        slider_values: Tuple (min, max, current[, default]) for slider mode.
-        slider_color: Fill color for slider progress.
-        toggle_values: Tuple (min, max, current) or bool for toggle mode.
-        toggle_color: Background when toggle is on.
-        toggle_hover_color: Hover color when toggle is on.
-        toggle_disabled_color: Background when toggle is off.
-        toggle_disabled_hover_color: Hover color when toggle is off.
-        show_value: Display current value in additional text area.
-        show_symbol: Show/hide the center symbol.
-        editable: Enable/disable user interaction.
-        progress_bar: Display as non-editable progress bar.
-        image_path: Path to background image.
-        clip_to_shape: Clip children to button shape.
-        incremental_value: Step size for incremental slider mode, or tuple (step, axis).
-        inner_widget: QWidget to embed inside the button.
-        text_value: String value for text input mode. If set, enables inline editing.
-    """
+    """Configuration dataclass for BButton properties."""
     symbol: str = ""
     radius: int = 22
     color: QColor = field(default_factory=lambda: colors.button_color)
