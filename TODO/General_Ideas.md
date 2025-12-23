@@ -5,6 +5,8 @@
 - [30%] CUI workflow to CTX
 - [30%] Implement prefs manager and config classes
 - [20%] Implement plugin system
+
+- [ ] Overlay widget that will replace the bubbles layout. It should distribute CTX windows instead of bubbles. splitters should be added to avoid overlapping. The center part should have a click-through area.
 - [ ] Move temp values to ars_window.prefs
 - [ ] Implement folder watcher or new file finder function with callbacks.
 - [ ] implement whisperthunder and pollinations as extensions/plugins
@@ -27,6 +29,7 @@
 - [ ] Hover over incremental value containing b-button shows value.
 - [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] https://github.com/meshsplatting/mesh-splatting
+- [ ] 
 - [ ] 
 
 # Secret Release
