@@ -67,7 +67,7 @@ def execute_cmd(ars_window):
 
 
         config2.callbackL = {
-            img: (lambda img=img: define_img(img_path=img))
+            img: (lambda *args, img=img: define_img(img_path=img))
             for img in items}
         
         config2.callback_hover_in = {
