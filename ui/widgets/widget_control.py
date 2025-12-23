@@ -63,26 +63,26 @@ def set_updated_config(widget, key: str, value):
             if widget.additional_text_item:
                 widget.additional_text_item.setPlainText(value)
                 add_bounding = widget.additional_text_item.boundingRect()
-                main_text_item = widget.childItems()[0] if widget.childItems() else None
-                if main_text_item:
-                    main_bounding = main_text_item.boundingRect()
-                    main_right = main_bounding.width() / 2
-                    padding = 10
-                    add_left = main_right + padding
-                    widget.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
+                if widget._is_svg_symbol:
+                    main_right = widget.radius * 0.75
+                else:
+                    main_right = widget.main_symbol_item.boundingRect().width() / 2
+                padding = 10
+                add_left = main_right + padding
+                widget.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
                 widget.update()
             elif value:
                 widget.additional_text_item = QGraphicsTextItem(value, widget)
                 widget.additional_text_item.setFont(widget._additional_font)
                 widget.additional_text_item.setDefaultTextColor(widget._additional_text_color)
                 add_bounding = widget.additional_text_item.boundingRect()
-                main_text_item = widget.childItems()[0] if widget.childItems() else None
-                if main_text_item:
-                    main_bounding = main_text_item.boundingRect()
-                    main_right = main_bounding.width() / 2
-                    padding = 10
-                    add_left = main_right + padding
-                    widget.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
+                if widget._is_svg_symbol:
+                    main_right = widget.radius * 0.75
+                else:
+                    main_right = widget.main_symbol_item.boundingRect().width() / 2
+                padding = 10
+                add_left = main_right + padding
+                widget.additional_text_item.setPos(add_left, -add_bounding.height() / 2)
                 widget.update()
         
 
