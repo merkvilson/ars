@@ -75,8 +75,9 @@ class SoundItemWidget(QWidget):
         play_config = BButtonConfig(
             symbol=ic.ICON_PLAYER_PLAY,
             additional_text=file_path.stem,
-            use_extended_shape=True,
+            #use_extended_shape=True,
             callbackL=self.play_sound,
+            clip_to_shape = False
         )
         self.btn_play = BButtonWidget(play_config)
         layout.addWidget(self.btn_play)
@@ -116,8 +117,8 @@ class SoundItemWidget(QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
-            print(f"DEBUG: SoundItemWidget clicked: {self.file_path}")
             self.item_clicked.emit(self.file_path)
+            self.play_sound()
             # Also select the item in the list widget visually
             for i in range(self.parent_list_widget.count()):
                 item = self.parent_list_widget.item(i)
@@ -127,7 +128,6 @@ class SoundItemWidget(QWidget):
         super().mousePressEvent(event)
 
     def play_sound(self):
-        print(f"DEBUG: Play button clicked: {self.file_path}")
         self.item_clicked.emit(self.file_path) # Also select when playing
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.stop()
