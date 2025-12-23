@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QPainter, QColor, QPen
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-from pydub import AudioSegment
 import tempfile
+import soundfile as sf
 
 class WaveformWidget(QWidget):
     def __init__(self):
@@ -176,16 +176,11 @@ class WaveformWidget(QWidget):
                 hint_text = "Drag to pan"
                 painter.drawText(10, 40, hint_text)
 
-class AudioModifier(QMainWindow):
+class AudioModifierWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Audio Trimmer")
-        self.setMinimumSize(900, 650)
-
         
-        widget = QWidget()
-        self.setCentralWidget(widget)
-        layout = QVBoxLayout(widget)
+        layout = QVBoxLayout(self)
         layout.setContentsMargins(30, 30, 30, 30)
         
         self.waveform = WaveformWidget()
@@ -291,18 +286,22 @@ class AudioModifier(QMainWindow):
         
         if not file_path:
             return
-        
+        self.load_from_path(file_path)
+
+    def load_from_path(self, file_path):
+        print(f"DEBUG: AudioModifierWidget.load_from_path called with {file_path}")
         self.file_path = Path(file_path)
         
         try:
-            self.audio_segment = AudioSegment.from_file(file_path)
-            self.sample_rate = self.audio_segment.frame_rate
-            samples = np.array(self.audio_segment.get_array_of_samples())
+            # Use soundfile to read audio
+            data, samplerate = sf.read(str(self.file_path))
+            self.sample_rate = samplerate
             
-            if self.audio_segment.channels == 2:
-                samples = samples.reshape((-1, 2))
-            
-            self.audio_data = samples
+            # Handle stereo/mono
+            if len(data.shape) > 1 and data.shape[1] == 2:
+                self.audio_data = data # Keep stereo
+            else:
+                self.audio_data = data # Mono or other
             
             # Reset zoom when loading new file
             self.waveform.zoom_level = 1.0
@@ -341,10 +340,13 @@ class AudioModifier(QMainWindow):
             self.play_trimmed_btn.setEnabled(True)
             self.save_btn.setEnabled(True)
             self.save_as_btn.setEnabled(True)
+            print("DEBUG: Audio loaded successfully")
             
         except Exception as e:
-            pass
-    
+            print(f"ERROR loading audio: {e}")
+            import traceback
+            traceback.print_exc()
+
     def update_trim(self):
         if self.audio_data is None:
             return
@@ -366,11 +368,11 @@ class AudioModifier(QMainWindow):
                                 self.fade_in_samples, self.fade_out_samples)
     
     def play_original(self):
-        if self.audio_segment is None:
+        if self.audio_data is None:
             return
         
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.wav')
-        self.audio_segment.export(temp_file.name, format='wav')
+        sf.write(temp_file.name, self.audio_data, self.sample_rate)
         self.temp_files.append(temp_file.name)
         
         self.player.stop()
@@ -378,86 +380,99 @@ class AudioModifier(QMainWindow):
         self.player.play()
     
     def play_trimmed(self):
-        if self.audio_segment is None:
+        if self.audio_data is None:
             return
         
-        start_ms = int((self.trim_start / self.sample_rate) * 1000)
-        end_ms = int((self.trim_end / self.sample_rate) * 1000)
-        
-        trimmed_segment = self.audio_segment[start_ms:end_ms]
-        
-        # Apply fade effects
-        fade_in_ms = int((self.fade_in_samples / self.sample_rate) * 1000)
-        fade_out_ms = int((self.fade_out_samples / self.sample_rate) * 1000)
-        
-        if fade_in_ms > 0:
-            trimmed_segment = trimmed_segment.fade_in(fade_in_ms)
-        if fade_out_ms > 0:
-            trimmed_segment = trimmed_segment.fade_out(fade_out_ms)
+        processed_data = self.get_processed_audio_data()
         
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.wav')
-        trimmed_segment.export(temp_file.name, format='wav')
+        sf.write(temp_file.name, processed_data, self.sample_rate)
         self.temp_files.append(temp_file.name)
         
         self.player.stop()
         self.player.setSource(QUrl.fromLocalFile(temp_file.name))
         self.player.play()
     
-    def get_processed_audio(self):
-        """Get the trimmed and faded audio segment"""
-        if self.audio_segment is None:
+    def get_processed_audio_data(self):
+        """Get the trimmed and faded audio data as numpy array"""
+        if self.audio_data is None:
             return None
         
-        start_ms = int((self.trim_start / self.sample_rate) * 1000)
-        end_ms = int((self.trim_end / self.sample_rate) * 1000)
+        # Slice
+        trimmed_data = self.audio_data[self.trim_start:self.trim_end].copy()
         
-        trimmed_segment = self.audio_segment[start_ms:end_ms]
-        
-        # Apply fade effects
-        fade_in_ms = int((self.fade_in_samples / self.sample_rate) * 1000)
-        fade_out_ms = int((self.fade_out_samples / self.sample_rate) * 1000)
-        
-        if fade_in_ms > 0:
-            trimmed_segment = trimmed_segment.fade_in(fade_in_ms)
-        if fade_out_ms > 0:
-            trimmed_segment = trimmed_segment.fade_out(fade_out_ms)
-        
-        return trimmed_segment
+        # Apply fade
+        if self.fade_in_samples > 0:
+            fade_in_curve = np.linspace(0, 1, self.fade_in_samples)
+            if len(trimmed_data.shape) > 1:
+                fade_in_curve = fade_in_curve[:, np.newaxis]
+            
+            # Apply to start
+            fade_len = min(len(trimmed_data), self.fade_in_samples)
+            trimmed_data[:fade_len] *= fade_in_curve[:fade_len]
+            
+        if self.fade_out_samples > 0:
+            fade_out_curve = np.linspace(1, 0, self.fade_out_samples)
+            if len(trimmed_data.shape) > 1:
+                fade_out_curve = fade_out_curve[:, np.newaxis]
+            
+            # Apply to end
+            fade_len = min(len(trimmed_data), self.fade_out_samples)
+            start_idx = len(trimmed_data) - fade_len
+            trimmed_data[start_idx:] *= fade_out_curve[-fade_len:]
+            
+        return trimmed_data
     
     def save_audio(self):
         """Save with the same filename (overwriting original)"""
-        if self.audio_segment is None or self.file_path is None:
+        if self.audio_data is None or self.file_path is None:
             return
         
-        trimmed_segment = self.get_processed_audio()
-        if trimmed_segment:
-            trimmed_segment.export(str(self.file_path), format=self.file_path.suffix[1:])
+        processed_data = self.get_processed_audio_data()
+        if processed_data is not None:
+            # Note: soundfile might not support writing all formats (like mp3) without extra libs.
+            # But it supports WAV, FLAC, OGG usually.
+            try:
+                sf.write(str(self.file_path), processed_data, self.sample_rate)
+            except Exception as e:
+                print(f"Error saving file: {e}")
+                # Fallback to wav if format not supported
+                new_path = self.file_path.with_suffix('.wav')
+                sf.write(str(new_path), processed_data, self.sample_rate)
+                print(f"Saved as {new_path} instead")
     
     def trim_and_save(self):
-        if self.audio_segment is None:
+        if self.audio_data is None:
             return
         
-        trimmed_segment = self.get_processed_audio()
-        if not trimmed_segment:
+        processed_data = self.get_processed_audio_data()
+        if processed_data is None:
             return
         
         original_ext = self.file_path.suffix.lower()
-        filter_str = f"{original_ext.upper()[1:]} Files (*{original_ext});;WAV Files (*.wav);;All Files (*.*)"
-        default_name = str(self.file_path.parent / f"{self.file_path.stem}_trimmed{original_ext}")
+        # Filter for formats soundfile likely supports
+        filter_str = "WAV Files (*.wav);;FLAC Files (*.flac);;OGG Files (*.ogg);;All Files (*.*)"
+        default_name = str(self.file_path.parent / f"{self.file_path.stem}_trimmed.wav")
         
         save_path, _ = QFileDialog.getSaveFileName(
             self, "Save Trimmed Audio", default_name, filter_str)
         
         if save_path:
-            trimmed_segment.export(save_path, format=Path(save_path).suffix[1:])
-    
-    def closeEvent(self, event):
-        # Clean up temp files
-        for temp_file in self.temp_files:
             try:
-                Path(temp_file).unlink()
-            except:
-                pass
+                sf.write(save_path, processed_data, self.sample_rate)
+            except Exception as e:
+                print(f"Error saving: {e}")
+
+class AudioModifier(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Audio Trimmer")
+        self.setMinimumSize(900, 650)
+        self.widget = AudioModifierWidget()
+        self.setCentralWidget(self.widget)
+
+    def closeEvent(self, event):
+        self.widget.cleanup()
         event.accept()
 
 if __name__ == '__main__':

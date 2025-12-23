@@ -3,10 +3,12 @@ from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QListWidget, 
                              QListWidgetItem, QInputDialog, QMessageBox)
-from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtCore import Qt, QUrl, pyqtSignal
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 class SoundItemWidget(QWidget):
+    item_clicked = pyqtSignal(Path)
+
     def __init__(self, file_path, parent_list_widget):
         super().__init__()
         self.file_path = file_path
@@ -17,6 +19,8 @@ class SoundItemWidget(QWidget):
         
         # Label
         self.label = QLabel(file_path.stem)
+        # Make label pass mouse events to parent (this widget)
+        self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents) 
         layout.addWidget(self.label, stretch=1)
         
         # Play Button
@@ -46,7 +50,21 @@ class SoundItemWidget(QWidget):
         self.player.setSource(QUrl.fromLocalFile(str(self.file_path)))
         self.audio.setVolume(0.7)
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            print(f"DEBUG: SoundItemWidget clicked: {self.file_path}")
+            self.item_clicked.emit(self.file_path)
+            # Also select the item in the list widget visually
+            for i in range(self.parent_list_widget.count()):
+                item = self.parent_list_widget.item(i)
+                if self.parent_list_widget.itemWidget(item) == self:
+                    self.parent_list_widget.setCurrentItem(item)
+                    break
+        super().mousePressEvent(event)
+
     def play_sound(self):
+        print(f"DEBUG: Play button clicked: {self.file_path}")
+        self.item_clicked.emit(self.file_path) # Also select when playing
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.stop()
         self.player.setPosition(0)
@@ -86,14 +104,17 @@ class SoundItemWidget(QWidget):
                 self.player.setSource(QUrl.fromLocalFile(str(self.file_path))) # Restore on error
                 QMessageBox.critical(self, "Error", f"Could not delete file: {e}")
 
-class SoundboardApp(QMainWindow):
+class SoundboardWidget(QWidget):
+    sound_selected = pyqtSignal(Path)
+
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Soundboard")
-        self.setMinimumSize(800, 600)
         
+        layout = QVBoxLayout(self)
         self.list_widget = QListWidget()
-        self.setCentralWidget(self.list_widget)
+        layout.addWidget(self.list_widget)
+        
+        self.list_widget.itemClicked.connect(self.on_item_clicked)
     
         sounds_dir = Path(__file__).parent / "sounds"
         sounds_dir.mkdir(exist_ok=True)
@@ -102,8 +123,21 @@ class SoundboardApp(QMainWindow):
         for f in sorted(sound_files):
             item = QListWidgetItem(self.list_widget)
             item_widget = SoundItemWidget(f, self.list_widget)
+            item_widget.item_clicked.connect(self.sound_selected.emit)
             item.setSizeHint(item_widget.sizeHint())
             self.list_widget.setItemWidget(item, item_widget)
+
+    def on_item_clicked(self, item):
+        widget = self.list_widget.itemWidget(item)
+        if widget:
+            self.sound_selected.emit(widget.file_path)
+
+class SoundboardApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Soundboard")
+        self.setMinimumSize(800, 600)
+        self.setCentralWidget(SoundboardWidget())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
