@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.bubble_cmds.render_video import BBL_VIDEO as open_render_video
-
+from ars_cmds.bubble_cmds.comfyui_node_editor import BBL_comfyui_node_editor as open_comfyui_node_editor
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
 
@@ -123,3 +123,4 @@ def open_workflow_prompt_editor(ars_window, file_path=None):
 
 def execute_cmd(ars_window):
     open_workflow_prompt_editor(ars_window)
+    open_comfyui_node_editor(ars_window)

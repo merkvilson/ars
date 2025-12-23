@@ -6,8 +6,8 @@ import sys
 import ctypes
 from PyQt6.QtCore import QObject, QEvent, QTimer
 
-BBL_TEST_CONFIG = {"symbol": ic.ICON_TEST}
-def BBL_TEST(*args):
+BBL_comfyui_node_editor_CONFIG = {"symbol": ic.ICON_TEST, "hidden": True}
+def BBL_comfyui_node_editor(*args):
     run_ext(__file__)
     
 DEFAULT_URL = r"http://127.0.0.1:8188/"
