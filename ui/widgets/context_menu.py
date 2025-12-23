@@ -282,6 +282,12 @@ class ContextButtonWindow(QWidget):
         
         self.scroll_area = None
         self._restore_scroll_timer = QTimer()
+        
+        # Temporarily ignore outside clicks to prevent accidental closing from the triggering click
+        self._ignore_outside_clicks = True
+        self._outside_click_timer = QTimer()
+        self._outside_click_timer.setSingleShot(True)
+        self._outside_click_timer.timeout.connect(self._enable_outside_clicks)
         self._restore_scroll_timer.setSingleShot(True)
         self._restore_scroll_timer.timeout.connect(self._restore_scrollbar)
 
@@ -589,6 +595,10 @@ class ContextButtonWindow(QWidget):
         self.bg_color = (r, g, b, new_alpha)
         self.update()
 
+    def _enable_outside_clicks(self):
+        """Enable closing on outside clicks after the initial delay."""
+        self._ignore_outside_clicks = False
+
     def _restore_scrollbar(self):
         if self.scroll_area:
             self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
@@ -615,6 +625,8 @@ class ContextButtonWindow(QWidget):
             animated_effects.open_effect(self, duration, start_radius)
         else:
             animated_effects.open_effect(self, 0, start_radius)
+        # Start the grace period timer for outside clicks
+        self._outside_click_timer.start(500)
 
     def keyPressEvent(self, event):
         if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_E:
@@ -640,6 +652,8 @@ class ContextButtonWindow(QWidget):
 
     def eventFilter(self, watched, event):
         if self._close_on_outside and event.type() == QEvent.Type.MouseButtonPress and event.button() == Qt.MouseButton.LeftButton:
+            if self._ignore_outside_clicks:
+                return False  # Ignore outside clicks during grace period
             pos = event.globalPosition().toPoint()
             local_pos = self.mapFromGlobal(pos)
             if not (self.rect().contains(local_pos) and self.mask().contains(local_pos)):
