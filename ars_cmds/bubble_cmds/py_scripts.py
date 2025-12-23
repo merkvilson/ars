@@ -20,6 +20,7 @@ def BBL_CODE_TERMINAL(*args):
 docs = pref_controller.get_path("documents")
 user_script_dir = os.path.join(docs, "scripts")
 
+
 def _list_user_scripts():
     return sorted(
         f for f in os.listdir(user_script_dir)
@@ -45,8 +46,8 @@ def scripts_ctx(ars_window, callback_ctx):
         index_str = str(i)
         full_path = os.path.join(user_script_dir, filename)
         config.additional_texts[index_str] = filename  # Key matches the item (string number)
-        config.callbackL[index_str] = lambda f=full_path: callback_ctx(f)  # Use lambda to capture current full_path
-        config.callbackR[index_str] = lambda f=full_path: open_file(f)
+        config.callbackL[index_str] = lambda x=None, f=full_path: callback_ctx(f)  # Use lambda to capture current full_path
+        config.callbackR[index_str] = lambda x=None, f=full_path: open_file(f)
 
     ctx = config.open_context(items=[str(i) for i in range(len(py_files))])
 
