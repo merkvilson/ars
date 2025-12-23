@@ -2,12 +2,58 @@ import sys
 import numpy as np
 from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QFileDialog, QSlider, QLabel)
+                             QPushButton, QFileDialog, QSlider, QLabel, QGraphicsView, QGraphicsScene)
 from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtGui import QPainter, QColor, QPen
+from PyQt6.QtGui import QPainter, QColor, QPen, QFont
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 import tempfile
 import soundfile as sf
+
+from ui.widgets.b_button import BButton, BButtonConfig
+
+class BButtonWidget(QWidget):
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self.scene = QGraphicsScene(self)
+        self.view = QGraphicsView(self.scene, self)
+        self.view.setStyleSheet("border: none; background: transparent;")
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.view.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.view.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.view)
+        
+        self.button = BButton(config)
+        self.scene.addItem(self.button)
+        
+        # Initial size adjustment
+        self.adjust_size()
+        
+    def adjust_size(self):
+        # Calculate bounding rect including children (additional text)
+        rect = self.button.childrenBoundingRect() | self.button.boundingRect()
+        
+        # Add padding for hover effects/ripples
+        margin = 4 
+        width = rect.width() + margin
+        height = rect.height() + margin
+        
+        self.setFixedSize(int(width), int(height))
+        
+        self.view.setSceneRect(rect.x() - margin/2, rect.y() - margin/2, width, height)
+
+    def update_text(self, text):
+        self.button.additional_text = text
+        self.button._update_additional_text()
+        self.adjust_size()
+
+    def setEnabled(self, enabled):
+        super().setEnabled(enabled)
+        if hasattr(self, 'button'):
+            self.button.setOpacity(1.0 if enabled else 0.5)
 
 class WaveformWidget(QWidget):
     def __init__(self):
@@ -238,13 +284,15 @@ class AudioModifierWidget(QWidget):
         # Playback buttons
         play_layout = QHBoxLayout()
         
-        self.play_original_btn = QPushButton("▶ Play Original")
-        self.play_original_btn.clicked.connect(self.play_original)
+        self.play_original_btn = BButtonWidget(BButtonConfig(
+            symbol="1", additional_text="Play Original", use_extended_shape=True, callbackL=self.play_original
+        ))
         self.play_original_btn.setEnabled(False)
         play_layout.addWidget(self.play_original_btn)
         
-        self.play_trimmed_btn = QPushButton("▶ Play Trimmed")
-        self.play_trimmed_btn.clicked.connect(self.play_trimmed)
+        self.play_trimmed_btn = BButtonWidget(BButtonConfig(
+            symbol="2", additional_text="Play Trimmed", use_extended_shape=True, callbackL=self.play_trimmed
+        ))
         self.play_trimmed_btn.setEnabled(False)
         play_layout.addWidget(self.play_trimmed_btn)
         
@@ -253,17 +301,20 @@ class AudioModifierWidget(QWidget):
         # Load and save buttons
         action_layout = QHBoxLayout()
         
-        load_btn = QPushButton("Load Audio File")
-        load_btn.clicked.connect(self.load_audio)
+        load_btn = BButtonWidget(BButtonConfig(
+            symbol="3", additional_text="Load Audio File", use_extended_shape=True, callbackL=self.load_audio
+        ))
         action_layout.addWidget(load_btn)
         
-        self.save_btn = QPushButton("Save")
-        self.save_btn.clicked.connect(self.save_audio)
+        self.save_btn = BButtonWidget(BButtonConfig(
+            symbol="4", additional_text="Save", use_extended_shape=True, callbackL=self.save_audio
+        ))
         self.save_btn.setEnabled(False)
         action_layout.addWidget(self.save_btn)
         
-        self.save_as_btn = QPushButton("Save As...")
-        self.save_as_btn.clicked.connect(self.trim_and_save)
+        self.save_as_btn = BButtonWidget(BButtonConfig(
+            symbol="5", additional_text="Save As...", use_extended_shape=True, callbackL=self.trim_and_save
+        ))
         self.save_as_btn.setEnabled(False)
         action_layout.addWidget(self.save_as_btn)
     
