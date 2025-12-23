@@ -16,10 +16,6 @@ import os
 import argparse
 from typing import List, Tuple, Dict, Optional
 
-# ---------------------------
-# CONFIG (change these if you want)
-# ---------------------------
-
 
 DEFAULT_FOLDER = os.path.join(".",)  # default project folder
 DEFAULT_EXTENSIONS = [".py", ".txt", ".qss", ".json", ".md", ".gsls", ".arsp", ".arsl", ".bat"]   # set to None to include all files
