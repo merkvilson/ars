@@ -32,57 +32,47 @@ class DraggableGraphicsView(QGraphicsView):
         self.symbol = symbol
         self.setAcceptDrops(True)
         self.drag_start_pos = None
-        self.indicator_item = None
+        self._insert_after = False
 
-    def _show_indicator(self):
-        should_play = self.indicator_item is None or not self.indicator_item.isVisible()
-        if self.indicator_item is None:
-            # Find the BButton to get the correct shape
-            b_button = None
-            for item in self.scene().items():
-                if isinstance(item, BButton):
-                    b_button = item
-                    break
+    def _is_vertical(self):
+        return getattr(self.parent_window.config, 'distribution_mode', 'y') == 'y'
+
+    def _cursor_in_trailing_half(self, pos):
+        if self._is_vertical():
+            return pos.y() > self.height() / 2
+        return pos.x() > self.width() / 2
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        if hasattr(self, '_show_line') and self._show_line:
+            painter = QPainter(self.viewport())
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            pen = QPen(colors.symbol_color)
+            pen.setWidth(3)
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            painter.setPen(pen)
             
-            if b_button:
-                path = b_button.shape()
-                self.indicator_item = QGraphicsPathItem(path)
-                self.indicator_item.setPos(b_button.pos())
-                
-                # Scale down to avoid cropping
-                rect = path.boundingRect()
-                self.indicator_item.setTransformOriginPoint(rect.center())
-                self.indicator_item.setScale(0.95)
-                
-                pen = QPen(colors.symbol_color)
-                pen.setWidth(4)
-                self.indicator_item.setPen(pen)
-                self.indicator_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
-                self.indicator_item.setZValue(100)
-                self.scene().addItem(self.indicator_item)
+            margin = 0.15
+            if self._is_vertical():
+                y = self.height() - 2 if self._insert_after else 2
+                x1, x2 = int(self.width() * margin), int(self.width() * (1 - margin))
+                painter.drawLine(x1, y, x2, y)
             else:
-                rect = self.sceneRect()
-                self.indicator_item = QGraphicsRectItem(rect)
-                
-                # Scale down to avoid cropping
-                self.indicator_item.setTransformOriginPoint(rect.center())
-                self.indicator_item.setScale(0.95)
-                
-                pen = QPen(colors.toggle_hover_color)
-                pen.setWidth(3)
-                pen.setStyle(Qt.PenStyle.DashLine)
-                self.indicator_item.setPen(pen)
-                self.indicator_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
-                self.indicator_item.setZValue(100)
-                self.scene().addItem(self.indicator_item)
-        
-        if should_play:
+                x = self.width() - 2 if self._insert_after else 2
+                y1, y2 = int(self.height() * margin), int(self.height() * (1 - margin))
+                painter.drawLine(x, y1, x, y2)
+
+    def _show_indicator(self, insert_after):
+        if not hasattr(self, '_show_line') or not self._show_line:
             play_sound("hover")
-        self.indicator_item.setVisible(True)
+        self._insert_after = insert_after
+        self._show_line = True
+        self.viewport().update()
 
     def _hide_indicator(self):
-        if self.indicator_item:
-            self.indicator_item.setVisible(False)
+        self._show_line = False
+        self._insert_after = False
+        self.viewport().update()
 
     def mousePressEvent(self, event):
         if self.parent_window.edit_mode:
@@ -173,7 +163,9 @@ class DraggableGraphicsView(QGraphicsView):
     def dragEnterEvent(self, event):
         if self.parent_window.edit_mode and event.mimeData().hasText():
             if event.mimeData().text() != str(self.symbol):
-                self._show_indicator()
+                # Determine insert position based on cursor location
+                insert_after = self._cursor_in_trailing_half(event.position())
+                self._show_indicator(insert_after)
             event.acceptProposedAction()
         else:
             event.ignore()
@@ -183,9 +175,19 @@ class DraggableGraphicsView(QGraphicsView):
 
     def dragMoveEvent(self, event):
         if self.parent_window.edit_mode and event.mimeData().hasText():
+            if event.mimeData().text() != str(self.symbol):
+                # Update indicator based on cursor position
+                insert_after = self._cursor_in_trailing_half(event.position())
+                if insert_after != self._insert_after:
+                    self._show_indicator(insert_after)
             event.acceptProposedAction()
         else:
             event.ignore()
+
+    def _cursor_in_trailing_half(self, pos):
+        if self._is_vertical():
+            return pos.y() > self.height() / 2
+        return pos.x() > self.width() / 2
 
     def dropEvent(self, event):
         self._hide_indicator()
@@ -193,10 +195,11 @@ class DraggableGraphicsView(QGraphicsView):
             source_symbol = event.mimeData().text()
             target_symbol = self.symbol
             if source_symbol != str(target_symbol):
-                self.parent_window.reorder_items(source_symbol, target_symbol)
+                self.parent_window.reorder_items(source_symbol, target_symbol, self._insert_after)
             event.acceptProposedAction()
         else:
             event.ignore()
+        self._insert_after = False
 
 class DropContainer(QWidget):
     def __init__(self, parent_window):
@@ -694,7 +697,7 @@ class ContextButtonWindow(QWidget):
         else:
             play_sound("back")
 
-    def reorder_items(self, source_symbol, target_symbol):
+    def reorder_items(self, source_symbol, target_symbol, insert_after=False):
         # Find source and target views
         source_view = None
         target_view = None
@@ -731,6 +734,10 @@ class ContextButtonWindow(QWidget):
             
             # Find index of target
             target_index = target_layout.indexOf(target_view)
+            
+            # Insert after target if requested
+            if insert_after:
+                target_index += 1
             
             # Insert source at target index
             target_layout.insertWidget(target_index, source_view, alignment=Qt.AlignmentFlag.AlignHCenter)
