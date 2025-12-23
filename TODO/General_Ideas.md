@@ -62,7 +62,6 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 - [ ] Tabs gui similar to the hierarchy menu
 - [ ] Move object 2 units up during Q dragging mode and drop on end.
 - [ ] Delete gizmo from viewport completely and re initilize it only if needed.
-- [ ] Single click on b_button should activate text edit field event.
 - [ ] 
 - [ ] 
 - [ ] 
@@ -75,6 +74,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 ## Finished
 
+- [✓] Single click on b_button should activate text edit field event.
 - [✓] Text edit area for b-button
 - [✓] Q drag should change parent of the object. grid=None, obj=obj
 - [✓] When pressing Q key, first play object move-to animation and then start realtime move-to dragging.
