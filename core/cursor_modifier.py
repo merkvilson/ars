@@ -1,5 +1,5 @@
 # cursor_modifier.py
-from PyQt6.QtWidgets import QWidget, QApplication, QGraphicsObject, QGraphicsView
+from PyQt6.QtWidgets import QWidget, QApplication, QGraphicsObject, QGraphicsView, QLineEdit, QTextEdit, QPlainTextEdit, QSplitterHandle, QSplitter
 from PyQt6.QtCore import QObject, QEvent, Qt, QPoint, QSize
 from PyQt6.QtGui import QCursor, QPixmap, QMouseEvent, QColor, QPainter, QPaintEvent
 from PyQt6.QtSvg import QSvgRenderer
@@ -35,8 +35,14 @@ class CursorIconWidget(QWidget):
             painter = QPainter(self)
             painter.drawPixmap(0, 0, self._pixmap)
 
+_cursor_cache = {}
+
 def create_qcursor(name: str, bg_color: QColor | None = None, anchor: str = "top_left", scale: float = 1.0) -> QCursor:
     """Renders an SVG icon into a QCursor object."""
+    cache_key = (name, bg_color.name() if bg_color else None, anchor, scale)
+    if cache_key in _cursor_cache:
+        return _cursor_cache[cache_key]
+
     icon_path = os.path.join("res", "icons", "cursor", f"{name}.svg")
     renderer = QSvgRenderer(icon_path)
     if not renderer.isValid():
@@ -90,9 +96,135 @@ def create_qcursor(name: str, bg_color: QColor | None = None, anchor: str = "top
     elif anchor == "right":
         hot_x, hot_y = w - 1, h // 2
 
-    return QCursor(final_pixmap, hot_x, hot_y)
+    cursor = QCursor(final_pixmap, hot_x, hot_y)
+    _cursor_cache[cache_key] = cursor
+    return cursor
 
 _current_cursor_info = ("cursor", "top_left")
+_app_default_cursor_info = ("cursor", "top_left")
+_cursor_watcher = None
+
+class GlobalCursorWatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self._current_type = "default" # "default" or "text"
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.MouseMove:
+            if QApplication.mouseButtons() != Qt.MouseButton.NoButton:
+                return False
+            
+            if QWidget.mouseGrabber():
+                return False
+
+            widget = QApplication.widgetAt(QCursor.pos())
+            target_widget = widget
+            
+            # Check for text widgets
+            is_text = False
+            temp_widget = widget
+            while temp_widget:
+                if isinstance(temp_widget, (QLineEdit, QTextEdit, QPlainTextEdit)):
+                    is_text = True
+                    break
+                temp_widget = temp_widget.parent()
+                if not isinstance(temp_widget, QWidget):
+                    break
+            
+            # Check for splitter handles
+            is_splitter = False
+            splitter_orientation = None
+            if isinstance(widget, QSplitterHandle):
+                is_splitter = True
+                splitter_orientation = widget.orientation()
+
+            # Check for window edges
+            is_edge = False
+            edge_orientation = None
+            
+            global_pos = QCursor.pos()
+            target_window = widget.window() if widget else None
+            
+            if not target_window:
+                for w in QApplication.topLevelWidgets():
+                    if w.isVisible() and w.geometry().contains(global_pos):
+                        target_window = w
+                        break
+            
+            if target_window and not target_window.isMaximized() and not target_window.isFullScreen():
+                margin = 6
+                pos = target_window.mapFromGlobal(global_pos)
+                rect = target_window.rect()
+                
+                left = pos.x() < margin
+                right = pos.x() > rect.width() - margin
+                top = pos.y() < margin
+                bottom = pos.y() > rect.height() - margin
+                
+                if left or right:
+                    is_edge = True
+                    edge_orientation = Qt.Orientation.Horizontal
+                elif top or bottom:
+                    is_edge = True
+                    edge_orientation = Qt.Orientation.Vertical
+
+            # Check for QGraphicsView items (BButton)
+            if not is_text and not is_splitter and not is_edge:
+                view = widget
+                if widget and not isinstance(view, QGraphicsView):
+                    view = widget.parent()
+                
+                if isinstance(view, QGraphicsView):
+                    try:
+                        view_pos = view.mapFromGlobal(global_pos)
+                        scene_pos = view.mapToScene(view_pos)
+                        if view.scene():
+                            items = view.scene().items(scene_pos)
+                            for item in items:
+                                # Check for SliderHandle-like item (don't override cursor)
+                                if hasattr(item, "parent_button"):
+                                    break
+                                    
+                                # Check for BButton-like item
+                                if hasattr(item, "text_value") and hasattr(item, "slider_values") and hasattr(item, "editable"):
+                                    if item.editable:
+                                        if item.text_value is not None or item.slider_values:
+                                            is_text = True
+                                            break
+                    except Exception:
+                        pass
+
+            if is_edge:
+                if edge_orientation == Qt.Orientation.Horizontal:
+                    if self._current_type != "resize_h_edge":
+                        set_cursor("arrows-move-horizontal", anchor="center")
+                        self._current_type = "resize_h_edge"
+                else:
+                    if self._current_type != "resize_v_edge":
+                        set_cursor("arrows-move-vertical", anchor="center")
+                        self._current_type = "resize_v_edge"
+            elif is_text:
+                if self._current_type != "text":
+                    set_cursor("text-cursor", anchor="center")
+                    self._current_type = "text"
+            elif is_splitter:
+                if splitter_orientation == Qt.Orientation.Horizontal:
+                    # Horizontal splitter has vertical handle moving horizontally
+                    if self._current_type != "resize_h":
+                        set_cursor("arrows-move-horizontal", anchor="center")
+                        self._current_type = "resize_h"
+                else:
+                    # Vertical splitter has horizontal handle moving vertically
+                    if self._current_type != "resize_v":
+                        set_cursor("arrows-move-vertical", anchor="center")
+                        self._current_type = "resize_v"
+            else:
+                if self._current_type != "default":
+                    name, anchor = _app_default_cursor_info
+                    set_cursor(name, anchor=anchor)
+                    self._current_type = "default"
+                    
+        return super().eventFilter(obj, event)
 
 def get_cursor() -> tuple[str, str]:
     """Returns the current cursor name and anchor."""
@@ -100,12 +232,18 @@ def get_cursor() -> tuple[str, str]:
 
 def set_default_cursor(cursor_name: str):
     """Sets the default, application-wide cursor."""
-    global _current_cursor_info
+    global _current_cursor_info, _app_default_cursor_info, _cursor_watcher
     _current_cursor_info = (cursor_name, "top_left")
+    _app_default_cursor_info = (cursor_name, "top_left")
     app = QApplication.instance()
     if not app:
         print("Warning: QApplication instance not found. Cannot set default cursor.")
         return
+    
+    if _cursor_watcher is None:
+        _cursor_watcher = GlobalCursorWatcher()
+        app.installEventFilter(_cursor_watcher)
+
     default_cursor = create_qcursor(cursor_name, bg_color=None, anchor="top_left")
     QApplication.setOverrideCursor(default_cursor)
 
