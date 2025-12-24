@@ -36,15 +36,17 @@ def r_dropdown(self, code_path = None):
     }
 
     def open_in_arseditor(path):
+        # Close existing code editor if open
         for ctx_menu in find_all_open_context_menus():
-            if "PythonEditorWidget" in str(ctx_menu.items):
+            if "SplitterWidget" in str(ctx_menu.items):
                 ctx_menu.close()
-                print("Closed existing Python Editor context menu.")
-        py_ctx_menu, code_editor = py_scripts.execute_cmd(self)
+        
+        # Open code editor with the file
+        py_ctx_menu, code_editor_widget = py_scripts.execute_cmd(self)
         with open(path, 'r', encoding='utf-8') as f:
             code_file = f.read()
-        code_editor.setPlainText(code_file)
-        code_editor.project_file_path = path
+        code_editor_widget.set_code(code_file)
+        code_editor_widget.code_editor.project_file_path = path
 
     config.callbackL = {
         ic.ICON_LOCK_state: lambda: (
