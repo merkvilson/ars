@@ -77,7 +77,7 @@ def scripts_ctx(ars_window, callback_ctx):
 
 
 
-def execute_cmd(ars_window):
+def execute_cmd(ars_window, animated=True):
     py_files = _list_user_scripts()
 
     if not py_files:
@@ -196,5 +196,5 @@ def execute_cmd(ars_window):
             ),
     }
 
-    ctx = config.open_context(items=options_list)
+    ctx = config.open_context(items=options_list, animated=animated)
     return ctx, code_editor_widget
