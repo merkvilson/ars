@@ -85,7 +85,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
         def on_queue_result(queue_remaining):
             if queue_remaining > 0:
-                print("Render queue is busy, cannot start a new render.")
+                # print("Render queue is busy, cannot start a new render.")
                 return
             do_render()
 
