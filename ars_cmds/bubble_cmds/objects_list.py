@@ -12,32 +12,20 @@ def BBL_LIST(*args):
 
 
 def execute_cmd(ars_window):
-    config = CtxConfig()
-    config.expand = "y"
-    config.auto_close = False
-    config.close_on_outside = False
-    config.extra_distance=[9999,0]
-    config.use_extended_shape = False
-    config.distribution_mode = "x"
-
-
-    options_list = [
-        [ic.ICON_SETTINGS, ic.ICON_TRASH, ic.ICON_FOCUS, ic.ICON_OBJ_BBOX], 
-        ["hierarchy"],
-        "   ",
-        ]
-    
     hierarchy = ObjectHierarchyWindow(ars_window.viewport)
 
-    config.custom_widget_items = {"hierarchy": hierarchy}
-
-
-    config.callbackL = {
-        "1": lambda: ctx.close_animated(),
-
-        ic.ICON_TRASH: lambda: delete_cmd(ars_window),
-        ic.ICON_FOCUS: lambda: view_selected(),
-    }
-
-    ctx = config.open_context(items=options_list)
+    # Integrate with SplitterOverlay
+    if hasattr(ars_window, 'splitter_overlay'):
+        overlay = ars_window.splitter_overlay
+        
+        # Set width
+        width = getattr(ars_window.prefs, 'objects_list_width', 300)
+        overlay.left_width = width
+        
+        overlay.set_widget("left", hierarchy)
+        
+        # Force update to apply width and layout
+        overlay._update_mask()
+        overlay._update_geometries()
+        overlay.update()
 
