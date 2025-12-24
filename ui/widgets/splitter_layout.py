@@ -25,10 +25,7 @@ class SplitterOverlay(QWidget):
         self.right_widget = None
 
         # Colors (semi-transparent)
-        self.top_color = QColor(255, 255, 255, 10)
-        self.bottom_color = QColor(255, 255, 255, 10)
-        self.left_color = QColor(60, 60, 180, 10)
-        self.right_color = QColor(180, 180, 60, 10)
+        self.bg_color = QColor(255, 255, 255, 10)
         
         self.cursor_modifier = CursorModifier(
             trigger_widget=self,
@@ -163,13 +160,13 @@ class SplitterOverlay(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         # Top
-        painter.fillRect(0, 0, self.width(), self.top_height, self.top_color)
+        painter.fillRect(0, 0, self.width(), self.top_height, self.bg_color)
         # Bottom
-        painter.fillRect(0, self.height() - self.bottom_height, self.width(), self.bottom_height, self.bottom_color)
+        painter.fillRect(0, self.height() - self.bottom_height, self.width(), self.bottom_height, self.bg_color)
         # Left
-        painter.fillRect(0, self.top_height, self.left_width, self.height() - self.top_height - self.bottom_height, self.left_color)
+        painter.fillRect(0, self.top_height, self.left_width, self.height() - self.top_height - self.bottom_height, self.bg_color)
         # Right
-        painter.fillRect(self.width() - self.right_width, self.top_height, self.right_width, self.height() - self.top_height - self.bottom_height, self.right_color)
+        painter.fillRect(self.width() - self.right_width, self.top_height, self.right_width, self.height() - self.top_height - self.bottom_height, self.bg_color)
     
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
