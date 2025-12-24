@@ -60,7 +60,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     }
 
 
-    def start_render(seed_step = 0):
+    def start_vp_img_render(seed_step = 0):
         if check_queue(): 
             print("Render queue is busy, cannot start a new render.")
             return
@@ -120,9 +120,9 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     config.callbackL = {
-        ic.ICON_PLAYER_PLAY: lambda: start_render(0),
-        ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_render(1),
-        ic.ICON_PLAYER_SKIP_BACK: lambda: start_render(-1),
+        ic.ICON_PLAYER_PLAY: lambda: start_vp_img_render(0),
+        ic.ICON_PLAYER_SKIP_FORWARD: lambda: start_vp_img_render(1),
+        ic.ICON_PLAYER_SKIP_BACK: lambda: start_vp_img_render(-1),
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_SAVE: lambda: save_output("render"),
         ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
