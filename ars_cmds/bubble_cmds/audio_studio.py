@@ -1,7 +1,5 @@
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QSplitter
 from prefs import pref_controller
 import os
 
@@ -14,28 +12,14 @@ def BBL_AUDIO_STUDIO(*args):
 
 
 def execute_cmd(ars_window):
-    from ui.sound_player.sound_player import SoundboardWidget
-    from ui.sound_player.sound_modifier import AudioModifierWidget
+    from ui.sound_player.audio_widget import AudioStudio
 
-    # Create Splitter (horizontal for player | modifier)
-    splitter = QSplitter(Qt.Orientation.Horizontal)
-    
-    # Create Sound Player
-    sound_player = SoundboardWidget()
-
-    # Create Sound Modifier
-    sound_modifier = AudioModifierWidget()
-
-    # Add to Splitter
-    splitter.addWidget(sound_player)
-    splitter.addWidget(sound_modifier)
+    # Create Audio Studio Widget
+    audio_studio = AudioStudio()
 
     # Set initial sizes (30% left, 70% right)
     width = ars_window.width()
-    splitter.setSizes([int(width * 0.3), int(width * 0.7)])
-
-    # Connect signal: when sound selected in player, load in modifier
-    sound_player.sound_selected.connect(sound_modifier.load_from_path)
+    audio_studio.splitter.setSizes([int(width * 0.3), int(width * 0.7)])
 
     # Integrate with SplitterOverlay
     if hasattr(ars_window, 'splitter_overlay'):
@@ -45,7 +29,7 @@ def execute_cmd(ars_window):
         height = getattr(ars_window.prefs, 'audio_studio_height', 300)
         overlay.bottom_height = height
         
-        overlay.set_widget("bottom", splitter)
+        overlay.set_widget("bottom", audio_studio)
         
         # Force update to apply height and layout
         overlay._update_mask()
