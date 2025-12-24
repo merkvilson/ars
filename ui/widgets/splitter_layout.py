@@ -19,6 +19,8 @@ class SplitterOverlay(QWidget):
         self.handle_size = 8
         self._dragging = None
         
+        self.bottom_widget = None
+
         # Colors (semi-transparent)
         self.top_color = QColor(180, 60, 60, 10)
         self.bottom_color = QColor(60, 180, 60, 10)
@@ -36,6 +38,29 @@ class SplitterOverlay(QWidget):
         self.setMouseTracking(True)
         self._update_mask()
     
+    def set_widget(self, position: str, widget: QWidget):
+        if position == "bottom":
+            if self.bottom_widget:
+                self.bottom_widget.setParent(None)
+                self.bottom_widget.deleteLater()
+            
+            self.bottom_widget = widget
+            if self.bottom_widget:
+                self.bottom_widget.setParent(self)
+                self.bottom_widget.show()
+                self._update_geometries()
+
+    def _update_geometries(self):
+        if self.bottom_widget:
+            # Leave space for the handle
+            offset = self.handle_size
+            self.bottom_widget.setGeometry(
+                0, 
+                self.height() - self.bottom_height + offset, 
+                self.width(), 
+                max(0, self.bottom_height - offset)
+            )
+
     def _update_mask(self):
         """Create a mask with a hole in the center."""
         full = QRegion(self.rect())
@@ -50,6 +75,7 @@ class SplitterOverlay(QWidget):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._update_mask()
+        self._update_geometries()
     
     def _get_handle_at(self, pos) -> str | None:
         y_top = self.top_height
@@ -101,6 +127,7 @@ class SplitterOverlay(QWidget):
                 self.right_width = max(min_size, min(self.width() - pos.x(), self.width() - self.left_width - max_center))
             
             self._update_mask()
+            self._update_geometries()
             self.update()
         else:
             handle = self._get_handle_at(event.pos())
