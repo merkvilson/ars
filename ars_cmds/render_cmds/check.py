@@ -14,7 +14,7 @@ class QueueChecker(QThread):
             if response.status_code == 200:
                 queue_data = response.json()
                 queue_remaining = len(queue_data.get("queue_running", [])) + len(queue_data.get("queue_pending", []))
-                print(f"Queue check: {queue_remaining} remaining")
+                # print(f"Queue check: {queue_remaining} remaining")
                 self.finished.emit(queue_remaining)
             else:
                 print(f"Queue check failed with status code: {response.status_code}")
@@ -58,7 +58,7 @@ def check_queue(callback=None):
         if response.status_code == 200:
             queue_data = response.json()
             queue_remaining = len(queue_data.get("queue_running", [])) + len(queue_data.get("queue_pending", []))
-            print(f"Queue check: {queue_remaining} remaining")
+            # print(f"Queue check: {queue_remaining} remaining")
             if queue_remaining == 0:
                 if callback: callback()
             return queue_remaining
