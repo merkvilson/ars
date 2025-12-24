@@ -119,8 +119,15 @@ class MainWindow(QMainWindow):
         text = str(text)
         self.CF.UP(key="additional_text", value=text, auto_close = auto_close)
 
-    def swap_widgets(self):
-        """Cycle through viewport -> img viewer -> gs_viewer -> viewport"""
+    def swap_widgets(self, widget = None):
+        if widget:
+            self.viewport.hide()
+            self.img.hide()
+            self.gs_viewer.hide()
+            widget.show()
+            self.msg(f"{widget.__class__.__name__}", auto_close=1000)
+            return
+
         if self.viewport.isVisible():
             self.viewport.hide()
             self.img.show()
