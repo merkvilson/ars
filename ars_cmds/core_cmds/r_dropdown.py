@@ -42,7 +42,7 @@ def r_dropdown(self, code_path = None):
                 ctx_menu.close()
         
         # Open code editor with the file
-        py_ctx_menu, code_editor_widget = py_scripts.execute_cmd(self)
+        py_ctx_menu, code_editor_widget = py_scripts.execute_cmd(self, animated=False)
         with open(path, 'r', encoding='utf-8') as f:
             code_file = f.read()
         code_editor_widget.set_code(code_file)
