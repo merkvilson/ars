@@ -43,6 +43,7 @@ from .widget_control import set_updated_config
 from core.cursor_modifier import CursorModifier
 
 from core.sound_manager import play_sound
+from util_functions.ars_window import ars_window
 
 
 class SliderHandle(QGraphicsRectItem):
@@ -548,7 +549,6 @@ class BButton(QGraphicsObject):
         
         def default_callbackM(value=None):
             # Revert slider or toggle to default value
-            play_sound("click")
             if self.slider_values:
                 if len(self.slider_values) >= 4:
                     default_val = self.slider_values[3]
@@ -597,7 +597,10 @@ class BButton(QGraphicsObject):
                     else:
                         self.callbackL()
             else:
-                print(f"{self.symbol} middle-clicked (no value to revert)")
+                ars_window().msg("No value to revert")
+                return
+                #print(f"{self.symbol} middle-clicked (no value to revert)")
+            play_sound("revert")
 
         self.callbackL = config.callbackL if config.callbackL else default_callbackL
         self.callbackR = config.callbackR if config.callbackR else default_callbackR
