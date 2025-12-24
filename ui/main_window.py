@@ -121,6 +121,9 @@ class MainWindow(QMainWindow):
 
     def swap_widgets(self, widget = None):
         if widget:
+            #check if widget is already visible
+            if widget.isVisible():
+                return
             self.viewport.hide()
             self.img.hide()
             self.gs_viewer.hide()
