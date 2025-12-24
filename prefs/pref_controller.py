@@ -28,6 +28,7 @@ class prefsConfig:
         self.code_editor_font_size = 14
 
         # Render Image
+        self.realtime_preview = False
         self.render_resolution = 512
         self.render_steps = 20
         self.render_seed = 12345
@@ -50,6 +51,8 @@ class prefsConfig:
 
         # Temporal Settings
         self.last_sel_obj_id = 0
+
+        
         
 
 
