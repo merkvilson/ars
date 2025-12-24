@@ -1,5 +1,5 @@
 from ui.widgets.context_menu import CtxConfig
-from ui.ars_code import CodeEditor, TerminalWidget
+from ui.ars_code import CodeEditorWidget
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from ars_cmds.util_cmds.open_file import open_file
@@ -7,8 +7,7 @@ import os
 from ars_cmds.core_cmds.load_object import selected_object, add_primitive
 from ars_cmds.util_cmds.time_cmd import after
 from PyQt6.QtGui import QColor, QTextCursor
-from PyQt6.QtCore import QTimer, Qt
-from PyQt6.QtWidgets import QSplitter
+from PyQt6.QtCore import QTimer
 from prefs import pref_controller
 
 
@@ -126,26 +125,16 @@ def execute_cmd(ars_window):
 
     available_height = int(config.custom_height - int(44 * 1.5))
     
-    # Create Splitter
-    splitter = QSplitter(Qt.Orientation.Vertical)
-    splitter.setFixedSize(int(ars_window.width() - 10), available_height)
-
-    # Create Editor
-    code_editor = CodeEditor()
-    code_editor.setPlainText(current_code_text)
+    # Create CodeEditorWidget (combined editor + terminal)
+    code_editor_widget = CodeEditorWidget()
+    code_editor_widget.setFixedSize(int(ars_window.width() - 10), available_height)
+    code_editor_widget.set_code(current_code_text)
     
-    # Create Terminal
-    terminal = TerminalWidget()
-    
-    # Add to Splitter
-    splitter.addWidget(code_editor)
-    splitter.addWidget(terminal)
-    
-    # Set initial sizes (4:1 ratio)
-    splitter.setSizes([int(available_height * 0.8), int(available_height * 0.2)])
+    # Get reference to the inner code editor
+    code_editor = code_editor_widget.code_editor
 
     config.custom_widget_items = {
-        "SplitterWidget": splitter
+        "SplitterWidget": code_editor_widget
     }
     config.slider_values = {
         ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha*100),
@@ -182,30 +171,30 @@ def execute_cmd(ars_window):
 
     code_editor.custom_namespace = default_namespace_injection
     code_editor.project_file_path = current_code_file
-    code_editor.set_font_size(ars_window.prefs.code_editor_font_size)
-    code_editor.set_alpha(ars_window.prefs.code_editor_alpha)
+    code_editor_widget.set_font_size(ars_window.prefs.code_editor_font_size)
+    code_editor_widget.set_alpha(ars_window.prefs.code_editor_alpha)
 
     config.callbackL = {
         ic.ICON_LIST: lambda: scripts_ctx(ars_window, read_code_file),
         ic.ICON_FOLDER_OPEN: lambda: open_file(user_script_dir),
-        ic.ICON_PLAYER_PLAY: lambda: code_editor.run_code(default_namespace_injection),
-        ic.ICON_SAVE: lambda: code_editor.save_script(),
+        ic.ICON_PLAYER_PLAY: lambda: code_editor_widget.run_code(default_namespace_injection),
+        ic.ICON_SAVE: lambda: code_editor_widget.save_script(),
         ic.ICON_CODE_TERMINAL: lambda: open_file(code_editor.project_file_path),
         ic.ICON_TXT_SIZE: lambda value: (
-            code_editor.set_font_size(value) ,
+            code_editor_widget.set_font_size(value) ,
             setattr(ars_window.prefs, 'code_editor_font_size', value),
             ),
         ic.ICON_SHADER_SMOOTH: lambda value: (
             ctx.set_alpha(value / 2550.0),
-            code_editor.set_alpha(value / 100.0), 
+            code_editor_widget.set_alpha(value / 100.0), 
             setattr(ars_window.prefs, 'code_editor_alpha', value / 100.0),
             ),
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
-            splitter.setFixedHeight(int(value - int(44 * 1.5))),
+            code_editor_widget.setFixedHeight(int(value - int(44 * 1.5))),
             setattr(ars_window.prefs, 'code_editor_height', int(value)),
             ),
     }
 
     ctx = config.open_context(items=options_list)
-    return ctx, code_editor
+    return ctx, code_editor_widget
