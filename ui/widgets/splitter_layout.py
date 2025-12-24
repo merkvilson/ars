@@ -21,6 +21,8 @@ class SplitterOverlay(QWidget):
         
         self.bottom_widget = None
         self.left_widget = None
+        self.top_widget = None
+        self.right_widget = None
 
         # Colors (semi-transparent)
         self.top_color = QColor(255, 255, 255, 10)
@@ -62,6 +64,28 @@ class SplitterOverlay(QWidget):
                 self.left_widget.show()
                 self._update_geometries()
 
+        elif position == "top":
+            if self.top_widget:
+                self.top_widget.setParent(None)
+                self.top_widget.deleteLater()
+            
+            self.top_widget = widget
+            if self.top_widget:
+                self.top_widget.setParent(self)
+                self.top_widget.show()
+                self._update_geometries()
+
+        elif position == "right":
+            if self.right_widget:
+                self.right_widget.setParent(None)
+                self.right_widget.deleteLater()
+            
+            self.right_widget = widget
+            if self.right_widget:
+                self.right_widget.setParent(self)
+                self.right_widget.show()
+                self._update_geometries()
+
     def _update_geometries(self):
         offset = self.handle_size
         
@@ -80,6 +104,24 @@ class SplitterOverlay(QWidget):
                 0,
                 self.top_height, # Start below top area
                 self.left_width - offset,
+                self.height() - self.top_height - self.bottom_height
+            )
+
+        if self.top_widget:
+            # Leave space for the handle
+            self.top_widget.setGeometry(
+                0,
+                0,
+                self.width(),
+                max(0, self.top_height - offset)
+            )
+
+        if self.right_widget:
+            # Leave space for the handle
+            self.right_widget.setGeometry(
+                self.width() - self.right_width + offset,
+                self.top_height,
+                max(0, self.right_width - offset),
                 self.height() - self.top_height - self.bottom_height
             )
 
