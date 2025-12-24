@@ -22,8 +22,8 @@ class SplitterOverlay(QWidget):
         self.bottom_widget = None
 
         # Colors (semi-transparent)
-        self.top_color = QColor(180, 60, 60, 10)
-        self.bottom_color = QColor(60, 180, 60, 10)
+        self.top_color = QColor(255, 255, 255, 10)
+        self.bottom_color = QColor(255, 255, 255, 10)
         self.left_color = QColor(60, 60, 180, 10)
         self.right_color = QColor(180, 180, 60, 10)
         
