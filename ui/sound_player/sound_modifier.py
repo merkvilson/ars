@@ -340,7 +340,6 @@ class AudioModifierWidget(QWidget):
         self.load_from_path(file_path)
 
     def load_from_path(self, file_path):
-        print(f"DEBUG: AudioModifierWidget.load_from_path called with {file_path}")
         self.file_path = Path(file_path)
         
         try:
@@ -391,7 +390,6 @@ class AudioModifierWidget(QWidget):
             self.play_trimmed_btn.setEnabled(True)
             self.save_btn.setEnabled(True)
             self.save_as_btn.setEnabled(True)
-            print("DEBUG: Audio loaded successfully")
             
         except Exception as e:
             print(f"ERROR loading audio: {e}")

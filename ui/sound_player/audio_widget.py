@@ -50,7 +50,6 @@ class AudioStudio(QWidget):
         self.sound_player.sound_selected.connect(self.on_sound_selected)
         
     def on_sound_selected(self, file_path):
-        print(f"DEBUG: AudioStudio received sound_selected signal: {file_path}")
         self.sound_modifier.load_from_path(file_path)
 
 if __name__ == '__main__':
