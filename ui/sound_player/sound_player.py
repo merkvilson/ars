@@ -207,7 +207,9 @@ class SoundboardWidget(QWidget):
         super().__init__()
         
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.list_widget = QListWidget()
+       # self.list_widget.setStyleSheet("border: none;")
         layout.addWidget(self.list_widget)
         
         self.list_widget.itemClicked.connect(self.on_item_clicked)
