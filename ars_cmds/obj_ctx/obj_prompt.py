@@ -1,12 +1,12 @@
 import os
 
-from PyQt6.QtCore import QPoint
+from PyQt6.QtCore import QPoint, QTimer
 from PyQt6.QtGui import QCursor
 
 from ars_cmds.bubble_cmds.delete_selected_obj import BBL_TRASH as delete_obj
 from ars_cmds.core_cmds.key_check import key_check_continuous
 from ars_cmds.mesh_gen.generate_mesh import generate_mesh
-from ars_cmds.render_cmds.check import check_queue
+from ars_cmds.render_cmds.check import check_queue_async
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.render_cmds.make_screenshot import make_screenshot
 from ars_cmds.render_cmds.render_pass import save_depth, save_render
@@ -61,30 +61,43 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     def start_vp_img_render(seed_step = 0):
-        if check_queue(): 
-            print("Render queue is busy, cannot start a new render.")
-            return
+        def do_render():
+            default_object.seed += seed_step
 
-        default_object.seed += seed_step
-
-        if type(default_object).__name__ == "CSprite":
-            default_object.revert_cutout()
-            self.render_manager.set_workflow("sprite"),
-        
-        elif type(default_object).__name__ == "CPoint":
-            self.render_manager.set_workflow("bg"),
+            if type(default_object).__name__ == "CSprite":
+                default_object.revert_cutout()
+                self.render_manager.set_workflow("sprite"),
             
-        else:
-            save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-            save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
-            self.render_manager.set_workflow("render"),
+            elif type(default_object).__name__ == "CPoint":
+                self.render_manager.set_workflow("bg"),
+                
+            else:
+                save_depth(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+                save_render(self.viewport, x=int(ctx.get_value(ic.ICON_GIZMO_SCALE)), y=int(ctx.get_value(ic.ICON_GIZMO_SCALE)))
+                self.render_manager.set_workflow("render"),
 
-        self.render_manager.set_ud("seed", default_object.seed)
-        self.render_manager.set_ud("steps", int(ctx.get_value(ic.ICON_STEPS)))
-        self.render_manager.set_ud("positive", default_object.prompt)
-        self.render_manager.set_ud("negative", "Low quality, blurry, deformed, bad anatomy") #TODO: make editable
+            self.render_manager.set_ud("seed", default_object.seed)
+            self.render_manager.set_ud("steps", int(ctx.get_value(ic.ICON_STEPS)))
+            self.render_manager.set_ud("positive", default_object.prompt)
+            self.render_manager.set_ud("negative", "Low quality, blurry, deformed, bad anatomy") #TODO: make editable
 
-        generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
+            generate_render(self, ctx, int(ctx.get_value(ic.ICON_STEPS)), default_object)
+
+        def on_queue_result(queue_remaining):
+            if queue_remaining > 0:
+                print("Render queue is busy, cannot start a new render.")
+                return
+            do_render()
+
+        check_queue_async(callback=on_queue_result)
+
+
+    realtime_timer = QTimer()
+    def realtime_tick():
+        if getattr(self, 'prefs', None) and self.prefs.realtime_preview:
+            start_vp_img_render(0)
+    realtime_timer.timeout.connect(realtime_tick)
+    realtime_timer.start(1000)
 
 
     def convert_sprite_to_mesh():
@@ -125,7 +138,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_PLAYER_SKIP_BACK: lambda: start_vp_img_render(-1),
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_SAVE: lambda: save_output("render"),
-        ic.ICON_CLOSE_RADIAL: lambda: (ctx.close(), callback(self)),
+        ic.ICON_CLOSE_RADIAL: lambda: (realtime_timer.stop(), ctx.close(), callback(self)),
         ic.ICON_IMAGE: lambda: swap_imge(self),
 
     }
