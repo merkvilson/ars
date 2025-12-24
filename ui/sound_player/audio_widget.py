@@ -34,28 +34,26 @@ except ImportError:
         from sound_modifier import AudioModifierWidget
 
 class AudioStudio(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Audio Studio")
-        self.resize(1200, 800)
+    def __init__(self, parent=None):
+        super().__init__(parent)
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         
         # Use a splitter for resizable areas
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        layout.addWidget(splitter)
+        self.splitter = QSplitter(Qt.Orientation.Horizontal)
+        layout.addWidget(self.splitter)
         
         # Left: Sound Player
         self.sound_player = SoundboardWidget()
-        splitter.addWidget(self.sound_player)
+        self.splitter.addWidget(self.sound_player)
         
         # Right: Sound Modifier
         self.sound_modifier = AudioModifierWidget()
-        splitter.addWidget(self.sound_modifier)
+        self.splitter.addWidget(self.sound_modifier)
         
         # Set initial sizes (e.g., 30% left, 70% right)
-        splitter.setSizes([300, 900])
+        self.splitter.setSizes([300, 900])
         
         # Connect signal
         self.sound_player.sound_selected.connect(self.on_sound_selected)
@@ -66,5 +64,7 @@ class AudioStudio(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = AudioStudio()
+    window.setWindowTitle("Audio Studio")
+    window.resize(1200, 800)
     window.show()
     sys.exit(app.exec())
