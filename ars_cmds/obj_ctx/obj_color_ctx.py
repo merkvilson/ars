@@ -140,7 +140,7 @@ class HSVSlider(QSlider):
 
 
 def obj_color(self, position, callback=None):
-    config = ContextMenuConfig()
+    config = CtxConfig()
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = False
