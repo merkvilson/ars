@@ -16,15 +16,25 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["QT_QPA_PLATFORM"] = "windows:fontengine=freetype"
 os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
-
 #Todo: Check if it is possible to add dict into os.environ for more complex settings
 
+# Suppress FFmpeg stderr output at file descriptor level before any Qt imports
 import sys
-from PyQt6.QtWidgets import QApplication
-from ui.main_window import MainWindow
+_devnull = os.open(os.devnull, os.O_WRONLY)
+_old_stderr = os.dup(2)
+os.dup2(_devnull, 2)
+os.close(_devnull)
+
+
 import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('airen.studio.ars')
 
 import pygame
+pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
+
+from PyQt6.QtWidgets import QApplication
+from ui.main_window import MainWindow
+
 
 class Application:
 
@@ -42,11 +52,6 @@ class Application:
         sys.exit(self._app.exec())
 
 def main() -> None:
-
-    pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
-    myappid = 'airen.studio.ars.0.51' # arbitrary string
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
     app = Application()
     app.run()
 
