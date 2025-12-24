@@ -13,6 +13,7 @@ from core.sound_manager import play_sound
 from hotkeys.hotkey_manager import HotkeyManager
 from ui.widgets.bubble_layout import FloatingBubblesManager
 from ui.widgets.cursor_follower import CursorFollowerWidget
+from ui.widgets.splitter_layout import SplitterOverlay
 from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
@@ -95,6 +96,11 @@ class MainWindow(QMainWindow):
         distribute_bubbles(self)
         self.bubbles_overlay.show()
 
+        # Splitter overlay
+        self.splitter_overlay = SplitterOverlay(parent=self.central_widget)
+        self.splitter_overlay.setGeometry(self.central_widget.rect())
+        self.splitter_overlay.show()
+
         # Render data manager
         self.render_manager = RenderDataManager(
             default_workflow_path=os.path.join("extensions","comfyui","workflow", "render.json")
@@ -150,6 +156,9 @@ class MainWindow(QMainWindow):
         if self.bubbles_overlay: # Make the overlay always cover the central widget
             self.bubbles_overlay.setGeometry(self.centralWidget().rect())
             self.bubbles_overlay.reinitialize_bubbles()
+        
+        if self.splitter_overlay:
+            self.splitter_overlay.setGeometry(self.centralWidget().rect())
 
     def showEvent(self, event):
         super().showEvent(event)
