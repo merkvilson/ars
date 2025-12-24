@@ -1,7 +1,7 @@
 from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtGui import QRegion, QPainter, QColor
 from PyQt6.QtWidgets import QWidget
-from core.cursor_modifier import set_cursor
+from core.cursor_modifier import set_cursor, CursorModifier
 
 
 class SplitterOverlay(QWidget):
@@ -24,6 +24,14 @@ class SplitterOverlay(QWidget):
         self.bottom_color = QColor(60, 180, 60, 10)
         self.left_color = QColor(60, 60, 180, 10)
         self.right_color = QColor(180, 180, 60, 10)
+        
+        self.cursor_modifier = CursorModifier(
+            trigger_widget=self,
+            axis="xy",
+            teleport_back=False,
+            cursor_type=None,
+            active_condition=lambda e: self._get_handle_at(e.pos()) is not None
+        )
         
         self.setMouseTracking(True)
         self._update_mask()
@@ -97,8 +105,12 @@ class SplitterOverlay(QWidget):
         else:
             handle = self._get_handle_at(event.pos())
             if handle in ("top", "bottom"):
+                self.cursor_modifier.axis = "y"
+                self.cursor_modifier.set_cursor_type("arrows-move-vertical", anchor="center")
                 set_cursor("arrows-move-vertical", anchor="center")
             elif handle in ("left", "right"):
+                self.cursor_modifier.axis = "x"
+                self.cursor_modifier.set_cursor_type("arrows-move-horizontal", anchor="center")
                 set_cursor("arrows-move-horizontal", anchor="center")
             else:
                 set_cursor("cursor", anchor="top_left")
