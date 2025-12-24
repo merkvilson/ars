@@ -2,8 +2,10 @@ import sys
 import os
 from pathlib import Path
 
-# Suppress Qt debug/info messages from FFmpeg and other Qt subsystems
-os.environ["QT_LOGGING_RULES"] = "qt.qpa.fonts=false;qt.multimedia.ffmpeg=false"
+# Suppress FFmpeg/Qt Multimedia debug output
+os.environ["QT_LOGGING_RULES"] = "*=false"
+os.environ["LIBAV_LOG_LEVEL"] = "quiet"
+os.environ["AV_LOG_FORCE_NOCOLOR"] = "1"
 
 # Add project root to sys.path to allow imports from ui, core, etc.
 project_root = Path(__file__).parents[2]

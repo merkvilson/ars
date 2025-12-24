@@ -1,6 +1,13 @@
 import sys
+import os
 import numpy as np
 from pathlib import Path
+
+# Suppress FFmpeg/Qt Multimedia debug output
+os.environ["QT_LOGGING_RULES"] = "*=false"
+os.environ["LIBAV_LOG_LEVEL"] = "quiet"
+os.environ["AV_LOG_FORCE_NOCOLOR"] = "1"
+
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QPushButton, QFileDialog, QSlider, QLabel, QGraphicsView, QGraphicsScene)
 from PyQt6.QtCore import Qt, QUrl

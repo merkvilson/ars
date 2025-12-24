@@ -1,5 +1,16 @@
 import sys
+import os
 from pathlib import Path
+
+# Suppress FFmpeg/Qt Multimedia stderr output before any Qt imports
+os.environ["QT_LOGGING_RULES"] = "*=false"
+if sys.platform == 'win32':
+    # Redirect stderr at file descriptor level to suppress FFmpeg C library output
+    _devnull = os.open(os.devnull, os.O_WRONLY)
+    _old_stderr = os.dup(2)
+    os.dup2(_devnull, 2)
+    os.close(_devnull)
+
 from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QSplitter
 from PyQt6.QtCore import Qt
 
