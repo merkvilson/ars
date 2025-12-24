@@ -7,6 +7,7 @@
 - [20%] Implement plugin system
 
 - [ ] Overlay widget that will replace the bubbles layout. It should distribute CTX windows instead of bubbles. splitters should be added to avoid overlapping. The center part should have a click-through area.
+- [ ] Right click on button in CTX menu, should make all b-buttons semi transparent (except the one under cursor) and open radial menu with b-button options.
 - [ ] Move temp values to ars_window.prefs
 - [ ] Implement folder watcher or new file finder function with callbacks.
 - [ ] implement whisperthunder and pollinations as extensions/plugins
