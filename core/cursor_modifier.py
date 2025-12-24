@@ -327,7 +327,8 @@ class CursorModifier(QObject):
                  axis: str = "xy",
                  mouse_button: Qt.MouseButton = Qt.MouseButton.LeftButton,
                  infinite_movement: bool = False,
-                 parent: QObject | None = None):
+                 parent: QObject | None = None,
+                 active_condition=None):
         super().__init__(parent)
         if axis not in ("xy", "x", "y"):
             raise ValueError("Argument 'axis' must be one of 'xy', 'x', or 'y'.")
@@ -346,6 +347,7 @@ class CursorModifier(QObject):
         self.anchor = anchor
         self.axis = axis
         self.infinite_movement = infinite_movement
+        self.active_condition = active_condition
         
         self._cursor_variants: list[QCursor] = []
         self._custom_cursor: QCursor | None = None
@@ -380,6 +382,11 @@ class CursorModifier(QObject):
 
     def _make_cursor(self, name: str) -> QCursor:
         return create_qcursor(name, self.bg_color, self.anchor)
+    
+    def set_cursor_type(self, name: str, anchor: str = "top_left"):
+        """Updates the cursor type and anchor dynamically."""
+        self.anchor = anchor
+        self._custom_cursor = self._make_cursor(name)
     
     def get_accumulated_offset(self) -> QPoint:
         """Returns the accumulated offset when infinite_movement is enabled."""
@@ -483,6 +490,8 @@ class CursorModifier(QObject):
     def eventFilter(self, watched_obj: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.Type.MouseButtonPress and isinstance(event, QMouseEvent) and event.button() == self.mouse_button:
             if self._has_install and watched_obj is self.trigger_widget:
+                if self.active_condition and not self.active_condition(event):
+                    return False
                 if not self._is_active: self._start_modification()
                 return False
             if self._is_graphics_item:
