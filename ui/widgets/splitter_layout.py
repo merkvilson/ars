@@ -20,6 +20,7 @@ class SplitterOverlay(QWidget):
         self._dragging = None
         
         self.bottom_widget = None
+        self.left_widget = None
 
         # Colors (semi-transparent)
         self.top_color = QColor(255, 255, 255, 10)
@@ -49,16 +50,37 @@ class SplitterOverlay(QWidget):
                 self.bottom_widget.setParent(self)
                 self.bottom_widget.show()
                 self._update_geometries()
+        
+        elif position == "left":
+            if self.left_widget:
+                self.left_widget.setParent(None)
+                self.left_widget.deleteLater()
+            
+            self.left_widget = widget
+            if self.left_widget:
+                self.left_widget.setParent(self)
+                self.left_widget.show()
+                self._update_geometries()
 
     def _update_geometries(self):
+        offset = self.handle_size
+        
         if self.bottom_widget:
             # Leave space for the handle
-            offset = self.handle_size
             self.bottom_widget.setGeometry(
                 0, 
                 self.height() - self.bottom_height + offset, 
                 self.width(), 
                 max(0, self.bottom_height - offset)
+            )
+            
+        if self.left_widget:
+            # Leave space for the handle
+            self.left_widget.setGeometry(
+                0,
+                self.top_height, # Start below top area
+                self.left_width - offset,
+                self.height() - self.top_height - self.bottom_height
             )
 
     def _update_mask(self):
