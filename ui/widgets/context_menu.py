@@ -288,8 +288,8 @@ class CtxConfig(ContextMenuConfig):
         self.start_angle = math.radians(start_degrees)
         self.arc_span = math.radians(end_degrees - start_degrees)
 
-    def open_context(self, parent=None, items=None, position=None):
-        return open_context(config=self, parent=parent, items=items, position=position)
+    def open_context(self, parent=None, items=None, position=None, animated=True):
+        return open_context(config=self, parent=parent, items=items, position=position, animated=animated)
 
 
 class ContextButtonWindow(QWidget):
@@ -780,7 +780,7 @@ def calc_positions(config, center_pos, count):
     return modes.get(config.distribution_mode, lambda: [])()
 
 
-def open_context(config=None, parent = None, items = None, position=None, ):
+def open_context(config=None, parent = None, items = None, position=None, animated = True):
     if hasattr(config, 'options'):
         items = list(config.options.keys())
         config.additional_texts = config.options
@@ -836,7 +836,8 @@ def open_context(config=None, parent = None, items = None, position=None, ):
         menu_pos.setY(parent_rect.top())
     ctx_window.move(menu_pos.x(), menu_pos.y())
 
-    ctx_window.open_animated()
+    if animated: ctx_window.open_animated()
+    else: ctx_window.show()
     ctx_window.raise_()
     ctx_window.activateWindow()
     return ctx_window
