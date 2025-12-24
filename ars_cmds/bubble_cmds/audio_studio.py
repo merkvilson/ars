@@ -31,9 +31,6 @@ def execute_cmd(ars_window):
     options_list = [
         [
             ic.ICON_ARROW_BARS_V,
-            ic.ICON_SHADER_SMOOTH,
-            "   ",
-            ic.ICON_FOLDER_OPEN,
             "   ",
         ],
         ["   ", "AudioSplitter", "   "],
@@ -67,11 +64,9 @@ def execute_cmd(ars_window):
     }
 
     config.slider_values = {
-        ic.ICON_SHADER_SMOOTH: (0, 100, getattr(ars_window.prefs, 'audio_studio_alpha', 1.0) * 100),
         ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, getattr(ars_window.prefs, 'audio_studio_height', 600)),
     }
     config.incremental_values = {
-        ic.ICON_SHADER_SMOOTH: 3,
         ic.ICON_ARROW_BARS_V: (-20, "y"),
     }
 
@@ -81,11 +76,7 @@ def execute_cmd(ars_window):
         sounds_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "res", "sounds")
 
     config.callbackL = {
-        ic.ICON_FOLDER_OPEN: lambda: open_file(sounds_dir),
-        ic.ICON_SHADER_SMOOTH: lambda value: (
-            ctx.set_alpha(value / 2550.0),
-            setattr(ars_window.prefs, 'audio_studio_alpha', value / 100.0),
-        ),
+
         ic.ICON_ARROW_BARS_V: lambda value: (
             ctx.resize_top(value),
             splitter.setFixedHeight(int(value - int(44 * 1.5))),
