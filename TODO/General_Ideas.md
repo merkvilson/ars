@@ -30,7 +30,7 @@
 - [ ] Remove preview object during pressing G and add distance depended point.
 - [ ] https://github.com/meshsplatting/mesh-splatting
 - [ ] Trigger new render based on new "undo item" instead of time period. 
-- [ ] 
+- [ ] replace add_primitive with add_object. it should recieve prim name and file path.
 
 # Secret Release
 - [ ] Customer should get working version of Airen 
