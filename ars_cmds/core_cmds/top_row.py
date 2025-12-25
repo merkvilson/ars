@@ -1,11 +1,5 @@
 from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
-from ars_cmds.core_cmds.run_ext import run_ext
-
-
-BBL_top_row_CONFIG ={"symbol": "", }
-def BBL_top_row(*args):
-    run_ext(__file__)
 
 
 def execute_cmd(ars_window):
