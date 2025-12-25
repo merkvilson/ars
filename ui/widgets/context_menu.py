@@ -10,7 +10,7 @@ from .utils import animated_effects
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QScrollArea,
     QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QStyle, QGraphicsRectItem, QGraphicsPathItem, QSizePolicy
+    QStyle, QSizePolicy
 )
 from PyQt6.QtGui import (
     QPainter, QColor,  QBrush, QCursor,
