@@ -17,7 +17,8 @@ class CursorFollowerWidget(QWidget):
     """
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
+        # Make it a child widget instead of a separate window to ensure visibility in full screen
+        self.setWindowFlags(Qt.WindowType.Widget | Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
@@ -97,17 +98,15 @@ class CursorFollowerWidget(QWidget):
         if self.isVisible():
             parent = self.parent()
             if parent:
-                global_cursor = QCursor.pos()
+                # Get cursor position relative to parent
+                local_cursor = parent.mapFromGlobal(QCursor.pos())
                 
-                # Calculate constraints in global coordinates
-                parent_tl = parent.mapToGlobal(QPoint(0, 0))
-                min_x = parent_tl.x()
-                min_y = parent_tl.y()
-                max_x = min_x + parent.width() - self.width()
-                max_y = min_y + parent.height() - self.height()
+                # Calculate constraints in local coordinates
+                max_x = parent.width() - self.width()
+                max_y = parent.height() - self.height()
 
-                x = max(min_x, min(global_cursor.x(), max_x))
-                y = max(min_y, min(global_cursor.y(), max_y))
+                x = max(0, min(local_cursor.x(), max_x))
+                y = max(0, min(local_cursor.y(), max_y))
                 
                 self.move(x, y)
                 self.raise_()
