@@ -38,6 +38,13 @@ class SplitterOverlay(QWidget):
         self.setMouseTracking(True)
         self._update_mask()
     
+    def _get_effective_sizes(self):
+        th = self.top_height if self.top_widget else 0
+        bh = self.bottom_height if self.bottom_widget else 0
+        lw = self.left_width if self.left_widget else 0
+        rw = self.right_width if self.right_widget else 0
+        return th, bh, lw, rw
+
     def set_widget(self, position: str, widget: QWidget):
         if position == "bottom":
             if self.bottom_widget:
@@ -48,7 +55,8 @@ class SplitterOverlay(QWidget):
             if self.bottom_widget:
                 self.bottom_widget.setParent(self)
                 self.bottom_widget.show()
-                self._update_geometries()
+            self._update_geometries()
+            self._update_mask()
         
         elif position == "left":
             if self.left_widget:
@@ -59,7 +67,8 @@ class SplitterOverlay(QWidget):
             if self.left_widget:
                 self.left_widget.setParent(self)
                 self.left_widget.show()
-                self._update_geometries()
+            self._update_geometries()
+            self._update_mask()
 
         elif position == "top":
             if self.top_widget:
@@ -70,7 +79,8 @@ class SplitterOverlay(QWidget):
             if self.top_widget:
                 self.top_widget.setParent(self)
                 self.top_widget.show()
-                self._update_geometries()
+            self._update_geometries()
+            self._update_mask()
 
         elif position == "right":
             if self.right_widget:
@@ -81,27 +91,29 @@ class SplitterOverlay(QWidget):
             if self.right_widget:
                 self.right_widget.setParent(self)
                 self.right_widget.show()
-                self._update_geometries()
+            self._update_geometries()
+            self._update_mask()
 
     def _update_geometries(self):
         offset = self.handle_size
+        th, bh, lw, rw = self._get_effective_sizes()
         
         if self.bottom_widget:
             # Leave space for the handle
             self.bottom_widget.setGeometry(
                 0, 
-                self.height() - self.bottom_height + offset, 
+                self.height() - bh + offset, 
                 self.width(), 
-                max(0, self.bottom_height - offset)
+                max(0, bh - offset)
             )
             
         if self.left_widget:
             # Leave space for the handle
             self.left_widget.setGeometry(
                 0,
-                self.top_height, # Start below top area
-                self.left_width - offset,
-                self.height() - self.top_height - self.bottom_height
+                th, # Start below top area
+                lw - offset,
+                self.height() - th - bh
             )
 
         if self.top_widget:
@@ -110,26 +122,27 @@ class SplitterOverlay(QWidget):
                 0,
                 0,
                 self.width(),
-                max(0, self.top_height - offset)
+                max(0, th - offset)
             )
 
         if self.right_widget:
             # Leave space for the handle
             self.right_widget.setGeometry(
-                self.width() - self.right_width + offset,
-                self.top_height,
-                max(0, self.right_width - offset),
-                self.height() - self.top_height - self.bottom_height
+                self.width() - rw + offset,
+                th,
+                max(0, rw - offset),
+                self.height() - th - bh
             )
 
     def _update_mask(self):
         """Create a mask with a hole in the center."""
+        th, bh, lw, rw = self._get_effective_sizes()
         full = QRegion(self.rect())
         center = QRegion(QRect(
-            self.left_width, 
-            self.top_height,
-            self.width() - self.left_width - self.right_width,
-            self.height() - self.top_height - self.bottom_height
+            lw, 
+            th,
+            self.width() - lw - rw,
+            self.height() - th - bh
         ))
         self.setMask(full.subtracted(center))
     
@@ -139,34 +152,41 @@ class SplitterOverlay(QWidget):
         self._update_geometries()
     
     def _get_handle_at(self, pos) -> str | None:
-        y_top = self.top_height
-        y_bottom = self.height() - self.bottom_height
-        x_left = self.left_width
-        x_right = self.width() - self.right_width
+        th, bh, lw, rw = self._get_effective_sizes()
+        
+        y_top = th
+        y_bottom = self.height() - bh
+        x_left = lw
+        x_right = self.width() - rw
         hs = self.handle_size
         
         # Horizontal handles (top/bottom edges)
-        if abs(pos.y() - y_top) < hs and x_left < pos.x() < x_right:
+        if th > 0 and abs(pos.y() - y_top) < hs and x_left < pos.x() < x_right:
             return "top"
-        if abs(pos.y() - y_bottom) < hs and x_left < pos.x() < x_right:
+        if bh > 0 and abs(pos.y() - y_bottom) < hs and x_left < pos.x() < x_right:
             return "bottom"
         # Vertical handles (left/right edges)  
-        if abs(pos.x() - x_left) < hs and y_top < pos.y() < y_bottom:
+        if lw > 0 and abs(pos.x() - x_left) < hs and y_top < pos.y() < y_bottom:
             return "left"
-        if abs(pos.x() - x_right) < hs and y_top < pos.y() < y_bottom:
+        if rw > 0 and abs(pos.x() - x_right) < hs and y_top < pos.y() < y_bottom:
             return "right"
         return None
     
     def paintEvent(self, event):
         painter = QPainter(self)
+        th, bh, lw, rw = self._get_effective_sizes()
         # Top
-        painter.fillRect(0, 0, self.width(), self.top_height, self.bg_color)
+        if th > 0:
+            painter.fillRect(0, 0, self.width(), th, self.bg_color)
         # Bottom
-        painter.fillRect(0, self.height() - self.bottom_height, self.width(), self.bottom_height, self.bg_color)
+        if bh > 0:
+            painter.fillRect(0, self.height() - bh, self.width(), bh, self.bg_color)
         # Left
-        painter.fillRect(0, self.top_height, self.left_width, self.height() - self.top_height - self.bottom_height, self.bg_color)
+        if lw > 0:
+            painter.fillRect(0, th, lw, self.height() - th - bh, self.bg_color)
         # Right
-        painter.fillRect(self.width() - self.right_width, self.top_height, self.right_width, self.height() - self.top_height - self.bottom_height, self.bg_color)
+        if rw > 0:
+            painter.fillRect(self.width() - rw, th, rw, self.height() - th - bh, self.bg_color)
     
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -177,15 +197,16 @@ class SplitterOverlay(QWidget):
             pos = event.pos()
             min_size = 20
             max_center = 10
+            th, bh, lw, rw = self._get_effective_sizes()
             
             if self._dragging == "top":
-                self.top_height = max(min_size, min(pos.y(), self.height() - self.bottom_height - max_center))
+                self.top_height = max(min_size, min(pos.y(), self.height() - bh - max_center))
             elif self._dragging == "bottom":
-                self.bottom_height = max(min_size, min(self.height() - pos.y(), self.height() - self.top_height - max_center))
+                self.bottom_height = max(min_size, min(self.height() - pos.y(), self.height() - th - max_center))
             elif self._dragging == "left":
-                self.left_width = max(min_size, min(pos.x(), self.width() - self.right_width - max_center))
+                self.left_width = max(min_size, min(pos.x(), self.width() - rw - max_center))
             elif self._dragging == "right":
-                self.right_width = max(min_size, min(self.width() - pos.x(), self.width() - self.left_width - max_center))
+                self.right_width = max(min_size, min(self.width() - pos.x(), self.width() - lw - max_center))
             
             self._update_mask()
             self._update_geometries()
