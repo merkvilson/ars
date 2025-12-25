@@ -1,5 +1,9 @@
 from ui.widgets.context_menu import CtxConfig
 from theme.fonts import font_icons as ic
+from ars_cmds.core_cmds.r_dropdown import r_dropdown
+import os
+import importlib
+import inspect
 
 
 def execute_cmd(ars_window):
@@ -11,10 +15,35 @@ def execute_cmd(ars_window):
     config.distribution_mode = "x"
 
 
-    items = [ ic.ICON_SETTINGS, ic.ICON_LIST, "   ", ic.ICON_CAMERA, ic.ICON_EYE, ic.ICON_RENDER, ic.ICON_BRAIN, ic.ICON_OBJ_BBOX, ic.ICON_CODE_TERMINAL, ic.ICON_WORKFLOW, ic.ICON_BACKGROUND,ic.ICON_PLAYER_TRACK_NEXT, "   ",  ic.ICON_BUBBLE,ic.ICON_MENU,]
+    items = ["   ",]
 
-
+    for filename in os.listdir(os.path.join('ars_cmds','bubble_cmds')):
+        if filename.endswith(".py") and "__init__" not in filename:
+            module_name = filename[:-3]
+            module = importlib.import_module(f"ars_cmds.bubble_cmds.{module_name}")
+            for name, func in inspect.getmembers(module, inspect.isfunction):
+                if name.startswith("BBL_"):
+                    stem = name[4:]
+                    config_var = name + "_CONFIG"
+                    if hasattr(module, config_var):
+                        config_dict = getattr(module, config_var)
+                        if isinstance(config_dict, dict):
+                            if not config_dict.get("visible", True):
+                                continue
+                            symbol = config_dict.get("symbol", stem)
+                        else:
+                            symbol = stem
+                    else:
+                        symbol = getattr(ic, f'ICON_{stem.upper()}', stem)
+                    
+                    # Get the full file path of the module
+                    module_file_path = os.path.abspath(module.__file__)
+                    
+                    items.append(symbol)
+                    config.callbackL[symbol] = lambda *args, f=func: f(ars_window)
+                    config.callbackR[symbol] = lambda *args, p=module_file_path: r_dropdown(ars_window, code_path=p)
     
+    items.append("   ")
     
     ctx = config.open_context(parent=ars_window.central_widget, items=items)
 
