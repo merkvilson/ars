@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QTreeWidget, 
     QTreeWidgetItem, 
     QHeaderView,
+    QSizePolicy
 )
 from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
 from PyQt6.QtCore import Qt, QSize
@@ -67,18 +68,22 @@ class ObjectHierarchyWindow(QWidget):
         self.id_to_obj = {}  # Map UID (id(obj)) to obj for safe reference
         self.uid_to_item = {}  # Map UID to QTreeWidgetItem
 
-        self.setFixedSize(200, 600)
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint |
-                            Qt.WindowType.WindowStaysOnTopHint)
+        # self.setFixedSize(200, 600)
+        self.setWindowFlags(Qt.WindowType.Widget)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setStyleSheet(StyleSheets.HIERARCHY_STYLE)
 
         # Container for all widgets
         self.container = QWidget(self)
         self.container.setObjectName("hierarchyWidget")
-        self.container.setGeometry(0, 0, self.width(), self.height())
+        # self.container.setGeometry(0, 0, self.width(), self.height())
 
-        self.layout = QVBoxLayout(self.container)
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addWidget(self.container)
+
+        self.container_layout = QVBoxLayout(self.container)
 
         # Tree widget
         self.tree = HierarchyTree(self.container)
@@ -106,7 +111,7 @@ class ObjectHierarchyWindow(QWidget):
         self.tree.itemSelectionChanged.connect(self.on_tree_selection_changed)
         self.tree.itemChanged.connect(self.on_item_renamed)
 
-        self.layout.addWidget(self.tree)
+        self.container_layout.addWidget(self.tree)
 
         # Populate from existing objects
         self.populate_from_manager()
