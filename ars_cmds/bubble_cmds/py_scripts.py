@@ -98,6 +98,8 @@ def execute_cmd(ars_window, animated=True):
     config.close_on_outside = False
     # config.expand = "x"
     config.distribution_mode = "x"
+    config.dock_area = "bottom"
+
     config.custom_height = ars_window.prefs.code_editor_height
     config.custom_width = ars_window.width()
     config.extra_distance = [0, 99999]
@@ -108,7 +110,6 @@ def execute_cmd(ars_window, animated=True):
 
     options_list = [
         [
-            ic.ICON_ARROW_BARS_V,
             ic.ICON_TXT_SIZE,
             ic.ICON_SHADER_SMOOTH,
             "   ",
@@ -119,15 +120,14 @@ def execute_cmd(ars_window, animated=True):
             ic.ICON_CODE_TERMINAL,
             "   ",
         ],
-        ["   ", "SplitterWidget", "   "],
-        "   ",
+        ["SplitterWidget"],
     ]
 
     available_height = int(config.custom_height - int(44 * 1.5))
     
     # Create CodeEditorWidget (combined editor + terminal)
     code_editor_widget = CodeEditorWidget()
-    code_editor_widget.setFixedSize(int(ars_window.width() - 10), available_height)
+    # code_editor_widget.setFixedSize(int(ars_window.width() - 10), available_height)
     code_editor_widget.set_code(current_code_text)
     
     # Get reference to the inner code editor
@@ -138,11 +138,10 @@ def execute_cmd(ars_window, animated=True):
     }
     config.slider_values = {
         ic.ICON_SHADER_SMOOTH: (0, 100, ars_window.prefs.code_editor_alpha*100),
-        ic.ICON_ARROW_BARS_V: (int(44 * 1.5), ars_window.height() - int(44 * 1.5) - 20, ars_window.prefs.code_editor_height),
         ic.ICON_TXT_SIZE: (10,48,ars_window.prefs.code_editor_font_size),
     }
-    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_ARROW_BARS_V: (-20, "y"),ic.ICON_TXT_SIZE: 1, }
-    config.slider_color = {ic.ICON_ARROW_BARS_V: QColor(0, 0, 0, 0)}
+    config.incremental_values = {ic.ICON_SHADER_SMOOTH: 3, ic.ICON_TXT_SIZE: 1, }
+    # config.slider_color = {ic.ICON_ARROW_BARS_V: QColor(0, 0, 0, 0)}
 
     def read_code_file(new_file):
         nonlocal current_code_file
@@ -188,11 +187,6 @@ def execute_cmd(ars_window, animated=True):
             ctx.set_alpha(value / 2550.0),
             code_editor_widget.set_alpha(value / 100.0), 
             setattr(ars_window.prefs, 'code_editor_alpha', value / 100.0),
-            ),
-        ic.ICON_ARROW_BARS_V: lambda value: (
-            ctx.resize_top(value),
-            code_editor_widget.setFixedHeight(int(value - int(44 * 1.5))),
-            setattr(ars_window.prefs, 'code_editor_height', int(value)),
             ),
     }
 
