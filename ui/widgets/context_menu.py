@@ -322,7 +322,7 @@ class DraggableSpacer(QWidget):
         mime.setText(str(self.symbol))
         drag.setMimeData(mime)
         
-        # Create round pixmap
+        # Create rounded square pixmap
         radius = self.parent_window.config.item_radius
         diameter = radius * 2
         pixmap = QPixmap(diameter, diameter)
@@ -331,12 +331,12 @@ class DraggableSpacer(QWidget):
         painter = QPainter(pixmap)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
-        # Draw circle
+        # Draw rounded square
         c = QColor(colors.symbol_color)
         c.setAlphaF(0.1)
         painter.setBrush(c)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawEllipse(0, 0, diameter, diameter)
+        painter.drawRoundedRect(0, 0, diameter, diameter, 8, 8)
         painter.end()
 
         drag.setPixmap(pixmap)
