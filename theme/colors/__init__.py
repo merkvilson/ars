@@ -7,7 +7,7 @@ with open(r'theme\colors\colors.json', 'r') as f:
 
 button_color = QColor(70, 70, 70, 200) or "#21252b"
 hover_color = QColor(150, 150, 150, 200) or "#3e4451"
-symbol_color = QColor(255, 255, 255, 180) or "#abb2bf"
+symbol_color = QColor(255, 255, 255, 220) or "#abb2bf"
 additional_text_color = QColor(255, 255, 255, 180) or "#abb2bf"
 hotkey_text_color = QColor(255, 255, 255, 180) or "#abb2bf"
 slider_color = QColor(150, 150, 150, 150) or "#969696"
