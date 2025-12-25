@@ -216,6 +216,7 @@ class DraggableSpacer(QWidget):
         self._insert_after = False
         self._show_line = False
         self._is_dragging = False
+        self._is_hovered = False
 
         # Behave like a stretch while still being a widget.
         is_vertical_stack = getattr(self.parent_window.config, 'distribution_mode', 'y') == 'y'
@@ -255,7 +256,14 @@ class DraggableSpacer(QWidget):
         # Visible only in edit mode.
         if self.parent_window.edit_mode:
             c = QColor(colors.symbol_color)
-            alpha = 0.05 if getattr(self, '_is_dragging', False) else 0.2
+            if getattr(self, '_is_dragging', False):
+                alpha = 0.05
+            elif getattr(self, '_is_hovered', False):
+                alpha = 0.4
+                c = c.lighter(130)
+            else:
+                alpha = 0.2
+            
             c.setAlphaF(alpha)
             painter.setBrush(c)
             painter.setPen(Qt.PenStyle.NoPen)
@@ -277,6 +285,18 @@ class DraggableSpacer(QWidget):
                 x = self.width() - 2 if self._insert_after else 2
                 y1, y2 = int(self.height() * margin), int(self.height() * (1 - margin))
                 painter.drawLine(x, y1, x, y2)
+
+    def enterEvent(self, event):
+        if self.parent_window.edit_mode:
+            self._is_hovered = True
+            play_sound("hover")
+            self.update()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self._is_hovered = False
+        self.update()
+        super().leaveEvent(event)
 
     def mousePressEvent(self, event):
         if self.parent_window.edit_mode and event.button() == Qt.MouseButton.LeftButton:
