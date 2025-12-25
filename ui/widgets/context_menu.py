@@ -276,6 +276,7 @@ class ContextMenuConfig:
         self.incremental_values = {}
         self.custom_width = None
         self.custom_height = None
+        self.dock_area = None
 
 class CtxConfig(ContextMenuConfig):
 
@@ -521,6 +522,8 @@ class ContextButtonWindow(QWidget):
                 col_layout = QVBoxLayout() if config.distribution_mode == "y" else QHBoxLayout()
                 col_layout.setContentsMargins(5, 5, 5, 5)
                 has_spacer = "spacer" in col
+                has_expanding_widget = any(action in config.custom_widget_items for action in col if isinstance(action, str))
+
                 if 'y' in expands and not has_spacer:
                     col_layout.addStretch(1)
                 for action in col:
@@ -529,7 +532,7 @@ class ContextButtonWindow(QWidget):
                         continue
                     if action in config.custom_widget_items:  # Added check
                         custom_widget = config.custom_widget_items[action]
-                        col_layout.addWidget(custom_widget, alignment=Qt.AlignmentFlag.AlignHCenter)
+                        col_layout.addWidget(custom_widget)
                     else:
                         btn = next(btn for btn in self.processed_items if btn.symbol == action)
                         full_rect = btn.boundingRect().united(btn.childrenBoundingRect())
@@ -553,7 +556,7 @@ class ContextButtonWindow(QWidget):
                     pass
                 elif 'y' in expands:
                     col_layout.addStretch(1)
-                else:
+                elif not has_expanding_widget:
                     col_layout.addStretch(1)
                 main_layout.addLayout(col_layout)
             if 'x' in expands and not has_h_spacer:
@@ -803,6 +806,43 @@ def open_context(config=None, parent = None, items = None, position=None, animat
     # Now create the grid window with processed BButton instances
     global ctx_window
     ctx_window = ContextButtonWindow(parent, items, config, position)
+
+    if hasattr(config, 'dock_area') and config.dock_area:
+        # Find ars_window
+        window = parent.window() if parent else QApplication.activeWindow()
+        
+        if hasattr(window, 'splitter_overlay'):
+            overlay = window.splitter_overlay
+            
+            # Configure for docking
+            ctx_window.setWindowFlags(Qt.WindowType.Widget) # Reset flags to be a normal widget
+            
+            # Remove fixed size constraint so it can resize with splitter
+            ctx_window.setMinimumSize(0, 0)
+            ctx_window.setMaximumSize(16777215, 16777215) # QWIDGETSIZE_MAX
+            
+            # Calculate preferred size for the dock
+            preferred_height = ctx_window.height()
+            preferred_width = ctx_window.width()
+            
+            if config.dock_area in ["top", "bottom"]:
+                if config.dock_area == "bottom":
+                     overlay.bottom_height = preferred_height
+            elif config.dock_area in ["left", "right"]:
+                if config.dock_area == "left":
+                    overlay.left_width = preferred_width
+            
+            overlay.set_widget(config.dock_area, ctx_window)
+            overlay._update_mask()
+            overlay._update_geometries()
+            overlay.update()
+            
+            # Disable auto-close behaviors for docked widgets
+            if ctx_window._close_on_outside:
+                 QApplication.instance().removeEventFilter(ctx_window)
+            ctx_window._close_on_outside = False
+            
+            return ctx_window
 
     if config.distribution_mode == 'radial':
         radial_center = ctx_window.radial_center
