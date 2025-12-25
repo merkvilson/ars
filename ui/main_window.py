@@ -18,8 +18,7 @@ from ui.img_viewer import ImageViewerWidget
 from prefs.pref_controller import prefsConfig
 from gs_viewer.gs_widget import GaussianSplattingWidget
 from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
-
-
+from ars_cmds.bubble_cmds.top_row import execute_cmd as open_top_row
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -56,7 +55,7 @@ class MainWindow(QMainWindow):
             self.viewport.grid.start_animation(duration=2)
             play_sound("startup3")
             open_timeline(self)
-
+            open_top_row(self)
             
             from ars_cmds import startup_cmds
 
