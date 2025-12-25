@@ -3,7 +3,7 @@ import inspect
 
 def hotkey_press(window, event):
     if event.key() == Qt.Key.Key_Escape:  
-        if getattr(window.config, 'dock_area', None) is None:
+        if window.config.dock_area is None:
             # Close the menu on Escape key press after a short delay
             QTimer.singleShot(300, lambda: window.close_animated(150, 50))
     else:
