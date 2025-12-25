@@ -10,7 +10,7 @@ from .utils import animated_effects
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QScrollArea,
     QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QStyle, QGraphicsRectItem, QGraphicsPathItem
+    QStyle, QGraphicsRectItem, QGraphicsPathItem, QSizePolicy
 )
 from PyQt6.QtGui import (
     QPainter, QColor,  QBrush, QCursor,
@@ -204,6 +204,139 @@ class DraggableGraphicsView(QGraphicsView):
             event.ignore()
         self._insert_after = False
 
+
+class DraggableSpacer(QWidget):
+    def __init__(self, parent_window, symbol):
+        super().__init__()
+        self.parent_window = parent_window
+        self.symbol = symbol
+        self.setAcceptDrops(True)
+        self.drag_start_pos = None
+        self._insert_after = False
+        self._show_line = False
+
+        # Behave like a stretch while still being a widget.
+        is_vertical_stack = getattr(self.parent_window.config, 'distribution_mode', 'y') == 'y'
+        if is_vertical_stack:
+            self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+            self.setMinimumHeight(12)
+        else:
+            self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+            self.setMinimumWidth(12)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+
+    def _is_vertical(self):
+        return getattr(self.parent_window.config, 'distribution_mode', 'y') == 'y'
+
+    def _cursor_in_trailing_half(self, pos):
+        if self._is_vertical():
+            return pos.y() > self.height() / 2
+        return pos.x() > self.width() / 2
+
+    def _show_indicator(self, insert_after):
+        if not self._show_line:
+            play_sound("hover")
+        self._insert_after = insert_after
+        self._show_line = True
+        self.update()
+
+    def _hide_indicator(self):
+        self._show_line = False
+        self._insert_after = False
+        self.update()
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        # Visible only in edit mode.
+        if self.parent_window.edit_mode:
+            pen = QPen(colors.symbol_color)
+            pen.setWidth(2)
+            pen.setStyle(Qt.PenStyle.DashLine)
+            painter.setPen(pen)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            r = self.rect().adjusted(3, 3, -3, -3)
+            painter.drawRoundedRect(r, 6, 6)
+
+        if self._show_line:
+            pen = QPen(colors.symbol_color)
+            pen.setWidth(3)
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            painter.setPen(pen)
+
+            margin = 0.15
+            if self._is_vertical():
+                y = self.height() - 2 if self._insert_after else 2
+                x1, x2 = int(self.width() * margin), int(self.width() * (1 - margin))
+                painter.drawLine(x1, y, x2, y)
+            else:
+                x = self.width() - 2 if self._insert_after else 2
+                y1, y2 = int(self.height() * margin), int(self.height() * (1 - margin))
+                painter.drawLine(x, y1, x, y2)
+
+    def mousePressEvent(self, event):
+        if self.parent_window.edit_mode and event.button() == Qt.MouseButton.LeftButton:
+            self.drag_start_pos = event.pos()
+            event.accept()
+            return
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if not self.parent_window.edit_mode:
+            super().mouseMoveEvent(event)
+            return
+        if not (event.buttons() & Qt.MouseButton.LeftButton):
+            super().mouseMoveEvent(event)
+            return
+        if not self.drag_start_pos:
+            return
+        if (event.pos() - self.drag_start_pos).manhattanLength() < QApplication.startDragDistance():
+            return
+
+        drag = QDrag(self)
+        mime = QMimeData()
+        mime.setText(str(self.symbol))
+        drag.setMimeData(mime)
+        drag.setPixmap(self.grab())
+        drag.setHotSpot(event.pos())
+        drag.exec(Qt.DropAction.MoveAction)
+
+    def dragEnterEvent(self, event):
+        if self.parent_window.edit_mode and event.mimeData().hasText():
+            if event.mimeData().text() != str(self.symbol):
+                insert_after = self._cursor_in_trailing_half(event.position())
+                self._show_indicator(insert_after)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if self.parent_window.edit_mode and event.mimeData().hasText():
+            if event.mimeData().text() != str(self.symbol):
+                insert_after = self._cursor_in_trailing_half(event.position())
+                if insert_after != self._insert_after or not self._show_line:
+                    self._show_indicator(insert_after)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragLeaveEvent(self, event):
+        self._hide_indicator()
+
+    def dropEvent(self, event):
+        self._hide_indicator()
+        if self.parent_window.edit_mode:
+            source_symbol = event.mimeData().text()
+            target_symbol = self.symbol
+            if source_symbol != str(target_symbol):
+                self.parent_window.reorder_items(source_symbol, target_symbol, self._insert_after)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+        self._insert_after = False
+
 class DropContainer(QWidget):
     def __init__(self, parent_window):
         super().__init__()
@@ -301,6 +434,8 @@ class ContextButtonWindow(QWidget):
         self.items = items
         self.symbol = symbol
         self.edit_mode = False
+
+        self._spacer_counter = 0
         
         self.scroll_area = None
         self._restore_scroll_timer = QTimer()
@@ -528,7 +663,9 @@ class ContextButtonWindow(QWidget):
                     col_layout.addStretch(1)
                 for action in col:
                     if action == "spacer":
-                        col_layout.addStretch(1)
+                        self._spacer_counter += 1
+                        spacer = DraggableSpacer(self, f"__spacer__{self._spacer_counter}")
+                        col_layout.addWidget(spacer)
                         continue
                     if action in config.custom_widget_items:  # Added check
                         custom_widget = config.custom_widget_items[action]
@@ -727,7 +864,7 @@ class ContextButtonWindow(QWidget):
                     item = col_layout.itemAt(j)
                     if not item or not item.widget(): continue
                     widget = item.widget()
-                    if isinstance(widget, DraggableGraphicsView) and str(widget.symbol) == str(symbol):
+                    if isinstance(widget, (DraggableGraphicsView, DraggableSpacer)) and str(widget.symbol) == str(symbol):
                         return widget, col_layout
             return None, None
 
@@ -746,7 +883,10 @@ class ContextButtonWindow(QWidget):
                 target_index += 1
             
             # Insert source at target index
-            target_layout.insertWidget(target_index, source_view, alignment=Qt.AlignmentFlag.AlignHCenter)
+            if isinstance(source_view, DraggableGraphicsView):
+                target_layout.insertWidget(target_index, source_view, alignment=Qt.AlignmentFlag.AlignHCenter)
+            else:
+                target_layout.insertWidget(target_index, source_view)
             
             # Note: We are not updating self.items here because the structure can be complex (tuples, spacers).
             # Visual reordering is achieved.
