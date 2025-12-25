@@ -215,6 +215,7 @@ class DraggableSpacer(QWidget):
         self.drag_start_pos = None
         self._insert_after = False
         self._show_line = False
+        self._is_dragging = False
 
         # Behave like a stretch while still being a widget.
         is_vertical_stack = getattr(self.parent_window.config, 'distribution_mode', 'y') == 'y'
@@ -253,13 +254,13 @@ class DraggableSpacer(QWidget):
 
         # Visible only in edit mode.
         if self.parent_window.edit_mode:
-            pen = QPen(colors.symbol_color)
-            pen.setWidth(2)
-            pen.setStyle(Qt.PenStyle.DashLine)
-            painter.setPen(pen)
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            r = self.rect().adjusted(3, 3, -3, -3)
-            painter.drawRoundedRect(r, 6, 6)
+            c = QColor(colors.symbol_color)
+            alpha = 0.05 if getattr(self, '_is_dragging', False) else 0.2
+            c.setAlphaF(alpha)
+            painter.setBrush(c)
+            painter.setPen(Qt.PenStyle.NoPen)
+            r = self.rect().adjusted(4, 4, -4, -4)
+            painter.drawRoundedRect(r, 8, 8)
 
         if self._show_line:
             pen = QPen(colors.symbol_color)
@@ -300,9 +301,32 @@ class DraggableSpacer(QWidget):
         mime = QMimeData()
         mime.setText(str(self.symbol))
         drag.setMimeData(mime)
-        drag.setPixmap(self.grab())
-        drag.setHotSpot(event.pos())
+        
+        # Create round pixmap
+        radius = self.parent_window.config.item_radius
+        diameter = radius * 2
+        pixmap = QPixmap(diameter, diameter)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Draw circle
+        c = QColor(colors.symbol_color)
+        c.setAlphaF(0.1)
+        painter.setBrush(c)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawEllipse(0, 0, diameter, diameter)
+        painter.end()
+
+        drag.setPixmap(pixmap)
+        drag.setHotSpot(QPoint(radius, radius))
+
+        self._is_dragging = True
+        self.update()
         drag.exec(Qt.DropAction.MoveAction)
+        self._is_dragging = False
+        self.update()
 
     def dragEnterEvent(self, event):
         if self.parent_window.edit_mode and event.mimeData().hasText():
