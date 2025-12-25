@@ -12,9 +12,9 @@ class SplitterOverlay(QWidget):
         
         # Edge sizes
         self.top_height = 80
-        self.bottom_height = 80
-        self.left_width = 150
-        self.right_width = 150
+        self.bottom_height = 15
+        self.left_width = 15
+        self.right_width = 15
         
         self.handle_size = 8
         self._dragging = None
@@ -25,7 +25,7 @@ class SplitterOverlay(QWidget):
         self.right_widget = None
 
         # Colors (semi-transparent)
-        self.bg_color = QColor(255, 255, 255, 10)
+        self.bg_color = QColor(255, 255, 255, 0)
         
         self.cursor_modifier = CursorModifier(
             trigger_widget=self,
@@ -176,7 +176,7 @@ class SplitterOverlay(QWidget):
         if self._dragging:
             pos = event.pos()
             min_size = 20
-            max_center = 100
+            max_center = 10
             
             if self._dragging == "top":
                 self.top_height = max(min_size, min(pos.y(), self.height() - self.bottom_height - max_center))
