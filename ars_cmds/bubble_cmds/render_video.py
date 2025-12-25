@@ -150,14 +150,15 @@ def execute_cmd(ars_window):
 
 
     config = CtxConfig()
-    config.use_extended_shape_items = {"timeline": (ars_window.width() / (40), 1)} #40 stands for item diameter
+    config.use_extended_shape_items = {"timeline": (ars_window.width() / (41), 1)} #40 stands for item diameter
     config.hover_scale_items = {"timeline": 0.95}
     config.auto_close = False
     config.close_on_outside = False
     config.use_extended_shape = False
     config.extra_distance = [0,99999]
     config.distribution_mode = "x"
-    config.custom_height = 110
+    config.custom_height = 120
+    config.dock_area = "bottom"
     config.incremental_value = True
     config.incremental_values = {"timeline": False,}
     #config.custom_width = 450
@@ -186,7 +187,6 @@ def execute_cmd(ars_window):
         ["   ", "timeline", "   ",],
         ]
     config.expand = "x"
-    
 
     config.slider_values = {
         "timeline": (0, 100, ars_window.prefs.timeline_frame),
