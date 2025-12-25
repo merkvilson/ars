@@ -6,7 +6,6 @@
 - [30%] Implement prefs manager and config classes
 - [20%] Implement plugin system
 
-- [ ] Overlay widget that will replace the bubbles layout. It should distribute CTX windows instead of bubbles. splitters should be added to avoid overlapping. The center part should have a click-through area. ![alt text](image-2.png)
 - [ ] Right click on button in CTX menu, should make all b-buttons semi transparent (except the one under cursor) and open radial menu with b-button options.
 - [ ] Move temp values to ars_window.prefs
 - [ ] Implement folder watcher or new file finder function with callbacks.
@@ -78,6 +77,7 @@ It will be used not only for ComfyUI but also for tabler & lucid icons, document
 
 ## Finished
 
+- [✓] Overlay widget that will replace the bubbles layout. It should distribute CTX windows instead of bubbles. splitters should be added to avoid overlapping. The center part should have a click-through area.
 - [✓] Single click on b_button should activate text edit field event.
 - [✓] Text edit area for b-button
 - [✓] Q drag should change parent of the object. grid=None, obj=obj
