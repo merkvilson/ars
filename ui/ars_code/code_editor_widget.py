@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSplitter, QApplication
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSplitter, QApplication, QSizePolicy
 from PyQt6.QtCore import Qt
 
 # Handle imports whether run as script or module
@@ -23,6 +23,7 @@ class CodeEditorWidget(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
