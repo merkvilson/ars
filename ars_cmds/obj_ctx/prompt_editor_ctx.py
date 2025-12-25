@@ -31,11 +31,11 @@ def execute_cmd(ars_window):
             ic.ICON_SHADER_SMOOTH,
             ic.ICON_ARROW_BARS_V,
         ],
-        ["   ", "PromptEditorWidget", "   "],
+        ["PromptEditorWidget"],
         "   ",
     ] # Override
 
-    options_list = ["   ", "PromptEditorWidget", "   "]
+    options_list = ["PromptEditorWidget"]
 
 
     def set_text_from_prompt():

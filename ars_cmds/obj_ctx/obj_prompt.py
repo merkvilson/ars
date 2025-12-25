@@ -38,7 +38,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
 
     options_list = [
-    ["   ", "PromptEditorWidget", "   ",],
+    ["PromptEditorWidget"],
 
     [ic.ICON_STEPS, ic.ICON_GIZMO_SCALE,"   ", 
     ic.ICON_PLAYER_SKIP_BACK ,ic.ICON_PLAYER_PLAY, ic.ICON_PLAYER_SKIP_FORWARD, "   ", 
