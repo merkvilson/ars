@@ -184,7 +184,7 @@ def execute_cmd(ars_window):
         ic.ICON_TRASH_X,
         "   ",
         ],
-        ["   ", "timeline", "   ",],
+        ["timeline"],
         ]
     config.expand = "x"
 
