@@ -11,7 +11,7 @@ def execute_cmd(ars_window):
     config = CtxConfig()
     config.use_extended_shape = False
     config.auto_close = False
-    config.close_on_outside = False
+    config.close_on_outside = True
     config.distribution_mode = "x"
     config.anchor = "+y"
     config.extra_distance = [0,-30]
