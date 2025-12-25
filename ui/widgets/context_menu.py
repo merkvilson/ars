@@ -193,12 +193,13 @@ class DraggableGraphicsView(QGraphicsView):
         return pos.x() > self.width() / 2
 
     def dropEvent(self, event):
+        insert_after = self._insert_after
         self._hide_indicator()
         if self.parent_window.edit_mode:
             source_symbol = event.mimeData().text()
             target_symbol = self.symbol
             if source_symbol != str(target_symbol):
-                self.parent_window.reorder_items(source_symbol, target_symbol, self._insert_after)
+                self.parent_window.reorder_items(source_symbol, target_symbol, insert_after)
             event.acceptProposedAction()
         else:
             event.ignore()
@@ -326,12 +327,13 @@ class DraggableSpacer(QWidget):
         self._hide_indicator()
 
     def dropEvent(self, event):
+        insert_after = self._insert_after
         self._hide_indicator()
         if self.parent_window.edit_mode:
             source_symbol = event.mimeData().text()
             target_symbol = self.symbol
             if source_symbol != str(target_symbol):
-                self.parent_window.reorder_items(source_symbol, target_symbol, self._insert_after)
+                self.parent_window.reorder_items(source_symbol, target_symbol, insert_after)
             event.acceptProposedAction()
         else:
             event.ignore()
