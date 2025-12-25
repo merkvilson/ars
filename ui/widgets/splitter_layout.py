@@ -11,7 +11,7 @@ class SplitterOverlay(QWidget):
         super().__init__(parent)
         
         # Edge sizes
-        self.top_height = 80
+        self.top_height = 70
         self.bottom_height = 15
         self.left_width = 15
         self.right_width = 15
