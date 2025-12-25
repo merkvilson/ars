@@ -5,7 +5,7 @@ from PyQt6.QtGui import QFont, QColor, QTextCharFormat
 
 import sys
 from PyQt6.QtCore import pyqtSignal, QObject, Qt
-from PyQt6.QtWidgets import QPlainTextEdit, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QPlainTextEdit, QVBoxLayout, QWidget, QSizePolicy
 from PyQt6.QtGui import QFont, QColor, QTextCharFormat
 
 class OutputStream(QObject):
@@ -54,6 +54,7 @@ def install_redirectors():
 class TerminalWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         
