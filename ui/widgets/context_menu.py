@@ -855,6 +855,8 @@ class ContextButtonWindow(QWidget):
                 if not item or not item.widget(): continue
                 widget = item.widget()
                 if isinstance(widget, (DraggableGraphicsView, DraggableSpacer)):
+                    if "__spacer__" in str(widget.symbol):
+                        widget.symbol = "   "
                     col_data.append(widget.symbol)
             layout_data.append(col_data)
 
