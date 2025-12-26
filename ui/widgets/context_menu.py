@@ -482,8 +482,6 @@ class ContextButtonWindow(QWidget):
         self.items = items
         self.symbol = symbol
         self.edit_mode = False
-
-        self._spacer_counter = 0
         
         self.scroll_area = None
         self._restore_scroll_timer = QTimer()
@@ -711,8 +709,7 @@ class ContextButtonWindow(QWidget):
                     col_layout.addStretch(1)
                 for action in col:
                     if action == "spacer":
-                        self._spacer_counter += 1
-                        spacer = DraggableSpacer(self, f"__spacer__{self._spacer_counter}")
+                        spacer = DraggableSpacer(self, "   ")
                         col_layout.addWidget(spacer)
                         continue
                     if action in config.custom_widget_items:  # Added check
