@@ -907,7 +907,25 @@ class ContextButtonWindow(QWidget):
             with open(path, 'r') as f:
                 new_items = json.load(f)
             self.close()
+
+            set_a = [
+            item
+            for x in new_items
+            for item in (x if isinstance(x, (list, tuple)) else [x])
+            ]
+
+            set_b = [
+            item
+            for x in self.items
+            for item in (x if isinstance(x, (list, tuple)) else [x])
+            ]
+
+            difference = list(set(set_a) ^ set(set_b))
+            if difference:
+                new_items.append(difference)
+
             open_context(self.config, self.parent(), new_items, animated=True)
+
         except Exception as e:
             print(f"Error loading layout: {e}")
 
