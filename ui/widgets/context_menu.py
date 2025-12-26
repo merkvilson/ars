@@ -907,36 +907,6 @@ class ContextButtonWindow(QWidget):
             with open(path, 'r') as f:
                 new_items = json.load(f)
             self.close()
-            
-            set_a = [
-            item
-            for x in self.items
-            for item in (x if isinstance(x, (list, tuple)) else [x])
-            ]
-
-            set_b = [
-            item
-            for x in new_items
-            for item in (x if isinstance(x, (list, tuple)) else [x])
-            ]
-
-
-            difference = [item for item in set_a if item not in set_b]
-            print(f"Difference items: {difference}")
-            if difference:
-                new_items.append(difference)
-
-            def filter_nested(nested, correct):
-                result = []
-                for item in nested:
-                    if isinstance(item, list):
-                        filtered = filter_nested(item, correct)
-                        if filtered:  # keep non-empty sublists
-                            result.append(filtered)
-                    elif item in correct:
-                        result.append(item)
-                return result
-            new_items = filter_nested(new_items, set_a)
 
             open_context(self.config, self.parent(), new_items, animated=True)
 
