@@ -1,4 +1,5 @@
-from ui.widgets.context_menu import CtxConfig
+import json
+from ui.widgets.context_menu import CtxConfig, open_context
 from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.r_dropdown import r_dropdown
 import os
@@ -47,4 +48,49 @@ def execute_cmd(ars_window):
     
     ctx = config.open_context(parent=ars_window.central_widget, items=items)
 
-    ctx.load_layout()
+
+
+    def load_layout(path=os.path.join("saved_layouts", "ctx_layouts", "layout.json")):
+        
+        try:
+            with open(path, 'r') as f:
+                new_items = json.load(f)
+            ctx.close()
+            
+            set_a = [
+            item
+            for x in ctx.items
+            for item in (x if isinstance(x, (list, tuple)) else [x])
+            ]
+
+            set_b = [
+            item
+            for x in new_items
+            for item in (x if isinstance(x, (list, tuple)) else [x])
+            ]
+
+
+            difference = [item for item in set_a if item not in set_b]
+            print(f"Difference items: {difference}")
+            if difference:
+                new_items.append(difference)
+
+            def filter_nested(nested, correct):
+                result = []
+                for item in nested:
+                    if isinstance(item, list):
+                        filtered = filter_nested(item, correct)
+                        if filtered:  # keep non-empty sublists
+                            result.append(filtered)
+                    elif item in correct:
+                        result.append(item)
+                return result
+            new_items = filter_nested(new_items, set_a)
+
+            open_context(ctx.config, ctx.parent(), new_items, animated=True)
+
+        except Exception as e:
+            print(f"Error loading layout: {e}")
+
+
+    load_layout()
