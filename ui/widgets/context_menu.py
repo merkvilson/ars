@@ -882,6 +882,33 @@ class ContextButtonWindow(QWidget):
         except Exception as e:
             print(f"Error saving layout: {e}")
 
+    def load_layout(self, path=os.path.join("saved_layouts", "ctx_layouts", "layout.json")):
+        if path is None:
+            base_dir = os.path.join("saved_layouts", "ctx_layouts")
+            if not os.path.exists(base_dir):
+                os.makedirs(base_dir, exist_ok=True)
+            
+            file_path, _ = QFileDialog.getOpenFileName(
+                self, 
+                "Load Layout", 
+                base_dir, 
+                "JSON Files (*.json)"
+            )
+            
+            if file_path:
+                path = file_path
+            else:
+                return
+
+        try:
+            with open(path, 'r') as f:
+                new_items = json.load(f)
+            
+            self.close()
+            open_context(self.config, self.parent(), new_items, animated=False)
+        except Exception as e:
+            print(f"Error loading layout: {e}")
+
     def keyPressEvent(self, event):
         if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_E:
             self.toggle_edit_mode()
@@ -889,6 +916,10 @@ class ContextButtonWindow(QWidget):
             return
         if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_S:
             self.save_layout()
+            event.accept()
+            return
+        if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_L:
+            self.load_layout()
             event.accept()
             return
         hotkey_press(self, event)
