@@ -1,4 +1,6 @@
 import math
+import json
+import os
 from .b_button import BButton, BButtonConfig
 from theme import StyleSheets
 from theme.fonts.new_fonts import get_font
@@ -10,7 +12,7 @@ from .utils import animated_effects
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QScrollArea,
     QVBoxLayout, QHBoxLayout, QGraphicsView, QGraphicsScene,
-    QStyle, QSizePolicy
+    QStyle, QSizePolicy, QFileDialog
 )
 from PyQt6.QtGui import (
     QPainter, QColor,  QBrush, QCursor,
@@ -835,9 +837,61 @@ class ContextButtonWindow(QWidget):
         # Start the grace period timer for outside clicks
         self._outside_click_timer.start(500)
 
+    def save_layout(self, path=os.path.join("saved_layouts", "ctx_layouts", "layout.json")):
+        if not self.scroll_area: return
+        content = self.scroll_area.widget()
+        if not content: return
+        main_layout = content.layout()
+        if not main_layout: return
+
+        layout_data = []
+        
+        for i in range(main_layout.count()):
+            col_item = main_layout.itemAt(i)
+            if not col_item or not col_item.layout(): continue
+            col_layout = col_item.layout()
+            
+            col_data = []
+            for j in range(col_layout.count()):
+                item = col_layout.itemAt(j)
+                if not item or not item.widget(): continue
+                widget = item.widget()
+                if isinstance(widget, (DraggableGraphicsView, DraggableSpacer)):
+                    col_data.append(widget.symbol)
+            layout_data.append(col_data)
+
+        if path is None:
+            base_dir = os.path.join("saved_layouts", "ctx_layouts")
+            os.makedirs(base_dir, exist_ok=True)
+            
+            default_name = "layout_name"
+            
+            file_path, _ = QFileDialog.getSaveFileName(
+                self, 
+                "Save Layout", 
+                os.path.join(base_dir, default_name + ".json"), 
+                "JSON Files (*.json)"
+            )
+            
+            if file_path:
+                path = file_path
+            else:
+                return
+
+        try:
+            with open(path, 'w') as f:
+                json.dump(layout_data, f, indent=4)
+            print(f"Layout saved to {path}")
+        except Exception as e:
+            print(f"Error saving layout: {e}")
+
     def keyPressEvent(self, event):
         if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_E:
             self.toggle_edit_mode()
+            event.accept()
+            return
+        if event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) and event.key() == Qt.Key.Key_S:
+            self.save_layout()
             event.accept()
             return
         hotkey_press(self, event)
