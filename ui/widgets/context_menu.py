@@ -906,9 +906,8 @@ class ContextButtonWindow(QWidget):
         try:
             with open(path, 'r') as f:
                 new_items = json.load(f)
-            
             self.close()
-            open_context(self.config, self.parent(), new_items, animated=False)
+            open_context(self.config, self.parent(), new_items, animated=True)
         except Exception as e:
             print(f"Error loading layout: {e}")
 
