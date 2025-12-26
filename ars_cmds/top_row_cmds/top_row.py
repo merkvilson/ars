@@ -47,3 +47,4 @@ def execute_cmd(ars_window):
     
     ctx = config.open_context(parent=ars_window.central_widget, items=items)
 
+    ctx.load_layout()
