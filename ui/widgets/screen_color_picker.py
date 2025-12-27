@@ -5,7 +5,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt, QPointF, QTimer, QEasingCurve
 from PyQt6.QtGui import QColor, QPainter, QTransform, QCursor
-from core.cursor_modifier import set_cursor
+from core.cursor_modifier import show_cursor
 import time
 
 
@@ -65,7 +65,7 @@ class ScreenshotOverlay(QWidget):
         self.mouse_timer.start()
         
         # Hide cursor using cursor modifier
-        set_cursor("invisible")
+        show_cursor(False)
         
         # Initialize virtual cursor at current cursor position
         cursor_pos = QCursor.pos()
@@ -157,7 +157,7 @@ class ScreenshotOverlay(QWidget):
             # Call parent callback and close
             if self.animation_picked_color:
                 self.paretn_callback(self.animation_picked_color)
-            set_cursor("cursor")
+            show_cursor(True)
             self.close()
     
     def check_mouse_movement(self):
@@ -304,7 +304,7 @@ class ScreenshotOverlay(QWidget):
                 self.mouse_timer.stop()
                 self.animation_timer.start()
         elif event.button() == Qt.MouseButton.RightButton:
-            set_cursor("cursor")  # Restore cursor before closing
+            show_cursor(True)  # Restore cursor before closing
             self.close()
             
     def keyPressEvent(self, event):
@@ -313,7 +313,7 @@ class ScreenshotOverlay(QWidget):
         """
         if event.key() == Qt.Key.Key_Escape:
             self.mouse_timer.stop()
-            set_cursor("cursor")  # Restore cursor visibility
+            show_cursor(True)  # Restore cursor visibility
             self.close()
     
     def closeEvent(self, event):
@@ -322,5 +322,5 @@ class ScreenshotOverlay(QWidget):
         """
         self.mouse_timer.stop()
         self.animation_timer.stop()
-        set_cursor("cursor")  # Restore cursor visibility
+        show_cursor(True)  # Restore cursor visibility
         super().closeEvent(event)

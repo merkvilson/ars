@@ -111,6 +111,10 @@ class GlobalCursorWatcher(QObject):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseMove:
+            # If cursor is hidden, don't change it
+            if QApplication.overrideCursor() and QApplication.overrideCursor().shape() == Qt.CursorShape.BlankCursor:
+                return False
+
             if QApplication.mouseButtons() != Qt.MouseButton.NoButton:
                 return False
             
