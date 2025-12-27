@@ -62,6 +62,7 @@ class Application:
         sys.exit(self._app.exec())
 
 def main() -> None:
+    print("Starting Airen Studio...")
     app = Application()
     app.run()
 
