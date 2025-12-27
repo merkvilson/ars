@@ -1,1 +1,0 @@
-print("startup command executed")
