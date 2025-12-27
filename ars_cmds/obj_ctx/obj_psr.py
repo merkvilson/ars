@@ -19,6 +19,8 @@ def obj_scale(self, position, callback):
     config.close_on_outside = False
     config.auto_close = False
     config.show_value = True
+    config.close_duplicate = False
+
 
 
     options_list = [

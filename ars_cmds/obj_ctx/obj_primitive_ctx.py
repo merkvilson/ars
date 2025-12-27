@@ -22,6 +22,7 @@ def obj_primitive_ctx(self, position, callback):
     config.close_on_outside = False
     config.auto_close = False
     config.show_value = True
+    config.close_duplicate = False
 
     objs = ['sphere', 'cube', 'plane', 'cylinder', 'cone', 'disc', 'pyramid', 'torus', ]
 

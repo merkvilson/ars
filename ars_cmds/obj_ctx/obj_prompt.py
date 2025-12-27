@@ -33,6 +33,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.custom_width = 450
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
+    config.close_duplicate = False
     # config.incremental_values = {ic.ICON_STEPS: 1, ic.ICON_GIZMO_SCALE: 1}
 
 

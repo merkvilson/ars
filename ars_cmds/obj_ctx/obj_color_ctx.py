@@ -144,7 +144,8 @@ def obj_color(self, position, callback=None):
     config.anchor = "+y"
     config.close_on_outside = False
     config.auto_close = False
-#
+    config.close_duplicate = False
+
     options_list = ["H", "S", "V", "A", ic.ICON_IMAGE, ic.ICON_COLOR_PICKER, ic.ICON_CLOSE_RADIAL,]
 
     if not selected_object():

@@ -27,6 +27,7 @@ def obj_att_mng(ars_window, ):
     config.background_color = (255, 255, 255, 0)
     config.set_arc_range(-180,0)
     config.auto_close = False
+    config.close_duplicate = False
 
 
     
