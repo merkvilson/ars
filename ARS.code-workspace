@@ -5,8 +5,8 @@
 		}
 	],
     "settings": {
-        "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-        "python.terminal.activateEnvironment": true,
+        "python.defaultInterpreterPath": "${workspaceFolder}\\python_embeded\\python.exe",
+        "python.terminal.activateEnvironment": false,
         "files.associations": {
             "*.arsp": "python",
             "*.pyp": "python"
