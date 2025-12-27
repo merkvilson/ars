@@ -84,8 +84,13 @@ class CSprite(CGeometry):
         return {'cfg': self.cfg}
 
     def _update_gl_state(self):
-
-            self._visual.set_gl_state(cull_face=False)
+        alpha = self.get_alpha()
+        has_texture = hasattr(self, 'texture_filter') and self.texture_filter is not None
+        
+        if alpha < 1.0 or has_texture:
+            self._visual.set_gl_state(preset='translucent', cull_face=False)
+        else:
+            self._visual.set_gl_state(preset='opaque', cull_face=False)
 
 
 
