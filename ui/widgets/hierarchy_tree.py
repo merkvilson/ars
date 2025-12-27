@@ -24,7 +24,6 @@ class HierarchyItemDelegate(QStyledItemDelegate):
     BG_NORMAL = QColor(70, 70, 70, 200)
     BG_HOVER = QColor(80, 80, 80, 200)
     BG_SELECTED = QColor(130, 130, 130, 220)
-    BORDER_SELECTED = QColor("#AAAAAA")
 
     RADIUS = 18
     PAD_X = 8
@@ -73,12 +72,6 @@ class HierarchyItemDelegate(QStyledItemDelegate):
         painter.setBrush(bg)
         painter.drawRoundedRect(bg_rect, self.RADIUS, self.RADIUS)
 
-        if opt.state & style.StateFlag.State_Selected:
-            pen = QPen(self.BORDER_SELECTED)
-            pen.setWidth(1)
-            painter.setPen(pen)
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(bg_rect, self.RADIUS, self.RADIUS)
 
         painter.restore()
 
