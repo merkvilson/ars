@@ -55,6 +55,10 @@ db.sqlite3-journal
 *.sublime-workspace
 *.sublime-project
 
+# --- .NET build artifacts (launcher) ---
+portable/launcher/bin/
+portable/launcher/obj/
+
 # --- OS files ---
 .DS_Store
 Thumbs.db
