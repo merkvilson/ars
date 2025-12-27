@@ -19,6 +19,10 @@ ENV/
 env.bak/
 venv.bak/
 
+# --- Portable python (generated) ---
+python_embeded/
+portable/_downloads/
+
 # --- PyInstaller ---
 *.spec
 
