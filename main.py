@@ -20,10 +20,11 @@ os.environ['QT_LOGGING_RULES'] = 'qt.multimedia*=false'
 
 # Suppress FFmpeg stderr output at file descriptor level before any Qt imports
 import sys
-_devnull = os.open(os.devnull, os.O_WRONLY)
-_old_stderr = os.dup(2)
-os.dup2(_devnull, 2)
-os.close(_devnull)
+if os.environ.get("ARS_SHOW_STDERR") != "1":
+    _devnull = os.open(os.devnull, os.O_WRONLY)
+    _old_stderr = os.dup(2)
+    os.dup2(_devnull, 2)
+    os.close(_devnull)
 
 
 import pygame
