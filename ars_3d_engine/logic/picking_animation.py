@@ -17,16 +17,30 @@ class PickPulseAnimator(QtCore.QObject):
             return 1.0 - (1.0 - t) ** 3
 
         # Stop any existing pulse on this object
-        existing = getattr(obj, "_pick_pulse_timer", None)
-        try:
-            if existing is not None:
-                existing.stop()
-        except Exception:
-            pass
+        existing_timer = getattr(obj, "_pick_pulse_timer", None)
+        
+        # If we are interrupting an existing animation, we should try to restore 
+        # the ORIGINAL state before starting the new one, otherwise we drift.
+        # We can check if the object has stored original state.
+        if existing_timer is not None:
+            try:
+                existing_timer.stop()
+                # Restore original state if available
+                if hasattr(obj, "_pick_pulse_orig_scale"):
+                    obj.set_scale(obj._pick_pulse_orig_scale)
+                if hasattr(obj, "_pick_pulse_orig_color"):
+                    obj.set_color(obj._pick_pulse_orig_color)
+            except Exception:
+                pass
 
         try:
             base_scale = obj.get_scale()
             base_color = obj.get_color()  # (r, g, b, a)
+            
+            # Store these as the "original" state for this animation sequence
+            obj._pick_pulse_orig_scale = base_scale
+            obj._pick_pulse_orig_color = base_color
+            
         except Exception:
             return
 
@@ -45,8 +59,19 @@ class PickPulseAnimator(QtCore.QObject):
             if elapsed >= duration_s:
                 timer.stop()
                 try:
-                    obj.set_scale(base_scale)
-                    obj.set_color(base_color)
+                    # Restore from the stored original state to be safe
+                    if hasattr(obj, "_pick_pulse_orig_scale"):
+                        obj.set_scale(obj._pick_pulse_orig_scale)
+                        delattr(obj, "_pick_pulse_orig_scale")
+                    else:
+                        obj.set_scale(base_scale)
+                        
+                    if hasattr(obj, "_pick_pulse_orig_color"):
+                        obj.set_color(obj._pick_pulse_orig_color)
+                        delattr(obj, "_pick_pulse_orig_color")
+                    else:
+                        obj.set_color(base_color)
+                        
                 except Exception:
                     pass
                 try:
@@ -68,8 +93,12 @@ class PickPulseAnimator(QtCore.QObject):
             bright_factor = 1.0 + color_boost * k
 
             try:
-                obj.set_scale((base_scale[0] * scale_factor, base_scale[1] * scale_factor, base_scale[2] * scale_factor))
-                r, g, b, a = base_color
+                # Use the stored base values for calculation
+                current_base_scale = getattr(obj, "_pick_pulse_orig_scale", base_scale)
+                current_base_color = getattr(obj, "_pick_pulse_orig_color", base_color)
+                
+                obj.set_scale((current_base_scale[0] * scale_factor, current_base_scale[1] * scale_factor, current_base_scale[2] * scale_factor))
+                r, g, b, a = current_base_color
                 a2 = a if a >= 1.0 else clamp01(a * bright_factor)
                 obj.set_color((clamp01(r * bright_factor), clamp01(g * bright_factor), clamp01(b * bright_factor), a2))
             except Exception:
