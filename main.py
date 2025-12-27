@@ -26,13 +26,11 @@ os.dup2(_devnull, 2)
 os.close(_devnull)
 
 
-import ctypes
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('airen.studio.ars')
-
 import pygame
 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
 
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QIcon
 from ui.main_window import MainWindow
 
 
@@ -44,6 +42,15 @@ class Application:
 
     def run(self) -> None:
         self._app = QApplication(sys.argv)
+        
+        # Ensure Taskbar icon is consistent on Windows by setting AppUserModelID before QApplication
+        if sys.platform == 'win32':
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('airen.studio.ars')
+        icon_path = os.path.join("res", "icon.ico")
+        if os.path.exists(icon_path):
+            self._app.setWindowIcon(QIcon(icon_path))
+
         self._main_window = MainWindow()
         self._main_window.resize(1280, 720)
         self._main_window.show()
