@@ -71,8 +71,8 @@ def execute_cmd(ars_window):
 
 
             difference = [item for item in set_a if item not in set_b]
-            print(f"Difference items: {difference}")
             if difference:
+                # print(f"Difference items: {difference}")
                 new_items.append(difference)
 
             def filter_nested(nested, correct):
