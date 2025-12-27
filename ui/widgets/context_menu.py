@@ -458,6 +458,7 @@ class ContextMenuConfig:
         self.custom_width = None
         self.custom_height = None
         self.dock_area = None
+        self.close_duplicate = True
 
 class CtxConfig(ContextMenuConfig):
 
@@ -1063,8 +1064,9 @@ def open_context(config=None, parent = None, items = None, position=None, animat
     # Check if a menu with the same items is already open
     for ctx in find_all_open_context_menus(parent):
         if ctx.items == items:
-            ctx.close()
-            return None
+            if config.close_duplicate:
+                ctx.close()
+                return None
 
     play_sound("hover2")
     if parent is None:
