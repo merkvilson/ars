@@ -87,8 +87,8 @@ class ObjectHierarchyWindow(QWidget):
 
         # Tree widget
         self.tree = HierarchyTree(self.container)
-        self.tree.setIndentation(14)
-        self.tree.setIconSize(QSize(24, 24))
+        self.tree.setIndentation(18)
+        self.tree.setIconSize(QSize(26, 26))
         self.tree.setHeaderHidden(True)
         self.tree.header().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tree.setAnimated(True)
