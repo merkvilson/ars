@@ -6,6 +6,7 @@
 - [30%] Implement prefs manager and config classes
 - [20%] Implement plugin system
 
+- [ ] Semi-Dome HDRI Object
 - [ ] Right click on button in CTX menu, should make all b-buttons semi transparent (except the one under cursor) and open radial menu with b-button options.
 - [ ] Move temp values to ars_window.prefs
 - [ ] Implement folder watcher or new file finder function with callbacks.
