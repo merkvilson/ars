@@ -17,8 +17,6 @@ QTreeWidget::viewport {
 QTreeWidget::item, QListWidget#optionsList::item {
     height: 30px;
     padding: 4px;
-    color: rgba(255, 255, 255, 220);
-    border-radius: 18px;
     border: none;
     margin: 2px;
 }
