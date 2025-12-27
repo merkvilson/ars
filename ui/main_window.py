@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Airen Studio 2026 - Alpha Version 0.51")
-        self.setWindowIcon(QIcon(os.path.join("res", "icon.ico")))
+        self.setWindowIcon(QIcon(os.path.join("res", "icon.png")))
         self.radial_menu = None
         self.bubbles_overlay = None
         self.central_widget = None
