@@ -4,14 +4,89 @@ from PyQt6.QtWidgets import (
     QTreeWidget, 
     QTreeWidgetItem, 
     QHeaderView,
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
+    QStyle,
+    QStyleOption,
     QSizePolicy
 )
-from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
+from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor, QPen
 from PyQt6.QtCore import Qt, QSize
 import numpy as np
 from theme import StyleSheets
 from theme.fonts.new_fonts import get_font
 from core.sound_manager import play_sound
+
+
+class HierarchyItemDelegate(QStyledItemDelegate):
+    """Paint item background only behind icon+text, leaving the left indent/branch area transparent."""
+
+    BG_NORMAL = QColor(70, 70, 70, 200)
+    BG_HOVER = QColor(80, 80, 80, 200)
+    BG_SELECTED = QColor(130, 130, 130, 220)
+    BORDER_SELECTED = QColor("#AAAAAA")
+
+    RADIUS = 18
+    PAD_X = 8
+    PAD_Y = 2
+
+    def paint(self, painter: QPainter, option, index):
+        widget = option.widget
+        style = widget.style() if widget else None
+        if style is None:
+            return super().paint(painter, option, index)
+
+        opt = QStyleOptionViewItem(option)
+        # initStyleOption fills icon/text etc.
+        self.initStyleOption(opt, index)
+
+        # Compute the rect that actually contains icon+text.
+        deco = style.subElementRect(style.SubElement.SE_ItemViewItemDecoration, opt, widget)
+        text = style.subElementRect(style.SubElement.SE_ItemViewItemText, opt, widget)
+        content = deco.united(text)
+
+        # Paint background only for the "right pill" area:
+        # start at the icon/text and extend to the right edge of the row.
+        row = opt.rect
+        left = content.left() - self.PAD_X
+        top = row.top() + self.PAD_Y
+        right = row.right() - self.PAD_X
+        bottom = row.bottom() - self.PAD_Y
+        bg_rect = row
+        bg_rect.setLeft(int(left))
+        bg_rect.setTop(int(top))
+        bg_rect.setRight(int(right))
+        bg_rect.setBottom(int(bottom))
+
+        # Pick background for state.
+        if opt.state & style.StateFlag.State_Selected:
+            bg = self.BG_SELECTED
+        elif opt.state & style.StateFlag.State_MouseOver:
+            bg = self.BG_HOVER
+        else:
+            bg = self.BG_NORMAL
+
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(bg)
+        painter.drawRoundedRect(bg_rect, self.RADIUS, self.RADIUS)
+
+        if opt.state & style.StateFlag.State_Selected:
+            pen = QPen(self.BORDER_SELECTED)
+            pen.setWidth(1)
+            painter.setPen(pen)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawRoundedRect(bg_rect, self.RADIUS, self.RADIUS)
+
+        painter.restore()
+
+        # Let the base implementation draw icon/text, but suppress default highlight.
+        opt2 = QStyleOptionViewItem(opt)
+        opt2.state &= ~style.StateFlag.State_Selected
+        opt2.state &= ~style.StateFlag.State_HasFocus
+        super().paint(painter, opt2, index)
 
 
 def create_icon(symbol, color=QColor(255, 255, 255, 180), size=128):
@@ -39,6 +114,27 @@ class HierarchyTree(QTreeWidget):
 
     def on_item_entered(self, item, column):
         play_sound("hover")
+
+    def drawBranches(self, painter: QPainter, rect, index):
+        """Draw only the expand/collapse indicator (no connector lines).
+
+        Those vertical blue stripes are the style's connector lines, which scale with indentation depth.
+        We re-draw the branch primitive with only the flags needed for the arrow.
+        """
+        if not index.isValid():
+            return
+
+        if self.model() is None or not self.model().hasChildren(index):
+            return
+
+        opt = QStyleOption()
+        opt.rect = rect
+        opt.palette = self.palette()
+        opt.state = QStyle.StateFlag.State_Children
+        if self.isExpanded(index):
+            opt.state |= QStyle.StateFlag.State_Open
+
+        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_IndicatorBranch, opt, painter, self)
 
     def dropEvent(self, event):
         # Preserve active object across reorder
@@ -87,12 +183,15 @@ class ObjectHierarchyWindow(QWidget):
 
         # Tree widget
         self.tree = HierarchyTree(self.container)
+        self.tree.setStyle(self.tree.style())  # Remove the proxy style
+        self.tree.setItemDelegate(HierarchyItemDelegate(self.tree))
         self.tree.setIndentation(18)
         self.tree.setIconSize(QSize(26, 26))
         self.tree.setHeaderHidden(True)
         self.tree.header().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tree.setAnimated(True)
         self.tree.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.tree.setAllColumnsShowFocus(False)
         self.tree.setDragEnabled(True)
         self.tree.setAcceptDrops(True)
         self.tree.setDropIndicatorShown(True)
