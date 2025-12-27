@@ -414,7 +414,10 @@ class CGeometry(ABC):
 
     def _update_gl_state(self):
         alpha = self.get_alpha()
-        if alpha < 1.0:
+        # If a texture is attached, we assume it might have transparency, so we use translucent preset.
+        has_texture = hasattr(self, 'texture_filter') and self.texture_filter is not None
+        
+        if alpha < 1.0 or has_texture:
             self._visual.set_gl_state(preset='translucent', cull_face=True)
         else:
             self._visual.set_gl_state(preset='opaque')
@@ -521,6 +524,7 @@ class CGeometry(ABC):
         self._visual.update()
 
         self.texture_path = image_path  # Store the texture path
+        self._update_gl_state()
 
     def get_params(self):
         """
