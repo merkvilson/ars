@@ -1,1 +1,1 @@
-print("quick_test executed")
+print("startup command executed")
