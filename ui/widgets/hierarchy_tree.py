@@ -108,6 +108,16 @@ class HierarchyTree(QTreeWidget):
     def on_item_entered(self, item, column):
         play_sound("hover")
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.MiddleButton:
+            item = self.itemAt(event.pos())
+            if item is not None:
+                item.setExpanded(not item.isExpanded())
+            event.accept()
+            return
+
+        super().mousePressEvent(event)
+
     def drawBranches(self, painter: QPainter, rect, index):
         """Draw only the expand/collapse indicator (no connector lines).
 
