@@ -63,6 +63,8 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(100, lambda: startup_commands(self))
 
     def _setup_ui(self):
+        print("Setting up UI...")
+
         # Background widget
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
