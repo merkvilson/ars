@@ -12,8 +12,6 @@ def generate_mesh(self, ctx):
     
     self.render_manager.set_workflow("mesh"),
 
-
-    self.render_manager.set_workflow("video")
     self.render_manager.set_ud('steps', 20)
     self.render_manager.set_ud('seed', 1)
     self.render_manager.set_ud('resolution', 256)
