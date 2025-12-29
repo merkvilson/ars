@@ -13,6 +13,12 @@ def generate_mesh(self, ctx):
     self.render_manager.set_workflow("mesh"),
 
 
+    self.render_manager.set_workflow("video")
+    self.render_manager.set_ud('steps', 20)
+    self.render_manager.set_ud('seed', 1)
+    self.render_manager.set_ud('resolution', 256)
+
+
     timer = bbox_loading_animation(self.viewport._view.scene)
 
     ctx.update_item(ic.ICON_RENDER , "progress_bar", 1)
