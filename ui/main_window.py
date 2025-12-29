@@ -21,8 +21,11 @@ from ars_cmds.bubble_cmds.render_video import execute_cmd as open_timeline
 from ars_cmds.top_row_cmds.top_row import execute_cmd as open_top_row
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, splash=None):
         super().__init__()
+        self.splash = splash
+        if self.splash: self.splash.show_message("Initializing UI...")
+        
         self.setWindowTitle("Airen Studio 2026 - Alpha Version 0.52")
         
         self.set_app_icon()
@@ -77,6 +80,7 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(100, lambda: startup_commands(self))
 
     def _setup_ui(self):
+        if self.splash: self.splash.show_message("Setting up Viewport...")
         print("Setting up UI...")
 
         # Background widget
@@ -106,6 +110,7 @@ class MainWindow(QMainWindow):
         self.hotkey_manager = HotkeyManager(self.viewport._canvas.native)
 
         # Floating bubbles overlay
+        if self.splash: self.splash.show_message("Loading Bubbles...")
         self.bubbles_overlay = FloatingBubblesManager(parent=self.central_widget)
         self.bubbles_overlay.setGeometry(self.central_widget.rect())
         distribute_bubbles(self)
@@ -129,6 +134,7 @@ class MainWindow(QMainWindow):
 
     def _setup_extensions(self):
         """Initialize optional extensions"""
+        if self.splash: self.splash.show_message("Loading Extensions...")
         try:
             from extensions.cinema_4d.bridge import C4DBridge
             self.c4d_bridge = C4DBridge(self)
