@@ -19,14 +19,14 @@ def distribute_bubbles(self):
                     if hasattr(module, config_var):
                         config_dict = getattr(module, config_var)
                         if isinstance(config_dict, dict):
-                            if not config_dict.get("visible", True):
+                            if not config_dict.get("floating_bubble", False):
                                 continue
                             symbol = config_dict.get("symbol", stem)
                         else:
                             symbol = stem
                     else:
-                        symbol = globals().get(f'ICON_{stem.upper()}', stem)
-                    
+                        # symbol = globals().get(f'ICON_{stem.upper()}', stem)
+                        continue
                     # Get the full file path of the module
                     module_file_path = os.path.abspath(module.__file__)
                     
