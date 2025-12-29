@@ -27,9 +27,10 @@ class C4DBridge(QObject):
         self.running = True
         threading.Thread(target=self._server, daemon=True).start()
     
-    def stop(self):
+    def stop(self, restore=True):
         self.running = False
-        self._restore()
+        if restore:
+            self._restore()
     
     def _server(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
