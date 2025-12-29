@@ -59,7 +59,13 @@ class Application:
         self._main_window.show()
         #self._main_window.showMaximized()
         #self._main_window.showFullScreen()
-        sys.exit(self._app.exec())
+        
+        exit_code = self._app.exec()
+        
+        # Final cleanup
+        pygame.mixer.quit()
+        
+        sys.exit(exit_code)
 
 def main() -> None:
     print("Starting Airen Studio...")
