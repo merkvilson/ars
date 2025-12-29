@@ -2,7 +2,7 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from ars_3d_engine.viewport import ViewportWidget
 from ars_cmds.core_cmds.define_hotkeys import define_hotkeys
 from ars_cmds.core_cmds.distribute_bubbles import distribute_bubbles
@@ -182,5 +182,21 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(3000, self.close)
         else:
             if hasattr(self, 'c4d_bridge'):
-                self.c4d_bridge.stop()
+                self.c4d_bridge.stop(restore=False)
+            
+            # Stop video loop timer if it exists (from render_video bubble)
+            if hasattr(self, '_loop_timer') and self._loop_timer:
+                self._loop_timer.stop()
+                self._loop_timer.deleteLater() #TODO: Find more events that needs cleanup
+
+            # Stop render timer if it exists (from generate_render)
+            if hasattr(self, '_render_timer') and self._render_timer:
+                self._render_timer.stop()
+                self._render_timer.deleteLater()
+
+            # Close Vispy canvas to ensure its threads/resources are released
+            if hasattr(self, 'viewport') and self.viewport and hasattr(self.viewport, '_canvas'):
+                self.viewport._canvas.close()
+
             event.accept()
+            QApplication.instance().quit()
