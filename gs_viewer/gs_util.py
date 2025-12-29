@@ -108,6 +108,6 @@ def load_ply(path):
     return GaussianData(xyz, rots, scales, opacities, shs)
 
 if __name__ == "__main__":
-    gs = load_ply(r"C:\Users\gmerk\Downloads\point_cloud (1).ply")
+    gs = load_ply(r"\Downloads\point_cloud (1).ply")
     a = gs.flat()
     print(a.shape)
