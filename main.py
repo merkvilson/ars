@@ -52,12 +52,6 @@ class Application:
 
         self._app = QApplication(sys.argv)
         
-        icon_path = os.path.join("res", "icon.ico")
-        if not os.path.exists(icon_path):
-            icon_path = os.path.join("res", "icon.png")
-        if os.path.exists(icon_path):
-            self._app.setWindowIcon(QIcon(icon_path))
-
         self._main_window = MainWindow()
         self._main_window.resize(1920, 1080)
         self._main_window.show()
