@@ -29,7 +29,7 @@ if os.environ.get("ARS_SHOW_STDERR") != "1":
 
 from PyQt6.QtWidgets import QApplication
 from ui.widgets.splash_screen import SplashScreen
-
+from tests.splash_screen_test import show_random_message
 
 class Application:
 
@@ -59,6 +59,9 @@ class Application:
         pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
         
         splash.show_message("Loading Core Modules...")
+
+        show_random_message(splash)
+
         from ui.main_window import MainWindow
         
         self._main_window = MainWindow(splash=splash)
