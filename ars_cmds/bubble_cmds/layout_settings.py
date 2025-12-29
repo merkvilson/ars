@@ -21,7 +21,7 @@ def save_layout_as(ars_window, path = None):
         ars_window.bubbles_overlay.save_layout(path)
 
 
-
+BBL_MENU_CONFIG = {"symbol": ic.ICON_MENU, "hotkey": "L"}
 def BBL_MENU(*args):
     run_ext(__file__)
 

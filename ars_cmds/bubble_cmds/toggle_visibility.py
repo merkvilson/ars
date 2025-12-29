@@ -3,7 +3,7 @@ from theme.fonts import font_icons as ic
 from ars_cmds.core_cmds.run_ext import run_ext
 from PyQt6.QtGui import QCursor
 
-
+BBL_EYE_CONFIG = {"symbol": ic.ICON_EYE}
 def BBL_EYE(*arg):
     run_ext(__file__)
 

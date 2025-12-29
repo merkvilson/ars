@@ -11,7 +11,7 @@ from PyQt6.QtCore import QTimer
 from prefs import pref_controller
 
 
-
+BBL_CODE_TERMINAL_CONFIG = {"symbol": ic.ICON_CODE_TERMINAL}  
 def BBL_CODE_TERMINAL(*args):
     run_ext(__file__)
 

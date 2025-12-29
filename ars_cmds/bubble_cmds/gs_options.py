@@ -3,7 +3,7 @@ from ars_cmds.core_cmds.run_ext import run_ext
 from ui.widgets.context_menu import CtxConfig, close_all_open_context_menus
 from PyQt6.QtWidgets import QFileDialog
 
-
+BBL_BUBBLE_CONFIG = {"symbol": ic.ICON_BUBBLE}
 def BBL_BUBBLE(*args):
     run_ext(__file__)
 

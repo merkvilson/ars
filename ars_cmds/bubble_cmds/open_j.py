@@ -6,6 +6,8 @@ from PyQt6.QtGui import QColor
 from ars_cmds.render_cmds.generate_render import generate_render
 from ars_cmds.bubble_cmds.render_video import BBL_VIDEO as open_render_video
 from ars_cmds.bubble_cmds.comfyui_node_editor import BBL_comfyui_node_editor as open_comfyui_node_editor
+
+BBL_WORKFLOW_CONFIG = {"symbol": ic.ICON_WORKFLOW}
 def BBL_WORKFLOW(*args):
     run_ext(__file__)
 
