@@ -25,7 +25,14 @@ static class Program
         // But make this robust by searching upward for main.py.
         var root = FindRoot(exeDir) ?? Path.GetFullPath(Path.Combine(exeDir, "..", ".."));
         var pyRoot = Path.Combine(root, "python_embeded");
-        var pyExe = Path.Combine(pyRoot, "python.exe");
+        
+        // Try ARS_Engine.exe first (custom icon), fallback to python.exe
+        var pyExe = Path.Combine(pyRoot, "ARS_Engine.exe");
+        if (!File.Exists(pyExe))
+        {
+            pyExe = Path.Combine(pyRoot, "python.exe");
+        }
+
         var mainPy = Path.Combine(root, "main.py");
         var logPath = Path.Combine(root, "portable", "portable_run.log");
 

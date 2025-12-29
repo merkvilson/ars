@@ -7,6 +7,10 @@
     <AssemblyName>ARS</AssemblyName>
     <RootNamespace>ArsLauncher</RootNamespace>
     <ApplicationIcon>..\..\res\icon.ico</ApplicationIcon>
+    <Description>Airen Studio Launcher</Description>
+    <Copyright>Copyright © 2025 Airen Studio</Copyright>
+    <Product>Airen Studio</Product>
+    <Version>0.5.2</Version>
   </PropertyGroup>
 
   <!-- Keep Release builds clean for distribution: no PDBs, no SourceLink/repo metadata. -->
