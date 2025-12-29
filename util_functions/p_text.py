@@ -26,7 +26,6 @@ DEFAULT_SKIP_DIRS = ["__pycache__","python_embeded"]
 # DEFAULT_SKIP_DIRS = ["__pycache__", "cinema_4d"]
 DEFAULT_OUTPUT = os.path.join("util_functions", "project_files.txt")  # output file
 SAVE_OUTPUT = True  # set to False to skip saving (for testing)
-SAVE_OUTPUT = False
 # ---------------------------
 
 
@@ -190,8 +189,25 @@ def save_project_files(project_files: Dict[str, str], directory_tree: str, outpu
     """
     Save the directory tree and project files to output_file (overwrites if exists).
     """
+    # Calculate line counts for the summary
+    file_line_counts = []
+    for path, content in project_files.items():
+        if not (content.startswith("[SKIPPED") or content.startswith("[CONTENT TOO LONG")):
+            line_count = len(content.splitlines())
+            file_line_counts.append((path, line_count))
+        else:
+            file_line_counts.append((path, 0))
+
+    # Sort from more to less
+    file_line_counts.sort(key=lambda x: x[1], reverse=True)
+
     try:
         with open(output_file, "w", encoding="utf-8") as f:
+            f.write("=== FILE LINE COUNTS ===\n")
+            for path, count in file_line_counts:
+                f.write(f"{count:6} lines : {path}\n")
+            f.write("\n")
+
             f.write("=== DIRECTORY TREE ===\n")
             f.write(directory_tree)
             f.write("\n\n=== PROJECT FILES ===\n")
