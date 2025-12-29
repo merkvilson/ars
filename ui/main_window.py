@@ -25,11 +25,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Airen Studio 2026 - Alpha Version 0.52")
         
-        icon_path = os.path.join("res", "icon.ico")
-        if not os.path.exists(icon_path):
-            icon_path = os.path.join("res", "icon.png")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+        self.set_app_icon()
 
         self.radial_menu = None
         self.bubbles_overlay = None
@@ -53,9 +49,18 @@ class MainWindow(QMainWindow):
         self.prompt = "marble texture, high detail, 8k"
 
 
+    def set_app_icon(self):
+        icon_path = os.path.join("res", "icon.ico")
+        if not os.path.exists(icon_path):
+            icon_path = os.path.join("res", "icon.png")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.setWindowIcon(icon)
+            QApplication.setWindowIcon(icon)
 
     def execute_startup_commands(self):
         def startup_commands(self):
+            self.set_app_icon() # Double try to ensure icon is applied in Task Manager
             self.bubbles_overlay.load_layout(os.path.join("saved_layouts", "bubble_layout.arsl"))
             define_hotkeys(self)
             self.viewport.grid.start_animation(duration=2)
@@ -64,6 +69,9 @@ class MainWindow(QMainWindow):
             open_top_row(self)
             
             from ars_cmds import startup_cmds
+
+            # Final try after everything is settled
+            QTimer.singleShot(2000, self.set_app_icon)
 
 
         QTimer.singleShot(100, lambda: startup_commands(self))
