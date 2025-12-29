@@ -196,12 +196,16 @@ class AnimatedFrameSaver(latent_preview.LatentPreviewer):
 # Saves each sampling step to output/steps/
 # ============================================================================
 
-def create_step_saver_callback(model, steps, x0_output_dict=None, *args, **kwargs):
+def create_step_saver_callback(model, steps, x0_output_dict=None, *extra_args, **kwargs):
     """Create callback that saves preview at each sampling step"""
     preview_format = "JPEG"
     
     # Try to get previewer
-    previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
+    previewer = None
+    try:
+        previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
+    except Exception:
+        pass
 
     # Fallback: If previewer is None, try forcing Latent2RGB
     # FIX (2025-12-20): Recent ComfyUI updates introduced per-queue preview overrides (set_preview_method)
@@ -209,14 +213,20 @@ def create_step_saver_callback(model, steps, x0_output_dict=None, *args, **kwarg
     # We detect this case and temporarily force Latent2RGB to ensure we get a valid previewer
     # so step saving continues to work regardless of the UI settings.
     if not previewer:
-        # print("[ARS Preview Saver] Previewer is None, attempting to force Latent2RGB...")
-        original_method = args.preview_method
-        args.preview_method = LatentPreviewMethod.Latent2RGB
-        previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
-        args.preview_method = original_method
+        try:
+            # Use getattr to safely access global args.preview_method
+            original_method = getattr(args, 'preview_method', None)
+            if original_method is not None:
+                args.preview_method = LatentPreviewMethod.Latent2RGB
+                previewer = latent_preview.get_previewer(model.load_device, model.model.latent_format)
+                args.preview_method = original_method
+        except Exception:
+            # Skip if previewer cannot be forced (e.g. non-image workflows)
+            pass
+
     pbar = comfy.utils.ProgressBar(steps)
     
-    def callback(step, x0, x, total_steps, *args, **kwargs):
+    def callback(step, x0, x, total_steps, *cb_args, **cb_kwargs):
         # Update output dict if provided
         if x0_output_dict is not None:
             x0_output_dict["x0"] = x0
