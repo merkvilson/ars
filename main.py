@@ -42,12 +42,16 @@ class Application:
         self._main_window = None
 
     def run(self) -> None:
-        self._app = QApplication(sys.argv)
-        
         # Ensure Taskbar icon is consistent on Windows by setting AppUserModelID before QApplication
         if sys.platform == 'win32':
             import ctypes
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('airen.studio.ars')
+            try:
+                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('airen.studio.ars')
+            except Exception:
+                pass
+
+        self._app = QApplication(sys.argv)
+        
         icon_path = os.path.join("res", "icon.ico")
         if not os.path.exists(icon_path):
             icon_path = os.path.join("res", "icon.png")
