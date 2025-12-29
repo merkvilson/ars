@@ -34,6 +34,11 @@ class prefsConfig:
         self.render_seed = 12345
         self.render_prompt = "a beautiful landscape, high detail, 8k"
 
+        # Render Mesh
+        self.mesh_steps = 20
+        self.mesh_seed = 1
+        self.mesh_resolution = 256
+
         # Timeline / Render Video
         self.timeline_frame = 10
         self.timeline_fps = 30
