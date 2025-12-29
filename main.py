@@ -27,12 +27,8 @@ if os.environ.get("ARS_SHOW_STDERR") != "1":
     os.close(_devnull)
 
 
-import pygame
-pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)  # Standard settings for short sounds
-
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QIcon
-from ui.main_window import MainWindow
+from ui.widgets.splash_screen import SplashScreen
 
 
 class Application:
@@ -52,16 +48,36 @@ class Application:
 
         self._app = QApplication(sys.argv)
         
-        self._main_window = MainWindow()
+        # Show splash screen IMMEDIATELY
+        splash = SplashScreen()
+        splash.show()
+        splash.show_message("Starting Airen Studio...")
+        
+        # Now do the heavy imports and initialization
+        splash.show_message("Loading Audio Engine...")
+        import pygame
+        pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+        
+        splash.show_message("Loading Core Modules...")
+        from ui.main_window import MainWindow
+        
+        self._main_window = MainWindow(splash=splash)
+        
+        splash.show_message("Preparing Workspace...")
         self._main_window.resize(1920, 1080)
         self._main_window.show()
-        #self._main_window.showMaximized()
-        #self._main_window.showFullScreen()
+        
+        # Close splash screen after main window is shown
+        splash.close()
         
         exit_code = self._app.exec()
         
         # Final cleanup
-        pygame.mixer.quit()
+        try:
+            import pygame
+            pygame.mixer.quit()
+        except ImportError:
+            pass
         
         sys.exit(exit_code)
 
