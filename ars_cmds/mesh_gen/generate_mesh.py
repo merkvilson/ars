@@ -12,9 +12,9 @@ def generate_mesh(self, ctx):
     
     self.render_manager.set_workflow("mesh"),
 
-    self.render_manager.set_ud('steps', 20)
-    self.render_manager.set_ud('seed', 1)
-    self.render_manager.set_ud('resolution', 256)
+    self.render_manager.set_ud('steps', self.prefs.mesh_steps)
+    self.render_manager.set_ud('seed', self.prefs.mesh_seed)
+    self.render_manager.set_ud('resolution', self.prefs.mesh_resolution)
 
 
     timer = bbox_loading_animation(self.viewport._view.scene)
