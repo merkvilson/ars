@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.splash = splash
         if self.splash: self.splash.show_message("Initializing UI...")
         
-        self.setWindowTitle("Airen Studio 2026 - Alpha Version 0.52")
+        self.setWindowTitle("Airen Studio 2026 - Alpha Version")
         
         self.set_app_icon()
 
