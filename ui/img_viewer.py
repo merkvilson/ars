@@ -7,7 +7,6 @@ from PyQt6.QtGui import QPixmap, QWheelEvent, QMouseEvent, QPen, QColor, QPainte
 from PyQt6.QtCore import Qt, QRectF, QPointF, QVariantAnimation
 from PIL import Image, ImageSequence
 from PyQt6.QtWidgets import QApplication
-from ui.widgets.context_menu import close_all_open_context_menus
 
 class ImageViewer(QGraphicsView):
     def __init__(self, scene, parent=None):
@@ -120,8 +119,6 @@ class ImageViewer(QGraphicsView):
             ars_window = QApplication.instance().activeWindow() # This returns the main window instance
             ars_window.img.hide()
             ars_window.viewport.show()
-
-            close_all_open_context_menus()
 
         super().keyPressEvent(event)
 
