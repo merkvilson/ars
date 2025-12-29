@@ -26,6 +26,8 @@ DEFAULT_SKIP_DIRS = ["__pycache__","python_embeded"]
 # DEFAULT_SKIP_DIRS = ["__pycache__", "cinema_4d"]
 DEFAULT_OUTPUT = os.path.join("util_functions", "project_files.txt")  # output file
 SAVE_OUTPUT = True  # set to False to skip saving (for testing)
+SAVE_OUTPUT = False
+
 # ---------------------------
 
 
