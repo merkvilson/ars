@@ -95,6 +95,7 @@ def generate_render(self, ctx, max_steps, default_object):
                             self.viewport.bg.set_image(file_to_apply)
                         else:
                             ctx.update_item(ic.ICON_IMAGE, "image_path", file_to_apply)
+                            ctx.update_custom_widget("PromptEditorWidget", lambda widget: widget.set_image(file_to_apply))
                         if not self.viewport.isVisible() and hasattr(self, 'img') and self.img:
                             self.img.open_image(file_to_apply)
                 except:
