@@ -109,6 +109,6 @@ def generate_render(self, ctx, max_steps, default_object):
         
     # Start the timer
     update_timer.timeout.connect(apply_latest_texture)
-    update_timer.start(100)
+    update_timer.start(300)
     
     self._render_timer = update_timer
