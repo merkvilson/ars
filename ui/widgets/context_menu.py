@@ -413,7 +413,7 @@ class ContextMenuConfig:
         self.distribution_mode = 'y'  # Options: "x", "y", "radial"
         self.anchor = "-y"  # Options: "-y", "+y", "-x", "+x"
         self.close_on_outside = True
-        self.background_color = (80, 80, 80, 30)
+        self.background_color = (80, 80, 80, 60)
         self.background_corner_radius = 22.0
         self.font = get_font(20)
         self.additional_font = QFont("Arial", 10)
