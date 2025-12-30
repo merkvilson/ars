@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?t77iuu');
-  src:  url('fonts/icomoon.eot?t77iuu#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?t77iuu') format('truetype'),
-    url('fonts/icomoon.woff?t77iuu') format('woff'),
-    url('fonts/icomoon.svg?t77iuu#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?btmul9');
+  src:  url('fonts/icomoon.eot?btmul9#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?btmul9') format('truetype'),
+    url('fonts/icomoon.woff?btmul9') format('woff'),
+    url('fonts/icomoon.svg?btmul9#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,111 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-point-fill:before {
+  content: "\e9ca";
+}
+.icon-text-cursor:before {
+  content: "\e9cb";
+}
+.icon-arrow-bar-down:before {
+  content: "\e9cc";
+}
+.icon-arrow-bar-left:before {
+  content: "\e9cd";
+}
+.icon-arrow-bar-right:before {
+  content: "\e9ce";
+}
+.icon-arrow-bars-h:before {
+  content: "\e9cf";
+}
+.icon-arrow-bar-up:before {
+  content: "\e9d0";
+}
+.icon-arrows-diff:before {
+  content: "\e9d1";
+}
+.icon-arrows-exchange-2:before {
+  content: "\e9d2";
+}
+.icon-arrows-left-right:before {
+  content: "\e9d3";
+}
+.icon-arrows-move-horizontal:before {
+  content: "\e9d4";
+}
+.icon-arrows-move-vertical:before {
+  content: "\e9d5";
+}
+.icon-caret-down:before {
+  content: "\e9d6";
+}
+.icon-caret-left:before {
+  content: "\e9d7";
+}
+.icon-caret-left-right:before {
+  content: "\e9d8";
+}
+.icon-caret-right:before {
+  content: "\e9d9";
+}
+.icon-caret-up:before {
+  content: "\e9da";
+}
+.icon-caret-up-down:before {
+  content: "\e9db";
+}
+.icon-check:before {
+  content: "\e9dc";
+}
+.icon-click:before {
+  content: "\e9dd";
+}
+.icon-cursor:before {
+  content: "\e9de";
+}
+.icon-hand2:before {
+  content: "\e9df";
+}
+.icon-hierarchy:before {
+  content: "\e9e0";
+}
+.icon-invisible:before {
+  content: "\e9e1";
+}
+.icon-locate:before {
+  content: "\e9e2";
+}
+.icon-map-pin:before {
+  content: "\e9e3";
+}
+.icon-obj-focus:before {
+  content: "\e9e4";
+}
+.icon-obj-focus-off:before {
+  content: "\e9e5";
+}
+.icon-point:before {
+  content: "\e9e6";
+}
+.icon-pointer:before {
+  content: "\e9e7";
+}
+.icon-pointer-off:before {
+  content: "\e9e8";
+}
+.icon-rotate-x:before {
+  content: "\e9e9";
+}
+.icon-rotate-y:before {
+  content: "\e9ea";
+}
+.icon-rotate-z:before {
+  content: "\e9eb";
+}
+.icon-s-turn-up:before {
+  content: "\e9ec";
+}
 .icon-focus:before {
   content: "\e920";
 }
