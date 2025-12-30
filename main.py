@@ -67,7 +67,7 @@ class Application:
         self._main_window = MainWindow(splash=splash)
         
         splash.show_message("Preparing Workspace...")
-        self._main_window.resize(1920, 1080)
+        self._main_window.resize(1280, 720)
         self._main_window.show()
         
         # Close splash screen after main window is shown
