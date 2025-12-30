@@ -107,25 +107,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         #     copy_file_to_dir(get_path('last_step'), get_path('input'), "mesh", False)
 
 
-    def swap_imge(self):
-        if self.viewport.isVisible():
-            def post_screenshot():
-                # ctx.update_item(ic.ICON_IMAGE, "image_path", os.path.join(get_path('input'), "vp_screenshot.png") )
-                files = os.listdir(get_path('steps')) 
-                full_paths = [os.path.join(get_path('steps'), f) for f in files]
-                if full_paths:
-                    latest_file = max(full_paths, key=os.path.getmtime)
-                    if hasattr(self, 'img') and self.img:
-                        self.img.open_image(latest_file)
-                self.swap_widgets()
-                if full_paths: self.img.fit_image()
-            make_screenshot(self, callback=post_screenshot, x=200, y=200, name="vp_screenshot.png")
-        else:
-            self.swap_widgets()
-            # if get_path('last_step'):
-            #     ctx.update_item(ic.ICON_IMAGE, "image_path",get_path('last_step') )
-
-
 
     config.callbackL = {
         ic.ICON_PLAYER_PLAY: lambda: start_vp_img_render(0),
