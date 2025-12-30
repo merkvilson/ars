@@ -29,7 +29,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.use_extended_shape = False
     config.distribution_mode = "x"
     config.anchor = "+y"
-    config.custom_height = 260 + (140 if default_object == self and self.viewport.isVisible() else 0)
+    config.custom_height = 260
     config.custom_width = 410
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
@@ -125,7 +125,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         default_object.prompt = editor.toPlainText()
 
     editor = PromptEditor()
-    editor.setFixedSize(400, 140 +( 140 if default_object == self and self.viewport.isVisible() else 0))
+    editor.setFixedSize(400, 140)
     editor.setPlainText(default_object.prompt)
     editor.textChanged.connect(set_text_from_prompt)
 
