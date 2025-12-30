@@ -7,6 +7,8 @@ from PyQt6.QtGui import (
     QTextCursor,
     QPainter,
     QPen,
+    QPixmap,
+    QBrush,
 )
 from PyQt6.QtWidgets import QWidget, QApplication, QPlainTextEdit
 from ars_cmds.core_cmds.run_ext import run_string_code
@@ -55,6 +57,7 @@ class BaseCodeEditor(QPlainTextEdit):
         self.update_line_number_area_width(0)
         self.custom_namespace = {}
         self.project_file_path = None
+        self.current_image_path = None
         self.multi_cursors = []
         self._last_click_was_alt = False
         
@@ -107,7 +110,7 @@ class BaseCodeEditor(QPlainTextEdit):
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setStyleSheet(
             "QPlainTextEdit {"
-            f"background-color: rgba(40, 40, 40, 0.60);"
+            "background: transparent;"
             "color: #abb2bf;"
             "border: none;"
             "border-radius: 20px;"
@@ -118,6 +121,7 @@ class BaseCodeEditor(QPlainTextEdit):
         
         # Install event filter on viewport to catch mouse events reliably
         self.viewport().installEventFilter(self)
+        self.viewport().setAutoFillBackground(False)
         
         # Multi-cursor blinking
         self._cursor_blink_timer = QTimer(self)
@@ -203,16 +207,12 @@ class BaseCodeEditor(QPlainTextEdit):
     def set_alpha(self, alpha: float):
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
         self.current_alpha = alpha
-        self.setStyleSheet(
-            "QPlainTextEdit {"
-            f"background-color: rgba(20, 20, 20, {alpha});"
-            "color: #abb2bf;"
-            "border: none;"
-            "border-radius: 20px;"
-            "selection-color: #ffffff;"
-            "selection-background-color: #3e4451;"
-            "}"
-        )
+        self.viewport().update()
+
+    def set_image(self, path: str):
+        """Set an image as the background of the editor."""
+        self.current_image_path = path.replace("\\", "/")
+        self.viewport().update()
 
     def setFont(self, font):
         """Override setFont to keep line number area and completion popup in sync."""
@@ -292,6 +292,20 @@ class BaseCodeEditor(QPlainTextEdit):
         super().mousePressEvent(event)
 
     def viewportEvent(self, event):
+        if event.type() == QEvent.Type.Paint:
+            painter = QPainter(self.viewport())
+            
+            # 1. Draw background image if exists
+            if self.current_image_path and os.path.exists(self.current_image_path):
+                pixmap = QPixmap(self.current_image_path)
+                if not pixmap.isNull():
+                    painter.drawPixmap(self.viewport().rect(), pixmap)
+            
+            # 2. Draw background color overlay
+            overlay_color = QColor(20, 20, 20, int(self.current_alpha * 255))
+            painter.fillRect(self.viewport().rect(), overlay_color)
+            painter.end()
+
         result = super().viewportEvent(event)
         if event.type() == QEvent.Type.Paint:
             self._paint_multi_cursors()
