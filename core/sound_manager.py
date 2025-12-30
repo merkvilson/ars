@@ -45,7 +45,7 @@ def play_sound(name, volume=0.5):  # Default to half volume; pass a different va
     elif name == "hover2": volume = 0.6
     elif name == "delete-obj": volume = 0.6
     elif name == "click": volume = 0.06
-    elif name == "revert": volume = 0.2
+    elif name == "revert": volume = 0.08
     if not _ensure_mixer():
         return
     sound = _load_sound_cached(name)
