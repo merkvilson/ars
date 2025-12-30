@@ -29,7 +29,7 @@ if os.environ.get("ARS_SHOW_STDERR") != "1":
 
 from PyQt6.QtWidgets import QApplication
 from ui.widgets.splash_screen import SplashScreen
-from tests.splash_screen_test import show_random_message
+from tests.splash_screen_test import show_test_message
 
 class Application:
 
@@ -60,7 +60,7 @@ class Application:
         
         splash.show_message("Loading Core Modules...")
 
-        show_random_message(splash)
+        show_test_message(splash)
 
         from ui.main_window import MainWindow
         
