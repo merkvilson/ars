@@ -299,7 +299,20 @@ class BaseCodeEditor(QPlainTextEdit):
             if self.current_image_path and os.path.exists(self.current_image_path):
                 pixmap = QPixmap(self.current_image_path)
                 if not pixmap.isNull():
-                    painter.drawPixmap(self.viewport().rect(), pixmap)
+                    # "Cover" scaling: keep aspect ratio, fill viewport, crop overflow.
+                    vp_rect = self.viewport().rect()
+                    vp_w = vp_rect.width()
+                    vp_h = vp_rect.height()
+                    pm_w = pixmap.width()
+                    pm_h = pixmap.height()
+
+                    if vp_w > 0 and vp_h > 0 and pm_w > 0 and pm_h > 0:
+                        scale = max(vp_w / pm_w, vp_h / pm_h)
+                        draw_w = int(pm_w * scale)
+                        draw_h = int(pm_h * scale)
+                        draw_x = int((vp_w - draw_w) / 2)
+                        draw_y = int((vp_h - draw_h) / 2)
+                        painter.drawPixmap(QRect(draw_x, draw_y, draw_w, draw_h), pixmap)
             
             # 2. Draw background color overlay
             overlay_color = QColor(20, 20, 20, int(self.current_alpha * 255))
