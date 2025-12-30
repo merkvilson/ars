@@ -33,7 +33,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.custom_width = 410
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
-    config.close_duplicate = False
+    # config.close_duplicate = False
     # config.incremental_values = {ic.ICON_STEPS: 1, ic.ICON_GIZMO_SCALE: 1}
 
 
@@ -144,7 +144,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         default_object.prompt = editor.toPlainText()
 
     editor = PromptEditor()
-    editor.setFixedSize(400, 140 + 140 if default_object == self and self.viewport.isVisible() else 0)
+    editor.setFixedSize(400, 140 +( 140 if default_object == self and self.viewport.isVisible() else 0))
     editor.setPlainText(default_object.prompt)
     editor.textChanged.connect(set_text_from_prompt)
 
