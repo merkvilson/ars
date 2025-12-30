@@ -29,8 +29,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     config.use_extended_shape = False
     config.distribution_mode = "x"
     config.anchor = "+y"
-    config.custom_height = 260 + (300 if default_object == self and self.viewport.isVisible() else 0)
-    config.custom_width = 450
+    config.custom_height = 260 + (140 if default_object == self and self.viewport.isVisible() else 0)
+    config.custom_width = 410
     config.extra_distance = [0,(config.item_radius * 2) - 6 ]
     config.incremental_value = True
     config.close_duplicate = False
@@ -47,12 +47,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
 
     ["   ",ic.ICON_CLOSE_RADIAL,"   "],
     ]
-
-    if default_object == self and self.viewport.isVisible():
-            options_list.insert(0, [ic.ICON_IMAGE])
-    config.image_items = {ic.ICON_IMAGE: r" "}
-    config.use_extended_shape_items = {ic.ICON_IMAGE: (9.5, 6)}
-    config.per_item_radius = { ic.ICON_IMAGE: 23,}
 
     config.slider_values = {
         ic.ICON_STEPS: (1, 50, default_object.steps),
@@ -116,7 +110,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
     def swap_imge(self):
         if self.viewport.isVisible():
             def post_screenshot():
-                ctx.update_item(ic.ICON_IMAGE, "image_path", os.path.join(get_path('input'), "vp_screenshot.png") )
+                # ctx.update_item(ic.ICON_IMAGE, "image_path", os.path.join(get_path('input'), "vp_screenshot.png") )
                 files = os.listdir(get_path('steps')) 
                 full_paths = [os.path.join(get_path('steps'), f) for f in files]
                 if full_paths:
@@ -128,8 +122,8 @@ def prompt_ctx(self, position, default_object = None, callback = None):
             make_screenshot(self, callback=post_screenshot, x=200, y=200, name="vp_screenshot.png")
         else:
             self.swap_widgets()
-            if get_path('last_step'):
-                ctx.update_item(ic.ICON_IMAGE, "image_path",get_path('last_step') )
+            # if get_path('last_step'):
+            #     ctx.update_item(ic.ICON_IMAGE, "image_path",get_path('last_step') )
 
 
 
@@ -140,8 +134,6 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         ic.ICON_OBJ_HEXAGONS: lambda: convert_sprite_to_mesh(),
         ic.ICON_SAVE: lambda: save_output("render"),
         ic.ICON_CLOSE_RADIAL: lambda: (realtime_timer.stop(), ctx.close(), callback(self)),
-        ic.ICON_IMAGE: lambda: swap_imge(self),
-
     }
     def move_ctx():ctx.move(self.central_widget.mapFromGlobal(QCursor.pos())- QPoint(ctx.width()//2, ctx.height() - config.item_radius) )
     config.callbackR = { ic.ICON_CLOSE_RADIAL: lambda: key_check_continuous(callback=move_ctx, key='right', interval=4) }
@@ -152,7 +144,7 @@ def prompt_ctx(self, position, default_object = None, callback = None):
         default_object.prompt = editor.toPlainText()
 
     editor = PromptEditor()
-    editor.setFixedSize(440, 140)
+    editor.setFixedSize(400, 140 + 140 if default_object == self and self.viewport.isVisible() else 0)
     editor.setPlainText(default_object.prompt)
     editor.textChanged.connect(set_text_from_prompt)
 
