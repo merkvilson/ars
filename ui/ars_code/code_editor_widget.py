@@ -68,6 +68,10 @@ class CodeEditorWidget(QWidget):
         """Set editor transparency."""
         self.code_editor.set_alpha(alpha)
     
+    def set_image(self, path):
+        """Set editor background image."""
+        self.code_editor.set_image(path)
+    
     def clear_terminal(self):
         """Clear the terminal output."""
         self.terminal.clear_terminal()
