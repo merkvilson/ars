@@ -795,7 +795,13 @@ class ContextButtonWindow(QWidget):
             if item.symbol == item_symbol:
                 item.set_updated_config(config_key, value)
                 break
-            
+
+    def update_custom_widget(self, item_symbol, callback):
+        if item_symbol in self.config.custom_widget_items:
+            widget = self.config.custom_widget_items[item_symbol]
+            if widget:
+                callback(widget)
+
     def set_alpha(self, alpha: float):
         """Set the alpha (transparency) value. Alpha should be a value 0-1."""
         r, g, b, _ = self.bg_color
