@@ -14,6 +14,7 @@ def execute_cmd(ars_window):
     config.close_on_outside = False
     config.use_extended_shape = False
     config.distribution_mode = "x"
+    config.background_color = (0,0,0,0)
 
 
     items = ["   ",]

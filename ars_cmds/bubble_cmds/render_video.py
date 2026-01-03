@@ -161,7 +161,7 @@ def execute_cmd(ars_window):
     config.dock_area = "bottom"
     config.incremental_value = True
     config.incremental_values = {"timeline": False,}
-    #config.custom_width = 450
+    config.background_color = (0,0,0,0)
 
 
     options_list=    [
