@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
 
     def _setup_ui(self):
         if self.splash: self.splash.show_message("Setting up Viewport...")
-        print("Setting up UI...")
 
         # Background widget
         self.central_widget = QWidget(self)
